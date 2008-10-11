@@ -1,0 +1,11 @@
+Package: Rgis
+Type: Package
+Title: Geographic data for mapping and analysis
+Version: 0.1
+Date: 2008-10-07
+Depends: sp
+Author: Robert Hijmans
+Maintainer: <r.hijmans@gmail.com>
+Description: Download and read geographic data
+License: GPLv3
+LazyLoad: yes

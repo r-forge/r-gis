@@ -2,6 +2,7 @@
 \alias{read.adm}
 \alias{list.adm}
 \alias{remove.adm}
+\alias{list.ISO3}
 
 \title{ Read administrative boundary spatial features and attributes by country }
 \description{
@@ -15,12 +16,16 @@
 read.adm(ISO3="ABW", level = 0, download=TRUE)
 list.adm(ISO3=NA, level=NA)
 remove.adm(ISO3=NA, level=NA)
+list.ISO3(start=1, end=243)
+
 }
 
 \arguments{
   \item{ISO3}{ The \code{ISO3} code for a country }
   \item{level}{ The \code{level} of administrative division; 0 is country, 1 is first level of subdivision, etc. }
   \item{download}{ if \code{download} is TRUE, the data are downloaded to the local system if they are not there. }
+  \item{start}{ an integer between 1 and 243 that can be used to display a subset of the country names and ISO3 codes }
+  \item{end}{ an integer between 1 and 243 that can be used to display a subset of the country names and ISO3 codes }
 }
 \details{
 	In remove.adm the keyword \code{ALL} can be used as a value for ISO3 to remove all adm files on disk.

@@ -5,13 +5,9 @@
 # Version 1, October 2008
 
 
-
-
-
 read.adm <- function(ISO3="ABW", level=0, download=TRUE) {
 	pack <- "Rgis"
 	varname <- "adm_"
-	
 	filename <- system.file(paste("data/", varname, ISO3, level, ".RData", sep=""), package=pack)
 	# if file does not exist, filename will be ""
 	if (nchar(filename) == 0) {
@@ -25,7 +21,6 @@ read.adm <- function(ISO3="ABW", level=0, download=TRUE) {
 			cat("\nFile not available locally. Use 'download = TRUE'\n")
 		}
 	}	
-		
 	if (nchar(filename) > 0) {
 		thisenvir = new.env()
 		data <- get(load(filename, thisenvir), thisenvir)
