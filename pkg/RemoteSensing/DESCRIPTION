@@ -1,0 +1,11 @@
+Package: RemoteSensing
+Type: Package
+Title: Remote sensing 
+Version: 0.1
+Date: 2008-10-07
+Depends: raster, bitops
+Author: Yann Chemin
+Maintainer: <y.chemin@gmail.com>
+Description: Sattelite image analysis algorithms
+License: GPLv3
+LazyLoad: yes
