@@ -4,24 +4,24 @@
 # License GPL3
 # Version 1, October 2008
 
+read.adm <- function(ISO3="ABW", level=0, download=TRUE ) {
+	varname <- "adm"	
 
-read.adm <- function(ISO3="ABW", level=0, download=TRUE) {
-	pack <- "Rgis"
-	varname <- "adm_"
-	filename <- system.file(paste("data/", varname, ISO3, level, ".RData", sep=""), package=pack)
-	# if file does not exist, filename will be ""
-	if (nchar(filename) == 0) {
+# path should become a variable that user can set:	
+	path=paste(system.file(package="Rgis"),'/data/', sep='')
+	
+	filename <- paste(path, varname, '_', ISO3, level, ".RData", sep="")
+	if (!file.exists(filename)) {
 		if (download) {
-			theurl <- paste("http://biogeo.berkeley.edu/R/adm/", varname, ISO3, level, ".RData", sep="")
-			destfilename <- paste(system.file(package=pack), "/data/", varname, ISO3, level, ".RData", sep="")
-			download.file(url=theurl, destfile=destfilename, method="auto", quiet = FALSE, mode = "wb", cacheOK = TRUE)
-			filename <- system.file(paste("data/", varname, ISO3, level, ".RData", sep=""), package=pack)
-			if (nchar(filename) == 0) { cat("\nCould not download file -- perhaps it does not exist\n\n") }
-			} else {
+			theurl <- paste("http://www.r-gis.org/rgis/data/adm/", varname, '_', ISO3, level, ".RData", sep="")
+			download.file(url=theurl, destfile=filename, method="auto", quiet = FALSE, mode = "wb", cacheOK = TRUE)
+			if (!file.exists(filename))
+				{ cat("\nCould not download file -- perhaps it does not exist\n\n") }
+		} else {
 			cat("\nFile not available locally. Use 'download = TRUE'\n")
 		}
 	}	
-	if (nchar(filename) > 0) {
+	if (file.exists(filename)) {
 		thisenvir = new.env()
 		data <- get(load(filename, thisenvir), thisenvir)
 		return(data)
@@ -39,7 +39,6 @@ list.ISO3 <- function(start=1, end=243) {
 
 list.adm <- function(ISO3=NA, level=NA) {
 	pack <- "Rgis"
-
 	if (is.na(ISO3)) {
 		if (is.na(level)) {
 			ISOS <- list.files(paste(system.file(package=pack),"/data", sep=""), pattern = "^adm_",full.names=TRUE)
@@ -69,7 +68,7 @@ list.adm <- function(ISO3=NA, level=NA) {
 
 remove.adm <- function(ISO3=NA, level=NA) {
 	pack <- "Rgis"
-	varname <- "adm_"
+	varname <- "adm"
 	if (is.na(ISO3)) {cat("\nSpecify a country (ISO3) code.\n") 
 	} else if (ISO3 == "ALL") {
 		if (is.na(level)) {
@@ -84,14 +83,14 @@ remove.adm <- function(ISO3=NA, level=NA) {
 	} else {
 		if (is.na(level)) {
 			for (i in 0:5) {
-				filename <- system.file(paste("data/", varname, ISO3, i, ".RData", sep=""), package=pack)
+				filename <- system.file(paste("data/", varname, '_', ISO3, i, ".RData", sep=""), package=pack)
 				if (nchar(filename) > 0) { 
 					res <- file.remove(filename) 
 					if (res) {cat("removed", ISO3, i, "\n") }
 				}	
 			}	
 		} else {
-			filename <- system.file(paste("data/", varname, ISO3, level, ".RData", sep=""), package=pack)
+			filename <- system.file(paste("data/", varname, '_', ISO3, level, ".RData", sep=""), package=pack)
 			if (nchar(filename) > 0) { 
 				res <- file.remove(filename) 
 				if (res) {cat("removed", ISO3, level, "\n") }
