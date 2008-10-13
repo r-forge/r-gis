@@ -1,0 +1,4 @@
+importFrom("methods", Ops, Arith, Compare, Logic, Math, Math2, Summary, Complex)
+exportClasses(Raster, RasterStack)
+exportMethods(show)
+exportPattern("^[^\\.]")
