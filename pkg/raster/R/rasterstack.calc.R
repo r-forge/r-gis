@@ -20,7 +20,7 @@ rasterstack.calc <- function(rasterstack, fun, filename=NA, overwrite=FALSE, For
 		for (r in 1:rasterstack@nrows) {
 			rasterstack <- rasterstack.read.row(rasterstack, r)
 			out.raster@data@values <- as.array(apply(rowdata@data@values, 1, fun))
-			raster.write.binary.row(out.raster, r, overwrite)
+			raster.write.row(out.raster, r, overwrite)
 		}
 	}		
 	return(out.raster)

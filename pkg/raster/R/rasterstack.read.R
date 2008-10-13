@@ -25,7 +25,7 @@
  rasterstack.read.part.of.row <- function(rasterstack, rownumber, startcol=1, ncols=(rasterstack@ncols-startcol+1)) {
 	band <- 1
 	for (i in 1:length(rasterstack@rasters)) {
-		rs <- raster.read.part.of.row(rasterstack@rasters[[i]], rownumber, startcol, ncols, band)
+		rs <- raster.read.part.of.row(rasterstack@rasters[[i]], rownumber, startcol, ncols)
 		if ( i == 1 )  {
 			dd <- as.matrix(rs@data@values)
 		}

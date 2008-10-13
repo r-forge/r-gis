@@ -6,11 +6,14 @@
 \alias{raster.read.block}
 \alias{raster.read.cells}
 \alias{raster.read.xy}
+\alias{raster.get.matrix}
 
 \title{ Read from a raster data file }
 \description{
   Data associated with a raster object are read from file. Either all the data, by row, part of row, block, by cellnumber, or for (x,y) coordinates.
   Data can be read for Rgis binary files, as well as for many other formats (via a bridge to rgdal).
+  raster.get.matrix will return a matrix, optionally with the row and col numbers as names of the whole or part of the data that has been previously 
+  read with raster.read.all, read.row, read.part.of.row, read.block
 }
 
 \usage{
@@ -21,6 +24,7 @@ raster.read.part.of.row(raster, rownr,  startcol=1, ncols=(raster@ncols-startcol
 raster.read.block(raster, startrow, nrows=3, startcol=1, ncols=(raster@ncols-startcol+1)) 
 raster.read.cells(raster, cells)
 raster.read.xy(raster, xy)
+raster.get.matrix(raster, names=FALSE)
 }
 
 \arguments{
@@ -32,11 +36,14 @@ raster.read.xy(raster, xy)
   \item{ncols}{ number of columns to read on this each row ( (>= 1 & <= raster@ncols & > firstcol) }
   \item{cells}{ vector of cell numbers }
   \item{xy}{ x and y coordinates  }
+  \item{names}{ If TRUE, row and col names are provided }
 }
 \details{
 }
 \value{
-  a vector with raster values.  
+  a rater object containing a vector with raster values.  
+  or rater values for a set of points
+  or a matrix with raster values
 }
 \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} }
 

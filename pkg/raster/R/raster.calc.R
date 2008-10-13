@@ -12,7 +12,7 @@ raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALS
 	if (raster@data@content == 'all') {
 		out.raster@data@values <- as.vector(fun(raster@data@values)) 
 		if (!is.na(filename)) {
-			out.raster <- raster.write.binary(out.raster, overwrite=overwrite)
+			out.raster <- raster.write(out.raster, overwrite=overwrite)
 		}	
 	} else if (raster@data@source == 'disk') {
 		for (r in 1:raster@nrows) {
@@ -27,7 +27,7 @@ raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALS
 				}		
 			} else {
 				out.raster@data@values <- values 
-				out.raster <- raster.write.binary.row(out.raster, r, overwrite=overwrite)	
+				out.raster <- raster.write.row(out.raster, r, overwrite=overwrite)
 				if (r == raster@nrows ) {
 					out.raster@data@content <- 'nodata'
 					out.raster@data@values <- vector(length=0)
@@ -49,7 +49,7 @@ raster.calc.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE) {
 		n <- length(raster@ncols)
 		for (r in 1:raster@nrows) {
 			out.raster@data@values <- as.vector(fun(n)) 
-			out.raster <- raster.write.binary.row(out.raster, r, overwrite=overwrite)	}	
+			out.raster <- raster.write.row(out.raster, r, overwrite=overwrite)	}	
 		out.raster@data@values <- vector(length=0)	
 	}	
 	return(out.raster)
@@ -74,16 +74,16 @@ raster.calc.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, IN
 	
 		res <- vector(mode = "numeric", length = raster@ncols)
 		for (r in 1:raster@nrows) {
-			rowdata <- raster.read.row(raster, r)
+			raster <- raster.read.row(raster, r)
 			for (i in 1:length(rclmat[,1])) {
 				if (is.na(rclmat[i,1]) | is.na(rclmat[i,2])) {
-					res[ is.na(rowdata) ] <- rclmat[i, 3] 
+					res[ is.na(raster@data@values) ] <- rclmat[i, 3] 
 				} else { 
-					res[ (rowdata > rclmat[i,1]) & (rowdata <= rclmat[i,2])] <- rclmat[i , 3] 
+					res[ (raster@data@values > rclmat[i,1]) & (raster@data@values <= rclmat[i,2])] <- rclmat[i , 3] 
 				}
 			}
 			out.raster@data@values <- as.vector(res)
-			out.raster <- raster.write.binary.row(out.raster, r, overwrite=overwrite)
+			out.raster <- raster.write.row(out.raster, r, overwrite=overwrite)
 		}	
 		out.raster@data@values <- vector(length=0)
 	}	
