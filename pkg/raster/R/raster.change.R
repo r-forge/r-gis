@@ -35,7 +35,7 @@ raster.change.cut.with.raster <- function(raster, cutraster, filename="", overwr
 
 
 
-raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename="", overwrite=FALSE) {
+raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overwrite=FALSE) {
 	if (xmin > xmax) {
 		x <- xmin
 		xmin <- xmax
@@ -80,7 +80,7 @@ raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename="", overw
 		out.raster@data@content <- 'all'
 		if (nchar(out.raster@file@name) > 0 ) { out.raster <- try(raster.write(out.raster)) }
 		
-	} else if (raster@data@content != 'nodata') {
+	} else {
 		first.col <- raster.get.col.from.x(raster, xmin + 0.5 * out.raster@xres)
 		first.row <- raster.get.row.from.y(raster, ymax - 0.5 * out.raster@yres)
 		last.row <- first.row + out.raster@nrows - 1
@@ -129,8 +129,8 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 	out.raster@ymin <- raster@ymin - yexpansion
 	out.raster <- raster.set.rowcol(out.raster, nrows=rsteps, ncols=csteps) 
 	
-	if (INT) { out.raster <- raster.set.datatype(out.raster, "integer")  }
-	else { out.raster <- raster.set.datatype(out.raster, "numeric") }
+	if (INT) { out.raster <- raster.set.datatype(out.raster, 'integer")  }
+	else { out.raster <- raster.set.datatype(out.raster, 'numeric") }
 	
 
 	if (raster@data@content == 'all') 
