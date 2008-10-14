@@ -39,7 +39,7 @@ setClass ('AbstractRaster',
 		),
 	validity = function(object)
 	{
-		cond1 <- isTRUE(all.equal(object@ncols*object@nrows, object@ncells))
+		cond1 <- isTRUE(all.equal(as.numeric(object@ncols)*object@nrows, object@ncells))
 		#cond2 <- isTRUE(all.equal(object@xres,((object@xmax-object@xmin)/object@ncols))) 
 		#TODO 0.1 perc margin? Or just a warning when resolution is wrong?
 		#cond3 <- isTRUE(all.equal(object@yres,((object@ymax-object@ymin)/object@nrows))) 

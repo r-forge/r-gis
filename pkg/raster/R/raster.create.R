@@ -19,15 +19,14 @@ raster.create.new <-
 		proj <- try(CRS(projection), silent = T)
 		if (class(proj) == "try-error") { 
 			warning(paste('projection', projection, 'is not a valid')) 
-			raster <- new("Raster", ncols = nc, nrows = nr, ncells = nc * nr, xmin = xmin, xmax = xmax, ymin=ymin, ymax=ymax, yres=yr, xres=xr, projection=new("CRS"))
+			raster <- new("Raster", ncols = nc, nrows = nr, ncells = as.numeric(nr) * nc, xmin = xmin, xmax = xmax, ymin=ymin, ymax=ymax, yres=yr, xres=xr, projection=new("CRS"))
 		} else {
-			raster <- new("Raster", ncols = nc, nrows = nr, ncells = nc * nr, xmin = xmin, xmax = xmax, ymin=ymin, ymax=ymax, yres=yr, xres=xr, projection=proj)
+			raster <- new("Raster", ncols = nc, nrows = nr, ncells = as.numeric(nr) * nc, xmin = xmin, xmax = xmax, ymin=ymin, ymax=ymax, yres=yr, xres=xr, projection=proj)
 		}
 		raster@data@content <- 'nodata'
 		return(raster) 
 	} else {return <- NA }
 }
-r <- raster.create.new()
 
 
 raster.create.from.file <- function(filename, band=1) {

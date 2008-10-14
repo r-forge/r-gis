@@ -4,7 +4,7 @@
 # Date : June 2008
 # Version 0,3
 # Licence GPL v3
-
+#
 
 raster.get.matrix <- function(raster, names=FALSE) {
 	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }

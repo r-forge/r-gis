@@ -116,7 +116,7 @@ raster.write.row <- function(raster, rownumber, overwrite=FALSE) {
 		raster@file@driver == 'raster'
 	}	
 
-	if (raster@datatype == "integer") { raster@data@values <- as.vector(as.integer(raster@data@values)) }
+	if (raster@file@datatype == "integer") { raster@data@values <- as.vector(as.integer(raster@data@values)) }
 
 	rsd <- na.omit(as.vector(raster@data@values)) # min and max values
 	if (length(rsd) > 0) {

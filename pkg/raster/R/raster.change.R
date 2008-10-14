@@ -64,7 +64,7 @@ raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename="", overw
 	nrows <- round((ymax-ymin)/raster@yres)
 	out.raster <- raster.create.new(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, nrows=nrows, ncols=ncols )
 	out.raster <- raster.set.filename(out.raster, filename)
-	out.raster <- raster.set.datatype(out.raster, raster@datatype)
+	out.raster <- raster.set.datatype(out.raster, raster@file@datatype)
 
 	
 	if (raster@data@content == 'all')  {
