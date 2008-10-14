@@ -1,0 +1,11 @@
+Package: diversity
+Type: Package
+Title: Diversity
+Version: 0.1
+Date: 2008-10-07
+Depends: raster
+Author: Robert Hijmans
+Maintainer: <r.hijmans@gmail.com>
+Description: Biodiversity and niche modeling functions
+License: GPLv3
+LazyLoad: yes
