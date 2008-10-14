@@ -26,10 +26,10 @@ raster.write.ascii.row <- function(raster, rownumber, overwrite=FALSE) {
 			cat("XLLCORNER", raster@xmin, "\n", file = thefile)
 			cat("YLLCORNER", raster@ymin, "\n", file = thefile)
 			cat("CELLSIZE",  raster@xres, "\n", file = thefile)
-			cat("NODATA_value", raster@data@nodatavalue, "\n", file = thefile)
+			cat("NODATA_value", raster@file@nodatavalue, "\n", file = thefile)
 			close(thefile) #close connection
 		}
-		raster@data[is.na(raster@data@values)] <- raster@data@nodatavalue 
+		raster@data[is.na(raster@data@values)] <- raster@file@nodatavalue 
 		write.table(raster@data@values, raster@file@name, append = TRUE, quote = FALSE, sep = " ", eol = "\n", 
                           dec = ".", row.names = FALSE, col.names = FALSE)
     }
@@ -167,7 +167,7 @@ raster.write.hdr <- function(raster) {
 	cat("BandOrder=",  raster@file@bandorder, "\n", file = thefile)
 	cat("MinValue=",  raster@data@min, "\n", file = thefile)
 	cat("MaxValue=",  raster@data@max, "\n", file = thefile)
-	cat("NoDataValue=",  raster@data@nodatavalue, "\n", file = thefile)
+	cat("NoDataValue=",  raster@file@nodatavalue, "\n", file = thefile)
 #	cat("Sparse=", raster@sparse, "\n", file = thefile)
 #	cat("nCellvals=", raster@data@ncellvals, "\n", file = thefile)	
 	close(thefile)

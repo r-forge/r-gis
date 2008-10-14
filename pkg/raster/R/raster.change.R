@@ -80,7 +80,7 @@ raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename="", overw
 		out.raster@data@content <- 'all'
 		if (nchar(out.raster@file@name) > 0 ) { out.raster <- try(raster.write(out.raster)) }
 		
-	} else if (raster@datadescription != 'nodata') {
+	} else if (raster@data@content != 'nodata') {
 		first.col <- raster.get.col.from.x(raster, xmin + 0.5 * out.raster@xres)
 		first.row <- raster.get.row.from.y(raster, ymax - 0.5 * out.raster@yres)
 		last.row <- first.row + out.raster@nrows - 1
