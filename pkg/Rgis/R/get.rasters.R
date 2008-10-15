@@ -1,98 +1,50 @@
-# Read geographic data into R objects (first download  the data if not locally avaialble)
+# Read geographic data into R objects (first download  the data if not locally avaialble)"
 # Part of Rgis package
 # Author: Robert J. Hijmans, r.hijmans@gmail.com
 # License GPL3
 # Version 1, October 2008
 
 
-read.srtm <- function(row='37', col='08', download=TRUE) {
-	pack <- "Rgis"
-	varname <- "srtm"
-	filename <- system.file(paste("data/", varname, '_', row, '_', col, ".ZIP", sep=""), package=pack)
-	# if file does not exist, filename will be ""
-	if (nchar(filename) == 0) {
-		if (download) {
-			theurl <- paste("http://hypersphere.telascience.org/elevation/cgiar_srtm_v4/tiff/zip/", varname, '_', row, '_', col, ".ZIP", sep="")
-			destfilename <- paste(system.file(package=pack), "/data/", varname, '_', row, '_', col, ".ZIP", sep="")
-			download.file(url=theurl, destfile=destfilename, method="auto", quiet = FALSE, mode = "wb", cacheOK = TRUE)
-			filename <- system.file(paste("data/", varname, '_', row, '_', col, ".ZIP", sep=""), package=pack)
-			if (nchar(filename) == 0) { cat("\nCould not download file -- perhaps it does not exist\n\n") }
-			} else {
-			cat("\nFile not available locally. Use 'download = TRUE'\n")
+read.srtm <- function(x=106, y=-6, download=TRUE) {
+	pack <- 'Rgis'
+	varname <- 'srtm'
+	
+	x <- min(180, max(-180, x))
+	y <- min(60, max(-60, y))
+	rs <- raster.create.new(nrows=24, ncols=72, ymin=-60, ymax=60 )
+	row <- raster.get.row.from.y(rs, y)
+	col <- raster.get.col.from.x(rs, x)
+	if (row < 10) { row <- paste('0', row, sep='') }
+	if (col < 10) { col <- paste('0', col, sep='') }
+	
+	f <- paste(varname, '_', col, '_', row, sep="")
+	zipfilename <- paste(system.file(package=pack), "/data/", f, ".ZIP", sep="")
+	tiffilename <- paste(system.file(package=pack), "/data/", f, ".TIF", sep="")
+	
+	if (!file.exists(tiffilename)) {
+		if (!file.exists(zipfilename)) {
+			if (download) { 
+				theurl <- paste("http://hypersphere.telascience.org/elevation/cgiar_srtm_v4/tiff/zip/", f, ".ZIP", sep="")
+				download.file(url=theurl, destfile=zipfilename, method="auto", quiet = FALSE, mode = 'wb', cacheOK = TRUE)
+			} else {cat('file not available locally, use download=TRUE\n') }	
 		}
-	}		
-	if (nchar(filename) > 0) {
-		outfilename <- system.file(paste("data/", varname, '_', row, '_', col, "TIF", sep=""), package=pack)
-
-	#thisenvir = new.env()
-		unz(filename)
-		#data <- get(load(filename, thisenvir), thisenvir)
-		#return(data)
-	} 
-}
-
-
-list.adm <- function(ISO3=NA, level=NA) {
-	pack <- "Rgis"
-
-	if (is.na(ISO3)) {
-		if (is.na(level)) {
-			ISOS <- list.files(paste(system.file(package=pack),"/data", sep=""), pattern = "^adm_",full.names=TRUE)
-		} else  {
-			ISOS <- list.files(paste(system.file(package=pack),"/data", sep=""), pattern = paste('^adm_...', level, sep=""), full.names=TRUE)
-		}	
-	} else {
-		if (is.na(level)) {
-			ISOS <- list.files(paste(system.file(package=pack),"/data", sep=""), pattern = paste('^adm_', ISO3, sep=""), full.names=TRUE)
-		} else  {
-			ISOS <- list.files(paste(system.file(package=pack),"/data", sep=""), pattern = paste('^adm_', ISO3, level, sep=""), full.names=TRUE)
+		if (file.exists(zipfilename)) { 
+			wd <- getwd()
+			setwd( paste(system.file(package=pack), "/data", sep='') )
+			zipfn <- paste(f, ".ZIP", sep="")
+			fn <- paste(f, ".TIF", sep="")
+			zip.file.extract(file = fn, zipname = zipfn)
+			file.remove(zipfn)
+			setwd(wd)
+			tmpfile <- paste(tempdir(), '/', fn, sep="") 
+			file.copy(tmpfile, tiffilename, overwrite = FALSE)
+			file.remove(tmpfile)
 		}	
 	}
-	if (length(ISOS) > 0) {
-		for (i in 1:length(ISOS)) {	
-			split <- strsplit(ISOS[i], "/")
-			lng <- length(split[[1]])
-			filename <- split[[1]][[lng]]
-			filename <- gsub("adm_", "", gsub(".RData", "", filename))
-			cat(filename, '\n') 
-		} 
-	} else {
-		cat('No files found\n') 
+	if (file.exists(tiffilename)) { 
+		rs <- raster.create.from.file(tiffilename)
+		rs@projection <- CRS("+proj=longlat +datum=WGS84")
+		return(rs)
 	}	
 }
-
-
-remove.adm <- function(ISO3=NA, level=NA) {
-	pack <- "Rgis"
-	varname <- "adm_"
-	if (is.na(ISO3)) {cat("\nSpecify a country (ISO3) code.\n") 
-	} else if (ISO3 == "ALL") {
-		if (is.na(level)) {
-			ISOS <- list.files(paste(system.file(package=pack),"/data", sep=""), pattern = "^adm_",full.names=TRUE)
-		} else {
-			ISOS <- list.files(paste(system.file(package=pack),"/data", sep=""), pattern = paste('adm_...', level, sep="") ,full.names=TRUE)
-		}
-		for (j in 1:length(ISOS)) {
-			file.remove(ISOS[j]) 	
-			cat("removed", ISOS[j], "\n")
-		}
-	} else {
-		if (is.na(level)) {
-			for (i in 0:5) {
-				filename <- system.file(paste("data/", varname, ISO3, i, ".RData", sep=""), package=pack)
-				if (nchar(filename) > 0) { 
-					res <- file.remove(filename) 
-					if (res) {cat("removed", ISO3, i, "\n") }
-				}	
-			}	
-		} else {
-			filename <- system.file(paste("data/", varname, ISO3, level, ".RData", sep=""), package=pack)
-			if (nchar(filename) > 0) { 
-				res <- file.remove(filename) 
-				if (res) {cat("removed", ISO3, level, "\n") }
-			}
-		}
-	}	
-}
-
 
