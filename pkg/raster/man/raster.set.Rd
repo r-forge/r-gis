@@ -1,6 +1,8 @@
 \name{raster.set}
 \alias{raster.set.filename}
 \alias{raster.set.datatype}
+\alias{raster.set.rowcol}
+\alias{raster.set.bbox}
 
 \title{ Set properties of a raster object }
 
@@ -13,6 +15,8 @@
 \usage{
 raster.set.filename(raster, filename)
 raster.set.datatype(raster, datatype, datasize)
+raster.set.rowcol(raster, nrows=raster@nrows, ncols=raster@ncols) 
+raster.set.bbox(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax)
 }
 
 \arguments{
@@ -20,6 +24,13 @@ raster.set.datatype(raster, datatype, datasize)
   \item{filename}{ ~~Describe \code{filename} here~~ }
   \item{datatype}{ ~~Describe \code{filename} here~~ }
   \item{datasize}{ ~~Describe \code{filename} here~~ }
+  \item{nrows}{ ~~Describe \code{filename} here~~ }
+  \item{ncols}{ ~~Describe \code{filename} here~~ }  
+  \item{xmin}{ ~~Describe \code{filename} here~~ }
+  \item{xmax}{ ~~Describe \code{filename} here~~ }
+  \item{ymin}{ ~~Describe \code{filename} here~~ }
+  \item{ymax}{ ~~Describe \code{filename} here~~ }
+  
 }
 
 \details{

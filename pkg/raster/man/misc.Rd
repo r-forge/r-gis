@@ -6,6 +6,7 @@
 \alias{string.trim}
 \alias{calc.mode}
 \alias{calc.cv}
+\alias{raster.shortcuts}
 
 \title{ Miscellaneous functions }
 \description{
@@ -20,6 +21,7 @@ file.get.path(filename)
 string.trim(astring)
 calc.mode(x, na.rm = TRUE)
 calc.cv(x, na.rm = TRUE, singlevalueaszero=TRUE)
+raster.shortcuts()
 }
 \arguments{
   \item{filename}{ a filename with or without the path }
@@ -35,6 +37,7 @@ calc.cv(x, na.rm = TRUE, singlevalueaszero=TRUE)
   calc.mode returns the modal (most frequent) value of a vector of values, ties are broken at random
   calc.cv returns the coefficient of variation (expressed as a percentage). If there is only a single value, sd = NA
   and calc.cv returns NA if singlevaluecvzero=FALSE. However, the default is that cv=0 in this case.
+  raster.shortcuts provides shortcuts to raster functions. Type \code{raster.shortcuts} to see them
 }
 
 \author{Robert J. Hijmans \email{r.hijmans@gmail.com}}

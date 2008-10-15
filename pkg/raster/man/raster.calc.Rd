@@ -3,6 +3,8 @@
 \alias{raster.calc.isNA}
 \alias{raster.calc.setNA}
 \alias{raster.calc.reclass}
+\alias{raster.calc.init}
+\alias{raster.calc.neighborhood}
 
 \title{ Raster calculate }
 \description{
@@ -13,6 +15,8 @@ raster.calc(raster, fun, filename=NA, overwrite=FALSE, INT = FALSE)
 raster.calc.reclass(raster, rclmat, filename=NA, overwrite=FALSE, INT = FALSE)
 raster.calc.isNA(raster, value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
 raster.calc.setNA(raster, operator = "<=", value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
+raster.calc.init(raster, fun=runif, filename=NA, overwrite=FALSE) 
+raster.calc.neighborhood(raster, fun=mean, filename=NA, ngb=3, keepdata=TRUE, overwrite=FALSE) 
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -23,12 +27,16 @@ raster.calc.setNA(raster, operator = "<=", value = 0, filename=NA, overwrite=FAL
   \item{operator}{ the operator in setnull relative to the \code{value}, to set e.g. all values <= 2 to NA}
   \item{rclmat}{ \code{rclmat} the function to be applied }
   \item{filename}{ output filename for a new raster; if NA the result is not written to a file but returned with the raster object, in the data slot }
-  \item{overwrite}{ }
-  \item{INT}{ }
+  \item{overwrite}{ logical to indicate whether an existing output file should be overwritten }
+  \item{INT}{ logical. If \code{TRUE}, output will be integer values }
+  \item{ngb} {neighborhood size in number of cells}
+  \item{keepdata} {logical. If \code{TRUE}, NA will be removed for neighborhood computations. The result will only be NA if all cells are NA }
 }
+
 \details{
   Use this function to calculate values for a new raster based on an existing single raster. E.g. to add, multiply or divide a number. 
   Create and pass the appropriate function as an argument. 
+  raster.calc.init sets a value without reference to existing values. E.g. initialize with a single or random number.
 }
 \value{
   a new raster file (on disk) and associated object (in the R environment)

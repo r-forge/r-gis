@@ -8,26 +8,26 @@
 
 
 
-raster.change.disaggregate <- function(raster, filename, fun=mean, factor=2, overwrite=FALSE) {
-	stop("sorry, not implemented yet")
-}
+#raster.change.disaggregate <- function(raster, filename, fun=mean, factor=2, overwrite=FALSE) {
+#	stop("sorry, not implemented yet")
+#}
 
-raster.change.resample <- function(raster, filename, xmin, xmax, ymin, ymax, ncols, nrows, method="bilinear", overwrite=FALSE) {
-	stop("sorry, not implemented yet")
-}
+#raster.change.resample <- function(raster, filename, xmin, xmax, ymin, ymax, ncols, nrows, method="bilinear", overwrite=FALSE) {
+#	stop("sorry, not implemented yet")
+#}
 
-raster.change.expand <- function(raster, xmin, xmax, ymin, ymax, filename=NA, overwrite=FALSE) {
-	stop("sorry, not implemented yet")
-}
+#raster.change.expand <- function(raster, xmin, xmax, ymin, ymax, filename=NA, overwrite=FALSE) {
+#	stop("sorry, not implemented yet")
+#}
 
-raster.change.merge <- function(raster1, raster2, filename, overwrite=FALSE) {
+#raster.change.merge <- function(raster1, raster2, filename, overwrite=FALSE) {
 	#check resolution
 	#check origin
 	#if raster1 overlaps all of raster2 return raster1
 	#if there is no overlap combine
 	#if there is some overlap raster1 values are used in those places (
-	stop("sorry, not implemented yet")
-}
+#	stop("sorry, not implemented yet")
+#}
 
 raster.change.cut.with.raster <- function(raster, cutraster, filename="", overwrite=FALSE) {
 	return(raster.change.cut(raster, cutraster@xmin, cutraster@xmax, cutraster@ymin, cutraster@ymax, filename, overwrite))
@@ -129,8 +129,8 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 	out.raster@ymin <- raster@ymin - yexpansion
 	out.raster <- raster.set.rowcol(out.raster, nrows=rsteps, ncols=csteps) 
 	
-	if (INT) { out.raster <- raster.set.datatype(out.raster, 'integer")  }
-	else { out.raster <- raster.set.datatype(out.raster, 'numeric") }
+	if (INT) { out.raster <- raster.set.datatype(out.raster, 'integer')  }
+	else { out.raster <- raster.set.datatype(out.raster, 'numeric') }
 	
 
 	if (raster@data@content == 'all') 
@@ -150,9 +150,9 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 	} else if (raster@data@source == 'disk') {
 		col.index <- rep(rep(1:csteps,each=factor)[1:raster@ncols],times=factor)
 		new.data <- vector(length=rsteps*csteps)
-		for (i in 1:rsteps) 
+		for (r in 1:rsteps) 
 		{
-			startrow <- 1 + (i - 1) * factor
+			startrow <- 1 + (r - 1) * factor
 			endrow <- min(raster@nrows, startrow + factor - 1)
 			nrows <- endrow - startrow + 1
 			data.selected.rows <- raster.read.rows(raster, startrow = startrow, nrows = nrows)

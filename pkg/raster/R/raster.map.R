@@ -8,7 +8,7 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 #    z <- raster.read.rows(raster, 1, raster@nrows)
 	if (length(raster@data@values) != raster@ncells) { 
 		if (subsample) {
-			m <- raster.read.skip(raster, maxdim) 
+			m <- .raster.read.skip(raster, maxdim) 
 			xres <- (raster@xmax - raster@xmin) / dim(m)[2]
 			yres <- (raster@ymax - raster@ymin) / dim(m)[1]
 			x <- (0:dim(m)[2]) * xres + raster@xmin 

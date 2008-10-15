@@ -1,6 +1,7 @@
 \name{RasterStack-class}
 \docType{class}
 \alias{RasterStack-class}
+\alias{show,RasterStack-method}
 
 \title{Class "RasterStack" }
 \description{	Class for handling "stacks" of rasters. A stack is a   }

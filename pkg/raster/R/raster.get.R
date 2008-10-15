@@ -110,6 +110,7 @@ raster.get.cxy.from.box <- function(raster, xmin=raster@xmin, xmax=raster@xmax, 
 	firstcol <- raster.get.col.from.x(raster, xmin)
 	lastcol <- raster.get.col.from.x(raster, xmax)
 	cells <- vector("integer", length=0)
+# RH: ouch, this should be done with apply 	
 	for (i in firstrow:lastrow) {
 		firstcell <- (i-1) * raster@ncols + firstcol
 		lastcell <- (i-1) * raster@ncols + lastcol

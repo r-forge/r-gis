@@ -155,7 +155,7 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 
 
 #sample while reading and return matrix (for plotting )
-raster.read.skip <- function(raster, maxdim=500) {
+.raster.read.skip <- function(raster, maxdim=500) {
 	rasdim <- max(raster@ncols, raster@nrows )
 	if (rasdim <= maxdim) { 
 		dd <- raster.get.matrix(raster.read.all(raster))

@@ -9,6 +9,9 @@
 \alias{raster.get.x.from.col}
 \alias{raster.get.y.from.row}
 \alias{raster.get.xy.from.cell}
+\alias{raster.get.cxy.from.box}
+\alias{raster.is.valid.cell}
+
 
 \title{ Get column, row, or cell number from coordinates and vice versa }
 \description{
@@ -28,6 +31,8 @@ raster.get.cell.from.xy(raster, xy)
 raster.get.x.from.col(raster, colnr)
 raster.get.y.from.row(raster, rownr)
 raster.get.xy.from.cell(raster, cell)
+raster.get.cxy.from.box(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax)
+raster.is.valid.cell(raster, cell) 
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -39,10 +44,15 @@ raster.get.xy.from.cell(raster, cell)
   \item{colnr}{  column number(s) }
   \item{rownr}{  row number(s) }
   \item{cell}{  cell number(s) }
+  \item{xmin}{ minimum x coordinate of bounding box to get cell numbers for }
+  \item{xmax}{ maximum x coordinate of bounding box to get cell numbers for }
+  \item{ymin}{ minimum y coordinate of bounding box to get cell numbers for }
+  \item{ymax}{ maximum y coordinate of bounding box to get cell numbers for }
+  
  }
   
 \details{
-  All these functions accept a single value (or x,y pair), or a vector or list of these values,
+  All these functions accept a single value (or x, y pair), or a vector or list of these values,
   Cell numbers start at 1 in the upper left corner, and increase from left to right, and then from top to bottom
   The last cell number equals the number of cells of the raster.
 }
@@ -50,6 +60,8 @@ raster.get.xy.from.cell(raster, cell)
   row, col or cell number(s) 
   x or y coordinate(s)
   matrix(x,y) of pairs of coordinates 
+  matrix(cell, x, y) of cellnumbers and x and y coordinates
+  TRUE of FALSE for raster.is.valid.cell
 }
 \author{Robert J. Hijmans  \email{r.hijmans@gmail.com}}
 \examples{

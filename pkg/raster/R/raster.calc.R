@@ -109,7 +109,7 @@ raster.calc.setNA <- function(raster, operator= "<=", value=0, filename=NA, over
 }
 
 
-calc.ngb <- function(rows, ngb, fun, keepdata) {
+.calc.ngb <- function(rows, ngb, fun, keepdata) {
 	lim <- floor(ngb / 2)
 	res <- array(dim=length(rows[1,]))
 	lr <- length(rows[1,])
@@ -146,14 +146,14 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 		rowdata <- raster.read.row(raster, r)@data@values
 		ngbdata <- rbind(ngbdata[2:ngb,], t(rowdata))
 		if (r > lim) {
-			ngbgrid@data@values <- calc.ngb(ngbdata, ngb, fun, keepdata)
+			ngbgrid@data@values <- .calc.ngb(ngbdata, ngb, fun, keepdata)
 			ngbgrid <- raster.write.row(ngbgrid, rr, overwrite)
 			rr <- rr + 1
 		}
 	}
 	for (r in (raster@nrows+1):(raster@nrows+lim)) {
 		ngbdata <- rbind(ngbdata[2:ngb,], t(ngbdata1))
-		ngbgrid@data@values <- calc.ngb(ngbdata, ngb, fun, keepdata)
+		ngbgrid@data@values <- .calc.ngb(ngbdata, ngb, fun, keepdata)
 		ngbgrid <- raster.write.row(ngbgrid, rr, overwrite)
 		rr <- rr + 1
 	}
