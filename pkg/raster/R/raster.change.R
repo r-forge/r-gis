@@ -131,7 +131,6 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 	
 	if (INT) { out.raster <- raster.set.datatype(out.raster, 'integer')  }
 	else { out.raster <- raster.set.datatype(out.raster, 'numeric') }
-	
 
 	if (raster@data@content == 'all') 
 	{
@@ -145,7 +144,6 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 		out.raster@data@haveminmax <- TRUE
 		out.raster@data@content <- 'all'
 		if (nchar(out.raster@file@name) > 0 ) { out.raster <- try(raster.write(out.raster)) }
-
 		
 	} else if (raster@data@source == 'disk') {
 		col.index <- rep(rep(1:csteps,each=factor)[1:raster@ncols],times=factor)
@@ -183,3 +181,4 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 	}
 	return(out.raster)
 }
+
