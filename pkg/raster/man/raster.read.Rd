@@ -6,7 +6,6 @@
 \alias{raster.read.block}
 \alias{raster.read.cells}
 \alias{raster.read.xy}
-\alias{raster.get.matrix}
 
 \title{ Read from a raster data file }
 \description{
@@ -24,7 +23,7 @@ raster.read.part.of.row(raster, rownr,  startcol=1, ncols=(raster@ncols-startcol
 raster.read.block(raster, startrow, nrows=3, startcol=1, ncols=(raster@ncols-startcol+1)) 
 raster.read.cells(raster, cells)
 raster.read.xy(raster, xy)
-raster.get.matrix(raster, names=FALSE)
+
 }
 
 \arguments{
@@ -36,7 +35,6 @@ raster.get.matrix(raster, names=FALSE)
   \item{ncols}{ number of columns to read on this each row ( (>= 1 & <= raster@ncols & > firstcol) }
   \item{cells}{ vector of cell numbers }
   \item{xy}{ x and y coordinates  }
-  \item{names}{ If TRUE, row and col names are provided }
 }
 \details{
 }

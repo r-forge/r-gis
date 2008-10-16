@@ -6,6 +6,12 @@
 # Licence GPL v3
 #
 
+
+raster.get.data <- function(raster) {
+	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
+	return(raster@data@values)
+}
+
 raster.get.matrix <- function(raster, names=FALSE) {
 	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
 	if (raster@data@content=="all") {

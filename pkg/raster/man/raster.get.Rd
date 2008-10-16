@@ -1,4 +1,6 @@
 \name{raster.get}
+\alias{raster.get.data}
+\alias{raster.get.matrix}
 \alias{raster.get.col.from.cell}
 \alias{raster.get.row.from.cell}
 \alias{raster.get.cell.from.rowcol}
@@ -12,15 +14,20 @@
 \alias{raster.get.cxy.from.box}
 \alias{raster.is.valid.cell}
 
-
+  
 \title{ Get column, row, or cell number from coordinates and vice versa }
 \description{
+  raster.get.data returns datavalues that are associated with the raster object (e.g. after raster.read.* has been used). Data are returned as a vector. 
+  raster.get.matrix will return a matrix, optionally with the row and col numbers as names of the whole or part of the data that has been previously 
   Get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or
   get the coordiantes of the center of a raster cell from a column, or cell number(s)
   There are relatively low-level operations that most users will not use. 
   They are needed for manipulating grids and point to grid conversion
 }
+
 \usage{
+raster.get.data(raster)
+raster.get.matrix(raster, names=FALSE)
 raster.get.col.from.cell(raster, cell)
 raster.get.row.from.cell(raster, cell)
 raster.get.cell.from.rowcol(raster, rownr, colnr)
@@ -38,6 +45,7 @@ raster.is.valid.cell(raster, cell)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{raster}{ raster or rasterstack object }
+  \item{names}{ If TRUE, row and col names are provided }
   \item{x}{  x coordinate(s) }
   \item{y}{  y coordinate(s) }
   \item{xy}{ matrix of x and y coordinates }

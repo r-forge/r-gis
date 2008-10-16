@@ -1,6 +1,10 @@
 \name{raster.set}
 \alias{raster.set.filename}
 \alias{raster.set.datatype}
+\alias{raster.set.data}
+\alias{raster.set.rowdata}
+\alias{raster.set.blockdata}
+\alias{raster.set.sparsedata}
 \alias{raster.set.rowcol}
 \alias{raster.set.bbox}
 
@@ -15,6 +19,10 @@
 \usage{
 raster.set.filename(raster, filename)
 raster.set.datatype(raster, datatype, datasize)
+raster.set.data(raster, data) 
+raster.set.rowdata(raster, rowdata, rownr) 
+raster.set.blockdata(raster, blockdata, firstcell, lastcell) 
+raster.set.sparsedata(raster, sparsedata, indices) 
 raster.set.rowcol(raster, nrows=raster@nrows, ncols=raster@ncols) 
 raster.set.bbox(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax)
 }
@@ -24,13 +32,20 @@ raster.set.bbox(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ym
   \item{filename}{ ~~Describe \code{filename} here~~ }
   \item{datatype}{ ~~Describe \code{filename} here~~ }
   \item{datasize}{ ~~Describe \code{filename} here~~ }
+  \item{data}{ ~~Describe \code{filename} here~~ }
+  \item{rowdata}{ ~~Describe \code{filename} here~~ }
+  \item{rownr}{ ~~Describe \code{filename} here~~ }
+  \item{blockdata}{ ~~Describe \code{filename} here~~ }
+  \item{firstcell}{ ~~Describe \code{filename} here~~ }
+  \item{lastcell}{ ~~Describe \code{filename} here~~ }
+  \item{sparsedata}{ ~~Describe \code{filename} here~~ }
+  \item{indices}{ ~~Describe \code{filename} here~~ }
   \item{nrows}{ ~~Describe \code{filename} here~~ }
   \item{ncols}{ ~~Describe \code{filename} here~~ }  
   \item{xmin}{ ~~Describe \code{filename} here~~ }
   \item{xmax}{ ~~Describe \code{filename} here~~ }
   \item{ymin}{ ~~Describe \code{filename} here~~ }
   \item{ymax}{ ~~Describe \code{filename} here~~ }
-  
 }
 
 \details{

@@ -4,6 +4,7 @@
 # Version 0,1
 # Licence GPL v3
 
+
 raster.is.valid.cell <- function(raster, cell) {
 	cell <- round(cell)
 	validcell <- vector(length=length(cell))
