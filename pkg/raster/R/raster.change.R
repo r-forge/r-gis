@@ -137,8 +137,8 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 		col.index <- rep(rep(1:csteps,each=factor)[1:raster@ncols],times=raster@nrows)
 		row.index <- rep(1:rsteps,each=raster@ncols*factor)[1:raster@ncells]
 		cell.index <- (csteps * (row.index - 1)) + col.index
-		if (rm.NA) {out.raster@data@values <- as.vector(tapply(raster@data,cell.index,function(x){fun(na.omit(x))}))}
-		else {out.raster@data@values <- as.vector(tapply(raster@data,cell.index,fun))}
+		if (rm.NA) {out.raster@data@values <- as.vector(tapply(raster@data@values, cell.index, function(x){fun(na.omit(x))}))}
+		else {out.raster@data@values <- as.vector(tapply(raster@data@values, cell.index, fun))}
 		out.raster@data@min <- min(raster@data@values, na.rm=TRUE)
 		out.raster@data@max <- max(raster@data@values, na.rm=TRUE)
 		out.raster@data@haveminmax <- TRUE

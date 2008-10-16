@@ -19,7 +19,7 @@ rasterstack.calc <- function(rasterstack, fun, filename=NA, overwrite=FALSE, For
 		if (ForceIntOutput) { out.raster <- raster.set.datatype(out.raster, "integer") }
 		for (r in 1:rasterstack@nrows) {
 			rasterstack <- rasterstack.read.row(rasterstack, r)
-			out.raster@data@values <- as.array(apply(rowdata@data@values, 1, fun))
+			out.raster@data@values <- as.array(apply(rasterstack@data@values, 1, fun))
 			raster.write.row(out.raster, r, overwrite)
 		}
 	}		
@@ -29,7 +29,7 @@ rasterstack.calc <- function(rasterstack, fun, filename=NA, overwrite=FALSE, For
 #		res <- vector(mode = "numeric", length = rasterstack@ncols)
 
 #		for (cl in 1:rasterstack@ncols) {
-#			celldata <- na.omit(rowdata[cl,]) 
+#			celldata <- na.omit([cl,]) 
 #			if (length(celldata) == 0) { res[cl] <- NA }
 #			else { res[cl] <- fun(celldata) } 
 #		}	

@@ -15,7 +15,7 @@
 		rs <- raster.read.row(rasterstack@rasters[[i]], rownumber)
 		if ( i == 1 )  { dd <- as.matrix(rs@data@values)
 		} else { dd <- cbind(dd, rs@data@values) }	   
-	colnames(dd)[i] <- rasterstack@rasters[[i]]@shortname
+	colnames(dd)[i] <- rasterstack@rasters[[i]]@file@shortname
 	}
 	rasterstack@data@values <- as.matrix(dd)
 	return(rasterstack)
@@ -32,7 +32,7 @@
 		else {
 			dd <- cbind(dd, rs@data@values) 
 		}	   
-	colnames(dd)[i] <- rasterstack@rasters[[i]]@shortname
+	colnames(dd)[i] <- rasterstack@rasters[[i]]@file@shortname
 	}
 	rasterstack@data@values <- as.array(dd)
 	return(rasterstack)
@@ -46,7 +46,7 @@ rasterstack.read.xy <- function(rasterstack, xy) {
 			result <- v
 		} else {
 			result <- cbind(result, v[,2])
-			colnames(result)[length(result[1,])] <- rasterstack@rasters[[i]]@shortname
+			colnames(result)[length(result[1,])] <- rasterstack@rasters[[i]]@file@shortname
 		}
 	}
 	rasterstack@data@values <- as.array(result)
@@ -61,7 +61,7 @@ rasterstack.read.cell <- function(rasterstack, cell) {
 			result <- v
 		} else {
 			result <- cbind(result, v[,2])
-			colnames(result)[length(result[1,])] <- rasterstack@rasters[[i]]@shortname
+			colnames(result)[length(result[1,])] <- rasterstack@rasters[[i]]@file@shortname
 		}
 	}
 	rasterstack@data@values <- as.array(result)

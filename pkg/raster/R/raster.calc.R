@@ -129,6 +129,17 @@ raster.calc.setNA <- function(raster, operator= "<=", value=0, filename=NA, over
 }
 
 
+.calc.ngb2 <- function(rows, ngb, fun, keepdata) {
+	lim <- floor(ngb / 2)
+	res <- array(dim=length(rows[1,]))
+	addNA <- (matrix(ncol=lim, nrow=ngb))
+	rows <- cbind(addNA, rows, addNA)
+#	d <- rows[, max(1,(i-lim)):min((i+lim),lr)]
+#	if (rm.NA) {out.raster@data@values <- as.vector(tapply(raster@data,cell.index,function(x){fun(na.omit(x))}))}
+#		else {out.raster@data@values <- as.vector(tapply(raster@data,cell.index,fun))}
+}
+	
+
 
 raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepdata=TRUE, overwrite=FALSE) {
 	ngb <- round(ngb)
@@ -137,9 +148,9 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 	lim <- floor(ngb / 2)
 	ngbgrid <- raster.set.filename(raster, filename)
 	
-	ngbdata1 <- array(data = NA, dim = raster@ncols)
-	ngbdata <- ngbdata1
-	for (i in 2:ngb) { ngbdata <- rbind(ngbdata, t(ngbdata1)) }	
+# first create an empty matrix with nrows = ngb and ncols = raster@ncols
+
+	ngbdata1 <- array(data = NA, dim = c(ngb, raster@ncols))
 	
 	rr <- 1
 	for (r in 1:raster@nrows) {
