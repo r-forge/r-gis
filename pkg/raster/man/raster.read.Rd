@@ -11,7 +11,6 @@
 \description{
   Data associated with a raster object are read from file. Either all the data, by row, part of row, block, by cellnumber, or for (x,y) coordinates.
   Data can be read for Rgis binary files, as well as for many other formats (via a bridge to rgdal).
-  raster.get.matrix will return a matrix, optionally with the row and col numbers as names of the whole or part of the data that has been previously 
   read with raster.read.all, read.row, read.part.of.row, read.block
 }
 
