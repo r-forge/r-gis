@@ -80,10 +80,10 @@ raster.write<- function(raster, overwrite=FALSE) {
 	raster@data@haveminmax <- TRUE
 	raster@file@driver == 'raster'
 	
-#	raster@data[is.na(raster@data)] <- raster@nodatavalue
+#	raster@data[is.na(raster@data@values)] <- raster@nodatavalue
 	if (raster@file@datatype == "integer") { raster@data@values <- as.vector(as.integer(raster@data@values)) }
 	transpose <- FALSE
-	if (is.matrix(raster@data)) {
+	if (is.matrix(raster@data@values)) {
 		if (ncol(raster@data@values) == raster@ncols  &  nrow(raster@data@values) == raster@nrows ) {
 			transpose <- TRUE
 	    } 
@@ -93,9 +93,9 @@ raster.write<- function(raster, overwrite=FALSE) {
 		}
 		else { stop("unexpected data, I do not know how to write this")	}
 	} 
-	raster@data[is.nan(raster@data)] <- NA
-	if (transpose) {writeBin(as.vector(t(raster@data)), con, size = raster@datasize) }
-	else {writeBin(as.vector(raster@data), con, size = raster@datasize)}
+	raster@data@values[is.nan(raster@data@values)] <- NA
+	if (transpose) {writeBin(as.vector(t(raster@data@values)), con, size = raster@file@datasize) }
+	else {writeBin(as.vector(raster@data@values), con, size = raster@file@datasize)}
 	close(con)
 	raster.write.hdr(raster) 
 	return(raster)
@@ -128,7 +128,7 @@ raster.write.row <- function(raster, rownumber, overwrite=FALSE) {
 	raster@data@values[is.nan(raster@data@values)] <- NA
 	raster@data@values[is.infinite(raster@data@values)] <- NA
 
-#	raster@data@values[is.na(raster@data)@values] <-  raster@file@nodatavalue
+#	raster@data@values[is.na(raster@data@values)] <-  raster@file@nodatavalue
 
 	writeBin(as.vector(raster@data@values), raster__binary__connection__wb, size = raster@file@datasize)
 	
