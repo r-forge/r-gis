@@ -6,32 +6,32 @@
 
 
 
-raster.set.sparsedata <- function(raster, sparsedata, indices) {
+raster.set.data.sparse <- function(raster, sparsedata, indices) {
 	stop('sorrrry, not yet implemented')
 }
 
-raster.set.blockdata <- function(raster, blockdata, firstcell, lastcell) {
+raster.set.data.block <- function(raster, blockdata, firstcell, lastcell) {
 	if (!is.vector(blockdata)) {	stop('data must be a vector') }
 	if (!(is.numeric(blockdata) | is.integer(blockdata)) | is.logical(blockdata)) { stop('data must be values') }
 	ncells <- lastcell - firstcell + 1
 	if (ncells != length(blockdata)) { stop('length(blockdata) <> (lastcell - firstcell + 1)') }
-	raster@values@data <- blockdata
-	raster@values@content <- 'block' 
-	raster@values@indices <- c(firstcell, lastcell)
+	raster@data@values <- blockdata
+	raster@data@content <- 'block' 
+	raster@data@indices <- c(firstcell, lastcell)
 	return(raster)
 }
 
 
-raster.set.rowdata <- function(raster, rowdata, rownr) {
+raster.set.data.row <- function(raster, rowdata, rownr) {
 	if (!is.vector(rowdata)) {	stop('data must be a vector') }
 	if (!(is.numeric(rowdata) | is.integer(rowdata)) | is.logical(rowdata)) { stop('data must be values') }
 	if (length(data) == raster@ncols) { 
-		raster@values@data <- rowdata
-		raster@values@content <- 'row' 
+		raster@data@values <- rowdata
+		raster@data@content <- 'row' 
 		startcell <- raster.get.cell.from.rowcol(raster, row=rownr, col=1)
 		endcell <- raster.get.cell.from.rowcol(raster, row=rownr, col=raster@ncols)
 		raster@values@indices <- c(startcell, endcell)
-	} else { stop(paste('length(data) != ',raster,'@ncols', sep='')) }
+	} else { stop(paste('length(data) != raster@ncols', sep='')) }
 	return(raster)
 }	
 
@@ -41,11 +41,11 @@ raster.set.data <- function(raster, data) {
 	if (!(is.numeric(data) | is.integer(data)) | is.logical(data)) {stop('data must be values')}
 	
 	if (length(data) == raster@ncells) { 
-		raster@values@data <- data
-		raster@values@content <- 'all'
-		raster@values@indices <- c(1, raster@ncells)
+		raster@data@values <- data
+		raster@data@content <- 'all'
+		raster@data@indices <- c(1, raster@ncells)
 	} else {
-		stop(paste('length(data) != ',raster,'@ncells', sep=''))
+		stop(paste('length(data) != raster@ncells', sep=''))
 	}	
 	return(raster)	
 }

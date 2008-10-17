@@ -2,9 +2,9 @@
 \alias{raster.set.filename}
 \alias{raster.set.datatype}
 \alias{raster.set.data}
-\alias{raster.set.rowdata}
-\alias{raster.set.blockdata}
-\alias{raster.set.sparsedata}
+\alias{raster.set.data.row}
+\alias{raster.set.data.block}
+\alias{raster.set.data.sparse}
 \alias{raster.set.rowcol}
 \alias{raster.set.bbox}
 
@@ -20,9 +20,9 @@
 raster.set.filename(raster, filename)
 raster.set.datatype(raster, datatype, datasize)
 raster.set.data(raster, data) 
-raster.set.rowdata(raster, rowdata, rownr) 
-raster.set.blockdata(raster, blockdata, firstcell, lastcell) 
-raster.set.sparsedata(raster, sparsedata, indices) 
+raster.set.data.row(raster, rowdata, rownr) 
+raster.set.data.block(raster, blockdata, firstcell, lastcell) 
+raster.set.data.sparse(raster, sparsedata, indices) 
 raster.set.rowcol(raster, nrows=raster@nrows, ncols=raster@ncols) 
 raster.set.bbox(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax)
 }
