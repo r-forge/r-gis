@@ -94,7 +94,7 @@ rasterstack.add.rasters <- function(rasterstack, rasters) {
 				}
 			}	
 			if (count > 1) { 
-				raster@file@shortname <- paste(raster@file@shortname, "_", count, sep="")) }
+				raster@file@shortname <- paste(raster@file@shortname, "_", count, sep="") }
 		}	
 		if (addraster) { 
 			rasterstack@rasters[i] <- raster 
