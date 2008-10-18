@@ -10,7 +10,7 @@
 \usage{
 raster.create.new(xmin = -180, xmax = 180, ymin = -90, ymax = 90, nrows = 180, ncols = 360, projection = "+proj=longlat +datum=WGS84")
 raster.create.from.file(filename, band=1)
-%- raster.create.from.file.diva(filename, band=1)
+
 }
 
 %- maybe also 'usage' for other objects documented here.

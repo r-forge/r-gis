@@ -31,7 +31,7 @@ raster.create.new <-
 
 raster.create.from.file <- function(filename, band=1) {
 	if (toupper(file.get.extension(filename)) == ".GRD")
-		{ raster <- raster.create.from.file.diva(filename, band) }
+		{ raster <- .raster.create.from.file.binary(filename, band) }
 	else {
 		gdalinfo <- GDALinfo(filename)
 		nc <- as.integer(gdalinfo[["columns"]])
@@ -81,24 +81,26 @@ raster.create.from.file <- function(filename, band=1) {
 
 
 
-raster.create.from.file.diva <- function(filename, band=1) {
+.readini <- function(filename) {
+# readini thanks to Gabor Grothendieck <ggrothendieck_at_gmail.com> 
+	f  <- function(x) {
+		section <- ""
+		if (length(x) == 1) section <<- gsub("[\\[\\]]", "", x)
+		if (length(x) <= 1) return()
+		return(c(x, section))
+	}
+	Lines <- readLines(filename)
+	ini <-  do.call("rbind", lapply(strsplit(Lines, "="), f)) 
+	for (i in 1:length(ini[,1])) {ini[i,1] = toupper(ini[i, 1])}
+	return(ini)
+}
+
+
+.raster.create.from.file.binary <- function(filename, band=1) {
     if (!file.exists(filename)) { 
 		stop(paste(filename," does not exist")) 
 		}
-	readini <- function(filename) {
-   # readini thanks to Gabor Grothendieck <ggrothendieck_at_gmail.com> 
-		f  <- function(x) {
-			section <- ""
-			if (length(x) == 1) section <<- gsub("[\\[\\]]", "", x)
-			if (length(x) <= 1) return()
-			return(c(x, section))
-		}
-		Lines <- readLines(filename)
-		ini <-  do.call("rbind", lapply(strsplit(Lines, "="), f)) 
-		for (i in 1:length(ini[,1])) {ini[i,1] = toupper(ini[i, 1])}
-		return(ini)
-	}
-	ini <-  readini(filename)
+	ini <- .readini(filename)
 	byteorder <- .Platform$endian
 	nbands <- as.integer(1)
 	band <- as.integer(1)

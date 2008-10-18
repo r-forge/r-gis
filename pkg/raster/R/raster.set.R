@@ -4,17 +4,30 @@
 # Version 0,1
 # Licence GPL v3
 
-
+raster.clear.data <- function(raster) {
+	raster@data@content == 'nodata'
+	raster@data@indices == ''
+	return(raster)
+}		
 
 raster.set.data.sparse <- function(raster, sparsedata, indices) {
-	stop('sorrrry, not yet implemented')
+	stop('sorry, not yet implemented')
 }
 
 raster.set.data.block <- function(raster, blockdata, firstcell, lastcell) {
 	if (!is.vector(blockdata)) {	stop('data must be a vector') }
-	if (!(is.numeric(blockdata) | is.integer(blockdata)) | is.logical(blockdata)) { stop('data must be values') }
-	ncells <- lastcell - firstcell + 1
-	if (ncells != length(blockdata)) { stop('length(blockdata) <> (lastcell - firstcell + 1)') }
+	if (length(blockdata) == 0) {	stop('length(blockdata==0). If this is intended use raster.data.clear(raster)') }
+	if (!(is.numeric(blockdata) | is.integer(blockdata) | is.logical(blockdata))) { stop('data must be values') }
+	
+	firstcol <- raster.get.col.from.cell(raster, firstcell)
+	lastcol <- raster.get.col.from.cell(raster, lastcell)
+	firstrow <- raster.get.row.from.cell(raster, firstcell)
+	lastrow <- raster.get.row.from.cell(raster, lastcell)
+	ncells <- (lastcol - firstcol + 1) * (lastrow - firstrow + 1)
+	
+	if (ncells != length(blockdata)) { 
+		stop( paste("length(blockdata):", length(blockdata), "does not match the number implied by firstcell and lastcell:", ncells)) 
+	}
 	raster@data@values <- blockdata
 	raster@data@content <- 'block' 
 	raster@data@indices <- c(firstcell, lastcell)
@@ -24,30 +37,31 @@ raster.set.data.block <- function(raster, blockdata, firstcell, lastcell) {
 
 raster.set.data.row <- function(raster, rowdata, rownr) {
 	if (!is.vector(rowdata)) {	stop('data must be a vector') }
-	if (!(is.numeric(rowdata) | is.integer(rowdata)) | is.logical(rowdata)) { stop('data must be values') }
-	if (length(data) == raster@ncols) { 
+	if (length(rowdata) == 0) {	stop('length(rowdata==0). If this is intended then use raster.data.clear(raster)') }
+	if (!(is.numeric(rowdata) | is.integer(rowdata) | is.logical(rowdata))) { stop(paste('data must be values, but class =',class(rowdata))) }
+	if (length(rowdata) != raster@ncols) { stop('length(rowdata) != raster@ncols') 
+	} else {	
 		raster@data@values <- rowdata
 		raster@data@content <- 'row' 
-		startcell <- raster.get.cell.from.rowcol(raster, row=rownr, col=1)
-		endcell <- raster.get.cell.from.rowcol(raster, row=rownr, col=raster@ncols)
-		raster@values@indices <- c(startcell, endcell)
-	} else { stop(paste('length(data) != raster@ncols', sep='')) }
-	return(raster)
+		firstcell <- raster.get.cell.from.rowcol(raster, rownr=rownr, colnr=1)
+		lastcell <- raster.get.cell.from.rowcol(raster, rownr=rownr, colnr=raster@ncols)
+		raster@data@indices <- c(firstcell, lastcell)
+		return(raster)
+	}	
 }	
 
 
 raster.set.data <- function(raster, data) {
 	if (!is.vector(data)) {stop('data must be a vector')}
-	if (!(is.numeric(data) | is.integer(data)) | is.logical(data)) {stop('data must be values')}
-	
-	if (length(data) == raster@ncells) { 
+	if (length(data) == 0) {	stop('length(data==0). If this is intended then use raster.data.clear(raster)') }
+	if (!(is.numeric(data) | is.integer(data) | is.logical(data))) {stop('data must be values')}
+	if (length(data) != raster@ncells) { stop('length(data) != raster@ncells') 
+	} else {	
 		raster@data@values <- data
 		raster@data@content <- 'all'
 		raster@data@indices <- c(1, raster@ncells)
-	} else {
-		stop(paste('length(data) != raster@ncells', sep=''))
+		return(raster)	
 	}	
-	return(raster)	
 }
 
 

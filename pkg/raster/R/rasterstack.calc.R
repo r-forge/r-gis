@@ -12,14 +12,15 @@ rasterstack.calc <- function(rasterstack, fun, filename=NA, overwrite=FALSE, For
 		out.raster <- raster.set.filename(out.raster, "")
 		for (rs in 1:rasterstack@nrasters) {
 			rasterstack <- rasterstack.read.all(rasterstack)
-			out.raster@data@values <- as.array(apply(rasterstack@data@values, 1, fun))
+			out.raster <- raster.set.data(out.raster, apply(rasterstack@data@values, 1, fun)) 
 		}	
 	} else {
 		out.raster <- raster.set.filename(out.raster, filename)
 		if (ForceIntOutput) { out.raster <- raster.set.datatype(out.raster, "integer") }
 		for (r in 1:rasterstack@nrows) {
 			rasterstack <- rasterstack.read.row(rasterstack, r)
-			out.raster@data@values <- as.array(apply(rasterstack@data@values, 1, fun))
+			out.raster <- raster.set.data.row(out.raster, apply(rasterstack@data@values, 1, fun), rownr=r) 
+#			out.raster@data@values <- as.array(apply(rasterstack@data@values, 1, fun))
 			raster.write.row(out.raster, r, overwrite)
 		}
 	}		

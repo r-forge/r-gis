@@ -1,20 +1,25 @@
 \name{raster.map}
 \alias{raster.map}
+\alias{rasterstack.map}
 \title{ Map a raster layer }
 \description{
   Make a map of a raster dataset
 }
 \usage{
 raster.map(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...)
+rasterstack.map(rasterstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{raster}{ raster object}
+  \item{raster}{ Raster object}
   \item{col} {a color palette, i.e. a vector of n contiguous colors such as \code{rainbow}, \code{heat.colors}, and \code{topo.colors}, on one or your own making}
   \item{subsample}{ if TRUE, the image is resampled using maxdim}
   \item{maxdim}{ maximum requsted number of pixels in the map display (either vertial or horizontal) }
   \item{...}{ any argument that can be passed to image.plot(fields) and to image(graphics)} 
-}
+  \item{rasterstack}{ RasterStack object}
+  \item{index}{ The index of a raster in the rasterstack 1 <= index <= rasterstack@nrasters }
+
+  }
 \details{
   If \code{subsample=FALSE}, then \code{maxdim} is ingored. Subsampled maps are made by skipping rows and columns. This is always 
   done in a regular pattern (e.g. skip every second row). For this reason, the actual number of pixels when \code{subsample = TRUE}

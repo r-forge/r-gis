@@ -151,7 +151,7 @@ raster.get.data <- function(raster) {
 }
 
 raster.get.matrix <- function(raster, names=FALSE) {
-	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
+	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all() or raster.read.row()") }
 	if (raster@data@content=="all") {
 		mdata <- as.array(matrix(raster@data@values, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE))
 		if (names) {

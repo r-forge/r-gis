@@ -10,8 +10,8 @@
 
 \title{ Miscellaneous functions }
 \description{
-  Low level functions for file and string handling. Get or change file extension or extract
-  the file name from a full name (path + filename). Trim a string of characters (remove the whitespace before or after the string).
+  Low level functions for file and string handling. Get or change file extension or extract the filename or path from a full name (path + filename). Trim a string of characters (remove the whitespace before or after the string).
+  And two miscellanous statistical functions (mode and coefficient of variation)
 }
 \usage{
 file.change.extension(filename, newextension)
@@ -33,7 +33,7 @@ raster.shortcuts()
 }
 
 \value{
-  file.get return a file extension, filename or path.  
+  file.get.* returns a file extension, filename or path.  
   calc.mode returns the modal (most frequent) value of a vector of values, ties are broken at random
   calc.cv returns the coefficient of variation (expressed as a percentage). If there is only a single value, sd = NA
   and calc.cv returns NA if singlevaluecvzero=FALSE. However, the default is that cv=0 in this case.
@@ -43,10 +43,14 @@ raster.shortcuts()
 \author{Robert J. Hijmans \email{r.hijmans@gmail.com}}
 
 \examples{
-  fn <- "c:/temp folder/this is the file name. this is the extension"
-  file.get.extension(fn)
-  file.change.extension(fn, ".txt")
-  file.get.name(fn)
+	fn <- "c:/temp folder/filename.extension"
+	file.get.extension(fn)
+	file.change.extension(fn, ".txt")
+	file.get.name(fn)
+	file.get.path(fn)
+	data <- c(0,1,2,3,3,3,3,4,4,4,5,5,6,7,7,8,9,NA)
+	calc.mode(data)
+	calc.cv(data)
 }
 \keyword{ spatial }
 

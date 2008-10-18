@@ -56,7 +56,7 @@ setClass('RasterFile',
 		shortname ='character', # short name
 		driver ='character', #gdal, raster
 		gdalhandle='list',
-		datatype ='character',
+		datatype ='character', #'numeric' or 'integer'
 		datasize ='integer',
 		datasigned='logical',
 		datanotation='character',
@@ -89,22 +89,22 @@ setClass('RasterFile',
 
 setClass('RasterData', 
 	representation (
-		source='character', # RAM, disk
 		values='vector', 
 		content='character', #nodata, all, row, block, sparse
 		indices = 'vector',
 		haveminmax = 'logical',
 		min ='numeric',
-		max ='numeric'
+		max ='numeric',
+		source='character' # RAM, disk
 		),
 	prototype (	
-		source='RAM',
 		values=vector(),
 		content='nodata', 
 		indices =vector(mode='numeric'),
 		haveminmax = FALSE,
 		min = numeric(1),
-		max = numeric(1)
+		max = numeric(1),
+		source='RAM'
 	),	
 	validity = function(object)
 	{

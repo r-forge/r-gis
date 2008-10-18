@@ -73,8 +73,8 @@ raster.write<- function(raster, overwrite=FALSE) {
 	# dir.create(fixed2, FALSE)		
 		
 		
-	divagrid <- file.change.extension(raster@file@name, ".gri")
-	con <- file(divagrid, "wb")
+	binraster <- file.change.extension(raster@file@name, ".gri")
+	con <- file(binraster, "wb")
 	raster@data@min <- min(raster@data@values, na.rm=TRUE )
 	raster@data@max <- max(raster@data@values, na.rm=TRUE )
 	raster@data@haveminmax <- TRUE
@@ -108,8 +108,8 @@ raster.write.row <- function(raster, rownumber, overwrite=FALSE) {
 			stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) 
 		}
 		raster@file@name <- file.change.extension(raster@file@name, ".grd")
-		divagrid <- file.change.extension(raster@file@name, ".gri")
-		raster__binary__connection__wb <<- file(divagrid, "wb")
+		binraster <- file.change.extension(raster@file@name, ".gri")
+		raster__binary__connection__wb <<- file(binraster, "wb")
 		raster@data@min <- 3e34
 		raster@data@max <- -3e34 	
 		raster@data@haveminmax <- FALSE

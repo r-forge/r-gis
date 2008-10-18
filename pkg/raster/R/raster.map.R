@@ -4,9 +4,20 @@
 # Version 0,1
 # Licence GPL v3
 
+rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
+	index <- round(index)
+	i <- min(max(1, index), rasterstack@nrasters)
+	if (i != index) {stop("index should be >= 1 and <= rasterstack@nrasters")}
+	raster <- rasterstack@rasters[[i]]
+	if (rasterstack@data@content == 'all') {
+		raster <- raster.set.data(raster, rasterstack@data@values[i,])
+	}
+	raster.map(raster, col=col, subsample=subsample, maxdim=maxdim, ...)
+}	
+
+
 raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
-#    z <- raster.read.rows(raster, 1, raster@nrows)
-	if (length(raster@data@values) != raster@ncells) { 
+	if (length(raster@data@content) != 'all') { 
 		if (subsample) {
 			m <- .raster.read.skip(raster, maxdim) 
 			xres <- (raster@xmax - raster@xmin) / dim(m)[2]
@@ -21,21 +32,19 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 		}	
 	} else {
 		m <- raster.get.matrix(raster) 
+		# should sample here too if subsample = T
 		x <- (0:raster@ncols) * raster@xres + raster@xmin 
 		y <- (0:raster@nrows) * raster@yres + raster@ymin 
 	}
-
 	z <- t(m[nrow(m):1,])
 	image.plot(x, y, z, col=col, axes = TRUE, xlab="", ylab="", legend.width = 0.8, ...)
-	
+	box()
 #	image(x, y, z, col=col, axes = FALSE, xlab="", ylab="")
 #	contour(x, y, z, add = TRUE, col = "peru")
 #	xincr <- (raster@xmax - raster@xmin) / 12
 #	yincr <- (raster@ymax - raster@ymin) / 10
 #	axis(1, at = seq(raster@xmin, raster@xmax, by = xincr))
 #	axis(2, at = seq(raster@ymin, raster@ymax, by = yincr))
-	box()
-	raster@data@values <- vector(length=0)
 #	title(main = raster@file@shortname, font.main = 4)
 }	
 

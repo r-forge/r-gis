@@ -4,51 +4,29 @@
 # Date : June 2008
 # Version 0,3
 # Licence GPL v3
-#
 
 
-raster.get.data <- function(raster) {
-	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
-	return(raster@data@values)
+# read entire raster
+raster.read.all <- function(raster) {
+	raster <- raster.read.row(raster, -1)
+	raster@data@min <- min(raster@data@values, na.rm=TRUE)
+	raster@data@max <- max(raster@data@values, na.rm=TRUE)
+	raster@data@haveminmax <- TRUE
+	raster@data@content <- "all"
+	raster@data@indices <- c(1, raster@ncells)
+	return(raster)
 }
 
-raster.get.matrix <- function(raster, names=FALSE) {
-	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
-	if (raster@data@content=="all") {
-		mdata <- as.array(matrix(raster@data@values, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE))
-		if (names) {
-			colnames(mdata) <- seq(1:raster@ncols)
-			rownames(mdata) <- seq(1:raster@nrows)
-		}	
-		return(mdata)
-	} else if (raster@data@content=="block") {
-		startrow <- raster.get.row.from.cell(raster, raster@data@indices[1])
-		startcol <- raster.get.col.from.cell(raster, raster@data@indices[1])
-		endrow <- raster.get.row.from.cell(raster, raster@data@indices[2])
-		endcol <- raster.get.col.from.cell(raster, raster@data@indices[2])
-		ncols <- 1 + endcol - startcol
-		nrows <- 1 + endrow - startrow
-		
-		mdata <- as.matrix(t(raster@data@values[1:ncols]))
-		if (nrows > 1) {
-			for (i in 2:nrows) {
-				arow <- raster@data@values[((i-1)*ncols+1):((i-1)*ncols+ncols)]
-				mdata <- rbind(mdata, t(arow))
-			}
-		}
-		if (names) {
-			rowlist <- list()
-			for (i in 1:nrows) {
-				r <- startrow + i - 1
-				rowlist[i] <- paste(r, sep="")
-				rownames(mdata) <- rowlist
-				colnames(mdata) <- seq(1:ncols)+startcol-1
-			}	
-		}
-		return(mdata)
-	}	
+#read a single row
+raster.read.row <- function(raster, rownr) {
+	raster <- raster.read.part.of.row(raster, rownr)
+	return(raster)
 }
 
+#read multiple rows
+raster.read.rows <- function(raster, startrow, nrows=3) {
+	return(raster.read.block(raster, startrow, nrows))
+}	
 
 #read a block of data  (a rectangular area  of any dimension)  
 raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncols=(raster@ncols-startcol+1)) {
@@ -69,51 +47,24 @@ raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncols=(rast
 		nrows <- endrow - startrow + 1
 	}
 	raster <- raster.read.part.of.row(raster, startrow, startcol, ncols)
-	result <- raster@data@values
+	blockdata <- raster.get.data(raster)
 	if (nrows > 1) {
 		for (r in (startrow+1):endrow) {
 			raster <- raster.read.part.of.row(raster, r,  startcol, ncols)
-			result <- c(result, raster@data@values)
+			blockdata <- c(blockdata, raster.get.data(raster))
 		}	
 	}	
-	raster@data@values <- result
-	raster@data@content <- "block"
-	raster@data@indices <- c(raster.get.cell.from.rowcol(raster, startrow, startcol), raster.get.cell.from.rowcol(raster, endrow, (startcol+ncols-1)))
+	startcell <- raster.get.cell.from.rowcol(raster, startrow, startcol)
+	endcell <- raster.get.cell.from.rowcol(raster, endrow, (startcol+ncols-1))
+	raster <- raster.set.data.block(raster, blockdata, startcell, endcell)
 	return(raster)
 }
 
-
-# read entire raster
-raster.read.all <- function(raster) {
-	raster <- raster.read.row(raster, -1)
-	raster@data@min <- min(raster@data@values, na.rm=TRUE)
-	raster@data@max <- max(raster@data@values, na.rm=TRUE)
-	raster@data@haveminmax <- TRUE
-	raster@data@content <- "all"
-	raster@data@indices <- c(1, raster@ncells)
-	return(raster)
-}
-
-#raster.read.sparse <- function(raster) {
-#	d <- raster.read.row(raster, -1)
-#	stop("not implemented yet")
-#}
-
-
-#read multiple rows
-raster.read.rows <- function(raster, startrow, nrows=3) {
-	return(raster.read.block(raster, startrow, nrows))
-}	
-
-#read a single row
-raster.read.row <- function(raster, rownr) {
-	raster <- raster.read.part.of.row(raster, rownr)
-	raster@data@content <- "row"
-	return(raster)
-}
 
 #read part of a single row
 raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@ncols-startcol+1)) {
+	rownr <- round(rownr)
+	if (rownr == 0) { stop("rownr == 0. It should be between 1 and raster@nrows, or -1 for all rows") }
 	if (rownr > raster@nrows) { stop("rownr too high") }
 	if (startcol < 1) { stop("startcol < 1") }
 	if (startcol > raster@ncols) { stop("startcol  > raster@ncols") }
@@ -154,8 +105,16 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 		if (!is.vector(result)) { result <- as.vector(result) }
 	} 
 	raster@data@values <- as.vector(result)
-	raster@data@indices <- c(raster.get.cell.from.rowcol(raster, max(rownr, 1), startcol), raster.get.cell.from.rowcol(raster, max(rownr, 1), endcol))
-	raster@data@content <- "block"
+	if (rownr < 0) {
+		raster@data@indices <- c(1, raster@ncells)
+		raster@data@content <- "all"
+	} else if (startcol==1 && ncols==(raster@ncols-startcol+1)) {
+		raster@data@indices <- c(raster.get.cell.from.rowcol(raster, rownr, startcol), raster.get.cell.from.rowcol(raster, rownr, endcol))
+		raster@data@content <- "row"
+	} else {
+		raster@data@indices <- c(raster.get.cell.from.rowcol(raster, rownr, startcol), raster.get.cell.from.rowcol(raster, rownr, endcol))
+		raster@data@content <- "block"
+	}	
 	return(raster)
 }
 
@@ -255,4 +214,6 @@ raster.read.cells <- function(raster, cells) {
 		return(cells[,2:3])
 	}	
 }
+
+
 

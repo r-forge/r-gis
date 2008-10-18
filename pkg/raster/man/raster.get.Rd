@@ -1,6 +1,11 @@
 \name{raster.get}
 \alias{raster.get.data}
 \alias{raster.get.matrix}
+\alias{raster.get.ncols}
+\alias{raster.get.nrows}
+\alias{raster.get.ncells}
+\alias{raster.get.xres}
+\alias{raster.get.yres}
 \alias{raster.get.col.from.cell}
 \alias{raster.get.row.from.cell}
 \alias{raster.get.cell.from.rowcol}
@@ -15,19 +20,22 @@
 \alias{raster.is.valid.cell}
 
   
-\title{ Get column, row, or cell number from coordinates and vice versa }
+\title{ Get raster property values or compute column, row, or cell number of a raster from coordinates and vice versa }
 \description{
   raster.get.data returns datavalues that are associated with the raster object (e.g. after raster.read.* has been used). Data are returned as a vector. 
   raster.get.matrix will return a matrix, optionally with the row and col numbers as names of the whole or part of the data that has been previously 
-  Get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or
-  get the coordiantes of the center of a raster cell from a column, or cell number(s)
-  There are relatively low-level operations that most users will not use. 
-  They are needed for manipulating grids and point to grid conversion
+  raster.get.ncells, nrows, ncols, xres, yres simply take the values from the data slots in the Raster or RasterStack object. It is advisable to use these and other 'get' and 'set' functions rather than dirctly accessing the slots of an object. This will ensure object integrity and ensure that code will not break in the future, even if the underlying class definitions change. 
+  raster.get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
 }
 
 \usage{
 raster.get.data(raster)
 raster.get.matrix(raster, names=FALSE)
+raster.get.ncols(raster)
+raster.get.nrows(raster)
+raster.get.ncells(raster)
+raster.get.xres(raster)
+raster.get.yres(raster)
 raster.get.col.from.cell(raster, cell)
 raster.get.row.from.cell(raster, cell)
 raster.get.cell.from.rowcol(raster, rownr, colnr)
@@ -42,7 +50,6 @@ raster.get.cxy.from.box(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@
 raster.is.valid.cell(raster, cell) 
 }
 
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{raster}{ raster or rasterstack object }
   \item{names}{ If TRUE, row and col names are provided }
@@ -60,7 +67,7 @@ raster.is.valid.cell(raster, cell)
  }
   
 \details{
-  All these functions accept a single value (or x, y pair), or a vector or list of these values,
+  The get.col.from.cell and similar functions accept a single value (or x, y pair), or a vector or list of these values,
   Cell numbers start at 1 in the upper left corner, and increase from left to right, and then from top to bottom
   The last cell number equals the number of cells of the raster.
 }
@@ -75,7 +82,7 @@ raster.is.valid.cell(raster, cell)
 \examples{
 #using a new default raster (1 degree global)
 rs <- raster.create.new()
-rs
+raster.get.ncells(rs)
 raster.get.col.from.cell(rs, 10000)
 raster.get.row.from.cell(rs, 10000)
 raster.get.col.from.x(rs, 0.5)

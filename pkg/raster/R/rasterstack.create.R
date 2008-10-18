@@ -89,10 +89,12 @@ rasterstack.add.rasters <- function(rasterstack, rasters) {
 			if (rasterstack@ymax != raster@ymax) {addraster <- FALSE}
 			count <- 1
 			for (j in 1:(i-1)) {
-				if (raster@file@shortname == rasterstack@rasters[[j]]@file@shortname) { count <- count + 1 }
+				if (raster@file@shortname == rasterstack@rasters[[j]]@file@shortname) { 
+					count <- count + 1 
+				}
 			}	
 			if (count > 1) { 
-				warning(paste("raster:",raster@file@shortname, "added", count, "times")) }
+				raster@file@shortname <- paste(raster@file@shortname, "_", count, sep="")) }
 		}	
 		if (addraster) { 
 			rasterstack@rasters[i] <- raster 

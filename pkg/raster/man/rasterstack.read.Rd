@@ -12,7 +12,7 @@
 \usage{
 rasterstack.read.all(rasterstack)
 rasterstack.read.row(rasterstack, rownumber)
-rasterstack.read.part.of.row(rasterstack, rownumber, startcol, ncols)
+rasterstack.read.part.of.row(rasterstack, rownumber, startcol=1, ncols=(rasterstack@ncols-startcol+1)) 
 rasterstack.read.xy(rasterstack, xy)
 rasterstack.read.cell(rasterstack, cell)
 }
@@ -20,10 +20,10 @@ rasterstack.read.cell(rasterstack, cell)
 \arguments{
   \item{rasterstack}{ a rasterstack object  }
   \item{rownumber}{ number of the row for which to read data }
-  \item{startcol}{  }
-  \item{ncols}{  }
-  \item{xy}{ ~~Describe \code{xy} here~~ }
-  \item{cell}{ ~~Describe \code{xy} here~~ }  
+  \item{startcol}{ first column to read }
+  \item{ncols}{ number of columns to read }
+  \item{xy}{ pair(s) of x an y coordinates, e.g., c(0, 0) }
+  \item{cell}{ (vector of) cell number(s) }  
  }
 
 \value{

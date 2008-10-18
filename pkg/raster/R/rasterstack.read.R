@@ -5,36 +5,28 @@
 # Licence GPL v3
 
  rasterstack.read.all <- function(rasterstack) {
-	return(rasterstack.read.row(rasterstack, rownumber=-1))
-}
-
-
- rasterstack.read.row <- function(rasterstack, rownumber) {
-	band <- 1
-	for (i in 1:length(rasterstack@rasters)) {
-		rs <- raster.read.row(rasterstack@rasters[[i]], rownumber)
-		if ( i == 1 )  { dd <- as.matrix(rs@data@values)
-		} else { dd <- cbind(dd, rs@data@values) }	   
-	colnames(dd)[i] <- rasterstack@rasters[[i]]@file@shortname
-	}
-	rasterstack@data@values <- as.matrix(dd)
+	rasterstack <- rasterstack.read.part.of.row(rasterstack, rownumber=-1)
 	return(rasterstack)
 }
 
 
+ rasterstack.read.row <- function(rasterstack, rownumber) {
+	return(rasterstack.read.part.of.row(rasterstack, rownumber))
+}
+
+
  rasterstack.read.part.of.row <- function(rasterstack, rownumber, startcol=1, ncols=(rasterstack@ncols-startcol+1)) {
-	band <- 1
 	for (i in 1:length(rasterstack@rasters)) {
 		rs <- raster.read.part.of.row(rasterstack@rasters[[i]], rownumber, startcol, ncols)
 		if ( i == 1 )  {
-			dd <- as.matrix(rs@data@values)
+			rasterstack@data@values <- as.matrix(raster.get.data(rs))
 		}
 		else {
-			dd <- cbind(dd, rs@data@values) 
+			rasterstack@data@values <- cbind(rasterstack@data@values, raster.get.data(rs)) 
 		}	   
-	colnames(dd)[i] <- rasterstack@rasters[[i]]@file@shortname
 	}
-	rasterstack@data@values <- as.array(dd)
+	rasterstack@data@content <- rs@data@content
+	rasterstack@data@indices <- rs@data@indices
 	return(rasterstack)
 }
 
