@@ -4,12 +4,24 @@
 # Version 0,1
 # Licence GPL v3
 
+raster.get.ncols <- function(raster) {
+	return(raster@ncols)
+}
 
-raster.is.valid.cell <- function(raster, cell) {
-	cell <- round(cell)
-	validcell <- vector(length=length(cell))
-	validcell[cell > 0 & cell <= raster@ncells] <- TRUE
-	return(validcell)
+raster.get.nrows <- function(raster) {
+	return(raster@nrows)
+}
+
+raster.get.ncells <- function(raster) {
+	return(raster@ncells)
+}
+
+raster.get.xres <- function(raster) {
+	return(raster@xres)
+}
+
+raster.get.yres <- function(raster) {
+	return(raster@yres)
 }
 
 
@@ -30,7 +42,8 @@ raster.get.x.from.col <- function(raster, colnr) {
 raster.get.row.from.cell <- function(raster, cell) {
 	cell <- as.integer(round(cell))
 	cell[cell < 1 | cell > raster@ncells] <- NA
-	rownr <- as.integer(trunc(cell / (raster@ncols+1)) + 1)
+	rownr <- as.integer(trunc((cell-1)/raster@ncols) + 1)
+#	rownr <- as.integer(trunc(cell / (raster@ncols+1)) + 1)
     return(rownr)
 }
 
@@ -38,7 +51,9 @@ raster.get.row.from.cell <- function(raster, cell) {
 raster.get.col.from.cell <- function(raster, cell) {
 	cell <- as.integer(round(cell))
 	cell[cell < 1 | cell > raster@ncells] <- NA	
-	colnr <- as.integer(trunc(cell - (trunc(cell / (raster@ncols+1) )) * raster@ncols))
+	rownr <- as.integer(trunc((cell-1)/raster@ncols) + 1)
+	colnr <- as.integer(cell - ((rownr-1) * raster@ncols))
+#	colnr <- as.integer(trunc(cell - (trunc(cell / (raster@ncols+1) )) * raster@ncols))
     return(colnr)
 }
 
@@ -120,3 +135,55 @@ raster.get.cxy.from.box <- function(raster, xmin=raster@xmin, xmax=raster@xmax, 
 	cxy <- cbind(cells, raster.get.xy.from.cell(raster, cells))
 	return(cxy)
 }
+
+
+raster.is.valid.cell <- function(raster, cell) {
+	cell <- round(cell)
+	validcell <- vector(length=length(cell))
+	validcell[cell > 0 & cell <= raster@ncells] <- TRUE
+	return(validcell)
+}
+
+
+raster.get.data <- function(raster) {
+	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
+	return(raster@data@values)
+}
+
+raster.get.matrix <- function(raster, names=FALSE) {
+	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
+	if (raster@data@content=="all") {
+		mdata <- as.array(matrix(raster@data@values, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE))
+		if (names) {
+			colnames(mdata) <- seq(1:raster@ncols)
+			rownames(mdata) <- seq(1:raster@nrows)
+		}	
+		return(mdata)
+	} else if (raster@data@content=="block") {
+		startrow <- raster.get.row.from.cell(raster, raster@data@indices[1])
+		startcol <- raster.get.col.from.cell(raster, raster@data@indices[1])
+		endrow <- raster.get.row.from.cell(raster, raster@data@indices[2])
+		endcol <- raster.get.col.from.cell(raster, raster@data@indices[2])
+		ncols <- 1 + endcol - startcol
+		nrows <- 1 + endrow - startrow
+		
+		mdata <- as.matrix(t(raster@data@values[1:ncols]))
+		if (nrows > 1) {
+			for (i in 2:nrows) {
+				arow <- raster@data@values[((i-1)*ncols+1):((i-1)*ncols+ncols)]
+				mdata <- rbind(mdata, t(arow))
+			}
+		}
+		if (names) {
+			rowlist <- list()
+			for (i in 1:nrows) {
+				r <- startrow + i - 1
+				rowlist[i] <- paste(r, sep="")
+				rownames(mdata) <- rowlist
+				colnames(mdata) <- seq(1:ncols)+startcol-1
+			}	
+		}
+		return(mdata)
+	}	
+}
+
