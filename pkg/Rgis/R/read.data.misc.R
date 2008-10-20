@@ -32,7 +32,7 @@ set.data.path <- function(path, create=FALSE) {
 }	
 
 get.data.path <- function() {
-	path <- paste(Sys.getenv("R_GIS_DATA_DIR"))
+	path <- Sys.getenv("R_GIS_DATA_DIR")
 	if (path == "") {
 		path <- try(  readLines(paste(system.file(package="Rgis"), "/data/datadir", sep='')) )  
 	}

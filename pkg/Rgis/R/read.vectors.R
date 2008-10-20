@@ -16,13 +16,50 @@
 	indices <- .get.indices()
 	record <- subset(indices, indices[,1] == var)
 	if (record["subvar1"] != "ISO") { stop( 'not a country dataset' ) }
-	isos <- .get.ISO3()
-	iso <- subset(isos, isos[,2] == ISO3) 
-	if (length(iso)==0) { stop('this is not a valid ISO3 code. You can use list.ISO3() to find one') }
 }
 
+read.country.data <- function(country="ABW", varname="adm", level=0, rasterformat="raster", download=TRUE) {
+	path <- paste(get.data.path(), "/", varname, sep="")
+	if (!file.exists(path)) {  dir.create(path, recursive=T)  }
+	path <- paste(path, "/", sep="")
+	
+	if (varname == "adm") {
+		filename <- paste(path, varname, '_', country, level, ".RData", sep="")
+		theurl <- paste("http://www.r-gis.org/rgis/data/", varname, "/", varname, '_', country, level, ".RData", sep="")
+	} else {
+		filename <- paste(path, varname, '_', country, ".RData", sep="") 
+		theurl <- paste("http://www.r-gis.org/rgis/data/", varname, "/", varname, '_', country, ".RData", sep="")
+	}	
+	
+	if (!file.exists(filename)) {
+		isos <- .get.ISO3()
+		iso <- subset(isos, isos[,2] == country) 
+		if (length(iso)==0) { stop('this is not a valid ISO3 country code. You can use list.ISO3() to find one') }
+	
+		if (download) {
+			download.file(url=theurl, destfile=filename, method="auto", quiet = FALSE, mode = "wb", cacheOK = TRUE)
+			if (!file.exists(filename))
+				{ cat("\nCould not download file -- perhaps it does not exist \n") }
+		} else {
+			cat("\nFile not available locally. Use 'download = TRUE'\n")
+		}
+	}	
+
+	if (file.exists(filename)) {
+		thisenvir = new.env()
+		data <- get(load(filename, thisenvir), thisenvir)
+		if (class(data) == 'Raster') {
+			if (rasterformat != 'raster') {
+#				data <- raster.to.sp(raster)
+			}
+		}
+		return(data)
+	} 
+}
+
+
 read.adm <- function(ISO3="ABW", level=0, download=TRUE ) {
-	varname <- "adm"	
+	varname <- "adm"
 	path <- paste(get.data.path(), "/", varname, sep="")
 	if (!file.exists(path)) {  dir.create(path, recursive=T)  }
 	path <- paste(path, "/", sep="")
@@ -64,7 +101,9 @@ list.ISO3 <- function(start=1, end=243) {
 
 
 list.adm <- function(ISO3=NA, level=NA) {
-	path <- get.data.path()
+	varname <- 'adm'
+	path <- paste(get.data.path(), "/", varname, sep="")
+	
 	if (is.na(ISO3)) {
 		if (is.na(level)) {
 			ISOS <- list.files(path, pattern = "^adm_",full.names=TRUE)
@@ -93,7 +132,9 @@ list.adm <- function(ISO3=NA, level=NA) {
 
 
 remove.adm <- function(ISO3=NA, level=NA) {
-	path <- get.data.path()
+	varname <- 'adm'
+	path <- paste(get.data.path(), "/", varname, sep="")
+
 	if (is.na(ISO3)) {cat("\nSpecify a country (ISO3) code.\n") 
 	} else if (ISO3 == "ALL") {
 		if (is.na(level)) {
