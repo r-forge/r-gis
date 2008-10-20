@@ -26,12 +26,12 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 			y <- (0:dim(m)[1]) * yres + raster@ymin 
 		} else {
 			raster <- raster.read.all(raster)
-			m <- raster.get.matrix(raster)
+			m <- .raster.get.matrix(raster)
 			x <- (0:raster@ncols) * raster@xres + raster@xmin 
 			y <- (0:raster@nrows) * raster@yres + raster@ymin 
 		}	
 	} else {
-		m <- raster.get.matrix(raster) 
+		m <- .raster.get.matrix(raster) 
 		# should sample here too if subsample = T
 		x <- (0:raster@ncols) * raster@xres + raster@xmin 
 		y <- (0:raster@nrows) * raster@yres + raster@ymin 

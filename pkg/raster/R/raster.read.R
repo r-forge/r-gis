@@ -123,7 +123,7 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 .raster.read.skip <- function(raster, maxdim=500) {
 	rasdim <- max(raster@ncols, raster@nrows )
 	if (rasdim <= maxdim) { 
-		dd <- raster.get.matrix(raster.read.all(raster))
+		dd <- .raster.get.matrix(raster.read.all(raster))
 	} else {
 		fact <- maxdim / rasdim
 		ncols <- trunc(fact * raster@ncols)

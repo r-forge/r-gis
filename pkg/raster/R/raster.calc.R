@@ -4,16 +4,27 @@
 # Version 0,1
 # Licence GPL v3
 
+.raster.add.history <- function(raster, message) {
+	if (is.character(message) && message != "") {
+		raster@history <- c(message, raster@history)
+	}	
+}
+
+
+
 raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALSE) {
 	out.raster <- raster.set.filename(raster, filename)
 	if (INT) { out.raster <- raster.set.datatype(out.raster, "integer")  }
 	else { out.raster <- raster.set.datatype(out.raster, "numeric") }
 	
-	if (raster@data@content == 'all') {
+	if (raster@data@content == 'nodata' && raster@data@source == 'ram') { stop('raster has no data on disk or in memory') }
+	
+	if (raster@data@content != 'nodata') {
 		out.raster@data@values <- as.vector(fun(raster@data@values)) 
-		if (!is.na(filename)) {
+		if (!is.na(filename) && raster@data@content == 'all') {
 			out.raster <- raster.write(out.raster, overwrite=overwrite)
 		}	
+
 	} else if (raster@data@source == 'disk') {
 		for (r in 1:raster@nrows) {
 			raster <- raster.read.row(raster, r)
@@ -34,7 +45,7 @@ raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALS
 				}
 			}	
 		}
-	}	
+	} 	
 	return(out.raster)
 }
 

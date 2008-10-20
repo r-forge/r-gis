@@ -115,10 +115,13 @@ setClass('RasterData',
 setClass ('Raster',
 	contains = 'AbstractRaster',
 	representation (
+		title = 'character',
 		file = 'RasterFile',
-		data = 'RasterData'	
+		data = 'RasterData',
+		history = 'vector'
 		),
 	prototype (
+		history = vector(mode='character')
 		)
 	)
 	

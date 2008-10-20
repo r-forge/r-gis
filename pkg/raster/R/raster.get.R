@@ -145,20 +145,36 @@ raster.is.valid.cell <- function(raster, cell) {
 }
 
 
-raster.get.data <- function(raster) {
-	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all()") }
-	return(raster@data@values)
+raster.get.data <- function(raster, format='vector', names=FALSE) {
+	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all()") }
+	if (format=='matrix') {  return(.raster.get.matrix(raster, names)) 
+	} else { return(raster@data@values) 
+	}
 }
 
-raster.get.matrix <- function(raster, names=FALSE) {
-	if (raster@data@content=="nodata") {stop("First read some data (e.g., raster.read.all() or raster.read.row()") }
+.raster.get.matrix <- function(raster, names=FALSE) {
+	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all() or raster.read.row()") }
+	
 	if (raster@data@content=="all") {
-		mdata <- as.array(matrix(raster@data@values, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE))
+		mdata <- matrix(raster@data@values, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE)
 		if (names) {
 			colnames(mdata) <- seq(1:raster@ncols)
 			rownames(mdata) <- seq(1:raster@nrows)
 		}	
 		return(mdata)
+
+	} else if (raster@data@content=="sparse") {
+		stop("sparse data matrix not implemented yet")
+
+	} else if (raster@data@content=="row") {
+		mdata <- matrix(raster@data@values, nrow=1, ncol=raster@ncols, byrow=TRUE)
+		if (names) {
+			colnames(mdata) <- seq(1:raster@ncols)
+			therow <- raster.get.row.from.cell(raster, raster@data@indices[1])
+			rownames(mdata) <- therow
+		}
+		return(mdata)
+		
 	} else if (raster@data@content=="block") {
 		startrow <- raster.get.row.from.cell(raster, raster@data@indices[1])
 		startcol <- raster.get.col.from.cell(raster, raster@data@indices[1])

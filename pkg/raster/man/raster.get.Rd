@@ -1,6 +1,5 @@
 \name{raster.get}
 \alias{raster.get.data}
-\alias{raster.get.matrix}
 \alias{raster.get.ncols}
 \alias{raster.get.nrows}
 \alias{raster.get.ncells}
@@ -29,8 +28,7 @@
 }
 
 \usage{
-raster.get.data(raster)
-raster.get.matrix(raster, names=FALSE)
+raster.get.data(raster, format='vector', names=FALSE)
 raster.get.ncols(raster)
 raster.get.nrows(raster)
 raster.get.ncells(raster)
@@ -52,6 +50,7 @@ raster.is.valid.cell(raster, cell)
 
 \arguments{
   \item{raster}{ raster or rasterstack object }
+  \item{format}{ use \code{vector} to get the data as a single vector or \code{matrix} to get them as a matrix }
   \item{names}{ If TRUE, row and col names are provided }
   \item{x}{  x coordinate(s) }
   \item{y}{  y coordinate(s) }
