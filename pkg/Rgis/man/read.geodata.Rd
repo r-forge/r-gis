@@ -48,9 +48,5 @@ read.srtm(x=106, y=-6, download=TRUE)
 
 \author{ \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} } }
 \examples{
-	x <- read.adm()
-	plot(x)
-	list.adm()
-	remove.adm()
 }
 \keyword{ spatial }

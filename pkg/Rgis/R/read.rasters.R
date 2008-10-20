@@ -6,8 +6,8 @@
 
 
 read.srtm <- function(x=106, y=-6, download=TRUE) {
-	pack <- 'Rgis'
 	varname <- 'srtm'
+	path <- get.data.path()
 	
 	x <- min(180, max(-180, x))
 	y <- min(60, max(-60, y))
@@ -18,8 +18,8 @@ read.srtm <- function(x=106, y=-6, download=TRUE) {
 	if (col < 10) { col <- paste('0', col, sep='') }
 	
 	f <- paste(varname, '_', col, '_', row, sep="")
-	zipfilename <- paste(system.file(package=pack), "/data/", f, ".ZIP", sep="")
-	tiffilename <- paste(system.file(package=pack), "/data/", f, ".TIF", sep="")
+	zipfilename <- paste(path, "/", f, ".ZIP", sep="")
+	tiffilename <- paste(path, "/", f, ".TIF", sep="")
 	
 	if (!file.exists(tiffilename)) {
 		if (!file.exists(zipfilename)) {
@@ -30,7 +30,7 @@ read.srtm <- function(x=106, y=-6, download=TRUE) {
 		}
 		if (file.exists(zipfilename)) { 
 			wd <- getwd()
-			setwd( paste(system.file(package=pack), "/data", sep='') )
+			setwd( path )
 			zipfn <- paste(f, ".ZIP", sep="")
 			fn <- paste(f, ".TIF", sep="")
 			zip.file.extract(file = fn, zipname = zipfn)
