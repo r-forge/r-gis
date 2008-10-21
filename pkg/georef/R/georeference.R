@@ -43,10 +43,10 @@ get.ndigits <- function(x){
 
 
 #Detect conversion error (degrees-minutes to decimals) 
-detect.conversion.error <- function(xy){
+detect.conversion.error <- function(xy,min.ndigits){
 	xy <- na.omit(xy)
 	number.digits <- cbind(ndigits(xy[,1]),ndigits(xy[,2]))
-	index <- which((pmin(number.digits[,1],number.digits[,2]) + (as.numeric(abs(number.digits[,1]-number.digits[,2]))==1))>=2)
+	index <- which((pmin(number.digits[,1],number.digits[,2]) + (as.numeric(abs(number.digits[,1]-number.digits[,2]))==1))>=min.ndigits)
 	xy <- xy[index,]
 	xy <- abs(xy)
 	xy.dec <- xy - trunc(xy,digits=0)
