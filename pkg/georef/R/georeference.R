@@ -50,8 +50,8 @@ detect.conversion.error <- function(xy){
 	xy <- xy[index,]
 	xy <- abs(xy)
 	xy.dec <- xy - trunc(xy,digits=0)
-	a <- length(subset(xy.dec,xy.dec[,1]<0.6 & xy.dec[,2]<0.6)[,1])
-	b <- length(xy.dec[,1]) - a
-	p.value <- chisq.test(c(a,b),p=c(0.36,0.64))$p.value
-	return(list(p.value = p.value,estimated.number.wrongly.converted.coordinates = max(0,round(a - (a+b)*0.36)), total.evaluated.coordinates = a+b))}
-
+	fr <- vector(length=10)
+	for (i in 1:10)
+	fr[i] <- length(subset(xy.dec,xy.dec[,1]>(i-1)/10 & xy.dec[,2]<i/10)[,1])
+	p.value <- chisq.test(fr,p=rep(0.1,times=10))$p.value
+	return(list(p.value = p.value,frequencies = fr))}
