@@ -43,15 +43,15 @@ get.ndigits <- function(x){
 
 
 #Detect conversion error (degrees-minutes to decimals) 
-detect.conversion.error <- function(x,digits){
-	x <- as.vector(na.omit(x))
-    x <- x[get.ndigits(x) >= digits]
-    x <- abs(x)
-    x.dec <- x - trunc(x,digits=0)
-    a <- length(x.dec[x.dec < 0.6])
-    b <- length(x.dec[x.dec > 0.6])
-	result <- chisq.test(c(a,b), p=c(0.6,0.4))
-	return(list(p.value = result$p.value, estimated.number.wrong = round(a - (a+b)*0.6)))
- }
-
+detect.conversion.error <- function(xy){
+	xy <- na.omit(xy)
+	number.digits <- cbind(ndigits(xy[,1]),ndigits(xy[,2]))
+	index <- which((pmin(number.digits[,1],number.digits[,2]) + (as.numeric(abs(number.digits[,1]-number.digits[,2]))==1))>=2)
+	xy <- xy[index,]
+	xy <- abs(xy)
+	xy.dec <- xy - trunc(xy,digits=0)
+	a <- length(subset(xy.dec,xy.dec[,1]<0.6 & xy.dec[,2]<0.6)[,1])
+	b <- length(xy.dec[,1]) - a
+	p.value <- chisq.test(c(a,b),p=c(0.36,0.64))$p.value
+	return(list(p.value = p.value,estimated.number.wrongly.converted.coordinates = max(0,round(a - (a+b)*0.36)), total.evaluated.coordinates = a+b))}
 
