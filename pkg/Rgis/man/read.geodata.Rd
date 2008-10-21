@@ -1,8 +1,8 @@
-\name{read.adm}
+\name{read.data}
 \alias{read.adm}
 \alias{list.adm}
 \alias{remove.adm}
-\alias{list.ISO3}
+\alias{list.country.codes}
 \alias{read.srtm}
 
 
@@ -14,21 +14,21 @@
 	list.adm shows which data layers are locally available (have been downloaded)
 	remove.adm can be used to remove layers from the local disk
 	
-	list.ISO3 shows the ISO3 codes for all countries
+	list.country.codes shows names (in English) and their corresponding ISO3 codes for all countries
 	
 	read.srtm reads (after download) SRTM elevation data (90 m resolution) by 5 x 5 degrees tile. Only available between 60 S and 60 N
 
 }
 \usage{
-read.adm(ISO3="ABW", level = 0, download=TRUE)
-list.adm(ISO3=NA, level=NA)
-remove.adm(ISO3=NA, level=NA)
-list.ISO3(start=1, end=243)
+read.adm(country="ABW", level = 0, download=TRUE)
+list.adm(country=NA, level=NA)
+remove.adm(country=NA, level=NA)
+list.country.codes(start=1, end=243)
 read.srtm(x=106, y=-6, download=TRUE)
 }
 
 \arguments{
-  \item{ISO3}{ The \code{ISO3} code for a country }
+  \item{country}{ The \code{ISO3} code for a country }
   \item{level}{ The \code{level} of administrative division; 0 is country, 1 is first level of subdivision, etc. }
   \item{download}{ if \code{download} is TRUE, the data are downloaded to the local system if they are not there. }
   \item{start}{ an integer between 1 and 243 that can be used to display a subset of the country names and ISO3 codes }
