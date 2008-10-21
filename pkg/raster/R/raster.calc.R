@@ -21,10 +21,14 @@ raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALS
 	
 	if (raster@data@content != 'nodata') {
 		out.raster@data@values <- as.vector(fun(raster@data@values)) 
-		if (!is.na(filename) && raster@data@content == 'all') {
-			out.raster <- raster.write(out.raster, overwrite=overwrite)
+		
+		if (raster@data@content == 'all') {
+			if (!is.na(filename) ) {
+				out.raster <- raster.write(out.raster, overwrite=overwrite)
+			} else {
+				raster <- raster.set.minmax(raster)
+			}
 		}	
-
 	} else if (raster@data@source == 'disk') {
 		for (r in 1:raster@nrows) {
 			raster <- raster.read.row(raster, r)

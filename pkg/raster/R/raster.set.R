@@ -75,6 +75,14 @@ raster.set.bbox <- function(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=ras
 	return(raster)
 }
 
+raster.set.minmax <- function(raster) {
+	if (raster@data@content == 'all') {
+		raster@data@min <- min(raster.get.data, na.rm=T)
+		raster@data@max <- max(raster.get.data, na.rm=T)
+		return(raster)
+	} else {stop('cannot do this yet')}
+}
+
 raster.set.rowcol <- function(raster, nrows=raster@nrows, ncols=raster@ncols) {
 	raster@ncols <- as.integer(ncols)
 	raster@nrows <- as.integer(nrows)
