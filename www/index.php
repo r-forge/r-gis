@@ -43,10 +43,16 @@ echo $contents; } ?>
 
 <!-- end of project description -->
 
-This R-forge repository contains a number of related packages, that might eventually grow-up and move out to their own repositiry. 
-The 'base' package for all of them is 'raster'. It deals with low level raster (grid) data manipulation. It depends on a number of packages, notably sp and rgdal. We hope this package to CRAN before the end of this year (2008). 
+<br>
+This R-forge repository contains a number of related packages, that might eventually grow-up and move out to their own repository. 
+<br>
+The 'raster' package deals with low level raster (grid) data manipulation. It is used by the other packages, so you need to install it first if you want to use the others. raster depends on a number of packages, notably sp and rgdal. We hope this package to CRAN before the end of this year (2008). 
+<br>
 The 'Rgis' package is to become partly meta-package, gluing some other spatial packages together, partly GUI GIS package, and partly an easy access to on-line spatial data (this is the only bit that has been implemented, to a small extent, so far).
-The 'RemoteSensing' package contains remote sensing functions (right now mainly a set of vegetation indices). And diversity contains functions for the analysis of biodiversity data (not much there right now, and have a look at adehabitat instead if this is what you are looking for.)
+<br>
+The 'RemoteSensing' package contains remote sensing functions (right now mainly a set of vegetation indices). 
+<br>
+'diversity' contains functions for the analysis of biodiversity data (not much there right now, and have a look at adehabitat instead if this is what you are looking for.)
 
 
 <p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
