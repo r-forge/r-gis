@@ -18,7 +18,7 @@ rasterstack.calc <- function(rasterstack, fun, filename=NA, overwrite=FALSE, For
 		for (r in 1:rasterstack@nrows) {
 			rasterstack <- rasterstack.read.row(rasterstack, r)
 			out.raster <- raster.set.data.row(out.raster, apply(rasterstack@data@values, 1, fun), rownr=r) 
-			raster.write.row(out.raster, r, overwrite)
+			raster.write.row(out.raster, overwrite)
 		}
 	}		
 	return(out.raster)

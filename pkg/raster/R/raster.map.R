@@ -17,7 +17,23 @@ rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)),
 
 
 raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
-	if (length(raster@data@content) != 'all') { 
+	if (raster@data@content == 'all') {
+		m <- raster.data(raster, format='matrix')
+		if (subsample) {
+			skip <- round(max(raster.ncols(raster), raster.nrows(raster)) / maxdim)
+			cols <- (0:round(raster.ncols(raster)/skip)) * skip + 1
+			rows <- (0:round(raster.nrows(raster)/skip)) * skip + 1
+			m <- m[rows, cols]
+
+			xres <- (raster@xmax - raster@xmin) / dim(m)[2]
+			yres <- (raster@ymax - raster@ymin) / dim(m)[1]
+			x <- (0:dim(m)[2]) * xres + raster@xmin 
+			y <- (0:dim(m)[1]) * yres + raster@ymin 
+ 		} else {	
+			x <- (0:raster@ncols) * raster@xres + raster@xmin 
+			y <- (0:raster@nrows) * raster@yres + raster@ymin 	
+		}	
+	} else {
 		if (subsample) {
 			m <- .raster.read.skip(raster, maxdim) 
 			xres <- (raster@xmax - raster@xmin) / dim(m)[2]
@@ -26,16 +42,11 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 			y <- (0:dim(m)[1]) * yres + raster@ymin 
 		} else {
 			raster <- raster.read.all(raster)
-			m <- .raster.get.matrix(raster)
+			m <- raster.data(raster, format='matrix')
 			x <- (0:raster@ncols) * raster@xres + raster@xmin 
 			y <- (0:raster@nrows) * raster@yres + raster@ymin 
 		}	
-	} else {
-		m <- .raster.get.matrix(raster) 
-		# should sample here too if subsample = T
-		x <- (0:raster@ncols) * raster@xres + raster@xmin 
-		y <- (0:raster@nrows) * raster@yres + raster@ymin 
-	}
+	} 
 	z <- t(m[nrow(m):1,])
 	image.plot(x, y, z, col=col, axes = TRUE, xlab="", ylab="", legend.width = 0.8, ...)
 	box()

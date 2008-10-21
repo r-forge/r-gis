@@ -1,12 +1,9 @@
 \name{raster.write}
 \alias{raster.write}
 \alias{raster.write.row}
-\alias{raster.write.hdr}
 \alias{raster.write.ascii}
-\alias{raster.write.ascii.row}
 \alias{raster.write.import}
 \alias{raster.write.export}
-\alias{raster.write.cellvals}
 
 \title{ Write raster data to a file }
 \description{
@@ -14,11 +11,8 @@
 }
 \usage{
 raster.write(raster, overwrite=FALSE)
-raster.write.row(raster, rownumber, overwrite=FALSE)
-raster.write.hdr(raster)
-raster.write.cellvals(raster, cellvals, overwrite=FALSE)
+raster.write.row(raster, overwrite=FALSE)
 raster.write.ascii(raster, overwrite=FALSE)
-raster.write.ascii.row(raster, rownumber, overwrite=FALSE)
 raster.write.import(raster, outfile, overwrite=FALSE)
 raster.write.export(raster, outfile, filetype, overwrite=FALSE)
 }
@@ -26,8 +20,6 @@ raster.write.export(raster, outfile, filetype, overwrite=FALSE)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{raster}{ Raster object }
-  \item{cellvals}{ A matrix with two columns. The first has cell numbers, the second the values }
-  \item{rownumber}{ Number of the row to be written }
   \item{outfile}{ The file resulting from import or export }
   \item{filetype}{ The type of file to export to }
   \item{overwrite} { if TRUE existing files are overwritten }

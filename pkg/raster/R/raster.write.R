@@ -4,18 +4,18 @@
 # Version 0,1
 # Licence GPL v3
 
+
 raster.write.ascii <- function(raster, overwrite=FALSE) {
-	return(raster.write.ascii.row(raster, rownumber = -1, overwrite))
-}
 
-
-raster.write.ascii.row <- function(raster, rownumber, overwrite=FALSE) {
   	resdif <- abs((raster@yres - raster@xres) / raster@yres)
 	if (resdif > 0.01) {
 		print(paste("raster has unequal horizontal and vertical resolutions","\n", "these data cannot be stored in arc-ascii format"))
 	}
+
 	else {
-		if (rownumber <= 1 ) {
+
+		if (raster@data@indices[1] == 1)
+		{
 			raster <- raster.set.filename(raster, file.change.extension(raster@file@name, '.asc'))
 			if (!overwrite & file.exists(raster@file@name)) {
 				stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
@@ -29,6 +29,7 @@ raster.write.ascii.row <- function(raster, rownumber, overwrite=FALSE) {
 			cat("NODATA_value", raster@file@nodatavalue, "\n", file = thefile)
 			close(thefile) #close connection
 		}
+		
 		raster@data[is.na(raster@data@values)] <- raster@file@nodatavalue 
 		write.table(raster@data@values, raster@file@name, append = TRUE, quote = FALSE, sep = " ", eol = "\n", 
                           dec = ".", row.names = FALSE, col.names = FALSE)
@@ -37,110 +38,103 @@ raster.write.ascii.row <- function(raster, rownumber, overwrite=FALSE) {
 }
  
  
-raster.write.cellvals <- function(raster, cellvals, overwrite=FALSE) {
-	cellv <- subset(cellvals, ((cellvals[,2] <= raster@ncells) & (cellvals[,2] > 0)))
-	if (length(cellv) != length(cellvals))	{
-		warning(paste("cellvals had", (length(cellvals)-length(cellv)), "cells outside of 0 - ", raster@ncells))
-	}
-	rm(cellvals)
-	if (length(cellv[,1]) < 1) { stop("no valid cells") }
-#	if (!sparse) {
-		raster@data@values <- vector(length=raster@ncells)
-		raster@data@values[cellv[,1]] <- cellv[,2]
-		return(raster.write(raster, overwrite))		
-#	} else {
-#		raster@ncellvals <- length(cellv[,1])
-#		raster@data @values<- as.array(as.vector(t(cellv))) 
-#		raster@sparse <- TRUE
-#		return(raster.write.sparse(raster, overwrite))
-#	}
-} 
-
-
-#raster.write.binary.sparse <- function(raster, overwrite) {
-#	raster@sparse <- TRUE
-#	raster <- raster.write.(raster, overwrite)
-#	raster@data @values<- vector(length=0)
-#	return(raster)
-#}
- 
- 
-raster.write<- function(raster, overwrite=FALSE) {
+.raster.write.sparse <- function(raster, overwrite=FALSE) {
 	raster@file@name <- file.change.extension(raster@file@name, ".grd")
 	if (!overwrite & file.exists(raster@file@name)) {
 		stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
 
-	# dir.create(fixed2, FALSE)		
-		
-		
+	raster@file@driver == 'raster'
+
+	raster@data@values[is.nan(raster@data@values)] <- NA
+	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
+	raster <- raster.set.minmax(raster)
+
 	binraster <- file.change.extension(raster@file@name, ".gri")
 	con <- file(binraster, "wb")
-	raster@data@min <- min(raster@data@values, na.rm=TRUE )
-	raster@data@max <- max(raster@data@values, na.rm=TRUE )
-	raster@data@haveminmax <- TRUE
-	raster@file@driver == 'raster'
-	
-#	raster@data[is.na(raster@data@values)] <- raster@nodatavalue
-	if (raster@file@datatype == "integer") { raster@data@values <- as.vector(as.integer(raster@data@values)) }
-	transpose <- FALSE
-	if (is.matrix(raster@data@values)) {
-		if (ncol(raster@data@values) == raster@ncols  &  nrow(raster@data@values) == raster@nrows ) {
-			transpose <- TRUE
-	    } 
-		else if (ncol(raster@data@values) == raster@nrows  & nrow(raster@data@values) == raster@ncols) { 	
-		}
-		else if (ncol(raster@data@values) == 1  | nrow(raster@data@values) == 1) { #OK 
-		}
-		else { stop("unexpected data, I do not know how to write this")	}
-	} 
-	raster@data@values[is.nan(raster@data@values)] <- NA
-	if (transpose) {writeBin(as.vector(t(raster@data@values)), con, size = raster@file@datasize) }
-	else {writeBin(as.vector(raster@data@values), con, size = raster@file@datasize)}
+	writeBin( as.vector(raster@data@indices), con, size = as.integer(4)) 
+	writeBin( as.vector(raster@data@values), con, size = raster@file@datasize) 
 	close(con)
-	raster.write.hdr(raster) 
+
+	# add the 'sparse' key word to the hdr file!!!
+	.raster.write.hdr(raster) 
+	return(raster)
+} 
+
+
+ 
+raster.write <- function(raster, overwrite=FALSE) {
+
+	if (raster@data@content == 'sparse') { .raster.write.sparse(raster, overwrite) }
+
+	if (raster@data@content != 'all') {stop('first use raster.set.data()') }
+
+	raster@file@name <- file.change.extension(raster@file@name, ".grd")
+	if (!overwrite & file.exists(raster@file@name)) {
+		stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
+
+	raster@file@driver == 'raster'
+	raster@data@values[is.nan(raster@data@values)] <- NA
+	raster@data@values[is.infinite(raster@data@values)] <- NA
+
+	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
+	raster <- raster.set.minmax(raster)
+
+	binraster <- file.change.extension(raster@file@name, ".gri")
+	con <- file(binraster, "wb")
+	writeBin( raster@data@values, con, size = raster@file@datasize) 
+	close(con)
+
+	.raster.write.hdr(raster) 
 	return(raster)
 }
 
  
-raster.write.row <- function(raster, rownumber, overwrite=FALSE) {
-	if (rownumber == 1) { 	#  FIRST  ROW
+raster.write.row <- function(raster, overwrite=FALSE) {
+
+	if (raster@data@content != 'row') { stop('raster does not contain a row') }
+	
+	if (raster@data@indices[1] == 1) {
+ 	#  FIRST  ROW
 		if (!overwrite & file.exists(raster@file@name)) {
 			stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) 
 		}
 		raster@file@name <- file.change.extension(raster@file@name, ".grd")
 		binraster <- file.change.extension(raster@file@name, ".gri")
-		raster__binary__connection__wb <<- file(binraster, "wb")
+		attr(raster, "filecon") <- file(binraster, "wb")
 		raster@data@min <- 3e34
 		raster@data@max <- -3e34 	
 		raster@data@haveminmax <- FALSE
 		raster@file@driver == 'raster'
 	}	
 
-	if (raster@file@datatype == "integer") { raster@data@values <- as.vector(as.integer(raster@data@values)) }
+	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
 
-	rsd <- na.omit(as.vector(raster@data@values)) # min and max values
+	raster@data@values[is.nan(raster@data@values)] <- NA
+	raster@data@values[is.infinite(raster@data@values)] <- NA
+	rsd <- na.omit(raster@data@values) # min and max values
 	if (length(rsd) > 0) {
 		raster@data@min <- min(raster@data@min, min(rsd))
 		raster@data@max <- max(raster@data@max, max(rsd))
-		raster@data@haveminmax <- TRUE
 	}	
-	
-	raster@data@values[is.nan(raster@data@values)] <- NA
-	raster@data@values[is.infinite(raster@data@values)] <- NA
 
 #	raster@data@values[is.na(raster@data@values)] <-  raster@file@nodatavalue
-
-	writeBin(as.vector(raster@data@values), raster__binary__connection__wb, size = raster@file@datasize)
+	writeBin(as.vector(raster@data@values), raster@filecon, size = raster@file@datasize)
 	
-	if ( rownumber == raster@nrows ) { 	# LAST  ROW
-		raster.write.hdr(raster) 
-		close(raster__binary__connection__wb)		}
+	if (raster@data@indices[2] == raster@ncells) {
+	# LAST  ROW
+		.raster.write.hdr(raster) 
+		close(raster@filecon)
+		raster@data@haveminmax <- TRUE
+		raster@data@source <- 'disk'
+		raster@data@content <- 'nodata'
+		raster@data@values <- vector(length=0)
+	}
 		
 	return(raster)	
 }
 
 
-raster.write.hdr <- function(raster) {
+.raster.write.hdr <- function(raster) {
 	rastergrd <- file.change.extension(raster@file@name, ".grd")
 	thefile <- file(rastergrd, "w")  # open an txt file connectionis
 	cat("[General]", "\n", file = thefile)
@@ -183,9 +177,9 @@ raster.write.hdr <- function(raster) {
 raster.write.import <- function(raster, outfile, overwrite=FALSE) {
 # check extension
 	rsout <- raster.set.filename(raster, outfile)
-	for (i in 1:raster@ncols) {
-		d <- raster.read.row(raster, i)
-		raster.write.row(rsout, i, overwrite)
+	for (r in 1:raster@nrows) {
+		d <- raster.read.row(raster, r)
+		raster.write.row(rsout, overwrite)
 		}
 	return(rsout)
 }
@@ -193,12 +187,12 @@ raster.write.import <- function(raster, outfile, overwrite=FALSE) {
 raster.write.export <- function(raster, outfile, filetype, overwrite=FALSE) {
 	rsout <- raster.set.filename(raster, outfile)
 	if (filetype == 'ascii') {
-		for (i in 1:raster@ncols) {
-			d <- raster.read.row(raster, i)
-			raster.write.ascii.row(rsout, i, overwrite) 
+		for (r in 1:raster@rows) {
+			d <- raster.read.row(raster, r)
+			raster.write.ascii(rsout, overwrite) 
 		}
 	} else {
-		stop("filetype not supported (sorry..., more coming ...)")
+		stop("filetype not yet supported (sorry..., more coming ...)")
 	}
 	return(rsout)
 }

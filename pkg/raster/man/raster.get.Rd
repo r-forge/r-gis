@@ -1,10 +1,11 @@
 \name{raster.get}
-\alias{raster.get.data}
-\alias{raster.get.ncols}
-\alias{raster.get.nrows}
-\alias{raster.get.ncells}
-\alias{raster.get.xres}
-\alias{raster.get.yres}
+\alias{raster.data}
+\alias{raster.data.content}
+\alias{raster.ncols}
+\alias{raster.nrows}
+\alias{raster.ncells}
+\alias{raster.xres}
+\alias{raster.yres}
 \alias{raster.get.col.from.cell}
 \alias{raster.get.row.from.cell}
 \alias{raster.get.cell.from.rowcol}
@@ -28,12 +29,13 @@
 }
 
 \usage{
-raster.get.data(raster, format='vector', names=FALSE)
-raster.get.ncols(raster)
-raster.get.nrows(raster)
-raster.get.ncells(raster)
-raster.get.xres(raster)
-raster.get.yres(raster)
+raster.data(raster, format='vector', names=FALSE)
+raster.data.content(raster)
+raster.ncols(raster)
+raster.nrows(raster)
+raster.ncells(raster)
+raster.xres(raster)
+raster.yres(raster)
 raster.get.col.from.cell(raster, cell)
 raster.get.row.from.cell(raster, cell)
 raster.get.cell.from.rowcol(raster, rownr, colnr)
@@ -81,7 +83,7 @@ raster.is.valid.cell(raster, cell)
 \examples{
 #using a new default raster (1 degree global)
 rs <- raster.create.new()
-raster.get.ncells(rs)
+raster.ncells(rs)
 raster.get.col.from.cell(rs, 10000)
 raster.get.row.from.cell(rs, 10000)
 raster.get.col.from.x(rs, 0.5)
@@ -91,7 +93,7 @@ raster.get.cell.from.xy(rs, c(0.5, 0.5))
 raster.get.x.from.col(rs, c(1, 120, 180))
 raster.get.y.from.row(rs, 90)
 raster.get.xy.from.cell(rs, 10000)
-raster.get.xy.from.cell(rs, c(0, 1, 32581, rs@ncells, rs@ncells+1))
+raster.get.xy.from.cell(rs, c(0, 1, 32581, raster.ncells(rs), raster.ncells(rs)+1))
 
 #using a file from disk
 rs <- raster.create.from.file(system.file("external/test.ag", package="sp"))

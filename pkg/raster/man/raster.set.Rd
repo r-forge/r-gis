@@ -8,11 +8,12 @@
 \alias{raster.clear.data}
 \alias{raster.set.rowcol}
 \alias{raster.set.bbox}
+\alias{raster.set.minmax}
 
 \title{ Set properties of a raster object }
 
 \description{
-  Use these functions to set name and datatype properties of a raster object. While you can access the slots of the object directly, you would do that at your own peril because the value of one raster property can affect values in other properties, and changing slot values may thus break the integrity of the objects. Using slots directly may also lead to code to break in the future if underlying class definitions change. These methods are safer as the change in
+Use these functions to set name and datatype properties of a raster object. While you can access the slots of the object directly, you would do that at your own peril because the value of one raster property can affect values in other properties, and changing slot values may thus break the integrity of the objects. Using slots directly may also lead to code to break in the future if underlying class definitions change. 
   
 }
 
@@ -26,6 +27,7 @@ raster.set.data.sparse(raster, sparsedata, indices)
 raster.clear.data(raster)
 raster.set.rowcol(raster, nrows=raster@nrows, ncols=raster@ncols) 
 raster.set.bbox(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax)
+raster.set.minmax(raster)
 }
 
 \arguments{

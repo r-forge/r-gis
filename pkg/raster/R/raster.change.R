@@ -95,12 +95,8 @@ raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overw
 					out.raster@data@values  <- c(out.raster@data@values, raster@data@values)
 				}		
 			} else {
-				out.raster@data@values <- raster@data@values
-				out.raster <- raster.write.row(out.raster, rownr, overwrite)
-				if (r == last.row ) {
-					out.raster@data@content <- 'nodata'
-					out.raster@data@values <- vector(length=0)
-				}
+				out.raster <- raster.set.data.row(out.raster, raster@data@values, rownr)
+				out.raster <- raster.write.row(out.raster, overwrite)
 			}	
 			rownr <- rownr + 1
 		} 
@@ -168,15 +164,13 @@ raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRU
 					out.raster@data@values  <- c(out.raster@data@values, values)
 				}		
 			} else {
-				out.raster@data@values <- values
-				out.raster <- raster.write.row(out.raster, rownr, overwrite)
-				if (r == rsteps ) {
-					out.raster@data@content <- 'nodata'
-					out.raster@data@values <- vector(length=0)
-				}
+				out.raster <- raster.set.data.row(out.raster, values, rownr)
+				out.raster <- raster.write.row(out.raster, overwrite)
 			}	
 			rownr <- rownr + 1
 		} 			
 	}
 	return(out.raster)
 }
+
+

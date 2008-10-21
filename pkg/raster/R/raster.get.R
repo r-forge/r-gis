@@ -4,26 +4,29 @@
 # Version 0,1
 # Licence GPL v3
 
-raster.get.ncols <- function(raster) {
+raster.ncols <- function(raster) {
 	return(raster@ncols)
 }
 
-raster.get.nrows <- function(raster) {
+raster.nrows <- function(raster) {
 	return(raster@nrows)
 }
 
-raster.get.ncells <- function(raster) {
+raster.ncells <- function(raster) {
 	return(raster@ncells)
 }
 
-raster.get.xres <- function(raster) {
+raster.xres <- function(raster) {
 	return(raster@xres)
 }
 
-raster.get.yres <- function(raster) {
+raster.yres <- function(raster) {
 	return(raster@yres)
 }
 
+raster.data.content <- function(raster) {
+	return(raster@data@content)
+}
 
 raster.get.y.from.row <- function(raster, rownr) {
 	rownr <- round(rownr)
@@ -145,7 +148,7 @@ raster.is.valid.cell <- function(raster, cell) {
 }
 
 
-raster.get.data <- function(raster, format='vector', names=FALSE) {
+raster.data <- function(raster, format='vector', names=FALSE) {
 	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all()") }
 	if (format=='matrix') {  return(.raster.get.matrix(raster, names)) 
 	} else { return(raster@data@values) 

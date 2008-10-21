@@ -59,7 +59,9 @@ raster.set.data <- function(raster, data) {
 	} else {	
 		raster@data@values <- data
 		raster@data@content <- 'all'
+		raster@data@source <- 'ram'
 		raster@data@indices <- c(1, raster@ncells)
+		raster <- raster.set.minmax(raster)
 		return(raster)	
 	}	
 }
@@ -75,13 +77,21 @@ raster.set.bbox <- function(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=ras
 	return(raster)
 }
 
+
 raster.set.minmax <- function(raster) {
-	if (raster@data@content == 'all') {
-		raster@data@min <- min(raster.get.data, na.rm=T)
-		raster@data@max <- max(raster.get.data, na.rm=T)
-		return(raster)
-	} else {stop('cannot do this yet')}
+	if (raster@data@content == 'nodata') {stop('no data in memory') }
+	vals <- na.omit(raster.data(raster)) # min and max values
+	if (length(vals) > 0) {
+		raster@data@min <-  min(vals)
+		raster@data@max <- max(vals)
+	} else {
+		raster@data@min <- NA
+		raster@data@max <- NA
+	}
+	raster@data@haveminmax <- TRUE
+	return(raster)
 }
+
 
 raster.set.rowcol <- function(raster, nrows=raster@nrows, ncols=raster@ncols) {
 	raster@ncols <- as.integer(ncols)

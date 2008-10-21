@@ -9,11 +9,6 @@
 # read entire raster
 raster.read.all <- function(raster) {
 	raster <- raster.read.row(raster, -1)
-	raster@data@min <- min(raster@data@values, na.rm=TRUE)
-	raster@data@max <- max(raster@data@values, na.rm=TRUE)
-	raster@data@haveminmax <- TRUE
-	raster@data@content <- "all"
-	raster@data@indices <- c(1, raster@ncells)
 	return(raster)
 }
 
@@ -47,11 +42,11 @@ raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncols=(rast
 		nrows <- endrow - startrow + 1
 	}
 	raster <- raster.read.part.of.row(raster, startrow, startcol, ncols)
-	blockdata <- raster.get.data(raster)
+	blockdata <- raster.data(raster)
 	if (nrows > 1) {
 		for (r in (startrow+1):endrow) {
 			raster <- raster.read.part.of.row(raster, r,  startcol, ncols)
-			blockdata <- c(blockdata, raster.get.data(raster))
+			blockdata <- c(blockdata, raster.data(raster))
 		}	
 	}	
 	startcell <- raster.get.cell.from.rowcol(raster, startrow, startcol)
@@ -108,6 +103,7 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 	if (rownr < 0) {
 		raster@data@indices <- c(1, raster@ncells)
 		raster@data@content <- "all"
+		raster <- raster.set.minmax(raster)
 	} else if (startcol==1 && ncols==(raster@ncols-startcol+1)) {
 		raster@data@indices <- c(raster.get.cell.from.rowcol(raster, rownr, startcol), raster.get.cell.from.rowcol(raster, rownr, endcol))
 		raster@data@content <- "row"
@@ -115,6 +111,7 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 		raster@data@indices <- c(raster.get.cell.from.rowcol(raster, rownr, startcol), raster.get.cell.from.rowcol(raster, rownr, endcol))
 		raster@data@content <- "block"
 	}	
+	
 	return(raster)
 }
 

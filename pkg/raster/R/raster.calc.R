@@ -14,59 +14,59 @@
 
 raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALSE) {
 	out.raster <- raster.set.filename(raster, filename)
+	out.raster@file@gdalhandle <- list()
+
 	if (INT) { out.raster <- raster.set.datatype(out.raster, "integer")  }
 	else { out.raster <- raster.set.datatype(out.raster, "numeric") }
 	
 	if (raster@data@content == 'nodata' && raster@data@source == 'ram') { stop('raster has no data on disk or in memory') }
 	
-	if (raster@data@content != 'nodata') {
-		out.raster@data@values <- as.vector(fun(raster@data@values)) 
+# there is data	
+	if (raster@data@content == 'all') {
+		out.raster <- raster.set.data(out.raster, fun(raster@data@values)) 
+		if (!is.na(filename) ) { out.raster <- raster.write(out.raster, overwrite=overwrite)
+		}
+			
+	} else if (raster@data@content == 'sparse') {
+		out.raster <- raster.set.data.sparse(out.raster, fun(raster@data@values), raster@data@indices) 
+		if (!is.na(filename) ) { out.raster <- raster.write(out.raster, overwrite=overwrite)
+		}
 		
-		if (raster@data@content == 'all') {
-			if (!is.na(filename) ) {
-				out.raster <- raster.write(out.raster, overwrite=overwrite)
-			} else {
-				raster <- raster.set.minmax(raster)
-			}
-		}	
-	} else if (raster@data@source == 'disk') {
+	} else if (is.na(filename) ) {
+
+		if (raster@data@content == 'row') {
+			out.raster <- raster.set.data.row(out.raster, fun(raster@data@values), raster.get.row.from.cell(raster, raster@data@indices[1])) 
+
+		} else if (raster@data@content == 'block') {
+			out.raster <- raster.set.data.block(out.raster, fun(raster@data@values), raster@data@indices[1], raster@data@indices[2])  
+		}
+	} else if (!is.na(filename) ) {
+			
 		for (r in 1:raster@nrows) {
 			raster <- raster.read.row(raster, r)
-			values <- as.vector(fun(raster@data@values))
-			if (is.na(filename)) {
-				if (r == 1) {
-					out.raster@data@values  <- values
-					out.raster@data@content <- 'all'
-				} else {
-					out.raster@data@values  <- c(out.raster@data@values, values)
-				}		
-			} else {
-				out.raster@data@values <- values 
-				out.raster <- raster.write.row(out.raster, r, overwrite=overwrite)
-				if (r == raster@nrows ) {
-					out.raster@data@content <- 'nodata'
-					out.raster@data@values <- vector(length=0)
-				}
-			}	
+			out.raster <- raster.set.data.row(fun(raster.data(raster)), r)
+			out.raster <- raster.write.row(out.raster, overwrite=overwrite)
 		}
 	} 	
 	return(out.raster)
 }
 
 
+
 raster.calc.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE) {
 	if (is.na(filename)) {
 		out.raster <- raster.set.filename(raster, "")
 		n <- length(raster@data@ncells)
-		out.raster@data@values <- as.vector(fun(n)) 
+		out.raster <- raster.set.data(fun(n)) 
 	} else {
 		out.raster <- raster.set.filename(raster, filename)
 		n <- length(raster@ncols)
 		for (r in 1:raster@nrows) {
-			out.raster@data@values <- as.vector(fun(n)) 
-			out.raster <- raster.write.row(out.raster, r, overwrite=overwrite)	}	
+			out.raster <- raster.set.data.row(out.raster, fun(n), r) 
+			out.raster <- raster.write.row(out.raster, overwrite=overwrite)	}	
 		out.raster@data@values <- vector(length=0)	
 	}	
+	out.raster@file@gdalhandle <- list()
 	return(out.raster)
 }
 
@@ -97,18 +97,20 @@ raster.calc.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, IN
 					res[ (raster@data@values > rclmat[i,1]) & (raster@data@values <= rclmat[i,2])] <- rclmat[i , 3] 
 				}
 			}
-			out.raster@data@values <- as.vector(res)
-			out.raster <- raster.write.row(out.raster, r, overwrite=overwrite)
+			out.raster <- raster.set.data.row(out.raster, res, r)
+			out.raster <- raster.write.row(out.raster, overwrite=overwrite)
 		}	
 		out.raster@data@values <- vector(length=0)
 	}	
+	out.raster@file@gdalhandle <- list()
 	return(out.raster)
 }
 
 
 raster.calc.isNA <- function(raster, value=0, filename=NA, overwrite=FALSE, INT=FALSE) {
 	fun <- function(x) { x[is.na(x)] <- value; return(x)} 
-	return(raster.calc(raster, fun, filename, overwrite=overwrite, INT=INT)) 
+	raster <- raster.calc(raster, fun, filename, overwrite=overwrite, INT=INT)
+	return(raster) 
 }
 
 	
@@ -172,17 +174,18 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 		rowdata <- raster.read.row(raster, r)@data@values
 		ngbdata <- rbind(ngbdata[2:ngb,], t(rowdata))
 		if (r > lim) {
-			ngbgrid@data@values <- .calc.ngb(ngbdata, ngb, fun, keepdata)
-			ngbgrid <- raster.write.row(ngbgrid, rr, overwrite)
+			ngbgrid <- raster.set.data.row(ngbgrid, .calc.ngb(ngbdata, ngb, fun, keepdata), rr)
+			ngbgrid <- raster.write.row(ngbgrid, overwrite)
 			rr <- rr + 1
 		}
 	}
 	for (r in (raster@nrows+1):(raster@nrows+lim)) {
 		ngbdata <- rbind(ngbdata[2:ngb,], t(ngbdata1))
-		ngbgrid@data@values <- .calc.ngb(ngbdata, ngb, fun, keepdata)
-		ngbgrid <- raster.write.row(ngbgrid, rr, overwrite)
+		ngbgrid <- raster.set.data.row(ngbgrid, .calc.ngb(ngbdata, ngb, fun, keepdata), rr)
+		ngbgrid <- raster.write.row(ngbgrid, overwrite)
 		rr <- rr + 1
 	}
+	ngbgrid@file@gdalhandle <- list()
 	return(ngbgrid)
 }
 	
