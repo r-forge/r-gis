@@ -19,10 +19,10 @@
 	for (i in 1:length(rasterstack@rasters)) {
 		rs <- raster.read.part.of.row(rasterstack@rasters[[i]], rownumber, startcol, ncols)
 		if ( i == 1 )  {
-			rasterstack@data@values <- as.matrix(raster.data(rs))
+			rasterstack@data@values <- as.matrix(raster.values(rs))
 		}
 		else {
-			rasterstack@data@values <- cbind(rasterstack@data@values, raster.data(rs)) 
+			rasterstack@data@values <- cbind(rasterstack@data@values, raster.values(rs)) 
 		}	   
 	}
 	rasterstack@data@content <- rs@data@content

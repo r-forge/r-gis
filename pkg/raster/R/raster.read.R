@@ -42,11 +42,11 @@ raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncols=(rast
 		nrows <- endrow - startrow + 1
 	}
 	raster <- raster.read.part.of.row(raster, startrow, startcol, ncols)
-	blockdata <- raster.data(raster)
+	blockdata <- raster.values(raster)
 	if (nrows > 1) {
 		for (r in (startrow+1):endrow) {
 			raster <- raster.read.part.of.row(raster, r,  startcol, ncols)
-			blockdata <- c(blockdata, raster.data(raster))
+			blockdata <- c(blockdata, raster.values(raster))
 		}	
 	}	
 	startcell <- raster.get.cell.from.rowcol(raster, startrow, startcol)

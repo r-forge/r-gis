@@ -24,9 +24,27 @@ raster.yres <- function(raster) {
 	return(raster@yres)
 }
 
-raster.data.content <- function(raster) {
+raster.content <- function(raster) {
 	return(raster@data@content)
 }
+
+raster.indices <- function(raster) {
+	return(raster@data@indices)
+}
+
+raster.source <- function(raster) {
+	return(raster@data@source)
+}
+
+
+raster.values <- function(raster, format='vector', names=FALSE) {
+	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all()") }
+	if (format=='matrix') {  return(.raster.get.matrix(raster, names)) 
+	} else { return(raster@data@values) 
+	}
+}
+
+
 
 raster.get.y.from.row <- function(raster, rownr) {
 	rownr <- round(rownr)
@@ -147,13 +165,6 @@ raster.is.valid.cell <- function(raster, cell) {
 	return(validcell)
 }
 
-
-raster.data <- function(raster, format='vector', names=FALSE) {
-	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all()") }
-	if (format=='matrix') {  return(.raster.get.matrix(raster, names)) 
-	} else { return(raster@data@values) 
-	}
-}
 
 .raster.get.matrix <- function(raster, names=FALSE) {
 	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all() or raster.read.row()") }

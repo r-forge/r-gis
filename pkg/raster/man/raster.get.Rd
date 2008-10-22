@@ -1,6 +1,8 @@
 \name{raster.get}
-\alias{raster.data}
-\alias{raster.data.content}
+\alias{raster.values}
+\alias{raster.indices}
+\alias{raster.content}
+\alias{raster.source}
 \alias{raster.ncols}
 \alias{raster.nrows}
 \alias{raster.ncells}
@@ -29,8 +31,10 @@
 }
 
 \usage{
-raster.data(raster, format='vector', names=FALSE)
-raster.data.content(raster)
+raster.values(raster, format='vector', names=FALSE)
+raster.content(raster)
+raster.indices(raster)
+raster.source(raster)
 raster.ncols(raster)
 raster.nrows(raster)
 raster.ncells(raster)

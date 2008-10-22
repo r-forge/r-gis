@@ -1,4 +1,5 @@
 \name{raster.set}
+\alias{raster.set}
 \alias{raster.set.filename}
 \alias{raster.set.datatype}
 \alias{raster.set.data}
@@ -18,6 +19,7 @@ Use these functions to set name and datatype properties of a raster object. Whil
 }
 
 \usage{
+raster.set(raster, filename=NA)
 raster.set.filename(raster, filename)
 raster.set.datatype(raster, datatype, datasize)
 raster.set.data(raster, data) 
@@ -52,6 +54,7 @@ raster.set.minmax(raster)
 }
 
 \details{
+raster.set copies the parameters of a Raster object to a new object, but does not copy the filename nor the data associated with the original raster. 
 }
 
 \value{

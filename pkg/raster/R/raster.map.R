@@ -18,7 +18,7 @@ rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)),
 
 raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
 	if (raster@data@content == 'all') {
-		m <- raster.data(raster, format='matrix')
+		m <- raster.values(raster, format='matrix')
 		if (subsample) {
 			skip <- round(max(raster.ncols(raster), raster.nrows(raster)) / maxdim)
 			cols <- (0:round(raster.ncols(raster)/skip)) * skip + 1
@@ -42,7 +42,7 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 			y <- (0:dim(m)[1]) * yres + raster@ymin 
 		} else {
 			raster <- raster.read.all(raster)
-			m <- raster.data(raster, format='matrix')
+			m <- raster.values(raster, format='matrix')
 			x <- (0:raster@ncols) * raster@xres + raster@xmin 
 			y <- (0:raster@nrows) * raster@yres + raster@ymin 
 		}	

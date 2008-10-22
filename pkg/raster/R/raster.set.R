@@ -80,7 +80,7 @@ raster.set.bbox <- function(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=ras
 
 raster.set.minmax <- function(raster) {
 	if (raster@data@content == 'nodata') {stop('no data in memory') }
-	vals <- na.omit(raster.data(raster)) # min and max values
+	vals <- na.omit(raster.values(raster)) # min and max values
 	if (length(vals) > 0) {
 		raster@data@min <-  min(vals)
 		raster@data@max <- max(vals)
@@ -102,6 +102,12 @@ raster.set.rowcol <- function(raster, nrows=raster@nrows, ncols=raster@ncols) {
 	return(raster)
 }
 
+raster.set <- function(raster, filename=NA) {
+	raster <- raster.clear.data(raster)
+	raster <- raster.set.filename(raster, filename)
+	return(raster)
+}
+
 raster.set.filename <- function(raster, filename) {
 	if (is.na(filename)) {filename <- ""}
 	raster@file@name <- filename
@@ -110,6 +116,7 @@ raster.set.filename <- function(raster, filename) {
 	shortname <- gsub(" ", "_", shortname)
 	if (raster@file@nbands > 1) { shortname <- paste(shortname,"_",raster@file@band) } 
 	raster@file@shortname <- shortname
+	raster@file@gdalhandle <- list()
 	return(raster)
 }
 
