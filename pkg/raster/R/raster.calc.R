@@ -52,20 +52,26 @@ raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALS
 
 
 
-raster.calc.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE) {
+raster.calc.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE, INT=FALSE) {
+	out.raster <- raster.set(raster)
+	if (INT) { 
+		out.raster <- raster.set.datatype(out.raster, "integer") 
+		res <- vector(mode = "integer", length = raster.ncols(raster))
+	} else { 
+		out.raster <- raster.set.datatype(out.raster, "numeric") 
+		res <- vector(mode = "numeric", length = raster.ncols(raster))
+	}
 	if (is.na(filename)) {
-		out.raster <- raster.set.filename(raster, "")
-		n <- length(raster@data@ncells)
-		out.raster <- raster.set.data(fun(n)) 
+		n <- raster.ncells(raster)
+		out.raster <- raster.set.data(out.raster, fun(n)) 
 	} else {
 		out.raster <- raster.set.filename(raster, filename)
-		n <- length(raster@ncols)
-		for (r in 1:raster@nrows) {
+		n <- length(raster.ncols(raster))
+		for (r in 1:raster.nrows(raster)) {
 			out.raster <- raster.set.data.row(out.raster, fun(n), r) 
-			out.raster <- raster.write.row(out.raster, overwrite=overwrite)	}	
-		out.raster@data@values <- vector(length=0)	
+			out.raster <- raster.write.row(out.raster, overwrite=overwrite)	
+		}	
 	}	
-	out.raster@file@gdalhandle <- list()
 	return(out.raster)
 }
 
@@ -179,6 +185,7 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 	if ((ngb / 2) == floor(ngb/2)) { stop("only odd neighborhoods are supported") }
 	if (ngb == 1) { stop("ngb should be 3 or larger")  } 
 	lim <- floor(ngb / 2)
+	
 	ngbgrid <- raster.set.filename(raster, filename)
 	
 # first create an empty matrix with nrows = ngb and ncols = raster@ncols
@@ -196,13 +203,14 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 			rr <- rr + 1
 		}
 	}
+
+	ngbdata1 <- array(data = NA, dim = c(ngb, raster@ncols))
 	for (r in (raster@nrows+1):(raster@nrows+lim)) {
-		ngbdata <- rbind(ngbdata[2:ngb,], t(ngbdata1))
+		ngbdata <- rbind(ngbdata[2:ngb,], t(ngbdata1[1,]))
 		ngbgrid <- raster.set.data.row(ngbgrid, .calc.ngb(ngbdata, ngb, fun, keepdata), rr)
 		ngbgrid <- raster.write.row(ngbgrid, overwrite)
 		rr <- rr + 1
 	}
-	ngbgrid@file@gdalhandle <- list()
 	return(ngbgrid)
 }
 	

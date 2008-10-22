@@ -19,10 +19,15 @@ rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)),
 raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
 	if (raster@data@content == 'all') {
 		m <- raster.values(raster, format='matrix')
+		if (max(raster.ncols(raster), raster.nrows(raster)) <= maxdim) { subsample=FALSE }
+		
 		if (subsample) {
 			skip <- round(max(raster.ncols(raster), raster.nrows(raster)) / maxdim)
 			cols <- (0:round(raster.ncols(raster)/skip)) * skip + 1
+			cols <- cols[ cols <= raster.ncols(raster) ]
 			rows <- (0:round(raster.nrows(raster)/skip)) * skip + 1
+			rows <- rows[ rows <= raster.nrows(raster) ]
+			
 			m <- m[rows, cols]
 
 			xres <- (raster@xmax - raster@xmin) / dim(m)[2]

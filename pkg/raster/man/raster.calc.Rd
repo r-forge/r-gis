@@ -15,7 +15,7 @@ raster.calc(raster, fun, filename=NA, overwrite=FALSE, INT = FALSE)
 raster.calc.reclass(raster, rclmat, filename=NA, overwrite=FALSE, INT = FALSE)
 raster.calc.isNA(raster, value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
 raster.calc.setNA(raster, operator = "<=", value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
-raster.calc.init(raster, fun=runif, filename=NA, overwrite=FALSE) 
+raster.calc.init(raster, fun=runif, filename=NA, overwrite=FALSE, INT = FALSE) 
 raster.calc.neighborhood(raster, fun=mean, filename=NA, ngb=3, keepdata=TRUE, overwrite=FALSE) 
 }
 
