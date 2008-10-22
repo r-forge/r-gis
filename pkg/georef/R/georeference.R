@@ -1,4 +1,5 @@
 
+
 get.coordinates <- function(cy='', sp='', co='', loc='') {
 	theurl <- paste("http://bg.berkeley.edu:8080/ws/single?cy=", cy, "&sp=", sp, "&co=", co, "&locality=", loc, sep='')
 	xml <- xmlTreeParse(theurl)
@@ -15,10 +16,23 @@ get.elevation <- function(latitude, longitude) {
 }
 
 
+
+.get.country.list <- function() {
+	path <- paste(system.file(package="Rgis"), "/data", sep='')
+	d <- read.table(paste(path, "/countries", sep=""), header=T, sep="\t",  quote = "!@!")
+	return(as.matrix(d))
+}
+
 get.country <- function(latitude, longitude, radius=0) {
 	theurl <- paste("http://ws.geonames.org/countryCode?lat=", latitude, "&lng=", longitude, "&radius=", radius, sep='')
 	country <- scan(theurl, what='character', quiet=TRUE)
-	return(country)
+	if (length(country) > 1) { return(NA)
+	} else {
+		cnts <- .get.country.list()
+		rec <- subset(cnts, cnts[,3] == country) 
+		if (length(rec) == 0) { return(NA) }
+		else return(rec)
+	}	
 }
 
 
@@ -35,23 +49,3 @@ get.admin.division <- function(latitude, longitude, radius=0, maxrows=1) {
 #http://ws.geonames.org/findNearbyWikipedia?lat=47&lng=9
 
 
-
-get.ndigits <- function(x){
-    result <- pmax(0,nchar(abs(x))-nchar(abs(trunc(x,digits=0)))-1)
-    return(result)
-}
-
-
-#Detect conversion error (degrees-minutes to decimals) 
-detect.conversion.error <- function(xy,min.ndigits){
-	xy <- na.omit(xy)
-	number.digits <- cbind(ndigits(xy[,1]),ndigits(xy[,2]))
-	index <- which((pmin(number.digits[,1],number.digits[,2]) + (as.numeric(abs(number.digits[,1]-number.digits[,2]))==1))>=min.ndigits)
-	xy <- xy[index,]
-	xy <- abs(xy)
-	xy.dec <- xy - trunc(xy,digits=0)
-	fr <- vector(length=10)
-	for (i in 1:10){
-	fr[i] <- length(subset(xy.dec,xy.dec[,1]>(i-1)/10 & xy.dec[,2]<i/10)[,1])}
-	p.value <- chisq.test(fr,p=rep(0.1,times=10))$p.value
-	return(list(p.value = p.value,frequencies = fr))}
