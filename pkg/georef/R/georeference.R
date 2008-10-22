@@ -51,7 +51,7 @@ detect.conversion.error <- function(xy,min.ndigits){
 	xy <- abs(xy)
 	xy.dec <- xy - trunc(xy,digits=0)
 	fr <- vector(length=10)
-	for (i in 1:10)
-	fr[i] <- length(subset(xy.dec,xy.dec[,1]>(i-1)/10 & xy.dec[,2]<i/10)[,1])
+	for (i in 1:10){
+	fr[i] <- length(subset(xy.dec,xy.dec[,1]>(i-1)/10 & xy.dec[,2]<i/10)[,1])}
 	p.value <- chisq.test(fr,p=rep(0.1,times=10))$p.value
 	return(list(p.value = p.value,frequencies = fr))}
