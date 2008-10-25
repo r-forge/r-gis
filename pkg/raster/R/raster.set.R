@@ -67,11 +67,19 @@ raster.set.data <- function(raster, data) {
 }
 
 
-raster.set.bbox <- function(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster)) {
-	raster@bbox@xmin <- xmin
-	raster@bbox@xmax <- xmax
-	raster@bbox@ymin <- ymin
-	raster@bbox@ymax <- ymax
+raster.set.bbox <- function(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster), keepres=FALSE) {
+	xres <- raster.xres(raster)
+	yres <- raster.yres(raster)
+	raster@bbox[1,1] <- xmin
+	raster@bbox[1,2] <- xmax
+	raster@bbox[2,1] <- ymin
+	raster@bbox[2,2] <- ymax
+	if (keepres) {
+		raster@ncols <- as.integer(round( (raster.xmax(raster) - raster.xmin(raster)) / xres ))
+		raster@nrows <- as.integer(round( (raster.xmax(raster) - raster.xmin(raster)) / xres ))
+		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xres
+		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yres
+	}
 	return(raster)
 }
 

@@ -35,7 +35,7 @@ raster.write.export(raster, outfile, filetype, overwrite=FALSE)
 \seealso{ \code{\link[rgdal]{rgdal}} }
 \examples{ 
 
- rs <- raster.file(system.file("external/test.ag", package="sp"))
+ rs <- raster.from.file(system.file("external/test.ag", package="sp"))
  
 \dontrun{
 #read all data

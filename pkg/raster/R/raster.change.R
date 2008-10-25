@@ -20,22 +20,61 @@
 #	stop("sorry, not implemented yet")
 #}
 
-#raster.change.merge <- function(raster1, raster2, filename, overwrite=FALSE) {
+
+raster.merge <- function(rasters, filename, overwrite=FALSE) {
 	#check resolution
 	#check origin
+	#check projection
 	#if raster1 overlaps all of raster2 return raster1
 	#if there is no overlap combine
 	#if there is some overlap raster1 values are used in those places (
-#	stop("sorry, not implemented yet")
-#}
+	bb <- bbox(rasters[[1]])
+	for (i in 2:length(rasters)) {
+		bb2 <- bbox(rasters[[i]])
+		bb[,1] <- pmin(bb[,1], bb2[,1])
+		bb[,2] <- pmax(bb[,2], bb2[,2])
+	}
+	outrs <- raster.set(rasters[[1]])
+	outrs <- raster.set.bbox(outrs, bb[1,1],bb[1,2],bb[2,1],bb[2,2], keepres=TRUE)
 
-raster.change.cut.with.raster <- function(raster, cutraster, filename="", overwrite=FALSE) {
-	return(raster.change.cut(raster, raster.xmin(cutraster), raster.xmax(cutraster), raster.ymin(cutraster), raster.ymax(cutraster), filename, overwrite))
+	rowcol <- matrix(0, ncol=3, nrow=length(rasters))
+	for (i in 1:length(rasters)) {
+		xy1 <- raster.get.xy.from.cell(rasters[[i]], 1)
+#		xy2 <- raster.get.xy.from.cell(rasters[[i]], raster.ncols(rasters[[i]]))
+		xy3 <- raster.get.xy.from.cell(rasters[[i]], raster.ncells(rasters[[i]]) )
+		rowcol[i,1] <- raster.get.row.from.y(outrs, xy1[2]) #start row
+		rowcol[i,2] <- raster.get.row.from.y(outrs, xy3[2]) #end row
+		rowcol[i,3] <- raster.get.col.from.x(outrs, xy1[1]) #start col
+#		rowcol[i,4] <- raster.get.col.from.x(outrs, xy2[1]) #end col
+	}
+	
+	for (r in 1:raster.nrows(outrs)) {
+		rd <- as.vector(matrix(NA, nrow=1, ncol=raster.ncols(outrs))) 
+		for (i in length(rasters):1) {
+			if (r >= rowcol[i,1] & r <= rowcol[i,2]) { 
+				rasters[[i]] <- raster.read.row(rasters[[i]], r + 1 - rowcol[i,1]) 
+				d <- raster.values(rasters[[i]])
+				id2 <- seq(1:raster.ncols(rasters[[i]])) + rowcol[i,3] - 1
+				d <- cbind(id2, d)
+				d <- na.omit(d)
+				rd[d[,1]] <- d[,2]
+			}		
+		}
+		outrs <- raster.set.data.row(outrs, rd, r)
+		outrs <- raster.write.row(outrs)
+	}
+	return(outrs)
+}
+
+
+raster.cut.bbox <- function(raster, object, filename="", overwrite=FALSE) {
+	bb <- bbox(object)
+	return(raster.cut(raster, bb[1,1], bb[1,2], bb[2,1], bb[2,2], filename, overwrite))
 }
 
 
 
-raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overwrite=FALSE) {
+raster.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overwrite=FALSE) {
 	if (xmin > xmax) {
 		x <- xmin
 		xmin <- xmax
@@ -52,26 +91,18 @@ raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overw
 	ymin <- max(ymin, raster.ymin(raster))
 	ymax <- min(ymax, raster.ymax(raster))
 	
-#	xmin <- round(xmin/raster@xres)*raster@xres
-#	xmax <- round(xmax/raster@xres)*raster@xres
-#	ymin <- round(ymin/raster@yres)*raster@yres
-#	ymax <- round(ymax/raster@yres)*raster@yres
-	
 	if (xmin == xmax) {stop("xmin and xmax are less than one cell apart")}
 	if (ymin == ymax) {stop("ymin and ymax are less than one cell apart")}
 	
-	ncols <- round((xmax-xmin) / raster.xres(raster) ) 
-	nrows <- round((ymax-ymin) / raster.yres(raster) )
-	outraster <- raster.new(xmin=xmin, xmax=xmax, ymin=ymin, ymax=ymax, nrows=nrows, ncols=ncols, projection=raster@proj4string )
+	outraster <- raster.set(raster)
+	outraster <- raster.set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
 	outraster <- raster.set.filename(outraster, filename)
-	outraster <- raster.set.datatype(outraster, raster@file@datatype)
-
 	
 	if (raster@data@content == 'all')  {
 		first.start.cell <- raster.get.cell.from.xy(raster, c(xmin + 0.5 * raster.xres(raster), ymax - 0.5 * raster.yres(raster) ))	
 		last.start.cell <- raster.get.cell.from.xy(raster, c(xmin + 0.5 * raster.xres(raster), ymin + 0.5 * raster.yres(raster) ))
 		start.cells <- seq(first.start.cell, last.start.cell, by = raster@ncols)
-		end.cells <- start.cells + ncols - 1
+		end.cells <- start.cells + outraster@ncols - 1
 		selected.cells <- unlist(mapply(seq, start.cells, end.cells))
 		outraster@data@values <- raster@data[selected.cells]
 		outraster@data@min <- min(raster@data@values, na.rm=TRUE)
@@ -105,7 +136,7 @@ raster.change.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overw
 }
 
 
-raster.change.aggregate <- function(raster, fun = mean, factor = 2, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
+raster.aggregate <- function(raster, fun = mean, factor = 2, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
 {
 	factor <- round(factor)
 	if (factor < 2) {

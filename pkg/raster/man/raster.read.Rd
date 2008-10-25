@@ -46,7 +46,7 @@ raster.read.xy(raster, xy)
 
 \examples{
 
- rs <- raster.file(system.file("external/test.ag", package="sp"))
+ rs <- raster.from.file(system.file("external/test.ag", package="sp"))
 
 # read values for cells
   cells <- c(1, 1900, 5000)

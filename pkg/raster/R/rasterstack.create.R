@@ -46,7 +46,7 @@ rasterstack.add.files <- function(rasterstack, rasterfiles, bands= rep(1, length
 		if (!(file.exists(filename))) { 
 			stop(paste(filename, "does not exist")) 
 		}
-		raster <- raster.file(filename, band)
+		raster <- raster.from.file(filename, band)
 		rasterstack <- rasterstack.add.rasters(rasterstack, raster) 
 	}
 	return(rasterstack)

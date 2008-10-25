@@ -8,7 +8,7 @@
 
 
 
-.ll_sanity <- function(...) {return(TRUE)}
+#.ll_sanity <- function(...) {return(TRUE)}
 
 
 setClass ('AbstractRaster',
@@ -106,7 +106,7 @@ setClass ('Raster',
 setMethod ('show' , 'Raster', 
 	function(object) {
 		cat('class     :' , class(object), '\n')
-		cat('filename  :' , object@file@name, '\n')
+		cat('filename  :' , raster.filename(object), '\n')
 		if (object@file@nbands > 1) {
 			cat('nbands    :' , object@file@nbands, '\n')
 			cat('band      :' , object@file@band, '\n')
@@ -116,13 +116,12 @@ setMethod ('show' , 'Raster',
 		cat('ncells    :' , raster.ncells(object), '\n')
 		cat('datatype  :' , object@file@datanotation, '\n')
 		if (object@data@haveminmax) {
-			cat('min value :' , object@data@min, '\n')
-			cat('max value :' , object@data@max, '\n')
-			}
-		else {
+			cat('min value :' , raster.minvalue(object), '\n')
+			cat('max value :' , raster.maxvalue(object), '\n')
+		} else { #if (object@data@source == 'disk')  {
 			cat('min value : NA \n')
 			cat('max value : NA \n')
-			}
+		}
 		cat('projection:' , object@proj4string@projargs, '\n')
 		cat('xmin      :' , raster.xmin(object), '\n')
 		cat('xmax      :' , raster.xmax(object), '\n')

@@ -1,5 +1,8 @@
 \name{raster.get}
+\alias{raster.filename}
 \alias{raster.values}
+\alias{raster.maxvalue}
+\alias{raster.minvalue}
 \alias{raster.indices}
 \alias{raster.content}
 \alias{raster.source}
@@ -35,7 +38,10 @@
 }
 
 \usage{
+raster.filename(object)
 raster.values(raster, format='vector', names=FALSE)
+raster.minvalue(raster)
+raster.maxvalue(raster)
 raster.content(raster)
 raster.indices(raster)
 raster.source(raster)
@@ -109,7 +115,7 @@ raster.get.xy.from.cell(rs, 10000)
 raster.get.xy.from.cell(rs, c(0, 1, 32581, raster.ncells(rs), raster.ncells(rs)+1))
 
 #using a file from disk
-rs <- raster.file(system.file("external/test.ag", package="sp"))
+rs <- raster.from.file(system.file("external/test.ag", package="sp"))
 rs
 raster.get.cell.from.x.y(rs, 180000, 330000)
 #xy for corners of grid:

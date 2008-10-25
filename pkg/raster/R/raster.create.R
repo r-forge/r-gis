@@ -30,7 +30,6 @@ raster.new <- function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=
 	if (nc < 1) { stop("ncols should be larger than 0") }
 	if (nr < 1) { stop("nrows should be larger than 0") }
 	bb <- .raster.new.Spatial(xmin, xmax, ymin, ymax, projection)
-	print(bb)
 	if (validObject(bbox)) {
 		raster <- new("Raster", bbox = bb@bbox, proj4string=bb@proj4string, ncols = nc, nrows = nr )
 		raster@data@content <- 'nodata'
@@ -41,7 +40,7 @@ raster.new <- function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=
 }
 
 
-raster.file <- function(filename, band=1) {
+raster.from.file <- function(filename, band=1) {
 	if (toupper(file.get.extension(filename)) == ".GRD") {
 		raster <- .raster.create.from.file.binary(filename, band) 
 	} else {

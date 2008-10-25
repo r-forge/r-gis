@@ -4,6 +4,10 @@
 # Version 0,1
 # Licence GPL v3
 
+raster.filename <- function(object) {
+	return(object@file@name)
+}
+
 raster.ncols <- function(object) {
 	return(object@ncols)
 }
@@ -69,6 +73,14 @@ raster.values <- function(raster, format='vector', names=FALSE) {
 }
 
 
+raster.minvalue <- function(raster) {
+	return(raster@data@min)
+}
+
+
+raster.maxvalue <- function(raster) {
+	return(raster@data@max)
+}
 
 raster.get.y.from.row <- function(raster, rownr) {
 	rownr <- round(rownr)

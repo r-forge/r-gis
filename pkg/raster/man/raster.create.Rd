@@ -1,6 +1,6 @@
 \name{raster}
 \alias{raster.new}
-\alias{raster.file}
+\alias{raster.from.file}
 \title{ Create a new raster object }
 \description{
   This function let you create a new raster object, either from scratch "new" or from file.
@@ -8,7 +8,7 @@
 }
 \usage{
 	raster.new(xmin = -180, xmax = 180, ymin = -90, ymax = 90, nrows = 180, ncols = 360, projection = "+proj=longlat +datum=WGS84")
-	raster.file(filename, band=1)
+	raster.from.file(filename, band=1)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -24,7 +24,7 @@
   \item{projection}{ map projection of raster data }
 }
 \details{
-  raster.file uses "GDALinfo" from the rgdal package
+  raster.from.file uses "GDALinfo" from the rgdal package
   see the rgdal help for supported file types
 }
 
@@ -37,7 +37,7 @@
 \examples{
   raster1 <- raster.new(nrows=1080, ncols=2160)
   raster1
-  raster2 <- raster.file(system.file("external/test.ag", package="sp"))
+  raster2 <- raster.from.file(system.file("external/test.ag", package="sp"))
   raster2
 }
 \keyword{ spatial }

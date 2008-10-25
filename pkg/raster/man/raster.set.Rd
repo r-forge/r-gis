@@ -28,7 +28,7 @@ raster.set.data.block(raster, blockdata, firstcell, lastcell)
 raster.set.data.sparse(raster, sparsedata, indices) 
 raster.clear.data(raster)
 raster.set.rowcol(raster, nrows=raster.nrows(raster), ncols=raster.ncols(raster)) 
-raster.set.bbox(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster))
+raster.set.bbox(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster), keepres=FALSE)
 raster.set.minmax(raster)
 }
 
@@ -51,6 +51,7 @@ raster.set.minmax(raster)
   \item{xmax}{ the new maximum x coordinate of the raster }
   \item{ymin}{ the new minimum y coordinate of the raster }
   \item{ymax}{ the new maximum y coordinate of the raster }
+  \item{keepres} {logical. If \code{TRUE}, the resolution will stay the same (by adjusting the number of rows and columns)}
 }
 
 \details{
