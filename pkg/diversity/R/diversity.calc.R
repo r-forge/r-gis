@@ -1,8 +1,12 @@
 
 diversity.internal.checkdata <- function(x) {
-	if (!is.vector(x)) {stop('input should be a vector')}
-	if (is.numeric(x)) {x <- round(x)}
-	x <- x[!is.na(x)]
+	if (length(x) > 0) {
+		if (!is.vector(x)) {
+			stop('input should be a vector')
+		}
+		if (is.numeric(x)) {x <- round(x)}
+		x <- x[!is.na(x)]
+	}	
 	return(x)
 }	
 
@@ -28,10 +32,12 @@ diversity.index.presenceabsence <- function(x, species) {
 diversity.index.shannon <- function(x) {
 #   H(i) := sum((-P(i) * ln P(i))
 #   P(i) = the Proportion of objects in the i-th class
-	x <- diversity.internal.checkdata(x)
-	spp <- as.matrix(table(x)) / length(x)
-	H <- -1 * spp * log(spp) 
-	return(sum(H))
+	if (length(x) > 0) {
+		x <- diversity.internal.checkdata(x)
+		spp <- as.matrix(table(x)) / length(x)
+		H <- -1 * spp * log(spp) 	
+		return(sum(H))
+	} else { return(NA) } 	
 }
 
 diversity.index.margalef <- function(x) {
@@ -129,7 +135,7 @@ diversity.reserve.rebelo <- function(xy) {
 }
 
 	
-diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.calc.richness) {
+diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.index.richness) {
 	xya <- xya[,1:3]
 	rsout <- raster.set.filename(rs, filename)
 	cells <- raster.get.cell.from.xy(rs, xya[,1:2])
@@ -146,7 +152,9 @@ diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.calc.rich
 	dna <- d
 	for (r in 1 : rs@nrows) {
 		if (!allrows[r, 2]) {	
-			raster.write.row(rsout, dna, r) }
+			raster.set.data.row(rsout, dna, r)
+			raster.write.row(rsout) 
+		}
 		else {
 			dd <- subset(xyarc, xyarc[,4] == r)
 			cols <- dd[,5]
@@ -155,9 +163,12 @@ diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.calc.rich
 			d <- dna
 			for (c in 1:length(ucols)) {
 				ddd <- subset(dd, dd[,5] == ucols[c] )
-				d[ucols[c]] <- fun(ddd)	}
-			raster.write.row(rsout, d, r)
-	}	}	
+				d[ucols[c]] <- fun(ddd)	
+			}
+			raster.set.data.row(rsout, d, r)
+			raster.write.row(rsout)
+		}	
+	}	
 	return(rsout)
 }
 
