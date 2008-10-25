@@ -27,8 +27,8 @@ raster.set.data.row(raster, rowdata, rownr)
 raster.set.data.block(raster, blockdata, firstcell, lastcell) 
 raster.set.data.sparse(raster, sparsedata, indices) 
 raster.clear.data(raster)
-raster.set.rowcol(raster, nrows=raster@nrows, ncols=raster@ncols) 
-raster.set.bbox(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax)
+raster.set.rowcol(raster, nrows=raster.nrows(raster), ncols=raster.ncols(raster)) 
+raster.set.bbox(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster))
 raster.set.minmax(raster)
 }
 
@@ -63,7 +63,7 @@ raster.set copies the parameters of a Raster object to a new object, but does no
 \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} }
 
 \examples{ 
-	rs <- raster.create.new()
+	rs <- raster.new()
 	rs
 	rs <- raster.set.filename(rs, "c:/test.grd")
 	rs <- raster.set.rowcol(rs, nrows=18, ncols=36) 

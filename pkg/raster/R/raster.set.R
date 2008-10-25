@@ -55,25 +55,23 @@ raster.set.data <- function(raster, data) {
 	if (!is.vector(data)) {stop('data must be a vector')}
 	if (length(data) == 0) {	stop('length(data==0). If this is intended then use raster.data.clear(raster)') }
 	if (!(is.numeric(data) | is.integer(data) | is.logical(data))) {stop('data must be values')}
-	if (length(data) != raster@ncells) { stop('length(data) != raster@ncells') 
+	if (length(data) != raster.ncells(raster) ) { stop('length(data) != raster.ncells(raster)') 
 	} else {	
 		raster@data@values <- data
 		raster@data@content <- 'all'
 		raster@data@source <- 'ram'
-		raster@data@indices <- c(1, raster@ncells)
+		raster@data@indices <- c(1, raster.ncells(raster))
 		raster <- raster.set.minmax(raster)
 		return(raster)	
 	}	
 }
 
 
-raster.set.bbox <- function(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax) {
-	raster@xmin <- xmin
-	raster@xmax <- xmax
-	raster@ymin <- ymin
-	raster@ymax <- ymax
-	raster@xres <- (raster@xmax - raster@xmin) / raster@ncols
-	raster@yres <- (raster@ymax - raster@ymin) / raster@nrows
+raster.set.bbox <- function(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster)) {
+	raster@bbox@xmin <- xmin
+	raster@bbox@xmax <- xmax
+	raster@bbox@ymin <- ymin
+	raster@bbox@ymax <- ymax
 	return(raster)
 }
 
@@ -93,12 +91,9 @@ raster.set.minmax <- function(raster) {
 }
 
 
-raster.set.rowcol <- function(raster, nrows=raster@nrows, ncols=raster@ncols) {
+raster.set.rowcol <- function(raster, nrows=raster.nrows(raster), ncols=raster.ncols(raster)) {
 	raster@ncols <- as.integer(ncols)
 	raster@nrows <- as.integer(nrows)
-	raster@ncells <- as.integer(ncols * nrows)
-	raster@xres <- (raster@xmax - raster@xmin) / ncols
-	raster@yres <- (raster@ymax - raster@ymin) / nrows
 	return(raster)
 }
 

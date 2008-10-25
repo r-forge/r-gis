@@ -4,77 +4,98 @@
 # Version 0,1
 # Licence GPL v3
 
-raster.create.new <- 
-	function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=360, projection="+proj=longlat +datum=WGS84") {
-	valid <- TRUE
-	nr = as.integer(round(nrows))
-	nc = as.integer(round(ncols))
-	if (nc < 1) { valid <- FALSE }
-	if (nr < 1) { valid <- FALSE }
-	if (xmin > xmax) { valid <- FALSE }
-	if (ymin > ymax) { valid <- FALSE }
-	if (valid) {
-		xr <- (xmax - xmin) / ncols  
-		yr <- (ymax - ymin) / nrows
-		proj <- try(CRS(projection), silent = T)
-		if (class(proj) == "try-error") { 
-			warning(paste('projection', projection, 'is not a valid')) 
-			raster <- new("Raster", ncols = nc, nrows = nr, ncells = as.numeric(nr) * nc, xmin = xmin, xmax = xmax, ymin=ymin, ymax=ymax, yres=yr, xres=xr, projection=new("CRS"))
-		} else {
-			raster <- new("Raster", ncols = nc, nrows = nr, ncells = as.numeric(nr) * nc, xmin = xmin, xmax = xmax, ymin=ymin, ymax=ymax, yres=yr, xres=xr, projection=proj)
-		}
-		raster@data@content <- 'nodata'
-		return(raster) 
-	} else {return <- NA }
+.raster.new.Spatial <- function(xmin, xmax, ymin, ymax, projection="") {
+	bb <- new("Spatial")
+	bb@bbox[1,1] <- xmin
+	bb@bbox[1,2] <- xmax
+	bb@bbox[2,1] <- ymin
+	bb@bbox[2,2] <- ymax
+	bb@bbox[3,1] <- 0
+	bb@bbox[3,2] <- 1
+	bb@proj4string <- CRS(as.character(NA))
+	if (nchar(projection) > 0) {
+		projs <- try(CRS(projection), silent = T)
+		if (class(projs) == "try-error") { 
+			warning(paste('projection string', projection, 'is not a valid proj4 CRS string')) 
+		} else bb@proj4string <- projs	
+	}	
+	return(bb)
 }
 
 
-raster.create.from.file <- function(filename, band=1) {
-	if (toupper(file.get.extension(filename)) == ".GRD")
-		{ raster <- .raster.create.from.file.binary(filename, band) }
-	else {
-		gdalinfo <- GDALinfo(filename)
-		nc <- as.integer(gdalinfo[["columns"]])
-		nr <- as.integer(gdalinfo[["rows"]])
-		xn <- gdalinfo[["ll.x"]]
-		if (xn < 0) { ndecs <- 9 } else  { ndecs <- 8 }
-		xn <- as.numeric( substr( as.character(xn), 1, ndecs) )
+raster.new <- function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=360, projection="+proj=longlat +datum=WGS84") {
+	valid <- TRUE
+	nr = as.integer(round(nrows))
+	nc = as.integer(round(ncols))
+	if (nc < 1) { stop("ncols should be larger than 0") }
+	if (nr < 1) { stop("nrows should be larger than 0") }
+	bb <- .raster.new.Spatial(xmin, xmax, ymin, ymax, projection)
+	print(bb)
+	if (validObject(bbox)) {
+		raster <- new("Raster", bbox = bb@bbox, proj4string=bb@proj4string, ncols = nc, nrows = nr )
+		raster@data@content <- 'nodata'
+		return(raster) 
+	} else {
+		return <- NA 
+	}
+}
 
-		xx <- xn + gdalinfo[["res.x"]] * nc
-		if (xx < 0) { ndecs <- 9 } else  { ndecs <- 8 }
-		xx <- as.numeric( substr( as.character(xx), 1, ndecs) )
+
+raster.file <- function(filename, band=1) {
+	if (toupper(file.get.extension(filename)) == ".GRD") {
+		raster <- .raster.create.from.file.binary(filename, band) 
+	} else {
+		raster <- .raster.create.from.file.gdal(filename, band) 
+	}
+	return(raster)
+}	
+	
+	
+.raster.create.from.file.gdal <- function(filename, band) {	
+	gdalinfo <- GDALinfo(filename)
+	nc <- as.integer(gdalinfo[["columns"]])
+	nr <- as.integer(gdalinfo[["rows"]])
+	xn <- gdalinfo[["ll.x"]]
+	if (xn < 0) { ndecs <- 9 } else  { ndecs <- 8 }
+	xn <- as.numeric( substr( as.character(xn), 1, ndecs) )
+
+	xx <- xn + gdalinfo[["res.x"]] * nc
+	if (xx < 0) { ndecs <- 9 } else  { ndecs <- 8 }
+	xx <- as.numeric( substr( as.character(xx), 1, ndecs) )
 		
 #   as "ll" stands for lower left corner , it should be this,  yn <- gdalinfo[["ll.y"]];   yx <- ymin + gdalinfo[["res.y"]]  * raster$nrows
 #  but in fact  the upper left corner "ul" is returned so we do this:
-		yx <- gdalinfo[["ll.y"]]
-		if (yx < 0) { ndecs <- 9 } else  { ndecs <- 8 }
-		yx <- as.numeric( substr( as.character(yx), 1, ndecs) )
+	yx <- gdalinfo[["ll.y"]]
+	if (yx < 0) { ndecs <- 9 } else  { ndecs <- 8 }
+	yx <- as.numeric( substr( as.character(yx), 1, ndecs) )
 
-		yn <- yx - gdalinfo[["res.y"]] * nr
-		if (yn < 0) { ndecs <- 9 } else { ndecs <- 8 }
-		yn <- as.numeric( substr( as.character(yn), 1, ndecs) )
-		raster <- raster.create.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx)
-		raster <- raster.set.filename(raster, filename)
-		raster <- raster.set.datatype(raster, "numeric")
-		projection <- try(CRS(attr(gdalinfo, "projection")), silent = T)
-		if (class(projection) != "try-error") { raster@projection <- projection  } 
+	yn <- yx - gdalinfo[["res.y"]] * nr
+	if (yn < 0) { ndecs <- 9 } else { ndecs <- 8 }
+	yn <- as.numeric( substr( as.character(yn), 1, ndecs) )
+	raster <- raster.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx, projection="")
+	raster <- raster.set.filename(raster, filename)
+	raster <- raster.set.datatype(raster, "numeric")
+	
+	projection <- try(CRS(attr(gdalinfo, "projection")), silent = T)
+	if (class(projection) != "try-error") { 
+		raster@proj4string <- projection 
+	} 
 
-		raster@file@driver <- 'gdal' 
+	raster@file@driver <- 'gdal' 
 		#attr(gdalinfo, "driver")
 
-		raster@file@nbands <- as.integer(gdalinfo[["bands"]])
-		band <- as.integer(band)
-		if (band > raster@file@nbands) {
-			warning("band too high. Set to nbands")
-			band <- raster@file@nbands }
-		if ( band < 1) { 
-			warning("band too low. Set to 1")
-			band <- 1 }
-		raster@file@band <- as.integer(band)
+	raster@file@nbands <- as.integer(gdalinfo[["bands"]])
+	band <- as.integer(band)
+	if (band > raster@file@nbands) {
+		warning("band too high. Set to nbands")
+		band <- raster@file@nbands }
+	if ( band < 1) { 
+		warning("band too low. Set to 1")
+		band <- 1 }
+	raster@file@band <- as.integer(band)
 		
-		raster@file@gdalhandle[1] <- GDAL.open(filename)
+	raster@file@gdalhandle[1] <- GDAL.open(filename)
 #oblique.x   0  #oblique.y   0 
-	}
 	raster@data@source <- 'disk'
 	return(raster)
 }
@@ -124,11 +145,11 @@ raster.create.from.file <- function(filename, band=1) {
 		else if (ini[i,1] == "PROJECTION") {proj <- ini[i,2]} 
     }  
 
-    raster <- raster.create.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx)
+    raster <- raster.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx, projection="")
 	raster <- raster.set.filename(raster, filename)
 	raster@file@driver <- "raster"
 	projection <- try(CRS("proj"), silent = T)
-	if (class(projection) != "try-error") { raster@projection <- projection  } 
+	if (class(projection) != "try-error") { raster@proj4string <- projection  } 
 	
 	
 	raster@data@min <- minval

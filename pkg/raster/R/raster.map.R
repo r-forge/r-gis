@@ -17,6 +17,8 @@ rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)),
 
 
 raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
+#TODO if xlim and/or ylim are used, only read (and sample) for those areas.
+
 	if (raster@data@content == 'all') {
 		m <- raster.values(raster, format='matrix')
 		if (max(raster.ncols(raster), raster.nrows(raster)) <= maxdim) { subsample=FALSE }
@@ -30,26 +32,26 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 			
 			m <- m[rows, cols]
 
-			xres <- (raster@xmax - raster@xmin) / dim(m)[2]
-			yres <- (raster@ymax - raster@ymin) / dim(m)[1]
-			x <- (0:dim(m)[2]) * xres + raster@xmin 
-			y <- (0:dim(m)[1]) * yres + raster@ymin 
+			xres <- (raster.xmax(raster) - raster.xmin(raster) ) / dim(m)[2]
+			yres <- (raster.ymax(raster) - raster.ymin(raster) ) / dim(m)[1]
+			x <- (0:dim(m)[2]) * xres + raster.xmin(raster) 
+			y <- (0:dim(m)[1]) * yres + raster.ymin(raster) 
  		} else {	
-			x <- (0:raster@ncols) * raster@xres + raster@xmin 
-			y <- (0:raster@nrows) * raster@yres + raster@ymin 	
+			x <- (0:raster@ncols) * raster.xres(raster) + raster.xmin(raster) 
+			y <- (0:raster@nrows) * raster.yres(raster) + raster.ymin(raster) 	
 		}	
 	} else {
 		if (subsample) {
 			m <- .raster.read.skip(raster, maxdim) 
-			xres <- (raster@xmax - raster@xmin) / dim(m)[2]
-			yres <- (raster@ymax - raster@ymin) / dim(m)[1]
-			x <- (0:dim(m)[2]) * xres + raster@xmin 
-			y <- (0:dim(m)[1]) * yres + raster@ymin 
+			xres <- (raster.xmax(raster) - raster.xmin(raster)) / dim(m)[2]
+			yres <- (raster.ymax(raster) - raster.ymin(raster) ) / dim(m)[1]
+			x <- (0:dim(m)[2]) * xres + raster.xmin(raster) 
+			y <- (0:dim(m)[1]) * yres + raster.ymin(raster) 
 		} else {
 			raster <- raster.read.all(raster)
 			m <- raster.values(raster, format='matrix')
-			x <- (0:raster@ncols) * raster@xres + raster@xmin 
-			y <- (0:raster@nrows) * raster@yres + raster@ymin 
+			x <- (0:raster@ncols) * raster.xres(raster) + raster.xmin(raster) 
+			y <- (0:raster@nrows) * raster.yres(raster) + raster.ymin(raster) 
 		}	
 	} 
 	z <- t(m[nrow(m):1,])

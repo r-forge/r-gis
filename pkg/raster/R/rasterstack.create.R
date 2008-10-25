@@ -46,7 +46,7 @@ rasterstack.add.files <- function(rasterstack, rasterfiles, bands= rep(1, length
 		if (!(file.exists(filename))) { 
 			stop(paste(filename, "does not exist")) 
 		}
-		raster <- raster.create.from.file(filename, band)
+		raster <- raster.file(filename, band)
 		rasterstack <- rasterstack.add.rasters(rasterstack, raster) 
 	}
 	return(rasterstack)
@@ -63,30 +63,27 @@ rasterstack.add.rasters <- function(rasterstack, rasters) {
 		} else { raster <- rasters[[i]] }
 		
 		addraster <- TRUE
-		i <- length(rasterstack@rasters) + 1
+		i <- rasterstack@nrasters + 1
 		if (i == 1) {
-			rasterstack@projection = raster@projection
-			rasterstack@ncols <- raster@ncols
-			rasterstack@nrows <- raster@nrows
-			rasterstack@ncells <- raster@ncells
-			rasterstack@xmin <- raster@xmin
-			rasterstack@xmax <- raster@xmax
-			rasterstack@ymin <- raster@ymin
-			rasterstack@ymax <- raster@ymax
-			rasterstack@xres <- raster@xres
-			rasterstack@yres <- raster@yres	  
+			rasterstack@proj4string = raster@proj4string
+			rasterstack@ncols <- raster.ncols(raster)
+			rasterstack@nrows <- raster.nrows(raster)
+			rasterstack@bbox[1,1] <- raster.xmin(raster)
+			rasterstack@bbox[1,2] <- raster.xmax(raster)
+			rasterstack@bbox[2,1] <- raster.ymin(raster)
+			rasterstack@bbox[2,2] <- raster.ymax(raster)
 		} else {
-			if (length(attr(rasterstack@projection, "projection")) != 0)
+			if (length(attr(rasterstack@proj4string, "projection")) != 0)
 				{
-				if ( length(attr(raster@projection, "projection")) == 0 ) { warning("raster with unknown projection added") 
-				} else if (rasterstack@projection != raster@projection) { warning("different projections used") }	
+				if ( length(attr(raster@proj4string, "projection")) == 0 ) { warning("raster with unknown projection added") 
+				} else if (rasterstack@proj4string != raster@proj4string) { warning("different projections used") }	
 			}	
 			if (rasterstack@ncols != raster@ncols) {addraster <- FALSE}
 			if (rasterstack@nrows != raster@nrows) {addraster <- FALSE}
-			if (rasterstack@xmin != raster@xmin) {addraster <- FALSE}
-			if (rasterstack@xmax != raster@xmax) {addraster <- FALSE}
-			if (rasterstack@ymin != raster@ymin) {addraster <- FALSE}
-			if (rasterstack@ymax != raster@ymax) {addraster <- FALSE}
+			if (raster.xmin(rasterstack) != raster.xmin(raster)) {addraster <- FALSE}
+			if (raster.xmax(rasterstack) != raster.xmax(raster)) {addraster <- FALSE}
+			if (raster.ymin(rasterstack) != raster.ymin(raster)) {addraster <- FALSE}
+			if (raster.ymax(rasterstack) != raster.ymax(raster)) {addraster <- FALSE}
 			count <- 1
 			for (j in 1:(i-1)) {
 				if (raster@file@shortname == rasterstack@rasters[[j]]@file@shortname) { 

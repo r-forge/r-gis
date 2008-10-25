@@ -5,9 +5,45 @@
 # Licence GPL v3
 
 .raster.add.history <- function(raster, message) {
-	if (is.character(message) && message != "") {
+	if (is.character(message) & message != "") {
 		raster@history <- c(message, raster@history)
 	}	
+}
+
+
+
+
+.raster.smooth <- function(raster, kernel_size = 3, filename=NA) {
+#based on code by Drs. Paul Hiemstra
+#Department of Physical Geography, Faculty of Geosciences, University of Utrecht
+#https://stat.ethz.ch/pipermail/r-sig-geo/2008-June/003785.html
+# this does not work right now...
+
+	shift_matrix = function(m, row, col) {
+		nrow = dim(m)[1]
+		ncol = dim(m)[2]
+		if(row > 0) m = rbind(matrix(rep(NA,abs(row)*ncol), abs(row),ncol),m[1:(nrow-row),])
+		if(row < 0) m = rbind(m[-(row-1):nrow,],matrix(rep(NA,abs(row)*ncol), abs(row),ncol))
+		if(col > 0) m = cbind(matrix(rep(NA,abs(col)*nrow), nrow, abs(col)),m[,1:(ncol-col)])
+		if(col < 0) m = cbind(m[,-(col-1):ncol],matrix(rep(NA,abs(col)*nrow), nrow, abs(col)))
+	}
+
+	raster <- raster.read.all(raster)
+    m <- raster.values(raster, format = 'matrix')
+	
+	row_nums = rep(floor(kernel_size/2): -floor(kernel_size/2), each = kernel_size)
+    col_nums = rep(floor(kernel_size/2): -floor(kernel_size/2), kernel_size)
+    out = matrix(rep(0,dim(m)[1]*dim(m)[2]), dim(m))
+	
+    for(i in 1:length(row_nums)) {
+        out = out + shift_matrix(m, row_nums[i], col_nums[i])
+    }
+    res <- (out / (kernel_size * kernel_size))
+
+	res <- as.vector(t(res))
+	out.raster <- raster.set.filename(raster, filename)
+	out.raster <- raster.set.data(out.raster, res)
+	return(out.raster)
 }
 
 

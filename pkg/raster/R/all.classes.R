@@ -1,51 +1,28 @@
 # R classes for spatial data (raster data specifically) 
-# Authors: Robert J. Hijmans and Jacob van Etten
-# International Rice Research Institute
+# Authors: Robert J. Hijmans and Jacob van Etten, 
+# International Rice Research Institute. Philippines
 # contact: r.hijmans@gmail.com
 # Date : October 2008
-# Version 0,3
+# Version 0,4
 # Licence GPL v3
 
-setClass('BoundingBox', 
-	representation (
-		projection='CRS',
-		xmin ='numeric',
-		xmax ='numeric',
-		ymin ='numeric',
-		ymax ='numeric'
-		),
-	prototype (	
-		projection= new('CRS')
-	),	
-	validity = function(object)
-	{
-		cond1 <- object@xmin < object@xmax
-		cond2 <- object@ymin < object@ymax
-		#using the projection, additional conditions could be created...
-		cond <- cond1 & cond2
-		return(cond)
-	}
-)
 
-	
+
+.ll_sanity <- function(...) {return(TRUE)}
+
+
 setClass ('AbstractRaster',
-	contains = 'BoundingBox',
+# importing "Spatial" (bounding box + Proj4string) from the sp package
+	contains = 'Spatial',
 	representation (
 		ncols ='integer',
-		nrows ='integer',
-		ncells ='numeric',
-		xres ='numeric',
-		yres ='numeric'
+		nrows ='integer'
 		),
 	validity = function(object)
 	{
-		cond1 <- isTRUE(all.equal(as.numeric(object@ncols)*object@nrows, object@ncells))
-		#cond2 <- isTRUE(all.equal(object@xres,((object@xmax-object@xmin)/object@ncols))) 
-		#TODO 0.1 perc margin? Or just a warning when resolution is wrong?
-		#cond3 <- isTRUE(all.equal(object@yres,((object@ymax-object@ymin)/object@nrows))) 
-		#TODO 0.1 perc margin? Or just a warning when resolution is wrong?
-		cond <- cond1 #& cond2 & cond3
-		return(cond)
+		c1 <- (object@ncols > 0)
+		c2 <- (object@nrows > 0)
+		return(c1 & c2)
 	}
 )
 	
@@ -134,9 +111,9 @@ setMethod ('show' , 'Raster',
 			cat('nbands    :' , object@file@nbands, '\n')
 			cat('band      :' , object@file@band, '\n')
 		}	
-		cat('nrows     :' , object@nrows, '\n')
-		cat('ncols     :' , object@ncols, '\n')
-		cat('ncells    :' , object@ncells, '\n')
+		cat('nrows     :' , raster.nrows(object), '\n')
+		cat('ncols     :' , raster.ncols(object), '\n')
+		cat('ncells    :' , raster.ncells(object), '\n')
 		cat('datatype  :' , object@file@datanotation, '\n')
 		if (object@data@haveminmax) {
 			cat('min value :' , object@data@min, '\n')
@@ -146,13 +123,13 @@ setMethod ('show' , 'Raster',
 			cat('min value : NA \n')
 			cat('max value : NA \n')
 			}
-		cat('projection:' , object@projection@projargs, '\n')
-		cat('xmin      :' , object@xmin, '\n')
-		cat('xmax      :' , object@xmax, '\n')
-		cat('ymin      :' , object@ymin, '\n')
-		cat('ymax      :' , object@ymax, '\n')
-		cat('xres      :' , object@xres, '\n')
-		cat('yres      :' , object@yres, '\n')
+		cat('projection:' , object@proj4string@projargs, '\n')
+		cat('xmin      :' , raster.xmin(object), '\n')
+		cat('xmax      :' , raster.xmax(object), '\n')
+		cat('ymin      :' , raster.ymin(object), '\n')
+		cat('ymax      :' , raster.ymax(object), '\n')
+		cat('xres      :' , raster.xres(object), '\n')
+		cat('yres      :' , raster.yres(object), '\n')
 		cat ('\n')
 	}
 )
@@ -203,16 +180,16 @@ setMethod ('show' , 'RasterStack',
 		cat ('class     :' , class ( object ) , '\n')
 		cat ('filename  :' , object@filename, '\n')
 		cat ('nrasters  :' , object@nrasters, '\n')
-		cat ('nrows     :' , object@nrows, '\n')
-		cat ('ncols     :' , object@ncols, '\n')
-		cat ('ncells    :' , object@ncells, '\n')
-		cat ('projection:' , attr(object@projection, 'projection'), '\n')
-		cat ('xmin      :' , object@xmin, '\n')
-		cat ('xmax      :' , object@xmax, '\n')
-		cat ('ymin      :' , object@ymin, '\n')
-		cat ('ymax      :' , object@ymax, '\n')
-		cat ('xres      :' , object@xres , '\n')
-		cat ('yres      :' , object@yres , '\n')
+		cat ('nrows     :' , raster.nrows(object), '\n')
+		cat ('ncols     :' , raster.ncols(object), '\n')
+		cat ('ncells    :' , raster.ncells(object), '\n')
+		cat ('projection:' , attr(object@proj4string, 'projection'), '\n')
+		cat ('xmin      :' , raster.xmin(object), '\n')
+		cat ('xmax      :' , raster.xmax(object), '\n')
+		cat ('ymin      :' , raster.ymin(object), '\n')
+		cat ('ymax      :' , raster.ymax(object), '\n')
+		cat ('xres      :' , raster.xres(object) , '\n')
+		cat ('yres      :' , raster.yres(object) , '\n')
 		cat ('\n')
 	}
 )

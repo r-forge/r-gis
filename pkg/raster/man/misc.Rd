@@ -6,7 +6,6 @@
 \alias{string.trim}
 \alias{calc.mode}
 \alias{calc.cv}
-\alias{raster.shortcuts}
 
 \title{ Miscellaneous functions }
 \description{
@@ -21,7 +20,6 @@ file.get.path(filename)
 string.trim(astring)
 calc.mode(x, na.rm = TRUE)
 calc.cv(x, na.rm = TRUE, singlevalueaszero=TRUE)
-raster.shortcuts()
 }
 \arguments{
   \item{filename}{ a filename with or without the path }

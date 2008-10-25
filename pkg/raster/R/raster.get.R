@@ -4,24 +4,48 @@
 # Version 0,1
 # Licence GPL v3
 
-raster.ncols <- function(raster) {
-	return(raster@ncols)
+raster.ncols <- function(object) {
+	return(object@ncols)
 }
 
-raster.nrows <- function(raster) {
-	return(raster@nrows)
+raster.nrows <- function(object) {
+	return(object@nrows)
 }
 
-raster.ncells <- function(raster) {
-	return(raster@ncells)
+raster.ncells <- function(object) {
+	return( as.numeric(object@nrows) * object@ncols )
 }
 
-raster.xres <- function(raster) {
-	return(raster@xres)
+raster.xmin <- function(object) {
+	return (object@bbox[1,1])
 }
 
-raster.yres <- function(raster) {
-	return(raster@yres)
+raster.xmax <- function(object) {
+	return (object@bbox[1,2])
+}
+
+raster.ymin <- function(object) {
+	return (object@bbox[2,1])
+}
+
+raster.ymax <- function(object) {
+	return (object@bbox[2,2])
+}
+
+.raster.zmin <- function(object) {
+	return (object@bbox[3,1])
+}
+
+.raster.zmax <- function(object) {
+	return (object@bbox[3,2])
+}
+
+raster.xres <- function(object) {
+	return ( (raster.xmax(object) - raster.xmin(object)) / raster.ncols(object)  )
+}
+
+raster.yres <- function(object) {
+	return ( (raster.ymax(object) - raster.ymin(object)) / raster.nrows(object)  )
 }
 
 raster.content <- function(raster) {
@@ -49,20 +73,20 @@ raster.values <- function(raster, format='vector', names=FALSE) {
 raster.get.y.from.row <- function(raster, rownr) {
 	rownr <- round(rownr)
 	rownr[rownr < 1 | rownr > raster@nrows] <- NA
-	y <- raster@ymax - ((rownr-0.5) * raster@yres)
+	y <- raster.ymax(raster) - ((rownr-0.5) * raster.yres(raster))
 	return(y) }	
 	
 	
 raster.get.x.from.col <- function(raster, colnr) {
 	colnr <- round(colnr)
 	colnr[colnr < 1 | colnr > raster@ncols] <- NA
-	x <- raster@xmin + (colnr - 0.5) * raster@xres 
+	x <- raster.xmin(raster) + (colnr - 0.5) * raster.xres(raster) 
 	return(x) }  
 
 	
 raster.get.row.from.cell <- function(raster, cell) {
 	cell <- as.integer(round(cell))
-	cell[cell < 1 | cell > raster@ncells] <- NA
+	cell[cell < 1 | cell > raster.ncells(raster)] <- NA
 	rownr <- as.integer(trunc((cell-1)/raster@ncols) + 1)
 #	rownr <- as.integer(trunc(cell / (raster@ncols+1)) + 1)
     return(rownr)
@@ -71,7 +95,7 @@ raster.get.row.from.cell <- function(raster, cell) {
 
 raster.get.col.from.cell <- function(raster, cell) {
 	cell <- as.integer(round(cell))
-	cell[cell < 1 | cell > raster@ncells] <- NA	
+	cell[cell < 1 | cell > raster.ncells(raster)] <- NA	
 	rownr <- as.integer(trunc((cell-1)/raster@ncols) + 1)
 	colnr <- as.integer(cell - ((rownr-1) * raster@ncols))
 #	colnr <- as.integer(trunc(cell - (trunc(cell / (raster@ncols+1) )) * raster@ncols))
@@ -116,16 +140,16 @@ raster.get.cell.from.rowcol <- function(raster, rownr, colnr) {
 }
 
 raster.get.col.from.x <- function ( raster, x )	{
-	colnr <- (trunc((x - raster@xmin) / raster@xres)) + 1 
-	colnr[x == raster@xmax] <- raster@ncols
-	colnr[x < raster@xmin | x > raster@xmax] <- NA
+	colnr <- (trunc((x - raster.xmin(raster)) / raster.xres(raster))) + 1 
+	colnr[x == raster.xmax(raster)] <- raster.ncols(raster)
+	colnr[x < raster.xmin(raster) | x > raster.xmax(raster) ] <- NA
 	return(colnr) }
 	
 	
 raster.get.row.from.y <- function ( raster, y )	{
-	rownr <- 1 + (trunc((raster@ymax - y) / raster@yres))
-	rownr[y == raster@ymin] <- raster@nrows 
-	rownr[y > raster@ymax | y < raster@ymin] <- NA
+	rownr <- 1 + (trunc((raster.ymax(raster) - y) / raster.yres(raster)))
+	rownr[y == raster.ymin(raster) ] <- raster@nrows 
+	rownr[y > raster.ymax(raster) | y < raster.ymin(raster)] <- NA
 	return(rownr)
 }	
 	
@@ -141,7 +165,7 @@ raster.get.xy.from.cell <- function(raster, cell) {
 	return(xy) }  
 	
 	
-raster.get.cxy.from.box <- function(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax) {
+raster.get.cxy.from.box <- function(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster)) {
 	firstrow <- raster.get.row.from.y(raster, ymax)
 	lastrow <- raster.get.row.from.y(raster, ymin)
 	firstcol <- raster.get.col.from.x(raster, xmin)
@@ -161,7 +185,7 @@ raster.get.cxy.from.box <- function(raster, xmin=raster@xmin, xmax=raster@xmax, 
 raster.is.valid.cell <- function(raster, cell) {
 	cell <- round(cell)
 	validcell <- vector(length=length(cell))
-	validcell[cell > 0 & cell <= raster@ncells] <- TRUE
+	validcell[cell > 0 & cell <= raster.ncells(raster)] <- TRUE
 	return(validcell)
 }
 

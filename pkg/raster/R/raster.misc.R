@@ -18,7 +18,7 @@ calc.mode <- function(x, na.rm = TRUE) {
 #		return(result)
 	z <- x[!is.na(x)]
 	if (length(z) == 0) { return(NA) 
-	} else if (na.rm == FALSE && length(z) < length(x)) { return(NA)	 
+	} else if (na.rm == FALSE & length(z) < length(x)) { return(NA)	 
 	} else if (length(z) == 1) { return(z)
 	} else {
 		freq <- table(z)
@@ -37,8 +37,8 @@ calc.cv <- function(x, na.rm = TRUE, singlevalueaszero=TRUE) {
 # else a value of 0 is returned.
 	z <- x[!is.na(x)]
 	if (length(z) == 0) { return(NA) 
-	} else if (na.rm == FALSE && length(z) < length(x)) { return(NA)	 
-	} else if (length(z) == 1 && singlevalueaszero == TRUE) { return(0)
+	} else if (na.rm == FALSE & length(z) < length(x)) { return(NA)	 
+	} else if (length(z) == 1 & singlevalueaszero == TRUE) { return(0)
 	} else {
 		return(100 * sd(z) / mean(z))
 	}	

@@ -8,6 +8,10 @@
 \alias{raster.ncells}
 \alias{raster.xres}
 \alias{raster.yres}
+\alias{raster.xmin}
+\alias{raster.xmax}
+\alias{raster.ymin}
+\alias{raster.ymax}
 \alias{raster.get.col.from.cell}
 \alias{raster.get.row.from.cell}
 \alias{raster.get.cell.from.rowcol}
@@ -35,11 +39,15 @@ raster.values(raster, format='vector', names=FALSE)
 raster.content(raster)
 raster.indices(raster)
 raster.source(raster)
-raster.ncols(raster)
-raster.nrows(raster)
-raster.ncells(raster)
-raster.xres(raster)
-raster.yres(raster)
+raster.ncols(object)
+raster.nrows(object)
+raster.ncells(object)
+raster.xres(object)
+raster.yres(object)
+raster.xmin(object)
+raster.xmax(object)
+raster.ymin(object)
+raster.ymax(object)
 raster.get.col.from.cell(raster, cell)
 raster.get.row.from.cell(raster, cell)
 raster.get.cell.from.rowcol(raster, rownr, colnr)
@@ -50,12 +58,13 @@ raster.get.cell.from.xy(raster, xy)
 raster.get.x.from.col(raster, colnr)
 raster.get.y.from.row(raster, rownr)
 raster.get.xy.from.cell(raster, cell)
-raster.get.cxy.from.box(raster, xmin=raster@xmin, xmax=raster@xmax, ymin=raster@ymin, ymax=raster@ymax)
+raster.get.cxy.from.box(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster))
 raster.is.valid.cell(raster, cell) 
 }
 
 \arguments{
   \item{raster}{ raster or rasterstack object }
+  \item{object}{ raster or rasterstack object }
   \item{format}{ use \code{vector} to get the data as a single vector or \code{matrix} to get them as a matrix }
   \item{names}{ If TRUE, row and col names are provided }
   \item{x}{  x coordinate(s) }
@@ -86,7 +95,7 @@ raster.is.valid.cell(raster, cell)
 \author{Robert J. Hijmans  \email{r.hijmans@gmail.com}}
 \examples{
 #using a new default raster (1 degree global)
-rs <- raster.create.new()
+rs <- raster.new()
 raster.ncells(rs)
 raster.get.col.from.cell(rs, 10000)
 raster.get.row.from.cell(rs, 10000)
@@ -100,10 +109,10 @@ raster.get.xy.from.cell(rs, 10000)
 raster.get.xy.from.cell(rs, c(0, 1, 32581, raster.ncells(rs), raster.ncells(rs)+1))
 
 #using a file from disk
-rs <- raster.create.from.file(system.file("external/test.ag", package="sp"))
+rs <- raster.file(system.file("external/test.ag", package="sp"))
 rs
 raster.get.cell.from.x.y(rs, 180000, 330000)
 #xy for corners of grid:
-raster.get.xy.from.cell(rs, c(1, rs@ncols, rs@nrows, rs@ncells))
+raster.get.xy.from.cell(rs, c(1, raster.ncols(rs), raster.nrows(rs), raster.ncells(rs)))
 }
 \keyword{ spatial }

@@ -7,7 +7,7 @@
 
 raster.write.ascii <- function(raster, overwrite=FALSE) {
 
-  	resdif <- abs((raster@yres - raster@xres) / raster@yres)
+  	resdif <- abs((raster.yres(raster) - raster.xres(raster)) / raster.yres(raster) )
 	if (resdif > 0.01) {
 		print(paste("raster has unequal horizontal and vertical resolutions","\n", "these data cannot be stored in arc-ascii format"))
 	}
@@ -23,9 +23,9 @@ raster.write.ascii <- function(raster, overwrite=FALSE) {
 			thefile <- file(raster@file@name, "w")  # open an txt file connection
 			cat("NCOLS", raster@ncols, "\n", file = thefile)
 			cat("NROWS", raster@nrows, "\n", file = thefile)
-			cat("XLLCORNER", raster@xmin, "\n", file = thefile)
-			cat("YLLCORNER", raster@ymin, "\n", file = thefile)
-			cat("CELLSIZE",  raster@xres, "\n", file = thefile)
+			cat("XLLCORNER", raster.xmin(raster), "\n", file = thefile)
+			cat("YLLCORNER", raster.ymin(raster), "\n", file = thefile)
+			cat("CELLSIZE",  raster.xres(raster), "\n", file = thefile)
 			cat("NODATA_value", raster@file@nodatavalue, "\n", file = thefile)
 			close(thefile) #close connection
 		}
@@ -120,7 +120,7 @@ raster.write.row <- function(raster, overwrite=FALSE) {
 #	raster@data@values[is.na(raster@data@values)] <-  raster@file@nodatavalue
 	writeBin(as.vector(raster@data@values), raster@filecon, size = raster@file@datasize)
 	
-	if (raster@data@indices[2] == raster@ncells) {
+	if (raster@data@indices[2] == raster.ncells(raster) ) {
 	# LAST  ROW
 		.raster.write.hdr(raster) 
 		close(raster@filecon)
@@ -145,12 +145,12 @@ raster.write.row <- function(raster, overwrite=FALSE) {
 	cat("[GeoReference]", "\n", file = thefile)
 	cat("Rows=",  raster@nrows, "\n", file = thefile)
 	cat("Columns=",  raster@ncols, "\n", file = thefile)
-	cat("MinX=", raster@xmin, "\n", file = thefile)
-	cat("MinY=", raster@ymin, "\n", file = thefile)
-	cat("MaxX=", raster@xmax, "\n", file = thefile)
-	cat("MaxY=", raster@ymax, "\n", file = thefile)
-	cat("ResolutionX=", raster@xres, "\n", file = thefile)
-	cat("ResolutionY=", raster@yres, "\n", file = thefile)
+	cat("MinX=", raster.xmin(raster), "\n", file = thefile)
+	cat("MinY=", raster.ymin(raster), "\n", file = thefile)
+	cat("MaxX=", raster.xmax(raster), "\n", file = thefile)
+	cat("MaxY=", raster.ymax(raster), "\n", file = thefile)
+	cat("ResolutionX=", raster.xres(raster), "\n", file = thefile)
+	cat("ResolutionY=", raster.yres(raster), "\n", file = thefile)
 	
 	cat("[Data]", "\n", file = thefile)
 	if (raster@file@datatype == 'integer') {  datatype <- "INT"  } else { datatype <- "FLT" }
