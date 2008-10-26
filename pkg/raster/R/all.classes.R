@@ -193,4 +193,3 @@ setMethod ('show' , 'RasterStack',
 	}
 )
 
-

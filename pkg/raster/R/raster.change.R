@@ -8,26 +8,62 @@
 
 
 
-#raster.change.disaggregate <- function(raster, filename, fun=mean, factor=2, overwrite=FALSE) {
+
+#raster.resample <- function(raster, xmin, xmax, ymin, ymax, ncols, nrows, method="bilinear", filename="", overwrite=FALSE) {
 #	stop("sorry, not implemented yet")
 #}
 
-#raster.change.resample <- function(raster, filename, xmin, xmax, ymin, ymax, ncols, nrows, method="bilinear", overwrite=FALSE) {
+#raster.expand <- function(raster, xmin, xmax, ymin, ymax, filename="", overwrite=FALSE) {
 #	stop("sorry, not implemented yet")
 #}
 
-#raster.change.expand <- function(raster, xmin, xmax, ymin, ymax, filename=NA, overwrite=FALSE) {
-#	stop("sorry, not implemented yet")
-#}
+
+
+raster.disaggregate <- function(raster, smoothfun='none', factor=2, filename="", overwrite=FALSE) {
+	factor <- round(factor)
+	if (factor < 2) { stop('factor should be > 1') }
+	outrs <- raster.set(raster)
+
+	if (raster@data@source == 'disk') { 
+			stop('raster should be in memory for this version of raster.merge()') 
+	}
+
+	outrs <- raster.set.rowcol(outrs, raster.nrows(raster) * factor, raster.ncols(raster) * factor) 
+	
+	d <- raster.values(raster, format='matrix')
+	dims <- dim(d)
+	# the following surely can be done with an apply
+	dd <- cbind(d[,1], d[,1])
+	for (i in 2:raster.ncols(raster)) {
+		for (j in 1:factor) {
+			dd <- cbind(dd, d[,i])
+		}	
+	}
+	d <- cbind(dd[1,], dd[1,])
+	for (i in 2:raster.nrows(raster)) {
+		for (j in 1:factor) {
+			dd <- rbind(dd, d[i,])
+		}	
+	}
+	
+	outrs <- raster.set.data(outrs, d)
+	
+	warning('smoothfun is ignored in this preliminary version of raster.disaggregate')
+	return(outrs)
+}
+
 
 
 raster.merge <- function(rasters, filename, overwrite=FALSE) {
-	#check resolution
-	#check origin
-	#check projection
-	#if raster1 overlaps all of raster2 return raster1
-	#if there is no overlap combine
-	#if there is some overlap raster1 values are used in those places (
+	
+	res <- raster.compare(rasters, rowcol=FALSE)
+	
+	for (i in 1:length(rasters)) {
+		if (rasters[[i]]@data@source != 'disk') { 
+			stop('rasters should be stored on disk for this version of raster.merge()') 
+		}
+	}
+	
 	bb <- bbox(rasters[[1]])
 	for (i in 2:length(rasters)) {
 		bb2 <- bbox(rasters[[i]])
@@ -39,18 +75,16 @@ raster.merge <- function(rasters, filename, overwrite=FALSE) {
 
 	rowcol <- matrix(0, ncol=3, nrow=length(rasters))
 	for (i in 1:length(rasters)) {
-		xy1 <- raster.get.xy.from.cell(rasters[[i]], 1)
-#		xy2 <- raster.get.xy.from.cell(rasters[[i]], raster.ncols(rasters[[i]]))
-		xy3 <- raster.get.xy.from.cell(rasters[[i]], raster.ncells(rasters[[i]]) )
-		rowcol[i,1] <- raster.get.row.from.y(outrs, xy1[2]) #start row
-		rowcol[i,2] <- raster.get.row.from.y(outrs, xy3[2]) #end row
+		xy1 <- raster.get.xy.from.cell(rasters[[i]], 1) # first row/col on old raster[[i]]
+		xy2 <- raster.get.xy.from.cell(rasters[[i]], raster.ncells(rasters[[i]]) ) #last row/col on old raster[[i]]
+		rowcol[i,1] <- raster.get.row.from.y(outrs, xy1[2]) #start row on new raster
+		rowcol[i,2] <- raster.get.row.from.y(outrs, xy2[2]) #end row
 		rowcol[i,3] <- raster.get.col.from.x(outrs, xy1[1]) #start col
-#		rowcol[i,4] <- raster.get.col.from.x(outrs, xy2[1]) #end col
 	}
 	
 	for (r in 1:raster.nrows(outrs)) {
 		rd <- as.vector(matrix(NA, nrow=1, ncol=raster.ncols(outrs))) 
-		for (i in length(rasters):1) {
+		for (i in length(rasters):1) {  #reverse order so that the first raster covers the second etc.
 			if (r >= rowcol[i,1] & r <= rowcol[i,2]) { 
 				rasters[[i]] <- raster.read.row(rasters[[i]], r + 1 - rowcol[i,1]) 
 				d <- raster.values(rasters[[i]])

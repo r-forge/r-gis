@@ -1,7 +1,7 @@
 # Author: Robert J. Hijmans, r.hijmans@gmail.com
 # International Rice Research Institute
-# Date :  June 2008
-# Version 0,1
+# Date :  October 2008
+# Version 0,2
 # Licence GPL v3
 
 raster.filename <- function(object) {
@@ -36,6 +36,10 @@ raster.ymax <- function(object) {
 	return (object@bbox[2,2])
 }
 
+raster.boundingbox <- function(object) {
+	return(bbox(object)[1:2, 1:2])
+}
+
 .raster.zmin <- function(object) {
 	return (object@bbox[3,1])
 }
@@ -51,6 +55,23 @@ raster.xres <- function(object) {
 raster.yres <- function(object) {
 	return ( (raster.ymax(object) - raster.ymin(object)) / raster.nrows(object)  )
 }
+
+raster.resolution <- function(object) {
+	x <- raster.xres(object)
+	y <- raster.yres(object)
+	return(c(x, y))
+}
+
+raster.origin <- function(object) {
+	x <- raster.xmin(object) - raster.xres(object)*(round(raster.xmin(object) / raster.xres(object)))
+	y <- raster.ymax(object) - raster.yres(object)*(round(raster.ymax(object) / raster.yres(object)))
+	return(c(x, y))
+}
+
+raster.projection <- function(object) {
+	return(object@proj4string)
+}
+
 
 raster.content <- function(raster) {
 	return(raster@data@content)
@@ -81,6 +102,62 @@ raster.minvalue <- function(raster) {
 raster.maxvalue <- function(raster) {
 	return(raster@data@max)
 }
+
+
+
+
+raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) {
+	res <- TRUE
+	if (length(rasters) < 2) {
+		res <- F
+		if(stopiffalse) stop('length(rasters) < 2')
+	}	
+	res1 <- raster.resolution(rasters[[1]])
+	origin1 <- raster.origin(rasters[[1]])
+	for (i in 2:length(rasters)) { 
+		if (rowcol) {
+			if (raster.ncols(rasters[[1]]) != raster.ncols(rasters[[i]])) {
+				res <- F
+				if(stopiffalse) { stop('ncols different')} }
+			}	
+			if (raster.nrows(rasters[[1]]) != raster.nrows(rasters[[i]])) {
+				res <- F
+				if(stopiffalse) stop('nrows different')
+			}
+		}
+		if (projection) {
+			if (raster.projection(rasters[[1]]) != raster.projection(rasters[[i]])) {
+				res <- F
+				if(stopiffalse) stop('different projections')
+			}
+		}
+		resi <- raster.resolution(rasters[[i]])
+		xr <-  min(res1[1], resi[1])
+		yr <-  min(res1[2], resi[2])
+		if (resolution) {
+			if (abs(resi[1] - res1[1]) > slack * xr) {
+				res <- F
+				if(stopiffalse)  { stop('different x resolution') }
+			}	
+			if (abs(resi[2] - res1[2]) > slack * yr) { 
+				res <- F
+				if(stopiffalse) { stop('different y resolution') }
+			}
+		}
+		if (origin) {
+			origini <- raster.origin(rasters[[1]])
+			if ((abs(origini[1] - origin1[1])) > slack * xr) {
+				res <- F
+				if(stopiffalse) { stop('different x origins')
+			} 
+			if ((abs(origini[2] - origin1[2])) > slack * yr) {
+				res <- F
+				if(stopiffalse) { stop('different y origins')}
+			}	
+		}
+	}
+}
+
 
 raster.get.y.from.row <- function(raster, rownr) {
 	rownr <- round(rownr)

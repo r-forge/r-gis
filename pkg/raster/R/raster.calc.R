@@ -190,13 +190,17 @@ raster.calc.setNA <- function(raster, operator= "<=", value=0, filename=NA, over
     for (i in 1:length(rows[1,])) {
 		d <- rows[, max(1,(i-lim)):min((i+lim),lr)]
 		d <- as.vector(d)
-		dd <- na.omit(d)
-		if (keepdata) { 
-			if (length(dd) > 0) { 
-				res[i] <- fun(dd)
-			} 		
-		} else if (length(dd) == length(d)) { 
-			res[i] <- fun(d)
+		dd <- as.vector(na.omit(d))
+		if (length(dd) == 0) {
+			res[i] <- NA
+		} else if (keepdata) { 
+			res[i] <- fun(dd)
+		} else {
+			if (length(dd) == length(d)) { 
+				res[i] <- fun(d)
+			} else {
+				res[i] <- NA
+			}
 		}
 	}	
 	return(res)

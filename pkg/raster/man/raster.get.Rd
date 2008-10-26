@@ -11,10 +11,15 @@
 \alias{raster.ncells}
 \alias{raster.xres}
 \alias{raster.yres}
+\alias{raster.resolution}
+\alias{raster.boundingbox}
 \alias{raster.xmin}
 \alias{raster.xmax}
 \alias{raster.ymin}
 \alias{raster.ymax}
+\alias{raster.projection}
+\alias{raster.origin}
+\alias{raster.compare}
 \alias{raster.get.col.from.cell}
 \alias{raster.get.row.from.cell}
 \alias{raster.get.cell.from.rowcol}
@@ -29,12 +34,14 @@
 \alias{raster.is.valid.cell}
 
   
-\title{ Get raster property values or compute column, row, or cell number of a raster from coordinates and vice versa }
+\title{ Get raster properties or get the column, row, or cell number of a raster from coordinates and vice versa }
 \description{
   raster.get.data returns datavalues that are associated with the raster object (e.g. after raster.read.* has been used). Data are returned as a vector. 
   raster.get.matrix will return a matrix, optionally with the row and col numbers as names of the whole or part of the data that has been previously 
   raster.get.ncells, nrows, ncols, xres, yres simply take the values from the data slots in the Raster or RasterStack object. It is advisable to use these and other 'get' and 'set' functions rather than dirctly accessing the slots of an object. This will ensure object integrity and ensure that code will not break in the future, even if the underlying class definitions change. 
   raster.get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
+  raster.compare evaluates whether a list of rasters has the same origin, resolution, number of rows and columns, and projection (or a subset thereof)
+  
 }
 
 \usage{
@@ -50,10 +57,15 @@ raster.nrows(object)
 raster.ncells(object)
 raster.xres(object)
 raster.yres(object)
+raster.resolution(object)
 raster.xmin(object)
 raster.xmax(object)
 raster.ymin(object)
 raster.ymax(object)
+raster.boundingbox(object)
+raster.projection(object)
+raster.origin(object)
+raster.compare(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) 
 raster.get.col.from.cell(raster, cell)
 raster.get.row.from.cell(raster, cell)
 raster.get.cell.from.rowcol(raster, rownr, colnr)
@@ -83,7 +95,13 @@ raster.is.valid.cell(raster, cell)
   \item{xmax}{ maximum x coordinate of bounding box to get cell numbers for }
   \item{ymin}{ minimum y coordinate of bounding box to get cell numbers for }
   \item{ymax}{ maximum y coordinate of bounding box to get cell numbers for }
-  
+  \item{rasters} {}
+  \item{origin} {}
+  \item{resolution}{}
+  \item{rowcol}{}
+  \item{projection}{}
+  \item{slack} {}
+  \item{stopiffalse}{}
  }
   
 \details{
