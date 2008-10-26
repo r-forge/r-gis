@@ -102,7 +102,7 @@ calc.sr<-function(red, nir) #SR: Simple Vegetation ratio
 }
 
 
-calc.vari(blue, green, red) #VARI: Visible Atmospherically Resistant Index
+calc.vari<-function(blue, green, red) #VARI: Visible Atmospherically Resistant Index
 {
 # VARI is the Visible Atmospherically Resistant Index, it was 
 # designed to introduce an atmospheric self-correction 
