@@ -10,8 +10,29 @@ raster.clear.data <- function(raster) {
 	return(raster)
 }		
 
+raster.make.sparse <- function(raster) {
+	if (raster.content(raster) == 'sparse') {return(raster)
+	} else {
+		if (raster.content(raster) == 'all') {
+			vals <- seq(1:raster.ncells(raster))
+			vals <- cbind(vals, raster.values(raster))
+			vals <- as.vector(na.omit(vals))
+			raster <- raster.set.data.sparse(raster, sparsedata=vals[,2], indices=vals[,1])
+			return(raster)
+		} else { 
+			# as above, but by reading data from disk, row by row
+			stop('not implemented yet, use raster.read.all() first' )
+		}	
+	}
+}
+
 raster.set.data.sparse <- function(raster, sparsedata, indices) {
-	stop('sorry, not yet implemented')
+	raster@data@content <- 'sparse'
+	raster@data@values <- sparsedata
+	raster@data@indices <- indices
+	raster@data@source <- 'ram'
+	raster <- raster.set.minmax(raster)
+	return(raster)
 }
 
 raster.set.data.block <- function(raster, blockdata, firstcell, lastcell) {

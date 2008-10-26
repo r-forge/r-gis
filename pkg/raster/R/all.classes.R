@@ -72,7 +72,7 @@ setClass('RasterData',
 		haveminmax = 'logical',
 		min ='numeric',
 		max ='numeric',
-		source='character' # RAM, disk
+		source='character' # ram, disk
 		),
 	prototype (	
 		values=vector(),
@@ -81,7 +81,7 @@ setClass('RasterData',
 		haveminmax = FALSE,
 		min = numeric(1),
 		max = numeric(1),
-		source='RAM'
+		source='ram'
 	),	
 	validity = function(object)
 	{
