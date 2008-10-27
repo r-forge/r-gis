@@ -97,7 +97,7 @@ raster.set.bbox <- function(raster, xmin=raster.xmin(raster), xmax=raster.xmax(r
 	raster@bbox[2,2] <- ymax
 	if (keepres) {
 		raster@ncols <- as.integer(round( (raster.xmax(raster) - raster.xmin(raster)) / xres ))
-		raster@nrows <- as.integer(round( (raster.xmax(raster) - raster.xmin(raster)) / xres ))
+		raster@nrows <- as.integer(round( (raster.ymax(raster) - raster.ymin(raster)) / xres ))
 		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xres
 		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yres
 	}

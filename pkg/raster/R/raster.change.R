@@ -19,12 +19,12 @@
 
 
 
-raster.disaggregate <- function(raster, smoothfun='none', factor=2, filename="", overwrite=FALSE) {
+raster.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
 	factor <- round(factor)
 	if (factor < 2) { stop('factor should be > 1') }
 	outrs <- raster.set(raster)
-	if (raster@data@source == 'disk') { 
-			stop('raster should be in memory for this version of raster.merge()') 
+	if (raster.content(raster) != 'all') { 
+			stop('raster should be in memory for this version of raster.disaggregate()') 
 	} else {
 		outrs <- raster.set.rowcol(outrs, raster.nrows(raster) * factor, raster.ncols(raster) * factor) 
 		if (raster.content(raster)=='all') {
@@ -36,7 +36,6 @@ raster.disaggregate <- function(raster, smoothfun='none', factor=2, filename="",
 			outrs <- raster.set.data(outrs, d)
 		}	
 	}	
-	warning('smoothfun is ignored in this preliminary version of raster.disaggregate')
 	return(outrs)
 }
 
@@ -123,13 +122,12 @@ raster.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overwrite=FA
 		start.cells <- seq(first.start.cell, last.start.cell, by = raster@ncols)
 		end.cells <- start.cells + outraster@ncols - 1
 		selected.cells <- unlist(mapply(seq, start.cells, end.cells))
-		outraster@data@values <- raster@data[selected.cells]
+		outraster@data@values <- raster@data@values[selected.cells]
 		outraster@data@min <- min(raster@data@values, na.rm=TRUE)
 		outraster@data@max <- max(raster@data@values, na.rm=TRUE)
 		outraster@data@haveminmax <- TRUE
 		outraster@data@content <- 'all'
-		if (nchar(outraster@file@name) > 0 ) { outraster <- try(raster.write(outraster)) }
-		
+		if (nchar(outraster@file@name) > 0 ) { outraster <- try(raster.write(outraster)) }		
 	} else {
 		first.col <- raster.get.col.from.x(raster, xmin + 0.5 * raster.xres(outraster))
 		first.row <- raster.get.row.from.y(raster, ymax - 0.5 * raster.yres(outraster))
