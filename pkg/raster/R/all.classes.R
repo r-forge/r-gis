@@ -7,9 +7,17 @@
 # Licence GPL v3
 
 
-
-#.ll_sanity <- function(...) {return(TRUE)}
-
+# the below may be necessary as the function is not imported from SP (it is internal)
+# It is to check the bounds of lat/lon values, SP gives an error, I prefer a warning
+.ll_sanity <- function(bb) {
+	outside <- FALSE
+	if (bb[1,1] < -180) {outside <- TRUE }
+	if (bb[1,2] > 180) {outside <- TRUE }
+	if (bb[2,1] < -90) {outside <- TRUE }
+	if (bb[2,2] > 90) {outside <- TRUE }	
+	if (outside) { warning('latitude/longitude values are outside the normal range') }
+	return(TRUE)
+}
 
 setClass ('AbstractRaster',
 # importing "Spatial" (bounding box + Proj4string) from the sp package
@@ -64,7 +72,7 @@ setClass('RasterFile',
 )	
 
 
-setClass('RasterData', 
+setClass('SingleRasterData', 
 	representation (
 		values='vector', 
 		content='character', #nodata, all, row, block, sparse
@@ -94,7 +102,7 @@ setClass ('Raster',
 	representation (
 		title = 'character',
 		file = 'RasterFile',
-		data = 'RasterData',
+		data = 'SingleRasterData',
 		history = 'vector'
 		),
 	prototype (
@@ -102,39 +110,40 @@ setClass ('Raster',
 		)
 	)
 	
-		
+	
 setMethod ('show' , 'Raster', 
 	function(object) {
-		cat('class     :' , class(object), '\n')
-		cat('filename  :' , raster.filename(object), '\n')
+		cat('class       :' , class(object), '\n')
+		cat('filename    :' , raster.filename(object), '\n')
 		if (object@file@nbands > 1) {
-			cat('nbands    :' , object@file@nbands, '\n')
-			cat('band      :' , object@file@band, '\n')
+#			cat('nbands      :' , object@file@nbands, '\n')
+			cat('band        :' , object@file@band, '\n')
 		}	
-		cat('nrows     :' , raster.nrows(object), '\n')
-		cat('ncols     :' , raster.ncols(object), '\n')
-		cat('ncells    :' , raster.ncells(object), '\n')
-		cat('datatype  :' , object@file@datanotation, '\n')
+		cat('nrows       :' , raster.nrows(object), '\n')
+		cat('ncols       :' , raster.ncols(object), '\n')
+		cat('ncells      :' , raster.ncells(object), '\n')
+		cat('data type   :' , object@file@datanotation, '\n')
+		cat('data content:' , raster.content(object), '\n')
 		if (object@data@haveminmax) {
 			cat('min value :' , raster.minvalue(object), '\n')
 			cat('max value :' , raster.maxvalue(object), '\n')
 		} else { #if (object@data@source == 'disk')  {
-			cat('min value : NA \n')
-			cat('max value : NA \n')
+			cat('min value   : NA \n')
+			cat('max value   : NA \n')
 		}
-		cat('projection:' , object@proj4string@projargs, '\n')
-		cat('xmin      :' , raster.xmin(object), '\n')
-		cat('xmax      :' , raster.xmax(object), '\n')
-		cat('ymin      :' , raster.ymin(object), '\n')
-		cat('ymax      :' , raster.ymax(object), '\n')
-		cat('xres      :' , raster.xres(object), '\n')
-		cat('yres      :' , raster.yres(object), '\n')
+		cat('projection  :' , raster.projection(object, TRUE), '\n')
+		cat('xmin        :' , raster.xmin(object), '\n')
+		cat('xmax        :' , raster.xmax(object), '\n')
+		cat('ymin        :' , raster.ymin(object), '\n')
+		cat('ymax        :' , raster.ymax(object), '\n')
+		cat('xres        :' , raster.xres(object), '\n')
+		cat('yres        :' , raster.yres(object), '\n')
 		cat ('\n')
 	}
 )
 
 
-setClass('StackData', 
+setClass('MultipleRasterData', 
 	representation (
 		values='matrix', 
 		content='character', #nodata, all, row, block, sparse
@@ -151,13 +160,30 @@ setClass('StackData',
 )
 
 
+setClass ('RasterBrick',
+	contains = 'AbstractRaster',
+	representation (
+		title = 'character',
+		file = 'RasterFile',
+		data = 'MultipleRasterData',
+		history = 'vector'
+		),
+	prototype (
+		history = vector(mode='character')
+		),
+	validity = function(object)
+	{
+	}
+)
+	
+	
 setClass ('RasterStack',
 	contains = 'AbstractRaster',
 	representation (
 	    filename ='character',
 		nrasters='integer',
 		rasters ='list',
-		data = 'StackData'	
+		data = 'MultipleRasterData'	
 		),
 	prototype (
 		filename='',
@@ -182,7 +208,7 @@ setMethod ('show' , 'RasterStack',
 		cat ('nrows     :' , raster.nrows(object), '\n')
 		cat ('ncols     :' , raster.ncols(object), '\n')
 		cat ('ncells    :' , raster.ncells(object), '\n')
-		cat ('projection:' , attr(object@proj4string, 'projection'), '\n')
+		cat ('projection:' , raster.projection(object, TRUE), '\n')
 		cat ('xmin      :' , raster.xmin(object), '\n')
 		cat ('xmax      :' , raster.xmax(object), '\n')
 		cat ('ymin      :' , raster.ymin(object), '\n')

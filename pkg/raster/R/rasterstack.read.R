@@ -32,17 +32,8 @@
 
 
 rasterstack.read.xy <- function(rasterstack, xy) {
-	for (i in 1:length(rasterstack@rasters)) {
-		v <- raster.read.xy(rasterstack@rasters[[i]], xy)
-		if (i == 1) {
-			result <- v
-		} else {
-			result <- cbind(result, v[,2])
-			colnames(result)[length(result[1,])] <- rasterstack@rasters[[i]]@file@shortname
-		}
-	}
-	rasterstack@data@values <- as.array(result)
-	return(rasterstack)
+	cells <- raster.get.cell.from.xy(rasterstack, xy)
+	return(rasterstack.read.cell(rasterstack, cells))
 }
 
 
@@ -53,10 +44,10 @@ rasterstack.read.cell <- function(rasterstack, cell) {
 			result <- v
 		} else {
 			result <- cbind(result, v[,2])
-			colnames(result)[length(result[1,])] <- rasterstack@rasters[[i]]@file@shortname
+#			colnames(result)[length(result[1,])] <- rasterstack@rasters[[i]]@file@shortname
 		}
 	}
-	rasterstack@data@values <- as.array(result)
+	rasterstack@data@values <- as.matrix(result)
 	return(rasterstack)
 }
 

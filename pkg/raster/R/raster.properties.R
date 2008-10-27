@@ -69,8 +69,9 @@ raster.origin <- function(object) {
 	return(c(x, y))
 }
 
-raster.projection <- function(object) {
-	return(object@proj4string)
+raster.projection <- function(object, asText=FALSE) {
+	if (asText) {return(object@proj4string@projargs)}
+	else {return(object@proj4string)}
 }
 
 

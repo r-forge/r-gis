@@ -30,7 +30,7 @@ raster.write.ascii <- function(raster, overwrite=FALSE) {
 			close(thefile) #close connection
 		}
 		
-		raster@data[is.na(raster@data@values)] <- raster@file@nodatavalue 
+		raster@data@values[is.na(raster@data@values)] <- raster@file@nodatavalue 
 		write.table(raster@data@values, raster@file@name, append = TRUE, quote = FALSE, sep = " ", eol = "\n", 
                           dec = ".", row.names = FALSE, col.names = FALSE)
     }

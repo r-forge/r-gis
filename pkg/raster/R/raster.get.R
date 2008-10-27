@@ -67,10 +67,8 @@ raster.get.cell.from.xy <- function(raster, xy) {
 raster.get.cell.from.rowcol <- function(raster, rownr, colnr) {
 	rownr <- round(rownr)
 	colnr <- round(colnr)
-	if (rownr < 1)  { stop(paste('rownr should be between 1 -',raster@nrows)) }
-	if (rownr > raster@nrows) { stop(paste('rownr should be between 1 -',raster@nrows)) }
-	if (colnr < 1)  { stop(paste('colnr should be between 1 -',raster@ncols)) }
-	if (colnr > raster@ncols) { stop(paste('colnr should be between 1 -',raster@ncols)) }
+	rownr[rownr < 1 | rownr > raster@nrows] <- NA
+	colnr[colnr < 1 | colnr > raster@ncols] <- NA	
 	return((rownr-1) * raster@ncols + colnr)
 }
 
@@ -92,11 +90,13 @@ raster.get.row.from.y <- function ( raster, y )	{
 raster.get.xy.from.cell <- function(raster, cell) {
 	cell <- round(cell)
 	xy <- matrix(data = NA, ncol=2, nrow=length(cell))
-	colnames(xy) <- c("x", "y")
 	colnr <- raster.get.col.from.cell(raster, cell)
 	rownr <- raster.get.row.from.cell(raster, cell)
 	xy[,1] <- raster.get.x.from.col(raster, colnr)
 	xy[,2] <- raster.get.y.from.row(raster, rownr) 		
+
+	colnames(xy) <- c("x", "y")
+
 	return(xy) }  
 	
 	

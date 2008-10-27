@@ -19,7 +19,6 @@
 \alias{raster.ymax}
 \alias{raster.projection}
 \alias{raster.origin}
-\alias{raster.compare}
 
   
 \title{ Get raster properties }
@@ -27,7 +26,6 @@
   raster.values returns data values that are associated with the raster object (e.g. after raster.read.* has been used). Data are returned as a vector. 
   the option format='matrix' will return a matrix, optionally with the row and col numbers (names=TRUE). 
   raster.get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
-  raster.compare evaluates whether a list of rasters has the same origin, resolution, number of rows and columns, and projection (or a subset thereof)
 }
 
 \usage{
@@ -49,23 +47,16 @@ raster.xmax(object)
 raster.ymin(object)
 raster.ymax(object)
 raster.boundingbox(object)
-raster.projection(object)
+raster.projection(object, asText=FALSE)
 raster.origin(object)
-raster.compare(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) 
 }
 
 \arguments{
   \item{raster}{ raster or rasterstack object }
   \item{object}{ raster or rasterstack object }
   \item{format}{ use \code{vector} to get the data as a single vector or \code{matrix} to get them as a matrix }
+  \item{asText} { logical. If \code{TRUE}, the projection is returned as text. Otherwise a CRS object is returned}
   \item{names}{ If TRUE, row and col names are provided }
-  \item{rasters} {}
-  \item{origin} {}
-  \item{resolution}{}
-  \item{rowcol}{}
-  \item{projection}{}
-  \item{slack} {}
-  \item{stopiffalse}{}
  }
   
 
