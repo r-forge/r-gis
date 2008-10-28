@@ -24,7 +24,7 @@ get.elevation <- function(latitude, longitude) {
 }
 
 get.country <- function(lonlat, radius=0) {
-	cnts <- get.country.list()
+	cnts <- .get.country.list()
 	for (i in 1:length(lonlat[,1])) {
 		theurl <- paste("http://ws.geonames.org/countryCode?lat=", lonlat[i,2], "&lng=", lonlat[i,1], "&radius=", radius, sep='')
 		country <- scan(theurl, what='character', quiet=TRUE)
