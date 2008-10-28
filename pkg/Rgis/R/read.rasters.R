@@ -11,7 +11,7 @@ read.srtm <- function(x=106, y=-6, download=TRUE) {
 	
 	x <- min(180, max(-180, x))
 	y <- min(60, max(-60, y))
-	rs <- raster.create.new(nrows=24, ncols=72, ymin=-60, ymax=60 )
+	rs <- raster.new(nrows=24, ncols=72, ymin=-60, ymax=60 )
 	row <- raster.get.row.from.y(rs, y)
 	col <- raster.get.col.from.x(rs, x)
 	if (row < 10) { row <- paste('0', row, sep='') }
@@ -42,7 +42,7 @@ read.srtm <- function(x=106, y=-6, download=TRUE) {
 		}	
 	}
 	if (file.exists(tiffilename)) { 
-		rs <- raster.create.from.file(tiffilename)
+		rs <- raster.from.file(tiffilename)
 		rs@projection <- CRS("+proj=longlat +datum=WGS84")
 		return(rs)
 	}	
