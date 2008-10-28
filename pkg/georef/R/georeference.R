@@ -23,16 +23,22 @@ get.elevation <- function(latitude, longitude) {
 	return(as.matrix(d))
 }
 
-get.country <- function(latitude, longitude, radius=0) {
-	theurl <- paste("http://ws.geonames.org/countryCode?lat=", latitude, "&lng=", longitude, "&radius=", radius, sep='')
-	country <- scan(theurl, what='character', quiet=TRUE)
-	if (length(country) > 1) { return(NA)
-	} else {
-		cnts <- .get.country.list()
-		rec <- subset(cnts, cnts[,3] == country) 
-		if (length(rec) == 0) { return(NA) }
-		else return(rec)
+get.country <- function(lonlat, radius=0) {
+	cnts <- get.country.list()
+	for (i in 1:length(lonlat[,1])) {
+		theurl <- paste("http://ws.geonames.org/countryCode?lat=", lonlat[i,2], "&lng=", lonlat[i,1], "&radius=", radius, sep='')
+		country <- scan(theurl, what='character', quiet=TRUE)
+		if (length(country) > 1) { res <- NA
+		} else {
+			rec <- subset(cnts, cnts[,3] == country) 
+			if (length(rec) == 0) { return(NA) }
+			else res <- (rec)
+		}	
+		if (i==1) { res2 <- res 
+		} else { res2 <- rbind(res2, res) }
 	}	
+
+	return(res2)
 }
 
 
