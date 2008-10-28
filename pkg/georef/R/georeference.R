@@ -31,7 +31,7 @@ get.country <- function(lonlat, radius=0) {
 		if (length(country) > 1) { res <- NA
 		} else {
 			rec <- subset(cnts, cnts[,3] == country) 
-			if (length(rec) == 0) { return(NA) }
+			if (length(rec) == 0) { res <- NA }
 			else res <- (rec)
 		}	
 		if (i==1) { res2 <- res 
