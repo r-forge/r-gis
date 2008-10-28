@@ -15,7 +15,7 @@
 	if (bb[1,2] > 180) {outside <- TRUE }
 	if (bb[2,1] < -90) {outside <- TRUE }
 	if (bb[2,2] > 90) {outside <- TRUE }	
-	if (outside) { warning('latitude/longitude values are outside the normal range') }
+	if (outside) { warning('latitude/longitude values are outside their normal range') }
 	return(TRUE)
 }
 
@@ -64,7 +64,7 @@ setClass('RasterFile',
 		nodatavalue = -9999,
 		nbands = as.integer(1),
 		band = as.integer(1),
-		bandorder = 'BSQ'
+		bandorder = 'BIL'
 	),
 	validity = function(object)
 	{

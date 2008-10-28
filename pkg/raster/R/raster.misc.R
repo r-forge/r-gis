@@ -3,9 +3,19 @@
 # International Rice Research Institute
 # contact: r.hijmans@gmail.com
 # Date : October 2008
-# Version 0,1
+# Version 0,2
 # Licence GPL v3
 
+create.CRS <- function(projection) {
+	if (nchar(projection) < 6) { return(CRS(as.character(NA)))
+	} else {
+		projs <- try(CRS(projection), silent = T)
+		if (class(projs) == "try-error") { 
+			warning(paste('projection string', projection, 'is not a valid proj4 CRS string')) 
+			return(CRS(as.character(NA)))
+		} else return(projs)
+	}	
+}	
 
 
 calc.mode <- function(x, na.rm = TRUE) {

@@ -18,6 +18,7 @@ rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)),
 
 raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
 #TODO if xlim and/or ylim are used, only read (and sample) for those areas.
+	require(fields)
 
 	if (raster@data@content == 'all') {
 		m <- raster.values(raster, format='matrix')

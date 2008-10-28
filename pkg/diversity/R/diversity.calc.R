@@ -2,6 +2,8 @@
 diversity.internal.checkdata <- function(x) {
 	if (length(x) > 0) {
 		if (!is.vector(x)) {
+			print(x)
+			print(class(x))
 			stop('input should be a vector')
 		}
 		if (is.numeric(x)) {x <- round(x)}

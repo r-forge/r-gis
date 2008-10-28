@@ -13,12 +13,7 @@
 	bb@bbox[3,1] <- 0
 	bb@bbox[3,2] <- 1
 	bb@proj4string <- CRS(as.character(NA))
-	if (nchar(projection) > 0) {
-		projs <- try(CRS(projection), silent = T)
-		if (class(projs) == "try-error") { 
-			warning(paste('projection string', projection, 'is not a valid proj4 CRS string')) 
-		} else bb@proj4string <- projs	
-	}	
+	bb@proj4string <- create.CRS(projection)
 	return(bb)
 }
 
@@ -75,10 +70,7 @@ raster.from.file <- function(filename, band=1) {
 	raster <- raster.set.filename(raster, filename)
 	raster <- raster.set.datatype(raster, "numeric")
 	
-	projection <- try(CRS(attr(gdalinfo, "projection")), silent = T)
-	if (class(projection) != "try-error") { 
-		raster@proj4string <- projection 
-	} 
+	raster@proj4string <- create.CRS(attr(gdalinfo, "projection"))
 
 	raster@file@driver <- 'gdal' 
 		#attr(gdalinfo, "driver")
@@ -126,6 +118,7 @@ raster.from.file <- function(filename, band=1) {
 	band <- as.integer(1)
 	bandorder <- "BSQ"
 	ncellvals <- -9
+	projection <- ""
 	for (i in 1:length(ini[,1])) {
 		if (ini[i,1] == "MINX") {xn <- as.numeric(ini[i,2])} 
 		else if (ini[i,1] == "MAXX") {xx <- as.numeric(ini[i,2])} 
@@ -141,20 +134,18 @@ raster.from.file <- function(filename, band=1) {
 		else if (ini[i,1] == "NBANDS") {nbands <- ini[i,2]} 
 		else if (ini[i,1] == "BANDORDER") {bandorder <- ini[i,2]} 
 #		else if (ini[i,1] == "NCELLVALS") {ncellvals <- ini[i,2]} 
-		else if (ini[i,1] == "PROJECTION") {proj <- ini[i,2]} 
+		else if (ini[i,1] == "PROJECTION") {projstring <- ini[i,2]} 
     }  
 
-    raster <- raster.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx, projection="")
+    raster <- raster.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx, projection=projstring)
 	raster <- raster.set.filename(raster, filename)
 	raster@file@driver <- "raster"
-	projection <- try(CRS("proj"), silent = T)
-	if (class(projection) != "try-error") { raster@proj4string <- projection  } 
-	
-	
+
 	raster@data@min <- minval
 	raster@data@max <- maxval
 	raster@data@haveminmax <- TRUE
 	raster@file@nodatavalue <- nodataval
+	
 	inidatatype <- string.trim(inidatatype)
 	if (substr(inidatatype, 1, 3) == "INT") { datatp="integer"
 	} else { datatp="numeric" }
