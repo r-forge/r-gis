@@ -19,27 +19,6 @@
 
 
 
-raster.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
-	factor <- round(factor)
-	if (factor < 2) { stop('factor should be > 1') }
-	outrs <- raster.set(raster)
-	if (raster.content(raster) != 'all') { 
-			stop('raster should be in memory for this version of raster.disaggregate()') 
-	} else {
-		outrs <- raster.set.rowcol(outrs, raster.nrows(raster) * factor, raster.ncols(raster) * factor) 
-		if (raster.content(raster)=='all') {
-			cols <- rep(rep(1:raster.ncols(raster), each=factor), times=raster@nrows * factor)
-			rows <- rep(1:raster.nrows(raster), each=raster@ncols*factor*factor)
-			cells <- raster.get.cell.from.rowcol(raster, rows, cols)
-#			m <- matrix(cells, ncol=outrs@ncols, nrow=outrs@nrows, byrow=T)
-			d <- raster.values(raster)[cells]
-			outrs <- raster.set.data(outrs, d)
-		}	
-	}	
-	return(outrs)
-}
-
-
 
 raster.merge <- function(rasters, filename, overwrite=FALSE) {
 	res <- raster.compare(rasters, rowcol=FALSE)
@@ -153,7 +132,30 @@ raster.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overwrite=FA
 }
 
 
-raster.aggregate <- function(raster, fun = mean, factor = 2, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
+
+
+raster.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
+	factor <- round(factor)
+	if (factor < 2) { stop('factor should be > 1') }
+	outrs <- raster.set(raster)
+	if (raster.content(raster) != 'all') { 
+			stop('raster values should all be in memory for this version of raster.disaggregate()') 
+	} else {
+		outrs <- raster.set.rowcol(outrs, raster.nrows(raster) * factor, raster.ncols(raster) * factor) 
+		if (raster.content(raster)=='all') {
+			cols <- rep(rep(1:raster.ncols(raster), each=factor), times=raster@nrows * factor)
+			rows <- rep(1:raster.nrows(raster), each=raster@ncols*factor*factor)
+			cells <- raster.get.cell.from.rowcol(raster, rows, cols)
+#			m <- matrix(cells, ncol=outrs@ncols, nrow=outrs@nrows, byrow=T)
+			d <- raster.values(raster)[cells]
+			outrs <- raster.set.data(outrs, d)
+		}	
+	}	
+	return(outrs)
+}
+
+
+raster.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
 {
 	factor <- round(factor)
 	if (factor < 2) {
