@@ -77,7 +77,7 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 		if (rownr > 0) {
 			seek(con, ((rownr-1) * raster@ncols + (startcol-1)) * raster@file@datasize)
 			result <- readBin(con, what=dtype, n = ncols, size = raster@file@datasize, endian = raster@file@byteorder) }	
-			else {	result <- readBin(con, what=dtype, n = raster.ncells(raster), size = raster@file@datasize, endian = raster@file@byteorder) }
+			else {	result <- readBin(con, what=dtype, n = ncells(raster), size = raster@file@datasize, endian = raster@file@byteorder) }
 		close(con)
 		result[result <=  (0.999 * raster@file@nodatavalue) ] <- NA 
 	}
@@ -101,7 +101,7 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 	} 
 	raster@data@values <- as.vector(result)
 	if (rownr < 0) {
-		raster@data@indices <- c(1, raster.ncells(raster))
+		raster@data@indices <- c(1, ncells(raster))
 		raster@data@content <- "all"
 		raster <- raster.set.minmax(raster)
 	} else if (startcol==1 & ncols==(raster@ncols-startcol+1)) {
@@ -194,7 +194,7 @@ raster.read.cells <- function(raster, cells) {
 		colnames(cells) <- c("id", "cell", valuename)
 
 		uniquecells <- na.omit(unique(cells[order(cells[,2]),2]))
-		uniquecells <- uniquecells[(uniquecells > 0) & (uniquecells <= raster.ncells(raster) )]
+		uniquecells <- uniquecells[(uniquecells > 0) & (uniquecells <= ncells(raster) )]
 	
 		rastergri <- file.change.extension(raster@file@name, ".gri")
 		if (!file.exists(raster@file@name)) { stop(paste(raster@file@name," does not exist")) }

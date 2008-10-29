@@ -66,12 +66,12 @@ rasterstack.add.rasters <- function(rasterstack, rasters) {
 		i <- rasterstack@nrasters + 1
 		if (i == 1) {
 			rasterstack@proj4string = raster@proj4string
-			rasterstack@ncols <- raster.ncols(raster)
-			rasterstack@nrows <- raster.nrows(raster)
-			rasterstack@bbox[1,1] <- raster.xmin(raster)
-			rasterstack@bbox[1,2] <- raster.xmax(raster)
-			rasterstack@bbox[2,1] <- raster.ymin(raster)
-			rasterstack@bbox[2,2] <- raster.ymax(raster)
+			rasterstack@ncols <- ncols(raster)
+			rasterstack@nrows <- nrows(raster)
+			rasterstack@bbox[1,1] <- xmin(raster)
+			rasterstack@bbox[1,2] <- xmax(raster)
+			rasterstack@bbox[2,1] <- ymin(raster)
+			rasterstack@bbox[2,2] <- ymax(raster)
 		} else {
 			if (length(attr(rasterstack@proj4string, "projection")) != 0)
 				{
@@ -80,10 +80,10 @@ rasterstack.add.rasters <- function(rasterstack, rasters) {
 			}	
 			if (rasterstack@ncols != raster@ncols) {addraster <- FALSE}
 			if (rasterstack@nrows != raster@nrows) {addraster <- FALSE}
-			if (raster.xmin(rasterstack) != raster.xmin(raster)) {addraster <- FALSE}
-			if (raster.xmax(rasterstack) != raster.xmax(raster)) {addraster <- FALSE}
-			if (raster.ymin(rasterstack) != raster.ymin(raster)) {addraster <- FALSE}
-			if (raster.ymax(rasterstack) != raster.ymax(raster)) {addraster <- FALSE}
+			if (xmin(rasterstack) != xmin(raster)) {addraster <- FALSE}
+			if (xmax(rasterstack) != xmax(raster)) {addraster <- FALSE}
+			if (ymin(rasterstack) != ymin(raster)) {addraster <- FALSE}
+			if (ymax(rasterstack) != ymax(raster)) {addraster <- FALSE}
 			count <- 1
 			for (j in 1:(i-1)) {
 				if (raster@file@shortname == rasterstack@rasters[[j]]@file@shortname) { 

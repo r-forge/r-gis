@@ -5,40 +5,38 @@
 # Licence GPL v3
 
 
-raster.filename <- function(object) {
+filename <- function(object) {
 	return(object@file@name)
 }
 
-raster.ncols <- function(object) {
+ncols <- function(object) {
 	return(object@ncols)
 }
 
-raster.nrows <- function(object) {
+	
+nrows <- function(object) {
 	return(object@nrows)
 }
 
-raster.ncells <- function(object) {
-	return( as.numeric(object@nrows) * object@ncols )
+ncells <- function(object) {
+	return(return( as.numeric(nrows(object)) * ncols(object )))
 }
 
-raster.xmin <- function(object) {
+
+xmin <- function(object) {
 	return (object@bbox[1,1])
 }
 
-raster.xmax <- function(object) {
+xmax <- function(object) {
 	return (object@bbox[1,2])
 }
 
-raster.ymin <- function(object) {
+ymin <- function(object) {
 	return (object@bbox[2,1])
 }
 
-raster.ymax <- function(object) {
+ymax <- function(object) {
 	return (object@bbox[2,2])
-}
-
-raster.boundingbox <- function(object) {
-	return(bbox(object)[1:2, 1:2])
 }
 
 .raster.zmin <- function(object) {
@@ -49,27 +47,27 @@ raster.boundingbox <- function(object) {
 	return (object@bbox[3,2])
 }
 
-raster.xres <- function(object) {
-	return ( (raster.xmax(object) - raster.xmin(object)) / raster.ncols(object)  )
+xres <- function(object) {
+	return ( (xmax(object) - xmin(object)) / ncols(object)  )
 }
 
-raster.yres <- function(object) {
-	return ( (raster.ymax(object) - raster.ymin(object)) / raster.nrows(object)  )
+yres <- function(object) {
+	return ( (ymax(object) - ymin(object)) / nrows(object)  )
 }
 
-raster.resolution <- function(object) {
-	x <- raster.xres(object)
-	y <- raster.yres(object)
+resolution <- function(object) {
+	x <- xres(object)
+	y <- yres(object)
 	return(c(x, y))
 }
 
-raster.origin <- function(object) {
-	x <- raster.xmin(object) - raster.xres(object)*(round(raster.xmin(object) / raster.xres(object)))
-	y <- raster.ymax(object) - raster.yres(object)*(round(raster.ymax(object) / raster.yres(object)))
+origin <- function(object) {
+	x <- xmin(object) - xres(object)*(round(xmin(object) / xres(object)))
+	y <- ymax(object) - yres(object)*(round(ymax(object) / yres(object)))
 	return(c(x, y))
 }
 
-raster.projection <- function(object, asText=FALSE) {
+projection <- function(object, asText=FALSE) {
 	if (asText) {return(object@proj4string@projargs)}
 	else {return(object@proj4string)}
 }
@@ -114,26 +112,26 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 		res <- F
 		if(stopiffalse) stop('length(rasters) < 2')
 	}	
-	res1 <- raster.resolution(rasters[[1]])
-	origin1 <- raster.origin(rasters[[1]])
+	res1 <- resolution(rasters[[1]])
+	origin1 <- origin(rasters[[1]])
 	for (i in 2:length(rasters)) { 
 		if (rowcol) {
-			if (raster.ncols(rasters[[1]]) != raster.ncols(rasters[[i]])) {
+			if (ncols(rasters[[1]]) != ncols(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) { stop('ncols different')} }
 			}	
-			if (raster.nrows(rasters[[1]]) != raster.nrows(rasters[[i]])) {
+			if (nrows(rasters[[1]]) != nrows(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) stop('nrows different')
 			}
 		}
 		if (projection) {
-			if (raster.projection(rasters[[1]]) != raster.projection(rasters[[i]])) {
+			if (projection(rasters[[1]]) != projection(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) stop('different projections')
 			}
 		}
-		resi <- raster.resolution(rasters[[i]])
+		resi <- resolution(rasters[[i]])
 		xr <-  min(res1[1], resi[1])
 		yr <-  min(res1[2], resi[2])
 		if (resolution) {
@@ -147,7 +145,7 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 			}
 		}
 		if (origin) {
-			origini <- raster.origin(rasters[[1]])
+			origini <- origin(rasters[[1]])
 			if ((abs(origini[1] - origin1[1])) > slack * xr) {
 				res <- F
 				if(stopiffalse) { stop('different x origins')

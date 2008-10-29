@@ -26,8 +26,8 @@ as.raster <- function(spgrid, getdata=TRUE, dataindex=1) {
 }
 
 as.spgrid <- function(raster, type='grid')  {
-	bb <- raster.boundingbox(raster)
-	cs <- raster.resolution(raster)
+	bb <- bbox(raster)
+	cs <- resolution(raster)
 	cc <- bb[,1] + (cs/2)
 	cd <- ceiling(diff(t(bb))/cs)
 	grd <- GridTopology(cellcentre.offset=cc, cellsize=cs, cells.dim=cd)
@@ -35,13 +35,13 @@ as.spgrid <- function(raster, type='grid')  {
 	if (type=='pixel') {
 		raster <- raster.make.sparse(raster)
 		pts <- SpatialPoints(raster.get.xy.from.cell(raster, raster.indices(raster)))
-		sp <- SpatialPixelsDataFrame(points=pts, data=raster.values(raster), proj4string=raster.projection(raster)) 	
+		sp <- SpatialPixelsDataFrame(points=pts, data=raster.values(raster), proj4string=projection(raster)) 	
 		
 	} else if (type=='grid') {
 		if (raster.content(raster) == 'all') {
-			sp <- SpatialGridDataFrame(grd, proj4string=raster.projection(raster), data=raster.values(raster))
+			sp <- SpatialGridDataFrame(grd, proj4string=projection(raster), data=raster.values(raster))
 		} else { 
-			sp  <- SpatialGrid(grd, proj4string=raster.projection(raster))
+			sp  <- SpatialGrid(grd, proj4string=projection(raster))
 		}	
 	}
 	return(sp)

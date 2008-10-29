@@ -30,7 +30,7 @@ raster.get.cell.from.xy(raster, xy)
 raster.get.x.from.col(raster, colnr)
 raster.get.y.from.row(raster, rownr)
 raster.get.xy.from.cell(raster, cell)
-raster.get.cxy.from.box(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster))
+raster.get.cxy.from.box(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster))
 raster.is.valid.cell(raster, cell) 
 }
 
@@ -64,7 +64,7 @@ raster.is.valid.cell(raster, cell)
 \examples{
 #using a new default raster (1 degree global)
 rs <- raster.new()
-raster.ncells(rs)
+ncells(rs)
 raster.get.col.from.cell(rs, 10000)
 raster.get.row.from.cell(rs, 10000)
 raster.get.col.from.x(rs, 0.5)
@@ -74,13 +74,13 @@ raster.get.cell.from.xy(rs, c(0.5, 0.5))
 raster.get.x.from.col(rs, c(1, 120, 180))
 raster.get.y.from.row(rs, 90)
 raster.get.xy.from.cell(rs, 10000)
-raster.get.xy.from.cell(rs, c(0, 1, 32581, raster.ncells(rs), raster.ncells(rs)+1))
+raster.get.xy.from.cell(rs, c(0, 1, 32581, ncells(rs), ncells(rs)+1))
 
 #using a file from disk
 rs <- raster.from.file(system.file("external/test.ag", package="sp"))
 rs
 raster.get.cell.from.x.y(rs, 180000, 330000)
 #xy for corners of grid:
-raster.get.xy.from.cell(rs, c(1, raster.ncols(rs), raster.nrows(rs), raster.ncells(rs)))
+raster.get.xy.from.cell(rs, c(1, ncols(rs), nrows(rs), ncells(rs)))
 }
 \keyword{ spatial }

@@ -4,6 +4,7 @@
 \alias{raster.cut}
 \alias{raster.cut.bbox}
 \alias{raster.merge}
+\alias{raster.expand}
 
 \title{ Change raster database }
 \description{
@@ -14,6 +15,7 @@ raster.aggregate(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, IN
 raster.disaggregate(raster, factor=2, filename="", overwrite=FALSE) 
 raster.cut(raster, xmin, xmax, ymin, ymax, filename="", overwrite=FALSE) 
 raster.cut.bbox(raster, object, filename="", overwrite=FALSE)
+raster.expand(raster, xmin, xmax, ymin, ymax, filename="", overwrite=FALSE)
 raster.merge(rasters, filename, overwrite=FALSE) 
 }
 

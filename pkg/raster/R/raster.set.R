@@ -28,7 +28,7 @@ raster.make.sparse <- function(raster) {
 	if (raster.content(raster) == 'sparse') {return(raster)
 	} else {
 		if (raster.content(raster) == 'all') {
-			vals <- seq(1:raster.ncells(raster))
+			vals <- seq(1:ncells(raster))
 			vals <- cbind(vals, raster.values(raster))
 			vals <- as.vector(na.omit(vals))
 			raster <- raster.set.data.sparse(raster, sparsedata=vals[,2], indices=vals[,1])
@@ -90,28 +90,28 @@ raster.set.data <- function(raster, data) {
 	if (!is.vector(data)) {stop('data must be a vector')}
 	if (length(data) == 0) {	stop('length(data==0). If this is intended then use raster.data.clear(raster)') }
 	if (!(is.numeric(data) | is.integer(data) | is.logical(data))) {stop('data must be values')}
-	if (length(data) != raster.ncells(raster) ) { stop('length(data) != raster.ncells(raster)') 
+	if (length(data) != ncells(raster) ) { stop('length(data) != ncells(raster)') 
 	} else {	
 		raster@data@values <- data
 		raster@data@content <- 'all'
 		raster@data@source <- 'ram'
-		raster@data@indices <- c(1, raster.ncells(raster))
+		raster@data@indices <- c(1, ncells(raster))
 		raster <- raster.set.minmax(raster)
 		return(raster)	
 	}	
 }
 
 
-raster.set.bbox <- function(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster), keepres=FALSE) {
-	xres <- raster.xres(raster)
-	yres <- raster.yres(raster)
+raster.set.bbox <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE) {
+	xres <- xres(raster)
+	yres <- yres(raster)
 	raster@bbox[1,1] <- xmin
 	raster@bbox[1,2] <- xmax
 	raster@bbox[2,1] <- ymin
 	raster@bbox[2,2] <- ymax
 	if (keepres) {
-		raster@ncols <- as.integer(round( (raster.xmax(raster) - raster.xmin(raster)) / xres ))
-		raster@nrows <- as.integer(round( (raster.ymax(raster) - raster.ymin(raster)) / xres ))
+		raster@ncols <- as.integer(round( (xmax(raster) - xmin(raster)) / xres ))
+		raster@nrows <- as.integer(round( (ymax(raster) - ymin(raster)) / xres ))
 		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xres
 		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yres
 	}
@@ -134,7 +134,7 @@ raster.set.minmax <- function(raster) {
 }
 
 
-raster.set.rowcol <- function(raster, nrows=raster.nrows(raster), ncols=raster.ncols(raster)) {
+raster.set.rowcol <- function(raster, nrows=nrows(raster), ncols=ncols(raster)) {
 	raster@ncols <- as.integer(ncols)
 	raster@nrows <- as.integer(nrows)
 	return(raster)
