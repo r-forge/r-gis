@@ -25,20 +25,19 @@ get.elevation <- function(latitude, longitude) {
 
 get.country <- function(lonlat, radius=0) {
 	cnts <- .get.country.list()
+	res <- matrix(ncol=3,nrow=length(lonlat[,1]))
 	for (i in 1:length(lonlat[,1])) {
 		theurl <- paste("http://ws.geonames.org/countryCode?lat=", lonlat[i,2], "&lng=", lonlat[i,1], "&radius=", radius, sep='')
 		country <- scan(theurl, what='character', quiet=TRUE)
-		if (length(country) > 1) { res <- NA
+		if (length(country) > 1) { res[i,] <- c(NA,NA,NA)
 		} else {
 			rec <- subset(cnts, cnts[,3] == country) 
-			if (length(rec) == 0) { res <- NA }
-			else res <- (rec)
+			if (length(rec) == 0) { res[i,] <- c(NA,NA,NA) 
+			} else res[i,] <- rec
 		}	
-		if (i==1) { res2 <- res 
-		} else { res2 <- rbind(res2, res) }
 	}	
-
-	return(res2)
+	colnames(res) <- c("NAME_ENGLISH", "ISO3", "ISO2")
+	return(res)
 }
 
 
