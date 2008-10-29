@@ -11,16 +11,21 @@ raster.clear.data <- function(raster) {
 }		
 
 
-raster.set.projection <- function(raster, projection) {
+create.CRS <- function(projection) {
 	if (nchar(projection) < 6) { projs <- (CRS(as.character(NA)))
 	} else {
 		projs <- try(CRS(projection), silent = T)
 		if (class(projs) == "try-error") { 
 			warning(paste('projection string', projection, 'is not a valid proj4 CRS string')) 
 			projs <- (CRS(as.character(NA)))
-		} 
-	}	
-	raster@proj4string <- projs
+		}
+	}
+	return(projs)
+}
+
+
+raster.set.projection <- function(raster, projection) {
+	raster@proj4string <- create.CRS(projection)
 	return(raster)
 }
 
