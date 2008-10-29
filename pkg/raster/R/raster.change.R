@@ -21,7 +21,9 @@
 
 
 raster.merge <- function(rasters, filename, overwrite=FALSE) {
+	
 	res <- raster.compare(rasters, rowcol=FALSE)
+	
 	for (i in 1:length(rasters)) {
 		if (rasters[[i]]@data@source != 'disk') { 
 			stop('rasters should be stored on disk for this version of raster.merge()') 

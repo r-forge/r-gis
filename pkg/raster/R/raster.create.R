@@ -12,8 +12,7 @@
 	bb@bbox[2,2] <- ymax
 	bb@bbox[3,1] <- 0
 	bb@bbox[3,2] <- 1
-	bb@proj4string <- CRS(as.character(NA))
-	bb@proj4string <- create.CRS(projection)
+	bb <- raster.set.projection(bb, projection)
 	return(bb)
 }
 
@@ -70,7 +69,6 @@ raster.from.file <- function(filename, band=1) {
 	raster <- raster.set.filename(raster, filename)
 	raster <- raster.set.datatype(raster, "numeric")
 	
-	raster@proj4string <- create.CRS(attr(gdalinfo, "projection"))
 
 	raster@file@driver <- 'gdal' 
 		#attr(gdalinfo, "driver")
@@ -84,7 +82,9 @@ raster.from.file <- function(filename, band=1) {
 		warning("band too low. Set to 1")
 		band <- 1 }
 	raster@file@band <- as.integer(band)
-		
+
+	raster <- raster.set.projection(raster, attr(gdalinfo, "projection"))
+	
 	raster@file@gdalhandle[1] <- GDAL.open(filename)
 #oblique.x   0  #oblique.y   0 
 	raster@data@source <- 'disk'

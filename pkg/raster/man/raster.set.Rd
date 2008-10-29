@@ -11,6 +11,7 @@
 \alias{raster.set.rowcol}
 \alias{raster.set.bbox}
 \alias{raster.set.minmax}
+\alias{raster.set.projection}
 \alias{as.raster}
 \alias{as.spgrid}
 
@@ -34,6 +35,7 @@ raster.make.sparse(raster)
 raster.set.rowcol(raster, nrows=raster.nrows(raster), ncols=raster.ncols(raster)) 
 raster.set.bbox(raster, xmin=raster.xmin(raster), xmax=raster.xmax(raster), ymin=raster.ymin(raster), ymax=raster.ymax(raster), keepres=FALSE)
 raster.set.minmax(raster)
+raster.set.projection(raster, projection)
 as.raster(spgrid, getdata=TRUE, dataindex=1) 
 as.spgrid(raster, type='grid') 
 }
@@ -58,6 +60,7 @@ as.spgrid(raster, type='grid')
   \item{ymin}{ the new minimum y coordinate of the raster }
   \item{ymax}{ the new maximum y coordinate of the raster }
   \item{keepres} {logical. If \code{TRUE}, the resolution will stay the same (by adjusting the number of rows and columns)}
+  \item{projection} {a character string describing a projection and datum in PROJ4 format }
   \item{spgrid} { a sp raster type object (SpatialPixel, SpatialPixelDataFrame , SpatialGrid, or SpatialGridDataFrame }
   \item{getdata} { logical. If \code{TRUE}, values are added to the Raster object }
   \item{dataindex} {integer values >= 1 indicating the column in the sp dataframe to take the values from}

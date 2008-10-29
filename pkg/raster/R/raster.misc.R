@@ -6,18 +6,6 @@
 # Version 0,2
 # Licence GPL v3
 
-create.CRS <- function(projection) {
-	if (nchar(projection) < 6) { return(CRS(as.character(NA)))
-	} else {
-		projs <- try(CRS(projection), silent = T)
-		if (class(projs) == "try-error") { 
-			warning(paste('projection string', projection, 'is not a valid proj4 CRS string')) 
-			return(CRS(as.character(NA)))
-		} else return(projs)
-	}	
-}	
-
-
 calc.mode <- function(x, na.rm = TRUE) {
 #partly based on http://wiki.r-project.org/rwiki/doku.php?id=tips:stats-basic:modalvalue
 # ties are broken at random
