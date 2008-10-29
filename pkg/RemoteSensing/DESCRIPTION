@@ -1,7 +1,7 @@
 Package: RemoteSensing
 Type: Package
 Title: Remote sensing 
-Version: 0.1
+Version: 0.1.1
 Date: 2008-10-07
 Depends: raster, bitops
 Author: Yann Chemin

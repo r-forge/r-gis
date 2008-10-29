@@ -41,17 +41,16 @@ modis.qc500e(pixel)
 }
 
 \details{
-modis.stateqa500a returns Cloud State
-modis.stateqa500b returns Cloud shadow
-modis.stateqa500c returns LAND/WATER FLAG
-modis.stateqa500d returns AEROSOL QUANTITY
-modis.stateqa500e returns CIRRUS DETECTED
-modis.stateqa500f returns Internal Cloud Algorithm Flag
-modis.stateqa500g returns Internal Fire Algorithm Flag
-modis.stateqa500h returns MOD35 snow/ice flag
-modis.stateqa500i returns Pixel adjacent to cloud
-modis.stateqa500j returns BRDF correction performed
-modis.stateqa500k returns Internal Snow Mask
+modis.qc250a returns Cloud State
+modis.qc250b returns Cloud shadow
+modis.qc250c returns LAND/WATER FLAG
+modis.qc250d returns AEROSOL QUANTITY
+modis.qc250e returns CIRRUS DETECTED
+modis.qc250f returns Internal Cloud Algorithm Flag
+modis.qc500a returns Cloud State
+modis.qc500c returns LAND/WATER FLAG
+modis.qc500d returns AEROSOL QUANTITY
+modis.qc500e returns CIRRUS DETECTED
 }
 \value{
   

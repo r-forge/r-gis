@@ -1,13 +1,13 @@
 # Author: Yann Chemin
 # IRRI
 # License GPL3
-# Version 1, October 2008
+# Veon 1, October 2008
 
 #MODIS State Quality Assessment Extractor
 #Makes Human-readable images of State Quality Assessment binary bits from MOD09A 500m products (Vermote et al., 2008), this is the proper place to find cloud related information.
-#Vermote E.F., Kotchenova S.Y., Ray J.P. MODIS Surface Reflectance User's Guide. Version 1.2. June 2008. MODIS Land Surface Reflectance Science Computing Facility. Homepage
+#Vermote E.F., Kotchenova S.Y., Ray J.P. MODIS Surface Reflectance User's Guide. Veon 1.2. June 2008. MODIS Land Surface Reflectance Science Computing Facility. Homepage
 
-modis.stateqa500a<-function(pixel) 
+modis.sqa500a<-function(pixel) 
 #Cloud State unsigned int bits[0-1]
 {
 	#Cloud State unsigned int bits[0-1]
@@ -19,7 +19,7 @@ modis.stateqa500a<-function(pixel)
 	return(pixel)
 }
 	
-modis.stateqa500b<-function(pixel) 
+modis.sqa500b<-function(pixel) 
 #cloud shadow unsigned int bits[2]
 {
 	#cloud shadow unsigned int bits[2]
@@ -30,7 +30,7 @@ modis.stateqa500b<-function(pixel)
 	return(pixel)
 }
 	
-modis.stateqa500c<-function(pixel)
+modis.sqa500c<-function(pixel)
  #LAND/WATER FLAG unsigned int bits[3-5]
 {
 	#LAND/WATER FLAG unsigned int bits[3-5]
@@ -47,7 +47,7 @@ modis.stateqa500c<-function(pixel)
 	return(pixel)
 }
 
-modis.stateqa500d<-function(pixel)
+modis.sqa500d<-function(pixel)
  #AEROSOL QUANTITY unsigned int bits[6-7]
 {
 	#AEROSOL QUANTITY unsigned int bits[6-7]
@@ -60,7 +60,7 @@ modis.stateqa500d<-function(pixel)
 	return(pixel)
 }
 
-modis.stateqa500e<-function(pixel)
+modis.sqa500e<-function(pixel)
  #CIRRUS DETECTED unsigned int bits[8-9]
 {
 	#CIRRUS DETECTED unsigned int bits[8-9]
@@ -73,7 +73,7 @@ modis.stateqa500e<-function(pixel)
 	return(pixel)
 }
 
-modis.stateqa500f<-function(pixel)
+modis.sqa500f<-function(pixel)
  #Internal Cloud Algorithm Flag unsigned int bits[10]
 {
 	#Internal Cloud Algorithm Flag unsigned int bits[10]
@@ -84,7 +84,7 @@ modis.stateqa500f<-function(pixel)
 	return(pixel)
 }
 
-modis.stateqa500g<-function(pixel)
+modis.sqa500g<-function(pixel)
  #Internal Fire Algorithm Flag unsigned int bits[11]
 {
 	#Internal Fire Algorithm Flag unsigned int bits[11]
@@ -95,7 +95,7 @@ modis.stateqa500g<-function(pixel)
 	return(pixel)
 }
 
-modis.stateqa500h<-function(pixel,bandno)
+modis.sqa500h<-function(pixel,bandno)
  #MOD35 snow/ice flag unsigned int bits [12]
 {
 	#MOD35 snow/ice flag unsigned int bits [12]
@@ -106,7 +106,7 @@ modis.stateqa500h<-function(pixel,bandno)
 	return(pixel)
 }
 
-modis.stateqa500i<-function(pixel)
+modis.sqa500i<-function(pixel)
  #Pixel adjacent to cloud unsigned int bits[13]
 {
 	#Pixel adjacent to cloud unsigned int bits[13]
@@ -118,7 +118,7 @@ modis.stateqa500i<-function(pixel)
 	
 }
 	
-modis.stateqa500j<-function(pixel)
+modis.sqa500j<-function(pixel)
  #BRDF correction performed unsigned int bits[14]
 {
 	#BRDF correction performed unsigned int bits[14]
@@ -130,7 +130,7 @@ modis.stateqa500j<-function(pixel)
 }
 
 
-modis.stateqa500k<-function(pixel) 
+modis.sqa500k<-function(pixel) 
 #Internal Snow Mask unsigned int bits[15]
 {
 	#Internal Snow Mask unsigned int bits[15]

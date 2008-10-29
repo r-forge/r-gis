@@ -1,7 +1,7 @@
 # Author: Yann Chemin
 # IRRI
 # License GPL3
-# Version 1, October 2008
+# Veon 1, October 2008
 
 #MODIS Quality Assessment Extractor
 #Makes Human-readable images of Quality Assessment binary bits from MOD09A/Q products.

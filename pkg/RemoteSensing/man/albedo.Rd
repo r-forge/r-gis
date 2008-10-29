@@ -1,9 +1,9 @@
 \name{albedo}
 
-\alias{rs.albedo.aster}
-\alias{rs.albedo.landsat}
-\alias{rs.albedo.modis}
-\alias{rs.albedo.noaa}
+\alias{albedo.aster}
+\alias{albedo.landsat}
+\alias{albedo.modis}
+\alias{albedo.noaa}
 
 
 \title{ Albedo }
@@ -12,10 +12,10 @@
 }
 
 \usage{
-rs.albedo.aster(greenchan, nirchan, swirchan2, swirchan3, swirchan5, swirchan6) 
-rs.albedo.landsat(bluechan, greenchan, redchan, nirchan, chan5, chan7)
-rs.albedo.modis(redchan, nirchan, chan3, chan4, chan5, chan6, chan7) 
-rs.albedo.noaa(redchan, nirchan)
+albedo.aster(greenchan, nirchan, swirchan2, swirchan3, swirchan5, swirchan6) 
+albedo.landsat(bluechan, greenchan, redchan, nirchan, chan5, chan7)
+albedo.modis(redchan, nirchan, chan3, chan4, chan5, chan6, chan7) 
+albedo.noaa(redchan, nirchan)
 }
 
 
