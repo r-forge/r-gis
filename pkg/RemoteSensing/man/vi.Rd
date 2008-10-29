@@ -1,5 +1,4 @@
 \name{vi}
-\alias{vi}
 \alias{arvi}
 \alias{wdvi}
 \alias{sr}
@@ -24,7 +23,6 @@
 }
 
 \usage{
-vi(rasterstack, outputfilename, vegindex="ndvi", redchan=NA, nirchan=NA, bluechan=NA, greenchan=NA, chan5=NA, chan7=NA, slslopechan=NA, overwrite=FALSE) 
 arvi(red, nir, blue)
 wdvi(red, nir, slslope = 1)
 sr(red, nir)
@@ -44,19 +42,6 @@ vari(blue, green, red)
 
 
 \arguments{
-  \item{rasterstack}{ ~~Describe \code{red} here~~ }
-  \item{outputfilename}{ ~~Describe \code{red} here~~ }
-  \item{vegindex}{ ~~Describe \code{red} here~~ }
-  \item{overwrite}{ If \code{overwrite} is \code{TRUE} existing files will be overwritten}
-
-  \item{redchan}{ the index of the raster in the rasterstack that has the red channel (band) }
-  \item{nirchan}{ the index of the raster in the rasterstack that has the red channel (band) }
-  \item{bluechan}{ the index of the raster in the rasterstack that has the red channel (band) }
-  \item{greenchan}{ the index of the raster in the rasterstack that has the red channel (band) }
-  \item{chan5}{ the index of the raster in the rasterstack that has the red channel (band) }
-  \item{chan7}{ the index of the raster in the rasterstack that has the red channel (band) }
-  \item{slslopechan}{ the index of the raster in the rasterstack that has the red channel (band) }  
-
   \item{red}{ array of red channel (band) data}
   \item{nir}{ array of nir channel (band) data }
   \item{blue}{ array of blue channel (band) data }
