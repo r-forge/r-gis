@@ -51,7 +51,7 @@ raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncols=(rast
 	}	
 	startcell <- raster.get.cell.from.rowcol(raster, startrow, startcol)
 	endcell <- raster.get.cell.from.rowcol(raster, endrow, (startcol+ncols-1))
-	raster <- raster.set.data.block(raster, blockdata, startcell, endcell)
+	raster <- raster.set.values.block(raster, blockdata, startcell, endcell)
 	return(raster)
 }
 

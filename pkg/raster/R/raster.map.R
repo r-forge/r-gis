@@ -10,7 +10,7 @@ rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)),
 	if (i != index) {stop("index should be >= 1 and <= rasterstack@nrasters")}
 	raster <- rasterstack@rasters[[i]]
 	if (rasterstack@data@content == 'all') {
-		raster <- raster.set.data(raster, rasterstack@data@values[i,])
+		raster <- raster.set.values(raster, rasterstack@data@values[i,])
 	}
 	raster.map(raster, col=col, subsample=subsample, maxdim=maxdim, ...)
 }

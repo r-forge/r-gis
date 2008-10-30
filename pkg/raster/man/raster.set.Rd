@@ -4,11 +4,11 @@
 \alias{set.bbox}
 \alias{set.projection}
 \alias{raster.set.datatype}
-\alias{raster.set.data}
-\alias{raster.set.data.row}
-\alias{raster.set.data.block}
-\alias{raster.set.data.sparse}
-\alias{raster.clear.data}
+\alias{raster.set.values}
+\alias{raster.set.values.row}
+\alias{raster.set.values.block}
+\alias{raster.set.values.sparse}
+\alias{raster.clear.values}
 \alias{raster.make.sparse}
 \alias{raster.set.rowcol}
 \alias{raster.set.minmax}
@@ -28,11 +28,11 @@ set.projection(object, projection)
 set.filename(raster, filename)
 set.bbox(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE)
 raster.set.datatype(raster, datatype, datasize)
-raster.set.data(raster, data) 
-raster.set.data.row(raster, rowdata, rownr) 
-raster.set.data.block(raster, blockdata, firstcell, lastcell) 
-raster.set.data.sparse(raster, sparsedata, indices) 
-raster.clear.data(raster)
+raster.set.values(raster, values) 
+raster.set.values.row(raster, rowvalues, rownr) 
+raster.set.values.block(raster, blockvalues, firstcell, lastcell) 
+raster.set.values.sparse(raster, sparsevalues, indices) 
+raster.clear.values(raster)
 raster.make.sparse(raster)
 raster.set.rowcol(raster, nrows=nrows(raster), ncols=ncols(raster)) 
 raster.set.minmax(raster)
@@ -46,13 +46,13 @@ as.spgrid(raster, type='grid')
   \item{filename}{ filename of raster, can be blank }
   \item{datatype}{ the type of data ('numeric' or 'integer' that will be written to disk }
   \item{datasize}{ The size, in number of bytes, that wil be written to disk. typically 4 for integer, and 8 for numeric datatype }
-  \item{data}{ Data values to associate with the raster object. There should be values for all cells }
-  \item{rowdata}{ Data values to associate with the raster object for a single row }
+  \item{values}{ Data values to associate with the raster object. There should be values for all cells }
+  \item{rowvalues}{ Data values to associate with the raster object for a single row }
   \item{rownr}{ row number, between 1 and raster@nrows }
-  \item{blockdata}{ Data values to associate with the raster object for a block of data, i.e. a rectangular area within the entire raster }
+  \item{blockvalues}{ Data values to associate with the raster object for a block of data, i.e. a rectangular area within the entire raster }
   \item{firstcell}{ first cell (upper left corner) of the blockdata }
   \item{lastcell}{ last cell (upper left corner) of the blockdata }
-  \item{sparsedata}{ not implemented yet -- sparse data values. I.e. values for a number of raster cells }
+  \item{sparsevalues}{ not implemented yet -- sparse data values. I.e. values for a number of raster cells }
   \item{indices}{ the cell numbers corresponding to the sparse data }
   \item{nrows}{ the new number of rows for the raster }
   \item{ncols}{ the new number of cols for the raster }  

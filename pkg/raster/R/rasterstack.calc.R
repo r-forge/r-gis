@@ -5,23 +5,23 @@
 # Licence GPL v3
 
 rasterstack.calc <- function(rasterstack, fun, filename=NA, overwrite=FALSE, ForceIntOutput=FALSE) {
-	if (length(fun(seq(1:10))) > 1) { stop("function 'fun' used returns more than one value") }
+	if (length(fun(seq(1:5))) > 1) { stop("function 'fun' used returns more than one value") }
 
-	out.raster <- rasterstack@rasters[[1]]
+	outraster <- raster.set(rasterstack@rasters[[1]])
+	outraster <- set.filename(outraster, filename)
 	if (is.na(filename)) {
-		out.raster <- set.filename(out.raster, "")
 		rasterstack <- rasterstack.read.all(rasterstack)
-		out.raster <- raster.set.data(out.raster, apply(rasterstack@data@values, 1, fun)) 
+		outraster <- raster.set.values(outraster, apply(rasterstack@data@values, 1, fun)) 
 	} else {
-		out.raster <- set.filename(out.raster, filename)
-		if (ForceIntOutput) { out.raster <- raster.set.datatype(out.raster, "integer") }
+		if (ForceIntOutput) { outraster <- raster.set.datatype(outraster, "integer") }
 		for (r in 1:rasterstack@nrows) {
 			rasterstack <- rasterstack.read.row(rasterstack, r)
-			out.raster <- raster.set.data.row(out.raster, apply(rasterstack@data@values, 1, fun), rownr=r) 
-			raster.write.row(out.raster, overwrite)
+			vals <- apply(rasterstack@data@values, 1, fun)
+			outraster <- raster.set.values.row(outraster, vals, r) 
+			outraster <- raster.write.row(outraster, overwrite)
 		}
 	}		
-	return(out.raster)
+	return(outraster)
 }
 
 #		res <- vector(mode = "numeric", length = rasterstack@ncols)

@@ -66,7 +66,7 @@ raster.write <- function(raster, overwrite=FALSE) {
 
 	if (raster@data@content == 'sparse') { .raster.write.sparse(raster, overwrite) }
 
-	if (raster@data@content != 'all') {stop('first use raster.set.data()') }
+	if (raster@data@content != 'all') {stop('first use raster.set.values()') }
 
 	raster@file@name <- file.change.extension(raster@file@name, ".grd")
 	if (!overwrite & file.exists(raster@file@name)) {

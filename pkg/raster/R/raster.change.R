@@ -66,7 +66,7 @@ raster.expand <- function(raster, xmin, xmax, ymin, ymax, filename="", overwrite
 			d[] <- NA
 			startcell <- ((startrow-1)*outraster@ncols)+((r-1)*raster@ncols) + startcol
 			d[startcell:(startcell+raster@ncols)] <- v
-			outraster <- raster.set.data.row(outraster, d, r)
+			outraster <- raster.set.values.row(outraster, d, r)
 			outraster <- raster.write(outraster)
 		}
 	}
@@ -115,7 +115,7 @@ raster.merge <- function(rasters, filename, overwrite=FALSE) {
 				rd[d[,1]] <- d[,2]
 			}		
 		}
-		outrs <- raster.set.data.row(outrs, rd, r)
+		outrs <- raster.set.values.row(outrs, rd, r)
 		outrs <- raster.write.row(outrs, overwrite)
 	}
 	return(outrs)
@@ -180,7 +180,7 @@ raster.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overwrite=FA
 					outraster@data@values  <- c(outraster@data@values, raster@data@values)
 				}		
 			} else {
-				outraster <- raster.set.data.row(outraster, raster@data@values, rownr)
+				outraster <- raster.set.values.row(outraster, raster@data@values, rownr)
 				outraster <- raster.write.row(outraster, overwrite)
 			}	
 			rownr <- rownr + 1
@@ -206,7 +206,7 @@ raster.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) 
 			cells <- raster.get.cell.from.rowcol(raster, rows, cols)
 #			m <- matrix(cells, ncol=outrs@ncols, nrow=outrs@nrows, byrow=T)
 			d <- values(raster)[cells]
-			outrs <- raster.set.data(outrs, d)
+			outrs <- raster.set.values(outrs, d)
 		}	
 	}	
 	return(outrs)
@@ -277,7 +277,7 @@ raster.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.N
 					outraster@data@values  <- c(outraster@data@values, values)
 				}		
 			} else {
-				outraster <- raster.set.data.row(outraster, values, rownr)
+				outraster <- raster.set.values.row(outraster, values, rownr)
 				outraster <- raster.write.row(outraster, overwrite)
 			}	
 			rownr <- rownr + 1

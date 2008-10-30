@@ -22,28 +22,28 @@ raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALS
 	
 # there is data	
 	if (raster.content(raster) == 'all') {
-		out.raster <- raster.set.data(out.raster, fun(values(raster))) 
+		out.raster <- raster.set.values(out.raster, fun(values(raster))) 
 		if (!is.na(filename) ) { out.raster <- raster.write(out.raster, overwrite=overwrite)
 		}
 			
 	} else if (raster.content(raster) == 'sparse') {
-		out.raster <- raster.set.data.sparse(out.raster, fun(values(raster)), raster.indices(raster)) 
+		out.raster <- raster.set.values.sparse(out.raster, fun(values(raster)), raster.indices(raster)) 
 		if (!is.na(filename) ) { out.raster <- raster.write(out.raster, overwrite=overwrite)
 		}
 		
 	} else if (is.na(filename) ) {
 
 		if (raster.content(raster) == 'row') {
-			out.raster <- raster.set.data.row(out.raster, fun(values(raster)), raster.get.row.from.cell(raster, raster.indices(raster)[1])) 
+			out.raster <- raster.set.values.row(out.raster, fun(values(raster)), raster.get.row.from.cell(raster, raster.indices(raster)[1])) 
 
 		} else if (raster.content(raster) == 'block') {
-			out.raster <- raster.set.data.block(out.raster, fun(values(raster)), raster.indices(raster)[1], raster.indices(raster)[2])  
+			out.raster <- raster.set.values.block(out.raster, fun(values(raster)), raster.indices(raster)[1], raster.indices(raster)[2])  
 		}
 	} else if (!is.na(filename) ) {
 			
 		for (r in 1:raster@nrows) {
 			raster <- raster.read.row(raster, r)
-			out.raster <- raster.set.data.row(out.raster, fun(values(raster)), r)
+			out.raster <- raster.set.values.row(out.raster, fun(values(raster)), r)
 			out.raster <- raster.write.row(out.raster, overwrite=overwrite)
 		}
 	} 	
@@ -63,12 +63,12 @@ raster.calc.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE, IN
 	}
 	if (is.na(filename)) {
 		n <- ncells(raster)
-		out.raster <- raster.set.data(out.raster, fun(n)) 
+		out.raster <- raster.set.values(out.raster, fun(n)) 
 	} else {
 		out.raster <- set.filename(raster, filename)
 		n <- length(ncols(raster))
 		for (r in 1:nrows(raster)) {
-			out.raster <- raster.set.data.row(out.raster, fun(n), r) 
+			out.raster <- raster.set.values.row(out.raster, fun(n), r) 
 			out.raster <- raster.write.row(out.raster, overwrite=overwrite)	
 		}	
 	}	
@@ -105,8 +105,8 @@ raster.calc.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, IN
 				res[ (values(raster) > rclmat[i,1]) & (values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
 			}
 		}
-		if (raster.content(raster) == 'all') { out.raster <- raster.set.data(out.raster, res) }
-		if (raster.content(raster) == 'sparse') { out.raster <- raster.set.data.row(out.raster, res, raster.indices(raster)) }
+		if (raster.content(raster) == 'all') { out.raster <- raster.set.values(out.raster, res) }
+		if (raster.content(raster) == 'sparse') { out.raster <- raster.set.values.row(out.raster, res, raster.indices(raster)) }
 		if (!is.na(filename)) {	out.raster <- raster.write(out.raster) }
 	}
 
@@ -121,7 +121,7 @@ raster.calc.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, IN
 				res[ (values(raster) > rclmat[i,1]) & (values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
 			}
 		}
-		out.raster <- raster.set.data.row(out.raster, res, r)
+		out.raster <- raster.set.values.row(out.raster, res, r)
 		out.raster <- raster.write.row(out.raster, overwrite=overwrite)
 	}	
 	return(out.raster)
@@ -202,7 +202,7 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 		rowdata <- raster.read.row(raster, r)@data@values
 		ngbdata <- rbind(ngbdata[2:ngb,], t(rowdata))
 		if (r > lim) {
-			ngbgrid <- raster.set.data.row(ngbgrid, .calc.ngb(ngbdata, ngb, fun, keepdata), rr)
+			ngbgrid <- raster.set.values.row(ngbgrid, .calc.ngb(ngbdata, ngb, fun, keepdata), rr)
 			ngbgrid <- raster.write.row(ngbgrid, overwrite)
 			rr <- rr + 1
 		}
@@ -211,7 +211,7 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 	ngbdata1 <- array(data = NA, dim = c(ngb, raster@ncols))
 	for (r in (raster@nrows+1):(raster@nrows+lim)) {
 		ngbdata <- rbind(ngbdata[2:ngb,], t(ngbdata1[1,]))
-		ngbgrid <- raster.set.data.row(ngbgrid, .calc.ngb(ngbdata, ngb, fun, keepdata), rr)
+		ngbgrid <- raster.set.values.row(ngbgrid, .calc.ngb(ngbdata, ngb, fun, keepdata), rr)
 		ngbgrid <- raster.write.row(ngbgrid, overwrite)
 		rr <- rr + 1
 	}

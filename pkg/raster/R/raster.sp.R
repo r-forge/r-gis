@@ -15,11 +15,11 @@ as.raster <- function(spgrid, getdata=TRUE, dataindex=1) {
 				cells <- raster.get.cell.from.xy(raster, spgrid@coords)
 			}
 			vals <- spgrid@data[dataindex]
-			raster <- raster.set.data.sparse(raster, cells, vals)
+			raster <- raster.set.values.sparse(raster, cells, vals)
 		} else if ( class(spgrid)=='SpatialGrid' ) {
 			# do nothing, there is no data
 		} else if (class(spgrid)=='SpatialGridDataFrame' ) {
-			raster <- raster.set.data(raster, spgrid@data[dataindex])
+			raster <- raster.set.values(raster, spgrid@data[dataindex])
 		}
 	}
 	return(raster)
