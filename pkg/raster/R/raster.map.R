@@ -51,11 +51,11 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 		} else {
 			raster <- raster.read.all(raster)
 			m <- raster.values(raster, format='matrix')
-			x <- (0:raster@ncols) * xres(raster) + xmin(raster) 
-			y <- (0:raster@nrows) * yres(raster) + ymin(raster) 
+			x <- (0:ncols(raster)) * xres(raster) + xmin(raster) 
+			y <- (0:nrows(raster)) * yres(raster) + ymin(raster) 
 		}	
 	} 
-	z <- t(m[nrows(m):1,])
+	z <- t(m[nrow(m):1,])
 	image.plot(x, y, z, col=col, axes = TRUE, xlab="", ylab="", legend.width = 0.8, ...)
 	box()
 #	image(x, y, z, col=col, axes = FALSE, xlab="", ylab="")

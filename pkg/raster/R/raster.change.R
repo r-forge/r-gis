@@ -91,6 +91,7 @@ raster.merge <- function(rasters, filename, overwrite=FALSE) {
 		bb[,2] <- pmax(bb[,2], bb2[,2])
 	}
 	outrs <- raster.set(rasters[[1]])
+	outrs <- set.filename(outrs, filename)
 	outrs <- set.bbox(outrs, bb[1,1],bb[1,2],bb[2,1],bb[2,2], keepres=TRUE)
 
 	rowcol <- matrix(0, ncol=3, nrow=length(rasters))
@@ -115,7 +116,7 @@ raster.merge <- function(rasters, filename, overwrite=FALSE) {
 			}		
 		}
 		outrs <- raster.set.data.row(outrs, rd, r)
-		outrs <- raster.write.row(outrs)
+		outrs <- raster.write.row(outrs, overwrite)
 	}
 	return(outrs)
 }

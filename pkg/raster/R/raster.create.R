@@ -118,7 +118,7 @@ raster.from.file <- function(filename, band=1) {
 	band <- as.integer(1)
 	bandorder <- "BSQ"
 	ncellvals <- -9
-	projection <- ""
+	projstring <- ""
 	for (i in 1:length(ini[,1])) {
 		if (ini[i,1] == "MINX") {xn <- as.numeric(ini[i,2])} 
 		else if (ini[i,1] == "MAXX") {xx <- as.numeric(ini[i,2])} 

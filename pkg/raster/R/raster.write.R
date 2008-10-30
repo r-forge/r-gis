@@ -85,12 +85,12 @@ raster.write <- function(raster, overwrite=FALSE) {
 	close(con)
 
 	.raster.write.hdr(raster) 
+	raster@file@handle <- 'raster'
 	return(raster)
 }
 
  
 raster.write.row <- function(raster, overwrite=FALSE) {
-
 	if (raster@data@content != 'row') { stop('raster does not contain a row') }
 	
 	if (raster@data@indices[1] == 1) {
@@ -105,6 +105,7 @@ raster.write.row <- function(raster, overwrite=FALSE) {
 		raster@data@max <- -3e34 	
 		raster@data@haveminmax <- FALSE
 		raster@file@driver == 'raster'
+		raster@file@handle <- 'raster'
 	}	
 
 	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
@@ -120,7 +121,7 @@ raster.write.row <- function(raster, overwrite=FALSE) {
 #	raster@data@values[is.na(raster@data@values)] <-  raster@file@nodatavalue
 	writeBin(as.vector(raster@data@values), raster@filecon, size = raster@file@datasize)
 	
-	if (raster@data@indices[2] == raster) {
+	if (raster@data@indices[2] == ncells(raster)) {
 	# LAST  ROW
 		.raster.write.hdr(raster) 
 		close(raster@filecon)

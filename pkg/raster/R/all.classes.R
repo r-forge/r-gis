@@ -19,6 +19,16 @@
 	return(TRUE)
 }
 
+
+#setMethod ('show' , 'Spatial', 
+#	function(object) {
+#		cat('class     :', class(object), '\n')
+#		cat('projection:', projection(object), '\n')
+#		boundingbox(object)
+#	}
+#)	
+
+
 setClass ('AbstractRaster',
 # importing "Spatial" (bounding box + Proj4string) from the sp package
 	contains = 'Spatial',

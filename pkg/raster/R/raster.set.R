@@ -64,13 +64,33 @@ create.CRS <- function(projection) {
 	} else {
 		projs <- try(CRS(projection), silent = T)
 		if (class(projs) == "try-error") { 
-			warning(paste('projection string', projection, 'is not a valid proj4 CRS string')) 
+			warning(paste(projection, 'is not a valid proj4 CRS string')) 
 			projs <- (CRS(as.character(NA)))
 		}
 	}
 	return(projs)
 }
 
+create.boundingbox <- function(xmin, xmax, ymin, ymax, projection="") {
+	if (xmin > xmax) {
+		x <- xmin
+		xmin <- xmax
+		xmax <- x
+	}
+	if (ymin > ymax) {
+		y <- ymin
+		ymin <- ymax
+		ymax <- y
+	}
+	projs <- create.CRS(projection)
+	bb <- new("Spatial")
+	bb@bbox[1,1] <- xmin
+	bb@bbox[1,2] <- xmax
+	bb@bbox[2,1] <- ymin
+	bb@bbox[2,2] <- ymax
+	bb@proj4string <- projs
+	return(bb)
+}
 
 
 raster.make.sparse <- function(raster) {
