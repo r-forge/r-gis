@@ -85,7 +85,8 @@ raster.write <- function(raster, overwrite=FALSE) {
 	close(con)
 
 	.raster.write.hdr(raster) 
-	raster@file@handle <- 'raster'
+	raster@file@driver <- 'raster'
+        raster@file@gdalhandle <- list()
 	return(raster)
 }
 
@@ -104,8 +105,8 @@ raster.write.row <- function(raster, overwrite=FALSE) {
 		raster@data@min <- 3e34
 		raster@data@max <- -3e34 	
 		raster@data@haveminmax <- FALSE
-		raster@file@driver == 'raster'
-		raster@file@handle <- 'raster'
+		raster@file@driver <- 'raster'
+		raster@file@gdalhandle <- list()
 	}	
 
 	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
