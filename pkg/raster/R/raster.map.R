@@ -21,7 +21,7 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 #	require(fields)
 
 	if (raster.content(raster) == 'all') {
-		m <- raster.values(raster, format='matrix')
+		m <- values(raster, format='matrix')
 		if (max(ncols(raster), nrows(raster)) <= maxdim) { subsample=FALSE }
 		
 		if (subsample) {
@@ -50,7 +50,7 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 			y <- (0:dim(m)[1]) * yres + ymin(raster) 
 		} else {
 			raster <- raster.read.all(raster)
-			m <- raster.values(raster, format='matrix')
+			m <- values(raster, format='matrix')
 			x <- (0:ncols(raster)) * xres(raster) + xmin(raster) 
 			y <- (0:nrows(raster)) * yres(raster) + ymin(raster) 
 		}	

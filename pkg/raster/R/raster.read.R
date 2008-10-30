@@ -42,11 +42,11 @@ raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncols=(rast
 		nrows <- endrow - startrow + 1
 	}
 	raster <- raster.read.part.of.row(raster, startrow, startcol, ncols)
-	blockdata <- raster.values(raster)
+	blockdata <- values(raster)
 	if (nrows > 1) {
 		for (r in (startrow+1):endrow) {
 			raster <- raster.read.part.of.row(raster, r,  startcol, ncols)
-			blockdata <- c(blockdata, raster.values(raster))
+			blockdata <- c(blockdata, values(raster))
 		}	
 	}	
 	startcell <- raster.get.cell.from.rowcol(raster, startrow, startcol)
@@ -120,7 +120,7 @@ raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@nc
 .raster.read.skip <- function(raster, maxdim=500) {
 	rasdim <- max(raster@ncols, raster@nrows )
 	if (rasdim <= maxdim) { 
-		dd <- .raster.get.matrix(raster.read.all(raster))
+		dd <- .values.as.matrix(raster.read.all(raster))
 	} else {
 		fact <- maxdim / rasdim
 		ncols <- trunc(fact * raster@ncols)

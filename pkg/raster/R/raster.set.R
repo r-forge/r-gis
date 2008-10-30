@@ -98,7 +98,7 @@ raster.make.sparse <- function(raster) {
 	} else {
 		if (raster.content(raster) == 'all') {
 			vals <- seq(1:ncells(raster))
-			vals <- cbind(vals, raster.values(raster))
+			vals <- cbind(vals, values(raster))
 			vals <- as.vector(na.omit(vals))
 			raster <- raster.set.data.sparse(raster, sparsedata=vals[,2], indices=vals[,1])
 			return(raster)
@@ -175,7 +175,7 @@ raster.set.data <- function(raster, data) {
 
 raster.set.minmax <- function(raster) {
 	if (raster@data@content == 'nodata') {stop('no data in memory') }
-	vals <- na.omit(raster.values(raster)) # min and max values
+	vals <- na.omit(values(raster)) # min and max values
 	if (length(vals) > 0) {
 		raster@data@min <-  min(vals)
 		raster@data@max <- max(vals)

@@ -79,6 +79,16 @@ projection <- function(object, asText=TRUE) {
 }
 
 
+values <- function(object, format='vector', names=FALSE) {
+	if (object@data@content=="nodata") {stop("first read some data (e.g., raster.read.all()") }
+	if (format=='matrix') {  
+		return(.values.as.matrix(object, names)) 
+	} else {
+		return(object@data@values) 
+	}
+}
+
+
 raster.content <- function(raster) {
 	return(raster@data@content)
 }
@@ -89,14 +99,6 @@ raster.indices <- function(raster) {
 
 raster.source <- function(raster) {
 	return(raster@data@source)
-}
-
-
-raster.values <- function(raster, format='vector', names=FALSE) {
-	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all()") }
-	if (format=='matrix') {  return(.raster.get.matrix(raster, names)) 
-	} else { return(raster@data@values) 
-	}
 }
 
 
@@ -165,10 +167,13 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 }
 
 
-.raster.get.matrix <- function(raster, names=FALSE) {
+.values.as.matrix <- function(raster, names=FALSE) {
 	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all() or raster.read.row()") }
 	
-	if (raster@data@content=="all") {
+	if (is.matrix(raster@data@values)) {
+		return(raster@data@values)
+		
+	} else if (raster@data@content=="all") {
 		mdata <- matrix(raster@data@values, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE)
 		if (names) {
 			colnames(mdata) <- seq(1:raster@ncols)
@@ -204,12 +209,14 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 		nrows <- 1 + endrow - startrow
 		
 		mdata <- as.matrix(t(raster@data@values[1:ncols]))
+		
 		if (nrows > 1) {
 			for (i in 2:nrows) {
 				arow <- raster@data@values[((i-1)*ncols+1):((i-1)*ncols+ncols)]
 				mdata <- rbind(mdata, t(arow))
 			}
 		}
+		
 		if (names) {
 			rowlist <- list()
 			for (i in 1:nrows) {

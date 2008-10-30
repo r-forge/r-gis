@@ -62,7 +62,7 @@ raster.expand <- function(raster, xmin, xmax, ymin, ymax, filename="", overwrite
 		d <- vector(length=ncols(outraster))
 		for (r in 1:nrows(raster)) {
 			raster <- raster.read.row(raster, 1)
-			v <- raster.values(raster)
+			v <- values(raster)
 			d[] <- NA
 			startcell <- ((startrow-1)*outraster@ncols)+((r-1)*raster@ncols) + startcol
 			d[startcell:(startcell+raster@ncols)] <- v
@@ -108,7 +108,7 @@ raster.merge <- function(rasters, filename, overwrite=FALSE) {
 		for (i in length(rasters):1) {  #reverse order so that the first raster covers the second etc.
 			if (r >= rowcol[i,1] & r <= rowcol[i,2]) { 
 				rasters[[i]] <- raster.read.row(rasters[[i]], r + 1 - rowcol[i,1]) 
-				d <- raster.values(rasters[[i]])
+				d <- values(rasters[[i]])
 				id2 <- seq(1:ncols(rasters[[i]])) + rowcol[i,3] - 1
 				d <- cbind(id2, d)
 				d <- na.omit(d)
@@ -205,7 +205,7 @@ raster.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) 
 			rows <- rep(1:nrows(raster), each=raster@ncols*factor*factor)
 			cells <- raster.get.cell.from.rowcol(raster, rows, cols)
 #			m <- matrix(cells, ncol=outrs@ncols, nrow=outrs@nrows, byrow=T)
-			d <- raster.values(raster)[cells]
+			d <- values(raster)[cells]
 			outrs <- raster.set.data(outrs, d)
 		}	
 	}	

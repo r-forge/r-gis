@@ -35,11 +35,11 @@ as.spgrid <- function(raster, type='grid')  {
 	if (type=='pixel') {
 		raster <- raster.make.sparse(raster)
 		pts <- SpatialPoints(raster.get.xy.from.cell(raster, raster.indices(raster)))
-		sp <- SpatialPixelsDataFrame(points=pts, data=raster.values(raster), proj4string=projection(raster)) 	
+		sp <- SpatialPixelsDataFrame(points=pts, data=values(raster), proj4string=projection(raster)) 	
 		
 	} else if (type=='grid') {
 		if (raster.content(raster) == 'all') {
-			sp <- SpatialGridDataFrame(grd, proj4string=projection(raster), data=raster.values(raster))
+			sp <- SpatialGridDataFrame(grd, proj4string=projection(raster), data=values(raster))
 		} else { 
 			sp  <- SpatialGrid(grd, proj4string=projection(raster))
 		}	

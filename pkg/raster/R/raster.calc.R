@@ -22,28 +22,28 @@ raster.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALS
 	
 # there is data	
 	if (raster.content(raster) == 'all') {
-		out.raster <- raster.set.data(out.raster, fun(raster.values(raster))) 
+		out.raster <- raster.set.data(out.raster, fun(values(raster))) 
 		if (!is.na(filename) ) { out.raster <- raster.write(out.raster, overwrite=overwrite)
 		}
 			
 	} else if (raster.content(raster) == 'sparse') {
-		out.raster <- raster.set.data.sparse(out.raster, fun(raster.values(raster)), raster.indices(raster)) 
+		out.raster <- raster.set.data.sparse(out.raster, fun(values(raster)), raster.indices(raster)) 
 		if (!is.na(filename) ) { out.raster <- raster.write(out.raster, overwrite=overwrite)
 		}
 		
 	} else if (is.na(filename) ) {
 
 		if (raster.content(raster) == 'row') {
-			out.raster <- raster.set.data.row(out.raster, fun(raster.values(raster)), raster.get.row.from.cell(raster, raster.indices(raster)[1])) 
+			out.raster <- raster.set.data.row(out.raster, fun(values(raster)), raster.get.row.from.cell(raster, raster.indices(raster)[1])) 
 
 		} else if (raster.content(raster) == 'block') {
-			out.raster <- raster.set.data.block(out.raster, fun(raster.values(raster)), raster.indices(raster)[1], raster.indices(raster)[2])  
+			out.raster <- raster.set.data.block(out.raster, fun(values(raster)), raster.indices(raster)[1], raster.indices(raster)[2])  
 		}
 	} else if (!is.na(filename) ) {
 			
 		for (r in 1:raster@nrows) {
 			raster <- raster.read.row(raster, r)
-			out.raster <- raster.set.data.row(out.raster, fun(raster.values(raster)), r)
+			out.raster <- raster.set.data.row(out.raster, fun(values(raster)), r)
 			out.raster <- raster.write.row(out.raster, overwrite=overwrite)
 		}
 	} 	
@@ -100,9 +100,9 @@ raster.calc.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, IN
 	if (raster.content(raster) == 'all' | raster.content(raster) == 'sparse') {
 		for (i in 1:length(rclmat[,1])) {
 			if (is.na(rclmat[i,1]) | is.na(rclmat[i,2])) {
-				res[ is.na(raster.values(raster)) ] <- rclmat[i, 3] 
+				res[ is.na(values(raster)) ] <- rclmat[i, 3] 
 			} else { 
-				res[ (raster.values(raster) > rclmat[i,1]) & (raster.values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
+				res[ (values(raster) > rclmat[i,1]) & (values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
 			}
 		}
 		if (raster.content(raster) == 'all') { out.raster <- raster.set.data(out.raster, res) }
@@ -114,11 +114,11 @@ raster.calc.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, IN
 		raster <- raster.read.row(raster, r)
 		for (i in 1:length(rclmat[,1])) {
 			if (is.na(rclmat[i,1]) | is.na(rclmat[i,2])) {
-				res[ is.na(raster.values(raster)) ] <- rclmat[i, 3] 
+				res[ is.na(values(raster)) ] <- rclmat[i, 3] 
 			} else if (is.na(rclmat[i,1]) == is.na(rclmat[i,2])) {
-				res[ (raster.values(raster) == rclmat[i,1]) ] <- rclmat[i , 3] 
+				res[ (values(raster) == rclmat[i,1]) ] <- rclmat[i , 3] 
 			} else {
-				res[ (raster.values(raster) > rclmat[i,1]) & (raster.values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
+				res[ (values(raster) > rclmat[i,1]) & (values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
 			}
 		}
 		out.raster <- raster.set.data.row(out.raster, res, r)

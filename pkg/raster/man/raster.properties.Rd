@@ -1,11 +1,6 @@
 \name{properties}
 \alias{filename}
-\alias{raster.values}
-\alias{raster.maxvalue}
-\alias{raster.minvalue}
-\alias{raster.indices}
-\alias{raster.content}
-\alias{raster.source}
+\alias{values}
 \alias{ncols}
 \alias{nrows}
 \alias{ncells}
@@ -19,6 +14,11 @@
 \alias{projection}
 \alias{origin}
 \alias{boundingbox}
+\alias{raster.maxvalue}
+\alias{raster.minvalue}
+\alias{raster.indices}
+\alias{raster.content}
+\alias{raster.source}
 
   
   
@@ -33,12 +33,7 @@
 
 \usage{
 filename(object)
-raster.values(raster, format='vector', names=FALSE)
-raster.minvalue(raster)
-raster.maxvalue(raster)
-raster.content(raster)
-raster.indices(raster)
-raster.source(raster)
+values(object, format='vector', names=FALSE)
 ncols(object)
 nrows(object)
 ncells(object)
@@ -52,6 +47,11 @@ ymax(object)
 projection(object, asText=TRUE)
 origin(object)
 boundingbox(object)
+raster.minvalue(raster)
+raster.maxvalue(raster)
+raster.content(raster)
+raster.indices(raster)
+raster.source(raster)
 }
 
 \arguments{
