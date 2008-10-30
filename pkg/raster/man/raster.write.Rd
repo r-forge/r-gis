@@ -42,27 +42,27 @@ raster.write.export(raster, outfile, filetype, overwrite=FALSE)
  rs <- raster.read.all(rs)
 
 # write all to binary file
- rs <- raster.set.filename(rs, "binall.grd")
+ rs <- set.filename(rs, "binall.grd")
  rs <- raster.write.binary(rs, overwrite=TRUE)
  
 # write all to integer binary file
- rs <- raster.set.filename(rs, "binallint.grd")
+ rs <- set.filename(rs, "binallint.grd")
  rs <- raster.set.datatype(rs, "integer")
  rs <- raster.write.binary(rs, overwrite=TRUE)
  
 # write all to ascii file
- rs <- raster.set.filename(rs, "ascall.asc")
+ rs <- set.filename(rs, "ascall.asc")
  raster.write.ascii(rs, overwrite=TRUE)
  
 # read and write row by row; write to ascii file
- ascrow <- raster.set.filename(rs, "ascrow.asc")
+ ascrow <- set.filename(rs, "ascrow.asc")
  for (r in 1:rs@nrows) {
 	rs <- raster.read.row(rs, r)
 	ascrow@data <- rs@data
 	ascrow <- raster.write.ascii.row(ascrow, r, overwrite=TRUE) }
 	
 # read and write row by row; write to binary file
- binrow <- raster.set.filename(rs, "binrow.grd")
+ binrow <- set.filename(rs, "binrow.grd")
  for (r in 1:rs@nrows) {
 	binrow@data <- raster.read.row(rs, r)@data
 	binrow <- raster.write.binary.row(binrow, r, overwrite=TRUE) }

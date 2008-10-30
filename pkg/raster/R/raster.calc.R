@@ -65,7 +65,7 @@ raster.calc.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE, IN
 		n <- ncells(raster)
 		out.raster <- raster.set.data(out.raster, fun(n)) 
 	} else {
-		out.raster <- raster.set.filename(raster, filename)
+		out.raster <- set.filename(raster, filename)
 		n <- length(ncols(raster))
 		for (r in 1:nrows(raster)) {
 			out.raster <- raster.set.data.row(out.raster, fun(n), r) 
@@ -190,7 +190,7 @@ raster.calc.neighborhood <- function(raster, fun=mean, filename=NA, ngb=3, keepd
 	if (ngb == 1) { stop("ngb should be 3 or larger")  } 
 	lim <- floor(ngb / 2)
 	
-	ngbgrid <- raster.set.filename(raster, filename)
+	ngbgrid <- set.filename(raster, filename)
 	
 # first create an empty matrix with nrows = ngb and ncols = raster@ncols
 

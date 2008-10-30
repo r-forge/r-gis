@@ -12,7 +12,7 @@
 	bb@bbox[2,2] <- ymax
 	bb@bbox[3,1] <- 0
 	bb@bbox[3,2] <- 1
-	bb <- raster.set.projection(bb, projection)
+	bb <- set.projection(bb, projection)
 	return(bb)
 }
 
@@ -66,7 +66,7 @@ raster.from.file <- function(filename, band=1) {
 	if (yn < 0) { ndecs <- 9 } else { ndecs <- 8 }
 	yn <- as.numeric( substr( as.character(yn), 1, ndecs) )
 	raster <- raster.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx, projection="")
-	raster <- raster.set.filename(raster, filename)
+	raster <- set.filename(raster, filename)
 	raster <- raster.set.datatype(raster, "numeric")
 	
 
@@ -83,7 +83,7 @@ raster.from.file <- function(filename, band=1) {
 		band <- 1 }
 	raster@file@band <- as.integer(band)
 
-	raster <- raster.set.projection(raster, attr(gdalinfo, "projection"))
+	raster <- set.projection(raster, attr(gdalinfo, "projection"))
 	
 	raster@file@gdalhandle[1] <- GDAL.open(filename)
 #oblique.x   0  #oblique.y   0 
@@ -138,7 +138,7 @@ raster.from.file <- function(filename, band=1) {
     }  
 
     raster <- raster.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx, projection=projstring)
-	raster <- raster.set.filename(raster, filename)
+	raster <- set.filename(raster, filename)
 	raster@file@driver <- "raster"
 
 	raster@data@min <- minval

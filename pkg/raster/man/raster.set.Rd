@@ -1,6 +1,8 @@
 \name{raster.set}
 \alias{raster.set}
-\alias{raster.set.filename}
+\alias{set.filename}
+\alias{set.bbox}
+\alias{set.projection}
 \alias{raster.set.datatype}
 \alias{raster.set.data}
 \alias{raster.set.data.row}
@@ -9,9 +11,7 @@
 \alias{raster.clear.data}
 \alias{raster.make.sparse}
 \alias{raster.set.rowcol}
-\alias{raster.set.bbox}
 \alias{raster.set.minmax}
-\alias{raster.set.projection}
 \alias{as.raster}
 \alias{as.spgrid}
 
@@ -24,7 +24,9 @@ Use these functions to set name and datatype properties of a raster object. Whil
 
 \usage{
 raster.set(raster, filename=NA)
-raster.set.filename(raster, filename)
+set.projection(object, projection)
+set.filename(raster, filename)
+set.bbox(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE)
 raster.set.datatype(raster, datatype, datasize)
 raster.set.data(raster, data) 
 raster.set.data.row(raster, rowdata, rownr) 
@@ -33,14 +35,13 @@ raster.set.data.sparse(raster, sparsedata, indices)
 raster.clear.data(raster)
 raster.make.sparse(raster)
 raster.set.rowcol(raster, nrows=nrows(raster), ncols=ncols(raster)) 
-raster.set.bbox(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE)
 raster.set.minmax(raster)
-raster.set.projection(raster, projection)
 as.raster(spgrid, getdata=TRUE, dataindex=1) 
 as.spgrid(raster, type='grid') 
 }
 
 \arguments{
+  \item{object} {A spatial object (i.e. any Raster* objecty or Spatial* object from the SP package}
   \item{raster}{ A \code{Raster} object }
   \item{filename}{ filename of raster, can be blank }
   \item{datatype}{ the type of data ('numeric' or 'integer' that will be written to disk }
@@ -79,7 +80,7 @@ raster.set copies the parameters of a Raster object to a new object, but does no
 \examples{ 
 	rs <- raster.new()
 	rs
-	rs <- raster.set.filename(rs, "c:/test.grd")
+	rs <- set.filename(rs, "c:/test.grd")
 	rs <- raster.set.rowcol(rs, nrows=18, ncols=36) 
 	rs
 }

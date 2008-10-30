@@ -4,11 +4,59 @@
 # Version 0,1
 # Licence GPL v3
 
+
+raster.set.rowcol <- function(raster, nrows=nrows(raster), ncols=ncols(raster)) {
+	raster@ncols <- as.integer(ncols)
+	raster@nrows <- as.integer(nrows)
+	return(raster)
+}
+
+raster.set <- function(raster, filename=NA) {
+	raster <- raster.clear.data(raster)
+	raster <- set.filename(raster, filename)
+	return(raster)
+}
+
+set.filename <- function(raster, filename) {
+	if (is.na(filename)) {filename <- ""}
+	raster@file@name <- filename
+	shortname <- file.get.name(filename)
+	shortname <- file.change.extension(shortname, "")
+	shortname <- gsub(" ", "_", shortname)
+	if (raster@file@nbands > 1) { shortname <- paste(shortname,"_",raster@file@band) } 
+	raster@file@shortname <- shortname
+	raster@file@gdalhandle <- list()
+	return(raster)
+}
+
+
+set.projection <- function(object, projection) {
+	object@proj4string <- create.CRS(projection)
+	return(object)
+}
+
+
 raster.clear.data <- function(raster) {
 	raster@data@content == 'nodata'
 	raster@data@indices == ''
 	return(raster)
 }		
+
+set.bbox <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE) {
+	xres <- xres(raster)
+	yres <- yres(raster)
+	raster@bbox[1,1] <- xmin
+	raster@bbox[1,2] <- xmax
+	raster@bbox[2,1] <- ymin
+	raster@bbox[2,2] <- ymax
+	if (keepres) {
+		raster@ncols <- as.integer(round( (xmax(raster) - xmin(raster)) / xres ))
+		raster@nrows <- as.integer(round( (ymax(raster) - ymin(raster)) / xres ))
+		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xres
+		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yres
+	}
+	return(raster)
+}
 
 
 create.CRS <- function(projection) {
@@ -24,10 +72,6 @@ create.CRS <- function(projection) {
 }
 
 
-raster.set.projection <- function(raster, projection) {
-	raster@proj4string <- create.CRS(projection)
-	return(raster)
-}
 
 raster.make.sparse <- function(raster) {
 	if (raster.content(raster) == 'sparse') {return(raster)
@@ -107,21 +151,6 @@ raster.set.data <- function(raster, data) {
 }
 
 
-raster.set.bbox <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE) {
-	xres <- xres(raster)
-	yres <- yres(raster)
-	raster@bbox[1,1] <- xmin
-	raster@bbox[1,2] <- xmax
-	raster@bbox[2,1] <- ymin
-	raster@bbox[2,2] <- ymax
-	if (keepres) {
-		raster@ncols <- as.integer(round( (xmax(raster) - xmin(raster)) / xres ))
-		raster@nrows <- as.integer(round( (ymax(raster) - ymin(raster)) / xres ))
-		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xres
-		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yres
-	}
-	return(raster)
-}
 
 
 raster.set.minmax <- function(raster) {
@@ -138,30 +167,6 @@ raster.set.minmax <- function(raster) {
 	return(raster)
 }
 
-
-raster.set.rowcol <- function(raster, nrows=nrows(raster), ncols=ncols(raster)) {
-	raster@ncols <- as.integer(ncols)
-	raster@nrows <- as.integer(nrows)
-	return(raster)
-}
-
-raster.set <- function(raster, filename=NA) {
-	raster <- raster.clear.data(raster)
-	raster <- raster.set.filename(raster, filename)
-	return(raster)
-}
-
-raster.set.filename <- function(raster, filename) {
-	if (is.na(filename)) {filename <- ""}
-	raster@file@name <- filename
-	shortname <- file.get.name(filename)
-	shortname <- file.change.extension(shortname, "")
-	shortname <- gsub(" ", "_", shortname)
-	if (raster@file@nbands > 1) { shortname <- paste(shortname,"_",raster@file@band) } 
-	raster@file@shortname <- shortname
-	raster@file@gdalhandle <- list()
-	return(raster)
-}
 
 raster.set.datatype <- function(raster, datatype, datasize=4) {
 #  signed"  should become variable

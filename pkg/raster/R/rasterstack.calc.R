@@ -9,11 +9,11 @@ rasterstack.calc <- function(rasterstack, fun, filename=NA, overwrite=FALSE, For
 
 	out.raster <- rasterstack@rasters[[1]]
 	if (is.na(filename)) {
-		out.raster <- raster.set.filename(out.raster, "")
+		out.raster <- set.filename(out.raster, "")
 		rasterstack <- rasterstack.read.all(rasterstack)
 		out.raster <- raster.set.data(out.raster, apply(rasterstack@data@values, 1, fun)) 
 	} else {
-		out.raster <- raster.set.filename(out.raster, filename)
+		out.raster <- set.filename(out.raster, filename)
 		if (ForceIntOutput) { out.raster <- raster.set.datatype(out.raster, "integer") }
 		for (r in 1:rasterstack@nrows) {
 			rasterstack <- rasterstack.read.row(rasterstack, r)

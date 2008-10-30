@@ -18,6 +18,7 @@
 \alias{ymax}
 \alias{projection}
 \alias{origin}
+\alias{boundingbox}
 
   
   
@@ -48,8 +49,9 @@ xmin(object)
 xmax(object)
 ymin(object)
 ymax(object)
-projection(object, asText=FALSE)
+projection(object, asText=TRUE)
 origin(object)
+boundingbox(object)
 }
 
 \arguments{

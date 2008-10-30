@@ -43,8 +43,8 @@ raster.expand <- function(raster, xmin, xmax, ymin, ymax, filename="", overwrite
 	ymax <- max(ymax, ymax(raster))
 	
 	outraster <- raster.set(raster)
-	outraster <- raster.set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
-	outraster <- raster.set.filename(outraster, filename)
+	outraster <- set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
+	outraster <- set.filename(outraster, filename)
 
 	startrow <- raster.get.row.from.y(outraster, ymax(raster))
 	startcol <- raster.get.col.from.x(outraster, xmin(raster))
@@ -91,7 +91,7 @@ raster.merge <- function(rasters, filename, overwrite=FALSE) {
 		bb[,2] <- pmax(bb[,2], bb2[,2])
 	}
 	outrs <- raster.set(rasters[[1]])
-	outrs <- raster.set.bbox(outrs, bb[1,1],bb[1,2],bb[2,1],bb[2,2], keepres=TRUE)
+	outrs <- set.bbox(outrs, bb[1,1],bb[1,2],bb[2,1],bb[2,2], keepres=TRUE)
 
 	rowcol <- matrix(0, ncol=3, nrow=length(rasters))
 	for (i in 1:length(rasters)) {
@@ -149,8 +149,8 @@ raster.cut <- function(raster, xmin, xmax, ymin, ymax, filename='', overwrite=FA
 	if (ymin == ymax) {stop("ymin and ymax are less than one cell apart")}
 	
 	outraster <- raster.set(raster)
-	outraster <- raster.set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
-	outraster <- raster.set.filename(outraster, filename)
+	outraster <- set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
+	outraster <- set.filename(outraster, filename)
 	
 	if (raster@data@content == 'all')  {
 		first.start.cell <- raster.get.cell.from.xy(raster, c(xmin + 0.5 * xres(raster), ymax - 0.5 * yres(raster) ))	
@@ -227,7 +227,7 @@ raster.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.N
 	yexpansion <- (rsteps * factor - raster@nrows)  * xres(raster)
 	xexpansion <- (csteps * factor - raster@ncols) * yres(raster)
 		
-	outraster <- raster.set.filename(raster, filename)
+	outraster <- set.filename(raster, filename)
 	outraster@bbox[1,2] <- xmax(raster) + xexpansion
 	outraster@bbox[2,1] <- ymin(raster) - yexpansion
 	outraster <- raster.set.rowcol(outraster, nrows=rsteps, ncols=csteps) 

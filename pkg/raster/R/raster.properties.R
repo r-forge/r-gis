@@ -61,13 +61,19 @@ resolution <- function(object) {
 	return(c(x, y))
 }
 
+boundingbox <- function(object) {
+	b <- bbox(object)[1:2, 1:2]
+	rownames(b) <- c("x", "y")
+	return(b)
+}
+
 origin <- function(object) {
 	x <- xmin(object) - xres(object)*(round(xmin(object) / xres(object)))
 	y <- ymax(object) - yres(object)*(round(ymax(object) / yres(object)))
 	return(c(x, y))
 }
 
-projection <- function(object, asText=FALSE) {
+projection <- function(object, asText=TRUE) {
 	if (asText) {return(object@proj4string@projargs)}
 	else {return(object@proj4string)}
 }

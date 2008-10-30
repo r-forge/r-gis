@@ -16,7 +16,7 @@ raster.write.ascii <- function(raster, overwrite=FALSE) {
 
 		if (raster@data@indices[1] == 1)
 		{
-			raster <- raster.set.filename(raster, file.change.extension(raster@file@name, '.asc'))
+			raster <- set.filename(raster, file.change.extension(raster@file@name, '.asc'))
 			if (!overwrite & file.exists(raster@file@name)) {
 				stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
 
@@ -175,7 +175,7 @@ raster.write.row <- function(raster, overwrite=FALSE) {
 
 raster.write.import <- function(raster, outfile, overwrite=FALSE) {
 # check extension
-	rsout <- raster.set.filename(raster, outfile)
+	rsout <- set.filename(raster, outfile)
 	for (r in 1:raster@nrows) {
 		d <- raster.read.row(raster, r)
 		raster.write.row(rsout, overwrite)
@@ -184,7 +184,7 @@ raster.write.import <- function(raster, outfile, overwrite=FALSE) {
 }
 
 raster.write.export <- function(raster, outfile, filetype, overwrite=FALSE) {
-	rsout <- raster.set.filename(raster, outfile)
+	rsout <- set.filename(raster, outfile)
 	if (filetype == 'ascii') {
 		for (r in 1:raster@rows) {
 			d <- raster.read.row(raster, r)
