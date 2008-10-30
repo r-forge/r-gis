@@ -13,14 +13,14 @@ rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)),
 		raster <- raster.set.data(raster, rasterstack@data@values[i,])
 	}
 	raster.map(raster, col=col, subsample=subsample, maxdim=maxdim, ...)
-}	
+}
 
 
 raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
 #TODO if xlim and/or ylim are used, only read (and sample) for those areas.
 #	require(fields)
 
-	if (raster@data@content == 'all') {
+	if (raster.content(raster) == 'all') {
 		m <- raster.values(raster, format='matrix')
 		if (max(ncols(raster), nrows(raster)) <= maxdim) { subsample=FALSE }
 		
@@ -38,8 +38,8 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 			x <- (0:dim(m)[2]) * xres + xmin(raster) 
 			y <- (0:dim(m)[1]) * yres + ymin(raster) 
  		} else {	
-			x <- (0:raster@ncols) * xres(raster) + xmin(raster) 
-			y <- (0:raster@nrows) * yres(raster) + ymin(raster) 	
+			x <- (0:ncols(raster)) * xres(raster) + xmin(raster) 
+			y <- (0:nrows(raster)) * yres(raster) + ymin(raster) 	
 		}	
 	} else {
 		if (subsample) {

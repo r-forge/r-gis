@@ -16,13 +16,13 @@ raster.write.ascii <- function(raster, overwrite=FALSE) {
 
 		if (raster@data@indices[1] == 1)
 		{
-			raster <- set.filename(raster, file.change.extension(raster@file@name, '.asc'))
-			if (!overwrite & file.exists(raster@file@name)) {
-				stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
+			raster <- set.filename(raster, file.change.extension(filename(raster), '.asc'))
+			if (!overwrite & file.exists(filename(raster))) {
+				stop(paste(filename(raster),"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
 
 			thefile <- file(raster@file@name, "w")  # open an txt file connection
-			cat("NCOLS", raster@ncols, "\n", file = thefile)
-			cat("NROWS", raster@nrows, "\n", file = thefile)
+			cat("NCOLS", ncols(raster), "\n", file = thefile)
+			cat("NROWS", nrows(raster), "\n", file = thefile)
 			cat("XLLCORNER", xmin(raster), "\n", file = thefile)
 			cat("YLLCORNER", ymin(raster), "\n", file = thefile)
 			cat("CELLSIZE",  xres(raster), "\n", file = thefile)
@@ -31,8 +31,8 @@ raster.write.ascii <- function(raster, overwrite=FALSE) {
 		}
 		
 		raster@data@values[is.na(raster@data@values)] <- raster@file@nodatavalue 
-		write.table(raster@data@values, raster@file@name, append = TRUE, quote = FALSE, sep = " ", eol = "\n", 
-                          dec = ".", row.names = FALSE, col.names = FALSE)
+		write.table(raster.values(raster), filename(raster), append = TRUE, quote = FALSE, 
+							sep = " ", eol = "\n", dec = ".", row.names = FALSE, col.names = FALSE)
     }
 	return(raster)
 }
