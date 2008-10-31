@@ -139,7 +139,7 @@ diversity.reserve.rebelo <- function(xy) {
 	
 diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.index.richness) {
 	xya <- xya[,1:3]
-	rsout <- raster.set.filename(rs, filename)
+	rsout <- set.filename(rs, filename)
 	cells <- raster.get.cell.from.xy(rs, xya[,1:2])
 	rows <- raster.get.row.from.cell(rs, cells)
 	cols <- raster.get.col.from.cell(rs, cells)
@@ -154,7 +154,7 @@ diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.index.ric
 	dna <- d
 	for (r in 1 : rs@nrows) {
 		if (!allrows[r, 2]) {	
-			raster.set.data.row(rsout, dna, r)
+			raster.set.values.row(rsout, dna, r)
 			raster.write.row(rsout) 
 		}
 		else {
@@ -167,7 +167,7 @@ diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.index.ric
 				ddd <- subset(dd, dd[,5] == ucols[c] )
 				d[ucols[c]] <- fun(ddd)	
 			}
-			raster.set.data.row(rsout, d, r)
+			raster.set.values.row(rsout, d, r)
 			raster.write.row(rsout)
 		}	
 	}	
