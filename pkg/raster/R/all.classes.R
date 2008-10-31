@@ -135,8 +135,8 @@ setMethod ('show' , 'Raster',
 		cat('data type   :' , object@file@datanotation, '\n')
 		cat('data content:' , raster.content(object), '\n')
 		if (object@data@haveminmax) {
-			cat('min value :' , raster.minvalue(object), '\n')
-			cat('max value :' , raster.maxvalue(object), '\n')
+			cat('min value   :' , raster.minvalue(object), '\n')
+			cat('max value   :' , raster.maxvalue(object), '\n')
 		} else { #if (object@data@source == 'disk')  {
 			cat('min value   : NA \n')
 			cat('max value   : NA \n')

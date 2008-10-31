@@ -171,8 +171,6 @@ raster.set.values <- function(raster, values) {
 }
 
 
-
-
 raster.set.minmax <- function(raster) {
 	if (raster@data@content == 'nodata') {stop('no data in memory') }
 	vals <- na.omit(values(raster)) # min and max values

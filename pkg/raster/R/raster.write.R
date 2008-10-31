@@ -68,11 +68,13 @@ raster.write <- function(raster, overwrite=FALSE) {
 
 	if (raster@data@content != 'all') {stop('first use raster.set.values()') }
 
+	raster@file@driver <- 'raster'
+    raster@file@gdalhandle <- list()
 	raster@file@name <- file.change.extension(raster@file@name, ".grd")
+
 	if (!overwrite & file.exists(raster@file@name)) {
 		stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
 
-	raster@file@driver == 'raster'
 	raster@data@values[is.nan(raster@data@values)] <- NA
 	raster@data@values[is.infinite(raster@data@values)] <- NA
 
@@ -85,8 +87,6 @@ raster.write <- function(raster, overwrite=FALSE) {
 	close(con)
 
 	.raster.write.hdr(raster) 
-	raster@file@driver <- 'raster'
-        raster@file@gdalhandle <- list()
 	return(raster)
 }
 
@@ -103,7 +103,7 @@ raster.write.row <- function(raster, overwrite=FALSE) {
 		binraster <- file.change.extension(raster@file@name, ".gri")
 		attr(raster, "filecon") <- file(binraster, "wb")
 		raster@data@min <- 3e34
-		raster@data@max <- -3e34 	
+		raster@data@max <- -3e34 
 		raster@data@haveminmax <- FALSE
 		raster@file@driver <- 'raster'
 		raster@file@gdalhandle <- list()

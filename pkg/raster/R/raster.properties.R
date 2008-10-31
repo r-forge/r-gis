@@ -74,8 +74,10 @@ origin <- function(object) {
 }
 
 projection <- function(object, asText=TRUE) {
-	if (asText) {return(object@proj4string@projargs)}
-	else {return(object@proj4string)}
+	if (asText) {
+		if (is.na(object@proj4string@projargs)) { return('NA') 
+		} else return(object@proj4string@projargs)
+	} else {return(object@proj4string)}
 }
 
 
@@ -134,7 +136,7 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 			}
 		}
 		if (projection) {
-			if (projection(rasters[[1]]) != projection(rasters[[i]])) {
+			if (projection(rasters[[1]]) != projection(rasters[[2]]) )  { 
 				res <- F
 				if(stopiffalse) stop('different projections')
 			}
@@ -164,6 +166,7 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 			}	
 		}
 	}
+	return(res)
 }
 
 
