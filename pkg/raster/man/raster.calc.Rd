@@ -1,31 +1,30 @@
-\name{raster.calc}
-\alias{raster.calc}
-\alias{raster.calc.isNA}
-\alias{raster.calc.setNA}
-\alias{raster.calc.reclass}
-\alias{raster.calc.init}
-\alias{raster.calc.neighborhood}
+\name{calc}
+\alias{calc}
+\alias{calc.reclass}
+\alias{calc.neighborhood}
+\alias{calc.isNA}
+\alias{calc.setNA}
+\alias{calc.init}
 
 \title{ Raster calculate }
 \description{
-  Calculate values on a single raster, through a 'scalar' calculation (e.g. add or arcsin). Also used to change between values to and from "NA". 
+  Calculate values for a new raster, from scratch or based on a single existing raster
 }
 \usage{
-raster.calc(raster, fun, filename=NA, overwrite=FALSE, INT = FALSE)
-raster.calc.reclass(raster, rclmat, filename=NA, overwrite=FALSE, INT = FALSE)
-raster.calc.isNA(raster, value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
-raster.calc.setNA(raster, operator = "<=", value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
-raster.calc.init(raster, fun=runif, filename=NA, overwrite=FALSE, INT = FALSE) 
-raster.calc.neighborhood(raster, fun=mean, filename=NA, ngb=3, keepdata=TRUE, overwrite=FALSE) 
+calc(raster, fun, filename="", overwrite=FALSE, INT = FALSE)
+calc.isNA(raster, value = 0, filename="", overwrite=FALSE, INT = FALSE)
+calc.setNA(raster, operator = "<=", value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
+calc.init(raster, fun=runif, filename="", overwrite=FALSE, INT = FALSE) 
+calc.neighborhood(raster, fun=mean, filename="", ngb=3, keepdata=TRUE, overwrite=FALSE) 
+calc.reclass(raster, rclmat, filename="", overwrite=FALSE, INT = FALSE)
 }
 
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{raster}{ a raster object }
-  \item{fun}{ the function to be applied, for \code{raster.calc} this should be a function that takes a single number as an argument }
-  \item{value}{ the (threshold) value to replace with null or that null should become }
-  \item{operator}{ the operator in setnull relative to the \code{value}, to set e.g. all values <= 2 to NA}
-  \item{rclmat}{ \code{rclmat} the function to be applied }
+  \item{fun}{ the function to be applied, for \code{calc} this should be a function that takes a single number as an argument }
+  \item{value}{ the (threshold) value to replace with NA or that should be set to NA }
+  \item{operator}{ the operator in setNA relative to the \code{value}, to set e.g. all values <= 2 to NA}
+  \item{rclmat}{ matrix for reclassifcation. (see below) }
   \item{filename}{ output filename for a new raster; if NA the result is not written to a file but returned with the raster object, in the data slot }
   \item{overwrite}{ logical to indicate whether an existing output file should be overwritten }
   \item{INT}{ logical. If \code{TRUE}, output will be integer values }
@@ -34,15 +33,28 @@ raster.calc.neighborhood(raster, fun=mean, filename=NA, ngb=3, keepdata=TRUE, ov
 }
 
 \details{
-  Use this function to calculate values for a new raster based on an existing single raster. E.g. to add, multiply or divide a number. 
-  Create and pass the appropriate function as an argument. 
-  raster.calc.init sets a value without reference to existing values. E.g. initialize with a single or random number.
-}
+	Use calc to calculate values for a new raster based on an existing single raster. E.g. to add, multiply or divide a number. Create and pass the appropriate function as an argument. 
+	calc.isNA replaces NA with a value. 
+	calc.setNA sets values to NA (raster, operator = "<=", value = 0, filename=NA, overwrite=FALSE, INT = FALSE)
+	calc.init sets a value without reference to existing values. E.g. initialize with a single, sequential, or random number.
+	calc.neighborhood computes a neighborhood value. I.e. a value computed with function 'fun', for all cells in the square neigborhood (of size ngb * ngb) around each cell 
+	calc.reclass reclassifies groups of values to other values. E.g. All values between 1 and 10 become 1, and between 11 and 15 become 2. 
+	Reclassification is done with matrix "rclmat". This matrix must have 3 columns. The first two columns are "from" "to" of the input values, and the third column has the new value for that range.
+	
+	If the input raster has all values in memory (after read.all(raster)), the functions will also return the new data in memory. If there is a file name, the data will also be saved to that file. 
+	If the values are not in memory the new values will be written to file. 
+	}
 \value{
-  a new raster file (on disk) and associated object (in the R environment)
+	a new raster file (on disk or in memory) and associated object (in the R environment)
 }
 \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} }
 
 \examples{
+
+ r <- raster.new(ncols=36, nrows=18)
+ r <- set.values(r, seq(1:get.ncells(r)))
+ r2 <- calc.init(r, fun=runif)
+
+
 }
 \keyword{ spatial }

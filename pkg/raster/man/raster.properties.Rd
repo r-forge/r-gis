@@ -1,57 +1,57 @@
 \name{properties}
-\alias{filename}
-\alias{values}
-\alias{ncols}
-\alias{nrows}
-\alias{ncells}
-\alias{xres}
-\alias{yres}
-\alias{resolution}
-\alias{xmin}
-\alias{xmax}
-\alias{ymin}
-\alias{ymax}
-\alias{projection}
-\alias{origin}
-\alias{boundingbox}
-\alias{raster.maxvalue}
-\alias{raster.minvalue}
-\alias{raster.indices}
-\alias{raster.content}
-\alias{raster.source}
+\alias{get.filename}
+\alias{get.values}
+\alias{get.ncols}
+\alias{get.nrows}
+\alias{get.ncells}
+\alias{get.xres}
+\alias{get.yres}
+\alias{get.resolution}
+\alias{get.xmin}
+\alias{get.xmax}
+\alias{get.ymin}
+\alias{get.ymax}
+\alias{get.projection}
+\alias{get.origin}
+\alias{get.boundingbox}
+\alias{get.maxvalue}
+\alias{get.minvalue}
+\alias{get.indices}
+\alias{get.content}
+\alias{get.source}
 
   
   
 \title{ Get raster properties }
 \description{
-  raster.values returns data values that are associated with the raster object (e.g. after raster.read.* has been used). Data are returned as a vector. 
+  get.values returns data values that are associated with the raster object (e.g. after read.* has been used). Data are returned as a vector. 
   the option format='matrix' will return a matrix, optionally with the row and col numbers (names=TRUE). 
-  raster.get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
+  get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
   use bbox() (form sp) to get the bounding box of a raster type object.
   
 }
 
 \usage{
-filename(object)
-values(object, format='vector', names=FALSE)
-ncols(object)
-nrows(object)
-ncells(object)
-xres(object)
-yres(object)
-resolution(object)
-xmin(object)
-xmax(object)
-ymin(object)
-ymax(object)
-projection(object, asText=TRUE)
-origin(object)
-boundingbox(object)
-raster.minvalue(raster)
-raster.maxvalue(raster)
-raster.content(raster)
-raster.indices(raster)
-raster.source(raster)
+get.filename(object)
+get.values(object, format='vector', names=FALSE)
+get.ncols(object)
+get.nrows(object)
+get.ncells(object)
+get.xres(object)
+get.yres(object)
+get.resolution(object)
+get.xmin(object)
+get.xmax(object)
+get.ymin(object)
+get.ymax(object)
+get.projection(object, asText=TRUE)
+get.origin(object)
+get.boundingbox(object)
+get.minvalue(raster)
+get.maxvalue(raster)
+get.content(raster)
+get.indices(raster)
+get.source(raster)
 }
 
 \arguments{
@@ -78,23 +78,23 @@ raster.source(raster)
 \examples{
 #using a new default raster (1 degree global)
 rs <- raster.new()
-ncells(rs)
-raster.get.col.from.cell(rs, 10000)
-raster.get.row.from.cell(rs, 10000)
-raster.get.col.from.x(rs, 0.5)
-raster.get.row.from.y(rs, 0.5)
-raster.get.cell.from.x.y(rs, 0.5, 0.5)
-raster.get.cell.from.xy(rs, c(0.5, 0.5))
-raster.get.x.from.col(rs, c(1, 120, 180))
-raster.get.y.from.row(rs, 90)
-raster.get.xy.from.cell(rs, 10000)
-raster.get.xy.from.cell(rs, c(0, 1, 32581, ncells(rs), ncells(rs)+1))
+get.ncells(rs)
+get.col.from.cell(rs, 10000)
+get.row.from.cell(rs, 10000)
+get.col.from.x(rs, 0.5)
+get.row.from.y(rs, 0.5)
+get.cell.from.x.y(rs, 0.5, 0.5)
+get.cell.from.xy(rs, c(0.5, 0.5))
+get.x.from.col(rs, c(1, 120, 180))
+get.y.from.row(rs, 90)
+get.xy.from.cell(rs, 10000)
+get.xy.from.cell(rs, c(0, 1, 32581, get.ncells(rs), get.ncells(rs)+1))
 
 #using a file from disk
 rs <- raster.from.file(system.file("external/test.ag", package="sp"))
 rs
-raster.get.cell.from.x.y(rs, 180000, 330000)
+get.cell.from.x.y(rs, 180000, 330000)
 #xy for corners of grid:
-raster.get.xy.from.cell(rs, c(1, ncols(rs), nrows(rs), ncells(rs)))
+get.xy.from.cell(rs, c(1, get.ncols(rs), get.nrows(rs), get.ncells(rs)))
 }
 \keyword{ spatial }

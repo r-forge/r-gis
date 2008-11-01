@@ -17,12 +17,12 @@
 
  rasterstack.read.part.of.row <- function(rasterstack, rownumber, startcol=1, ncols=(rasterstack@ncols-startcol+1)) {
 	for (i in 1:length(rasterstack@rasters)) {
-		rs <- raster.read.part.of.row(rasterstack@rasters[[i]], rownumber, startcol, ncols)
+		rs <- read.part.of.row(rasterstack@rasters[[i]], rownumber, startcol, ncols)
 		if ( i == 1 )  {
-			rasterstack@data@values <- as.matrix( values(rs) )
+			rasterstack@data@values <- as.matrix( get.values(rs) )
 		}
 		else {
-			rasterstack@data@values <- cbind(rasterstack@data@values, values(rs)) 
+			rasterstack@data@values <- cbind(rasterstack@data@values, get.values(rs)) 
 		}	   
 	}
 	rasterstack@data@content <- rs@data@content
@@ -32,14 +32,14 @@
 
 
 rasterstack.read.xy <- function(rasterstack, xy) {
-	cells <- raster.get.cell.from.xy(rasterstack, xy)
+	cells <- get.cell.from.xy(rasterstack, xy)
 	return(rasterstack.read.cell(rasterstack, cells))
 }
 
 
 rasterstack.read.cell <- function(rasterstack, cell) {
 	for (i in 1:length(rasterstack@rasters)) {
-		v <- raster.read.cells(rasterstack@rasters[[i]], cell)
+		v <- read.cells(rasterstack@rasters[[i]], cell)
 		if (i == 1) {
 			result <- v
 		} else {

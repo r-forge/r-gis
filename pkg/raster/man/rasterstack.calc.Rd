@@ -20,7 +20,7 @@ rasterstack.calc(rasterstack, fun, filename=NA, overwrite=FALSE, ForceIntOutput 
 
 \author{Robert J. Hijmans  \email{r.hijmans@gmail.com}}
 
-\seealso{ \code{\link{raster.calc}}, ~~~ }
+\seealso{ \code{\link{calc}}, ~~~ }
 \examples{
 
 }

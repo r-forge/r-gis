@@ -5,75 +5,78 @@
 # Licence GPL v3
 
 
-filename <- function(object) {
+get.filename <- function(object) {
 	return(object@file@name)
 }
 
-ncols <- function(object) {
+get.ncols <- function(object) {
 	return(object@ncols)
 }
 
 	
-nrows <- function(object) {
+get.nrows <- function(object) {
 	return(object@nrows)
 }
 
-ncells <- function(object) {
-	return(return( as.numeric(nrows(object)) * ncols(object )))
+get.ncells <- function(object) {
+	return(return( as.numeric(get.nrows(object)) * get.ncols(object )))
 }
 
 
-xmin <- function(object) {
+get.xmin <- function(object) {
 	return (object@bbox[1,1])
 }
 
-xmax <- function(object) {
+get.xmax <- function(object) {
 	return (object@bbox[1,2])
 }
 
-ymin <- function(object) {
+get.ymin <- function(object) {
 	return (object@bbox[2,1])
 }
 
-ymax <- function(object) {
+get.ymax <- function(object) {
 	return (object@bbox[2,2])
 }
 
-.raster.zmin <- function(object) {
+.get.zmin <- function(object) {
 	return (object@bbox[3,1])
 }
 
-.raster.zmax <- function(object) {
+.get.zmax <- function(object) {
 	return (object@bbox[3,2])
 }
 
-xres <- function(object) {
-	return ( (xmax(object) - xmin(object)) / ncols(object)  )
+get.xres <- function(object) {
+	return ( (get.xmax(object) - get.xmin(object)) / get.ncols(object)  )
 }
 
-yres <- function(object) {
-	return ( (ymax(object) - ymin(object)) / nrows(object)  )
+get.yres <- function(object) {
+	return ( (get.ymax(object) - get.ymin(object)) / get.nrows(object)  )
 }
 
-resolution <- function(object) {
-	x <- xres(object)
-	y <- yres(object)
+get.resolution <- function(object) {
+	x <- get.xres(object)
+	y <- get.yres(object)
 	return(c(x, y))
 }
 
-boundingbox <- function(object) {
+get.boundingbox <- function(object) {
+	if (class(object) == 'matrix') {
+		object <- new.boundingbox(object[1,1], object[1,2], object[2,1], object[2,2])
+	}
 	b <- bbox(object)[1:2, 1:2]
 	rownames(b) <- c("x", "y")
 	return(b)
 }
 
-origin <- function(object) {
-	x <- xmin(object) - xres(object)*(round(xmin(object) / xres(object)))
-	y <- ymax(object) - yres(object)*(round(ymax(object) / yres(object)))
+get.origin <- function(object) {
+	x <- get.xmin(object) - get.xres(object)*(round(get.xmin(object) / get.xres(object)))
+	y <- get.ymax(object) - get.yres(object)*(round(get.ymax(object) / get.yres(object)))
 	return(c(x, y))
 }
 
-projection <- function(object, asText=TRUE) {
+get.projection <- function(object, asText=TRUE) {
 	if (asText) {
 		if (is.na(object@proj4string@projargs)) { return('NA') 
 		} else return(object@proj4string@projargs)
@@ -81,8 +84,8 @@ projection <- function(object, asText=TRUE) {
 }
 
 
-values <- function(object, format='vector', names=FALSE) {
-	if (object@data@content=="nodata") {stop("first read some data (e.g., raster.read.all()") }
+get.values <- function(object, format='vector', names=FALSE) {
+	if (object@data@content=="nodata") {stop("first read some data (e.g., read.all()") }
 	if (format=='matrix') {  
 		return(.values.as.matrix(object, names)) 
 	} else {
@@ -91,46 +94,48 @@ values <- function(object, format='vector', names=FALSE) {
 }
 
 
-raster.content <- function(raster) {
-	return(raster@data@content)
-}
 
-raster.indices <- function(raster) {
-	return(raster@data@indices)
-}
-
-raster.source <- function(raster) {
-	return(raster@data@source)
-}
-
-
-raster.minvalue <- function(raster) {
+get.minvalue <- function(raster) {
 	return(raster@data@min)
 }
 
 
-raster.maxvalue <- function(raster) {
+get.maxvalue <- function(raster) {
 	return(raster@data@max)
+}
+
+
+get.content <- function(raster) {
+	return(raster@data@content)
+}
+
+ get.indices <- function(raster) {
+	return(raster@data@indices)
+}
+
+get.source <- function(raster) {
+	return(raster@data@source)
 }
 
 
 
 
-raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) {
+
+compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) {
 	res <- TRUE
 	if (length(rasters) < 2) {
 		res <- F
 		if(stopiffalse) stop('length(rasters) < 2')
 	}	
-	res1 <- resolution(rasters[[1]])
+	res1 <- get.resolution(rasters[[1]])
 	origin1 <- origin(rasters[[1]])
 	for (i in 2:length(rasters)) { 
 		if (rowcol) {
-			if (ncols(rasters[[1]]) != ncols(rasters[[i]])) {
+			if (get.ncols(rasters[[1]]) != get.ncols(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) { stop('ncols different')} }
 			}	
-			if (nrows(rasters[[1]]) != nrows(rasters[[i]])) {
+			if (get.nrows(rasters[[1]]) != get.nrows(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) stop('nrows different')
 			}
@@ -141,7 +146,7 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 				if(stopiffalse) stop('different projections')
 			}
 		}
-		resi <- resolution(rasters[[i]])
+		resi <- get.resolution(rasters[[i]])
 		xr <-  min(res1[1], resi[1])
 		yr <-  min(res1[2], resi[2])
 		if (resolution) {
@@ -171,7 +176,7 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 
 
 .values.as.matrix <- function(raster, names=FALSE) {
-	if (raster@data@content=="nodata") {stop("first read some data (e.g., raster.read.all() or raster.read.row()") }
+	if (raster@data@content=="nodata") {stop("first read some data (e.g., read.all() or read.row()") }
 	
 	if (is.matrix(raster@data@values)) {
 		return(raster@data@values)
@@ -198,16 +203,16 @@ raster.compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, p
 		mdata <- matrix(raster@data@values, nrow=1, ncol=raster@ncols, byrow=TRUE)
 		if (names) {
 			colnames(mdata) <- seq(1:raster@ncols)
-			therow <- raster.get.row.from.cell(raster, raster@data@indices[1])
+			therow <- get.row.from.cell(raster, raster@data@indices[1])
 			rownames(mdata) <- therow
 		}
 		return(mdata)
 		
 	} else if (raster@data@content=="block") {
-		startrow <- raster.get.row.from.cell(raster, raster@data@indices[1])
-		startcol <- raster.get.col.from.cell(raster, raster@data@indices[1])
-		endrow <- raster.get.row.from.cell(raster, raster@data@indices[2])
-		endcol <- raster.get.col.from.cell(raster, raster@data@indices[2])
+		startrow <- get.row.from.cell(raster, raster@data@indices[1])
+		startcol <- get.col.from.cell(raster, raster@data@indices[1])
+		endrow <- get.row.from.cell(raster, raster@data@indices[2])
+		endcol <- get.col.from.cell(raster, raster@data@indices[2])
 		ncols <- 1 + endcol - startcol
 		nrows <- 1 + endrow - startrow
 		

@@ -1,42 +1,40 @@
-\name{raster.change}
-\alias{raster.aggregate}
-\alias{raster.disaggregate}
-\alias{raster.cut}
-\alias{raster.cut.bbox}
-\alias{raster.merge}
-\alias{raster.expand}
+\name{change}
+\alias{change.aggregate}
+\alias{change.disaggregate}
+\alias{change.cut}
+\alias{change.cut.bbox}
+\alias{change.merge}
+\alias{change.expand}
 
 \title{ Change raster database }
 \description{
-  Change the basic parameters of a raster such as its resolution or extent
+	Use existing raster(s) to create a new raster with different spatial extent or resolution
 }
 \usage{
-raster.aggregate(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
-raster.disaggregate(raster, factor=2, filename="", overwrite=FALSE) 
-raster.cut(raster, xmin, xmax, ymin, ymax, filename="", overwrite=FALSE) 
-raster.cut.bbox(raster, object, filename="", overwrite=FALSE)
-raster.expand(raster, xmin, xmax, ymin, ymax, filename="", overwrite=FALSE)
-raster.merge(rasters, filename, overwrite=FALSE) 
+change.aggregate(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
+change.disaggregate(raster, factor=2, filename="", overwrite=FALSE) 
+change.cut(raster, boundingbox, filename="", overwrite=FALSE) 
+change.expand(raster, boundingbox, filename="", overwrite=FALSE)
+change.merge(rasters, filename, overwrite=FALSE) 
 }
 
 \arguments{
   \item{raster}{ a Raster object }
   \item{rasters}{ a list of Raster objects }
-  \item{object} {object with bounding box used to cut a raster. Any object that has a 'bbox' bounding box (including Raster). I.e. objects descending from the Spatial class in the sp package }
+  \item{boundingbox} {bounding box used to cut a raster. Any object that is or has a bounding box (see below) }
   \item{filename}{ output filename for a new raster }
   \item{fun}{ function used to aggregate values. It should return one number. E.g. mean or max }
   \item{factor}{ degree of aggregation or disaggregation expressed as number of cells (horizontally). I.e. \code{factor = 2} will result in a grid with 2 x 2 = 4 times fewer cells }
   \item{expand}{ if \code{expand == TRUE} grids will get larger if \code{factor} if the number of the division of the columns or rows with factor does not return an integer }
   \item{rm.NA}{ if \code{rm.NA == TRUE}, remove NA cells from calculations }
-  \item{INT}{ }
+  \item{INT}{ logical. If \code{TRUE} the values will be rounded and stored as integer }
   \item{overwrite}{ if TRUE, "filename" will be overwritten if it exists }
-  \item{xmin}{ minimum x coordinate of bounding box to cut a piece from a raster }
-  \item{xmax}{ maximum x coordinate of bounding box to cut a piece from a raster }
-  \item{ymin}{ minimum y coordinate of bounding box to cut a piece from a raster }
-  \item{ymax}{ maximum y coordinate of bounding box to cut a piece from a raster }
 }
 
 \details{
+ Objects that have bounding boxes include Raster, and other objects descending from the Spatial class in the sp package. 
+ You can check this with get.boundingbox(object)
+ They can be created with the function new.boundingbox
 }
 
 \value{

@@ -1,17 +1,20 @@
 \name{raster}
 \alias{raster.new}
+\alias{raster.from.bbox}
 \alias{raster.from.file}
+
 \title{ Create a new raster object }
 \description{
-  This function let you create a new raster object, either from scratch "new" or from file.
-  The raster object does not contain the data, only the parameters that describe it
+  These functions create new raster objects, either from scratch, "raster.new" or from file.
+  The created raster object does not contain any cell (pixel) values, it only has the parameters that describe it.
+  See read* and get.values() for access to the values
 }
 \usage{
 	raster.new(xmin = -180, xmax = 180, ymin = -90, ymax = 90, nrows = 180, ncols = 360, projection = "+proj=longlat +datum=WGS84")
+	raster.from.bbox(boundingbox, nrows = 1, ncols = 1)
 	raster.from.file(filename, band=1)
 }
 
-%- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{filename}{ name of raster data file  }
   \item{band}{ band number in case of a file of multiple bands, default = 1 }
@@ -21,6 +24,7 @@
   \item{ymax}{ maximum y coordinate of raster (top border) }
   \item{nrows}{ number of rows on raster }
   \item{ncols}{ number of columns on raster }
+  \item{boundingbox} {bounding box used to cut a raster. Any object that is or has a bounding box (see below) }
   \item{projection}{ map projection of raster data }
 }
 \details{

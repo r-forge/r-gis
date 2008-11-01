@@ -4,28 +4,18 @@
 # Version 0,1
 # Licence GPL v3
 
-.raster.new.Spatial <- function(xmin, xmax, ymin, ymax, projection="") {
-	bb <- new("Spatial")
-	bb@bbox[1,1] <- xmin
-	bb@bbox[1,2] <- xmax
-	bb@bbox[2,1] <- ymin
-	bb@bbox[2,2] <- ymax
-	bb@bbox[3,1] <- 0
-	bb@bbox[3,2] <- 1
-	bb <- set.projection(bb, projection)
-	return(bb)
+raster.new <- function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=360, projection="+proj=longlat +datum=WGS84") {
+	bb <- new.boundingbox(xmin, xmax, ymin, ymax, projection)
+	return(raster.from.bbox(bb, nrows=nrows, ncols=ncols))
 }
 
-
-raster.new <- function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=360, projection="+proj=longlat +datum=WGS84") {
-	valid <- TRUE
+raster.from.bbox <- function(boundingbox, nrows=1, ncols=1) {
 	nr = as.integer(round(nrows))
 	nc = as.integer(round(ncols))
 	if (nc < 1) { stop("ncols should be larger than 0") }
 	if (nr < 1) { stop("nrows should be larger than 0") }
-	bb <- .raster.new.Spatial(xmin, xmax, ymin, ymax, projection)
-	if (validObject(bbox)) {
-		raster <- new("Raster", bbox = bb@bbox, proj4string=bb@proj4string, ncols = nc, nrows = nr )
+	if (validObject(boundingbox)) {
+		raster <- new("Raster", bbox = boundingbox@bbox, proj4string=boundingbox@proj4string, ncols = nc, nrows = nr )
 		raster@data@content <- 'nodata'
 		return(raster) 
 	} else {
@@ -33,18 +23,16 @@ raster.new <- function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=
 	}
 }
 
-
 raster.from.file <- function(filename, band=1) {
 	if (toupper(file.get.extension(filename)) == ".GRD") {
-		raster <- .raster.create.from.file.binary(filename, band) 
+		raster <- .raster.from.file.binary(filename, band) 
 	} else {
-		raster <- .raster.create.from.file.gdal(filename, band) 
+		raster <- .raster.from.file.gdal(filename, band) 
 	}
 	return(raster)
 }	
 	
-	
-.raster.create.from.file.gdal <- function(filename, band) {	
+.raster.from.file.gdal <- function(filename, band) {	
 	gdalinfo <- GDALinfo(filename)
 	nc <- as.integer(gdalinfo[["columns"]])
 	nr <- as.integer(gdalinfo[["rows"]])
@@ -67,7 +55,7 @@ raster.from.file <- function(filename, band=1) {
 	yn <- as.numeric( substr( as.character(yn), 1, ndecs) )
 	raster <- raster.new(ncols=nc, nrows=nr, xmin=xn, ymin=yn, xmax=xx, ymax=yx, projection="")
 	raster <- set.filename(raster, filename)
-	raster <- raster.set.datatype(raster, "numeric")
+	raster <- set.datatype(raster, "numeric")
 	
 
 	raster@file@driver <- 'gdal' 
@@ -108,7 +96,7 @@ raster.from.file <- function(filename, band=1) {
 }
 
 
-.raster.create.from.file.binary <- function(filename, band=1) {
+.raster.from.file.binary <- function(filename, band=1) {
     if (!file.exists(filename)) { 
 		stop(paste(filename," does not exist")) 
 		}
@@ -150,7 +138,7 @@ raster.from.file <- function(filename, band=1) {
 	if (substr(inidatatype, 1, 3) == "INT") { datatp="integer"
 	} else { datatp="numeric" }
 	datasz <- as.integer(substr(inidatatype, 4, 4))
-	raster <- raster.set.datatype(raster, datatype=datatp, datasize=datasz)
+	raster <- set.datatype(raster, datatype=datatp, datasize=datasz)
 	if ((byteorder == "little") | (byteorder == "big")) { raster@file@byteorder <- byteorder } 	
 	raster@file@nbands <- as.integer(nbands)
 	raster@file@band <- as.integer(band)

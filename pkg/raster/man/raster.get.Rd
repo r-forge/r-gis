@@ -1,37 +1,37 @@
-\name{raster.get}
-\alias{raster.get.col.from.cell}
-\alias{raster.get.row.from.cell}
-\alias{raster.get.cell.from.rowcol}
-\alias{raster.get.col.from.x}
-\alias{raster.get.row.from.y}
-\alias{raster.get.cell.from.xy}
-\alias{raster.get.cell.from.x.y}
-\alias{raster.get.x.from.col}
-\alias{raster.get.y.from.row}
-\alias{raster.get.xy.from.cell}
-\alias{raster.get.cxy.from.box}
-\alias{raster.is.valid.cell}
+\name{get}
+\alias{get.col.from.cell}
+\alias{get.row.from.cell}
+\alias{get.cell.from.rowcol}
+\alias{get.col.from.x}
+\alias{get.row.from.y}
+\alias{get.cell.from.xy}
+\alias{get.cell.from.x.y}
+\alias{get.x.from.col}
+\alias{get.y.from.row}
+\alias{get.xy.from.cell}
+\alias{get.cxy.from.box}
+\alias{is.valid.cell}
 
   
 \title{ Get the column, row, or cell number of a raster from coordinates and vice versa }
+
 \description{
-  raster.get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
-  raster.compare evaluates whether a list of rasters has the same origin, resolution, number of rows and columns, and projection (or a subset thereof)  
+  get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
 }
 
 \usage{
-raster.get.col.from.cell(raster, cell)
-raster.get.row.from.cell(raster, cell)
-raster.get.cell.from.rowcol(raster, rownr, colnr)
-raster.get.col.from.x(raster, x)
-raster.get.row.from.y(raster, y)
-raster.get.cell.from.x.y(raster, x, y)
-raster.get.cell.from.xy(raster, xy)
-raster.get.x.from.col(raster, colnr)
-raster.get.y.from.row(raster, rownr)
-raster.get.xy.from.cell(raster, cell)
-raster.get.cxy.from.box(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster))
-raster.is.valid.cell(raster, cell) 
+get.col.from.cell(raster, cell)
+get.row.from.cell(raster, cell)
+get.cell.from.rowcol(raster, rownr, colnr)
+get.col.from.x(raster, x)
+get.row.from.y(raster, y)
+get.cell.from.x.y(raster, x, y)
+get.cell.from.xy(raster, xy)
+get.x.from.col(raster, colnr)
+get.y.from.row(raster, rownr)
+get.xy.from.cell(raster, cell)
+get.cxy.from.box(raster, xmin=get.xmin(raster), xmax=get.xmax(raster), ymin=get.ymin(raster), ymax=get.ymax(raster))
+is.valid.cell(raster, cell) 
 }
 
 \arguments{
@@ -64,23 +64,23 @@ raster.is.valid.cell(raster, cell)
 \examples{
 #using a new default raster (1 degree global)
 rs <- raster.new()
-ncells(rs)
-raster.get.col.from.cell(rs, 10000)
-raster.get.row.from.cell(rs, 10000)
-raster.get.col.from.x(rs, 0.5)
-raster.get.row.from.y(rs, 0.5)
-raster.get.cell.from.x.y(rs, 0.5, 0.5)
-raster.get.cell.from.xy(rs, c(0.5, 0.5))
-raster.get.x.from.col(rs, c(1, 120, 180))
-raster.get.y.from.row(rs, 90)
-raster.get.xy.from.cell(rs, 10000)
-raster.get.xy.from.cell(rs, c(0, 1, 32581, ncells(rs), ncells(rs)+1))
+get.ncells(rs)
+get.col.from.cell(rs, 10000)
+get.row.from.cell(rs, 10000)
+get.col.from.x(rs, 0.5)
+get.row.from.y(rs, 0.5)
+get.cell.from.x.y(rs, 0.5, 0.5)
+get.cell.from.xy(rs, c(0.5, 0.5))
+get.x.from.col(rs, c(1, 120, 180))
+get.y.from.row(rs, 90)
+get.xy.from.cell(rs, 10000)
+get.xy.from.cell(rs, c(0, 1, 32581, get.ncells(rs), get.ncells(rs)+1))
 
 #using a file from disk
 rs <- raster.from.file(system.file("external/test.ag", package="sp"))
 rs
-raster.get.cell.from.x.y(rs, 180000, 330000)
+get.cell.from.x.y(rs, 180000, 330000)
 #xy for corners of grid:
-raster.get.xy.from.cell(rs, c(1, ncols(rs), nrows(rs), ncells(rs)))
+get.xy.from.cell(rs, c(1, get.ncols(rs), get.nrows(rs), get.ncells(rs)))
 }
 \keyword{ spatial }

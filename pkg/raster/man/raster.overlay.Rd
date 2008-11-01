@@ -1,31 +1,31 @@
-\name{r.overlay}
-\alias{r.overlay}
-\alias{r.cover}
+\name{overlay}
+\alias{calc.overlay}
+\alias{calc.cover}
 
 \title{ Raster overlay calculation }
 \description{
   Calculate values for a new raster object, based on two other rasters.  
 }
 \usage{
-	r.overlay(raster1, raster2, fun=function(x,y){return(x+y)}, filename="") 
-	r.cover(raster1, raster2, filename="") 
+	calc.overlay(raster1, raster2, fun=function(x,y){return(x+y)}, filename="", overwrite=TRUE) 
+	calc.cover(raster1, raster2, filename="", overwrite=TRUE) 
 }
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{raster1}{ a raster object }
   \item{raster2}{ a raster object }
-  \item{fun}{ the function to be applied, for \code{raster.calc} this should be a function that takes a single number as an argument }
+  \item{fun}{ the function to be appliepd. This should be a function that takes two numbers as an argument }
   \item{filename}{ filename for the output raster. A valid filename must be provided when the data of the input rasters are on disk }
+  \item{overwrite}{}
 }
 
 \details{
-  The default function of r.overlay sums the two rasters. Here are some other useful functions that you can use:
-  substract: fun=function(x,y){return(x-y)}
+  The default function of calc.overlay sums the two rasters. Here are two other example functions that you can use:
   multiply: fun=function(x,y){return(x*y)}
-  divide: fun=function(x,y){return(x/y)}
+  percentage: fun=function(x,y){return(100 * x / y)}
   
-  r.cover returns the values of the first raster, except where the first raster values are NA
+  calc.cover returns the values of the first raster, except where the first raster values are NA
 }
 \value{
   a new raster object (if a filename is provided, a file on disk) 

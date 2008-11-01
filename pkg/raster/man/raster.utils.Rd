@@ -1,20 +1,20 @@
 \name{raster.utilities}
-\alias{raster.compare}
-\alias{create.CRS}
-\alias{create.boundingbox}
+\alias{compare}
+\alias{new.CRS}
+\alias{new.boundingbox}
 
   
 \title{ Compare rasters }
 \description{
-  raster.compare evaluates whether a list of rasters has the same origin, resolution, number of rows and columns, and projection (or a subset thereof).
-  create.CRS is a helper function to create a CRS map projection object.
-  create.boundingbox creates a new bounding box (a "Spatial" object) that can be used to....
+  compare evaluates whether a list of rasters has the same origin, resolution, number of rows and columns, and projection (or a subset thereof).
+  new.CRS is a helper function to create a CRS map projection object.
+  new.boundingbox creates a new bounding box (a "Spatial" object) that can be used to....
 }
 
 \usage{
-raster.compare(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) 
-create.CRS(projection)
-create.boundingbox(xmin, xmax, ymin, ymax, projection="")
+compare(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) 
+new.CRS(projection)
+new.boundingbox(xmin, xmax, ymin, ymax, projection="")
 
 }
 

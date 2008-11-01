@@ -1,17 +1,17 @@
-\name{raster.set}
-\alias{raster.set}
+\name{set}
+\alias{set.raster}
 \alias{set.filename}
 \alias{set.bbox}
 \alias{set.projection}
-\alias{raster.set.datatype}
-\alias{raster.set.values}
-\alias{raster.set.values.row}
-\alias{raster.set.values.block}
-\alias{raster.set.values.sparse}
-\alias{raster.clear.values}
-\alias{raster.make.sparse}
-\alias{raster.set.rowcol}
-\alias{raster.set.minmax}
+\alias{set.datatype}
+\alias{set.rowcol}
+\alias{set.values}
+\alias{set.values.row}
+\alias{set.values.block}
+\alias{set.values.sparse}
+\alias{clear.values}
+\alias{make.sparse}
+\alias{set.minmax}
 \alias{as.raster}
 \alias{as.spgrid}
 
@@ -23,19 +23,19 @@ Use these functions to set name and datatype properties of a raster object. Whil
 }
 
 \usage{
-raster.set(raster, filename=NA)
+set.raster(raster, filename=NA, INT=FALSE)
 set.projection(object, projection)
 set.filename(raster, filename)
-set.bbox(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE)
-raster.set.datatype(raster, datatype, datasize)
-raster.set.values(raster, values) 
-raster.set.values.row(raster, rowvalues, rownr) 
-raster.set.values.block(raster, blockvalues, firstcell, lastcell) 
-raster.set.values.sparse(raster, sparsevalues, indices) 
-raster.clear.values(raster)
-raster.make.sparse(raster)
-raster.set.rowcol(raster, nrows=nrows(raster), ncols=ncols(raster)) 
-raster.set.minmax(raster)
+set.bbox(raster, xmin=get.xmin(raster), xmax=get.xmax(raster), ymin=get.ymin(raster), ymax=get.ymax(raster), keepres=FALSE)
+set.datatype(raster, datatype, datasize)
+set.rowcol(raster, nrows=get.nrows(raster), ncols=get.ncols(raster)) 
+set.minmax(raster)
+set.values(raster, values) 
+set.values.row(raster, rowvalues, rownr) 
+set.values.block(raster, blockvalues, firstcell, lastcell) 
+set.values.sparse(raster, sparsevalues, indices) 
+clear.values(raster)
+make.sparse(raster)
 as.raster(spgrid, getdata=TRUE, dataindex=1) 
 as.spgrid(raster, type='grid') 
 }
@@ -44,6 +44,7 @@ as.spgrid(raster, type='grid')
   \item{object} {A spatial object (i.e. any Raster* objecty or Spatial* object from the SP package}
   \item{raster}{ A \code{Raster} object }
   \item{filename}{ filename of raster, can be blank }
+  \item{INT}{ logical }
   \item{datatype}{ the type of data ('numeric' or 'integer' that will be written to disk }
   \item{datasize}{ The size, in number of bytes, that wil be written to disk. typically 4 for integer, and 8 for numeric datatype }
   \item{values}{ Data values to associate with the raster object. There should be values for all cells }
@@ -81,7 +82,7 @@ raster.set copies the parameters of a Raster object to a new object, but does no
 	rs <- raster.new()
 	rs
 	rs <- set.filename(rs, "c:/test.grd")
-	rs <- raster.set.rowcol(rs, nrows=18, ncols=36) 
+	rs <- set.rowcol(rs, nrows=18, ncols=36) 
 	rs
 }
 

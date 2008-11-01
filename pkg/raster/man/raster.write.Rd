@@ -1,20 +1,20 @@
-\name{raster.write}
-\alias{raster.write}
-\alias{raster.write.row}
-\alias{raster.write.ascii}
-\alias{raster.write.import}
-\alias{raster.write.export}
+\name{write}
+\alias{write.raster}
+\alias{write.row}
+\alias{write.ascii}
+\alias{write.import}
+\alias{write.export}
 
 \title{ Write raster data to a file }
 \description{
-  Write raster data to a file. Either as Ascii (ESRI Arc Ascii) format, or a binary (DIVA-GIS) format. 
+  Write raster data to a file. Either as binary ('raster') format or Ascii (ESRI Arc Ascii) format. 
 }
 \usage{
-raster.write(raster, overwrite=FALSE)
-raster.write.row(raster, overwrite=FALSE)
-raster.write.ascii(raster, overwrite=FALSE)
-raster.write.import(raster, outfile, overwrite=FALSE)
-raster.write.export(raster, outfile, filetype, overwrite=FALSE)
+write.raster(raster, overwrite=FALSE)
+write.row(raster, overwrite=FALSE)
+write.ascii(raster, overwrite=FALSE)
+write.import(raster, outfile, overwrite=FALSE)
+write.export(raster, outfile, filetype='ascii', overwrite=FALSE)
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -39,33 +39,33 @@ raster.write.export(raster, outfile, filetype, overwrite=FALSE)
  
 \dontrun{
 #read all data
- rs <- raster.read.all(rs)
+ rs <- read.all(rs)
 
 # write all to binary file
  rs <- set.filename(rs, "binall.grd")
- rs <- raster.write.binary(rs, overwrite=TRUE)
+ rs <- write.binary(rs, overwrite=TRUE)
  
 # write all to integer binary file
  rs <- set.filename(rs, "binallint.grd")
- rs <- raster.set.datatype(rs, "integer")
- rs <- raster.write.binary(rs, overwrite=TRUE)
+ rs <- set.datatype(rs, "integer")
+ rs <- write.binary(rs, overwrite=TRUE)
  
 # write all to ascii file
  rs <- set.filename(rs, "ascall.asc")
- raster.write.ascii(rs, overwrite=TRUE)
+ write.ascii(rs, overwrite=TRUE)
  
 # read and write row by row; write to ascii file
  ascrow <- set.filename(rs, "ascrow.asc")
  for (r in 1:rs@nrows) {
-	rs <- raster.read.row(rs, r)
+	rs <- read.row(rs, r)
 	ascrow@data <- rs@data
-	ascrow <- raster.write.ascii.row(ascrow, r, overwrite=TRUE) }
+	ascrow <- write.ascii.row(ascrow, r, overwrite=TRUE) }
 	
 # read and write row by row; write to binary file
  binrow <- set.filename(rs, "binrow.grd")
  for (r in 1:rs@nrows) {
-	binrow@data <- raster.read.row(rs, r)@data
-	binrow <- raster.write.binary.row(binrow, r, overwrite=TRUE) }
+	binrow@data <- read.row(rs, r)@data
+	binrow <- write.binary.row(binrow, r, overwrite=TRUE) }
   }
 }
 
