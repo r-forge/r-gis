@@ -5,7 +5,6 @@
 \alias{get.col.from.x}
 \alias{get.row.from.y}
 \alias{get.cell.from.xy}
-\alias{get.cell.from.x.y}
 \alias{get.x.from.col}
 \alias{get.y.from.row}
 \alias{get.xy.from.cell}
@@ -16,7 +15,7 @@
 \title{ Get the column, row, or cell number of a raster from coordinates and vice versa }
 
 \description{
-  get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
+These functions get the column, row, or cell number of a Raster object (and of all other descendants of VirtualRaster, e.g. a RasterStack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
 }
 
 \usage{
@@ -25,7 +24,6 @@ get.row.from.cell(raster, cell)
 get.cell.from.rowcol(raster, rownr, colnr)
 get.col.from.x(raster, x)
 get.row.from.y(raster, y)
-get.cell.from.x.y(raster, x, y)
 get.cell.from.xy(raster, xy)
 get.x.from.col(raster, colnr)
 get.y.from.row(raster, rownr)
@@ -69,7 +67,6 @@ get.col.from.cell(rs, 10000)
 get.row.from.cell(rs, 10000)
 get.col.from.x(rs, 0.5)
 get.row.from.y(rs, 0.5)
-get.cell.from.x.y(rs, 0.5, 0.5)
 get.cell.from.xy(rs, c(0.5, 0.5))
 get.x.from.col(rs, c(1, 120, 180))
 get.y.from.row(rs, 90)
@@ -79,7 +76,7 @@ get.xy.from.cell(rs, c(0, 1, 32581, get.ncells(rs), get.ncells(rs)+1))
 #using a file from disk
 rs <- raster.from.file(system.file("external/test.ag", package="sp"))
 rs
-get.cell.from.x.y(rs, 180000, 330000)
+get.cell.from.xy(rs, c(180000, 330000))
 #xy for corners of grid:
 get.xy.from.cell(rs, c(1, get.ncols(rs), get.nrows(rs), get.ncells(rs)))
 }

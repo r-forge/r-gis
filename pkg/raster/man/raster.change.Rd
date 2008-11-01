@@ -43,6 +43,21 @@ change.merge(rasters, filename, overwrite=FALSE)
 \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} }
 
 \examples{
+	rs <- raster.new()
+	rs <- set.values(rs, runif(get.ncells(rs)))
+#	raster.map(rs)
+	rsa <- change.aggregate(rs, fact=10, fun=max)
+#	raster.map(rsa)
+	bb1 <- new.boundingbox(-180, -150, 60, 90)
+	rsc1 <- change.cut(rsa, bb1)	
+	bb2 <- new.boundingbox(0, 50, 0, 90)
+	rsc2 <- change.cut(rsa, bb2)	
+	rsc <- change.merge(c(rsc1, rsc2))
+#	raster.map(rsc)
+#	rs provides the bounding box for expand
+	rse <- change.expand(rsc, rs)
+	rsd <- change.disaggregate(rse, 3)
+#   rsn <- calc.neighborhood(rse)
 
 }
 

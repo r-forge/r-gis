@@ -21,7 +21,7 @@
 }
 
 \details{
-  The default function of calc.overlay sums the two rasters. Here are two other example functions that you can use:
+  The default function of calc.overlay sums the two rasters. Here are two other examples of functions that you can use:
   multiply: fun=function(x,y){return(x*y)}
   percentage: fun=function(x,y){return(100 * x / y)}
   

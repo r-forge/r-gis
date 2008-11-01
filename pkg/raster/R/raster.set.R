@@ -41,8 +41,9 @@ set.projection <- function(object, projection) {
 
 
 clear.values <- function(raster) {
-	raster@data@content == 'nodata'
-	raster@data@indices == ''
+	raster@data@content <- 'nodata'
+	raster@data@indices <- ""
+	raster@data@values <- ""
 	return(raster)
 }		
 

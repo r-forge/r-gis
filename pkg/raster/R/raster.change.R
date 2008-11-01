@@ -37,39 +37,67 @@ change.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 	startrow <- get.row.from.y(outraster, get.ymax(raster))
 	startcol <- get.col.from.x(outraster, get.xmin(raster))
 	
-	if (raster@data@content == 'all')  {
+	if (get.content(raster) == 'all')  {
 		d <- vector(length=get.ncells(outraster))
 		d[] <- NA
 		for (r in 1:get.nrows(raster)) {
-			v <- raster@values@data[(r-1)*raster@ncols+1:r*raster@ncols]
-			startcell <- ((startrow-1)*outraster@ncols)+((r-1)*raster@ncols) + startcol
-			d[startcell:startcell+raster@ncols] <- v
+			v <- get.row(raster, r) 
+			startcell <- (r + startrow -2) * get.ncols(outraster) + startcol
+			d[startcell:(startcell+get.ncols(raster)-1)] <- v
+			outraster <- set.values(outraster, d)
 		}
-	} else if (raster@data@source == 'disk')  {
+	} else if (get.source(raster) == 'disk')  {
 		if (filename == "") {stop('invalid filename')}
 		d <- vector(length=get.ncols(outraster))
 		for (r in 1:get.nrows(raster)) {
-			raster <- read.row(raster, 1)
+			raster <- read.row(raster, r)
 			v <- get.values(raster)
 			d[] <- NA
-			startcell <- ((startrow-1)*outraster@ncols)+((r-1)*raster@ncols) + startcol
-			d[startcell:(startcell+raster@ncols)] <- v
+			startcell <- (r + startrow -2) * get.ncols(outraster) + startcol
+			d[startcell:(startcell+get.ncols(raster)-1)] <- v
 			outraster <- set.values.row(outraster, d, r)
 			outraster <- write.raster(outraster)
 		}
 	}
+	return(outraster)
 }
 
 
 
+get.row <- function(raster, r) {
+	if (get.content(raster) == 'sparse') {return (get.row.sparse(raster, r))
+	} else if (get.content(raster) != 'all') {stop('cannot do. Need all data')
+	} else {
+		startcell <- get.cell.from.rowcol(raster, r, 1)
+		endcell <- startcell+get.ncols(raster)-1
+		return(get.values(raster)[startcell:endcell])
+	}	
+}
 
-change.merge <- function(rasters, filename, overwrite=FALSE) {
-	
+
+get.row.sparse <- function(raster, r, explode=TRUE) {
+	if (get.content(raster) != 'sparse') {stop('cannot do. Need sparse')}
+	startcell <- get.cell.from.rowcol(raster, r, 1)
+	endcell <- startcell+get.ncols(raster)-1
+	d <- cbind(get.indices(raster), get.values(raster))
+	d <- d[d[,1] >= startcell & d[,1] <= endcell, ] 
+	if (explode) { 
+		cells <- startcell:endcell
+		cells[] <- NA
+		cells[d[,1]] <- d[,2]	
+		return(cells)
+	} else {
+		return(d)
+	}	
+}
+
+
+change.merge <- function(rasters, filename='', overwrite=FALSE) {
 	res <- compare(rasters, rowcol=FALSE)
 	
 	for (i in 1:length(rasters)) {
-		if (rasters[[i]]@data@source != 'disk') { 
-			stop('rasters should be stored on disk for this version of raster.merge()') 
+		if (!(get.source(rasters[[i]]) == 'disk' | get.content(rasters[[i]]) == 'all' | get.content(rasters[[i]]) == 'sparse')) { 
+			stop('rasters should be stored on disk or values should be in memory') 
 		}
 	}
 	bb <- bbox(rasters[[1]])
@@ -79,7 +107,7 @@ change.merge <- function(rasters, filename, overwrite=FALSE) {
 		bb[,2] <- pmax(bb[,2], bb2[,2])
 	}
 	outrs <- set.raster(rasters[[1]], filename)
-	outrs <- set.bbox(outrs, bb[1,1],bb[1,2],bb[2,1],bb[2,2], keepres=TRUE)
+	outrs <- set.bbox(outrs, bb[1,1], bb[1,2], bb[2,1], bb[2,2], keepres=TRUE)
 
 	rowcol <- matrix(0, ncol=3, nrow=length(rasters))
 	for (i in 1:length(rasters)) {
@@ -89,22 +117,31 @@ change.merge <- function(rasters, filename, overwrite=FALSE) {
 		rowcol[i,2] <- get.row.from.y(outrs, xy2[2]) #end row
 		rowcol[i,3] <- get.col.from.x(outrs, xy1[1]) #start col
 	}
-	
+	v <- vector(length=0)
 	for (r in 1:get.nrows(outrs)) {
 		rd <- as.vector(matrix(NA, nrow=1, ncol=get.ncols(outrs))) 
 		for (i in length(rasters):1) {  #reverse order so that the first raster covers the second etc.
 			if (r >= rowcol[i,1] & r <= rowcol[i,2]) { 
-				rasters[[i]] <- read.row(rasters[[i]], r + 1 - rowcol[i,1]) 
-				d <- get.values(rasters[[i]])
+				if (rasters[[i]]@data@source == 'disk') {
+					rasters[[i]] <- read.row(rasters[[i]], r + 1 - rowcol[i,1]) 
+					d <- get.values(rasters[[i]])
+				} else {
+					d <- get.row(rasters[[i]], r + 1 - rowcol[i,1]) 
+				}
 				id2 <- seq(1:get.ncols(rasters[[i]])) + rowcol[i,3] - 1
 				d <- cbind(id2, d)
 				d <- na.omit(d)
 				rd[d[,1]] <- d[,2]
 			}		
 		}
-		outrs <- set.values.row(outrs, rd, r)
-		outrs <- write.row(outrs, overwrite)
+		if (filename != '') {
+			outrs <- set.values.row(outrs, rd, r)
+			outrs <- write.row(outrs, overwrite)
+		} else {
+			v <- c(v, rd)
+		}
 	}
+	if (filename == '') { outrs <- set.values(outrs, v) }
 	return(outrs)
 }
 

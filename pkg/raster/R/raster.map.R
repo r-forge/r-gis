@@ -4,6 +4,22 @@
 # Version 0,1
 # Licence GPL v3
 
+
+.hist.raster <- function(x, ...) {
+	if (get.content(x) != 'all') {
+		if (get.source(x) == 'disk') {
+		# also make a function that does this by block and combines these for a single histogram
+			x <- read.all(x)
+		} else { stop('cannot do')}
+	}
+	hist(get.values(x), ...)
+}
+
+setMethod('hist', signature(x='Raster'), 
+	function(x, ...){.hist.raster(x, ...)}
+)
+
+
 rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
 	index <- round(index)
 	i <- min(max(1, index), rasterstack@nrasters)

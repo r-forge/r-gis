@@ -23,7 +23,9 @@ Objects can be created by calls of the form \code{new("Raster", ...)}.
 \section{Methods}{
   \describe{
     \item{show}{\code{signature(object = "Raster")}: ... }
-	 }
+    \item{hist}{\code{signature(object = "Raster")}: ... }
+	
+ 	 }
 }
 \references{ ~put references to the literature/web site here ~ }
 \author{Robert J. Hijmans \email{r.hijmans@gmail.com}}

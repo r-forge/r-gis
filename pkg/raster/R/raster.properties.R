@@ -110,7 +110,7 @@ get.content <- function(raster) {
 }
 
  get.indices <- function(raster) {
-	return(raster@data@indices)
+	i <- raster@data@indices
 }
 
 get.source <- function(raster) {
@@ -125,25 +125,25 @@ compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projecti
 	res <- TRUE
 	if (length(rasters) < 2) {
 		res <- F
-		if(stopiffalse) stop('length(rasters) < 2')
+		if(stopiffalse) {stop('length(rasters) < 2')}
 	}	
 	res1 <- get.resolution(rasters[[1]])
-	origin1 <- origin(rasters[[1]])
+	origin1 <- get.origin(rasters[[1]])
 	for (i in 2:length(rasters)) { 
 		if (rowcol) {
 			if (get.ncols(rasters[[1]]) != get.ncols(rasters[[i]])) {
 				res <- F
-				if(stopiffalse) { stop('ncols different')} }
+				if(stopiffalse) { stop('ncols different') } 
 			}	
 			if (get.nrows(rasters[[1]]) != get.nrows(rasters[[i]])) {
 				res <- F
-				if(stopiffalse) stop('nrows different')
+				if(stopiffalse) { stop('nrows different') }
 			}
 		}
 		if (projection) {
-			if (projection(rasters[[1]]) != projection(rasters[[2]]) )  { 
+			if (get.projection(rasters[[1]]) != get.projection(rasters[[2]]) )  { 
 				res <- F
-				if(stopiffalse) stop('different projections')
+				if(stopiffalse) {stop('different projections')}
 			}
 		}
 		resi <- get.resolution(rasters[[i]])
@@ -160,10 +160,10 @@ compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projecti
 			}
 		}
 		if (origin) {
-			origini <- origin(rasters[[1]])
+			origini <- get.origin(rasters[[1]])
 			if ((abs(origini[1] - origin1[1])) > slack * xr) {
 				res <- F
-				if(stopiffalse) { stop('different x origins')
+				if(stopiffalse) { stop('different x origins') }
 			} 
 			if ((abs(origini[2] - origin1[2])) > slack * yr) {
 				res <- F

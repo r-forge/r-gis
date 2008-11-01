@@ -38,8 +38,15 @@ get.col.from.cell <- function(raster, cell) {
 }
 
 
-get.cell.from.x.y <- function(raster, x, y) {
-	if (length(x) != length(y)) { stop("length(x) != length(y)") }
+	
+get.cell.from.xy <- function(raster, xy) {
+	if (is.null(dim(xy))) { 
+		x <- xy[1]
+		y <- xy[2] 
+	} else { 
+		x <- xy[,1]
+		y <- xy[,2] 
+	}
 	cell <- vector(mode = "integer", length = length(x))
 	cell[cell == 0] <- NA
 	for (i in 1:length(x)) {
@@ -50,17 +57,6 @@ get.cell.from.x.y <- function(raster, x, y) {
 		}
 	}
 	return(cell)
-}
-	
-	
-get.cell.from.xy <- function(raster, xy) {
-	if (is.null(dim(xy))) { 
-		x <- xy[1]
-		y <- xy[2] }
-	else { 
-		x <- xy[,1]
-		y <- xy[,2] }
-	return( get.cell.from.x.y(raster, x, y) )
 }
 
 
