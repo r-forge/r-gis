@@ -35,7 +35,6 @@ as.spgrid(raster, type='grid')
 	rs <- raster.new()
 	rs <- set.values(rs, 1:ncells(rs))
 	sp <- as.spgrid(rs)
-	
 	rs2 <- as.raster(sp) 
 }
 
