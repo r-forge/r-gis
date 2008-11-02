@@ -1,18 +1,18 @@
-\name{RasterStack-class}
+\name{Brick-class}
 \docType{class}
-\alias{RasterStack-class}
-\alias{show,RasterStack-method}
+\alias{Brick-class}
+\alias{show,Brick-method}
 
-\title{Class "RasterStack" }
-\description{	Class for handling "stacks" of rasters. A stack is a   }
+\title{Class "Brick" }
+\description{	Class for handling "Bricks" of rasters.  }
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("RasterStack", ...)}.
+Objects can be created by calls of the form \code{new("Brick", ...)}.
 }
 
 \section{Slots}{
 	 \describe{
-    \item{\code{filename}:}{Object of class \code{"character"} filename of the stack (if saved to disk) }
-    \item{\code{nrasters}:}{Object of class \code{"integer"} number of raster objects in the stack }
+    \item{\code{filename}:}{Object of class \code{"character"} filename of the Brick (if saved to disk) }
+    \item{\code{nlayers}:}{Object of class \code{"integer"} number of raster objects in the Brick }
     \item{\code{rasters}:}{Object of class \code{"list"} list of the raster objects }
     \item{\code{projection}:}{Object of class \code{"character"} proj4 projection string }
     \item{\code{ncols}:}{Object of class \code{"integer"} number of columns of the rasters }
@@ -29,7 +29,7 @@ Objects can be created by calls of the form \code{new("RasterStack", ...)}.
 }
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "RasterStack")}: ... }
+    \item{show}{\code{signature(object = "Brick")}: ... }
 	 }
 }
 \author{Robert J. Hijmans  \email{r.hijmans@gmail.com}}
@@ -37,7 +37,7 @@ Objects can be created by calls of the form \code{new("RasterStack", ...)}.
 \seealso{ \code{\link[Raster]{Raster}} }
 
 \examples{
-showClass("RasterStack")
+showClass("Brick")
 }
 \keyword{classes}
 \keyword{ spatial }

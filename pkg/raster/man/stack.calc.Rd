@@ -1,15 +1,15 @@
-\name{rasterstack.calc}
-\alias{rasterstack.calc}
-\title{ Cell based calculations for a rasterstack }
+\name{stack.calc}
+\alias{s.calc}
+\title{ Cell based calculations for a stack }
 \description{
-  Cell based calculations for a rasterstack (a collection of 2 or more rasters of the same extent and resolution), resulting in a single raster. 
-  Any function that takes a one dimensional vector of values as in input can be passed as function.
+  Cell based calculations for a stack (a collection of 2 or more rasters of the same extent and resolution), resulting in a single raster. 
+  Any function that takes a one dimensional vector of value as input, and returns a single value, can be passed as function.
 }
 \usage{
-rasterstack.calc(rasterstack, fun, filename=NA, overwrite=FALSE, ForceIntOutput = FALSE)
+s.calc(rstack, fun, filename=NA, overwrite=FALSE, ForceIntOutput = FALSE)
 }
 \arguments{
-  \item{rasterstack}{ \code{rasterstack} a stack object }
+  \item{rstack}{ a \code{Stack} object }
   \item{fun}{ \code{fun} function to be applied }
   \item{filename}{ \code{filename} output raster filename. If NA, no file is written and result return in the data slot of the raster object }
   \item{overwrite}{ if \code{overwrite==TRUE} the output file will be overwritten if it exists}

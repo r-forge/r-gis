@@ -17,14 +17,22 @@ nrows <- function(object) {
 	return(object@nrows)
 }
 
-setMethod('dim', signature(x='Raster'), 
-	function(x){ return(c(nrows(x), ncols(x)))}
+
+setMethod('dim', signature(x='AbstractRaster'), 
+	function(x){ return(c(nrow(x), ncol(x)))}
+)
+
+setMethod('nrow', signature(x='AbstractRaster'), 
+	function(x){ return(x@nrows)}
+)
+
+setMethod('ncol', signature(x='AbstractRaster'), 
+	function(x){ return(x@ncols) }
 )
 
 ncells <- function(object) {
 	return(return( as.numeric(nrows(object)) * ncols(object )))
 }
-
 
 xmin <- function(object) {
 	return (object@bbox[1,1])
@@ -84,7 +92,7 @@ projection <- function(object, asText=TRUE) {
 
 values <- function(object, format='vector', names=FALSE) {
 	if (object@data@content=="nodata") {stop("first read some data (e.g., read.all()") }
-	if (format=='matrix') {  
+	if (format=='matrix') { 
 		return(.values.as.matrix(object, names)) 
 	} else {
 		return(object@data@values) 
@@ -92,33 +100,33 @@ values <- function(object, format='vector', names=FALSE) {
 }
 
 
+origin <- function(object) {
+	x <- xmin(object) - xres(object)*(round(xmin(object) / xres(object)))
+	y <- ymax(object) - yres(object)*(round(ymax(object) / yres(object)))
+	return(c(x, y))
+}
 
-get.minvalue <- function(raster) {
+
+minvalue <- function(raster) {
 	return(raster@data@min)
 }
 
 
-get.maxvalue <- function(raster) {
+maxvalue <- function(raster) {
 	return(raster@data@max)
 }
 
 
-get.content <- function(raster) {
+data.content <- function(raster) {
 	return(raster@data@content)
 }
 
-get.indices <- function(raster) {
+data.indices <- function(raster) {
 	i <- raster@data@indices
 }
 
-get.source <- function(raster) {
+data.source <- function(raster) {
 	return(raster@data@source)
-}
-
-get.origin <- function(object) {
-	x <- xmin(object) - xres(object)*(round(xmin(object) / xres(object)))
-	y <- ymax(object) - yres(object)*(round(ymax(object) / yres(object)))
-	return(c(x, y))
 }
 
 
@@ -129,7 +137,7 @@ compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projecti
 		if(stopiffalse) {stop('length(rasters) < 2')}
 	}	
 	res1 <- resolution(rasters[[1]])
-	origin1 <- get.origin(rasters[[1]])
+	origin1 <- origin(rasters[[1]])
 	for (i in 2:length(rasters)) { 
 		if (rowcol) {
 			if (ncols(rasters[[1]]) != ncols(rasters[[i]])) {
@@ -161,7 +169,7 @@ compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projecti
 			}
 		}
 		if (origin) {
-			origini <- get.origin(rasters[[1]])
+			origini <- origin(rasters[[1]])
 			if ((abs(origini[1] - origin1[1])) > slack * xr) {
 				res <- F
 				if(stopiffalse) { stop('different x origins') }
