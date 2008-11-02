@@ -133,10 +133,10 @@ setMethod ('show' , 'Raster',
 		cat('ncols       :' , ncols(object), '\n')
 		cat('ncells      :' , ncells(object), '\n')
 		cat('data type   :' , object@file@datanotation, '\n')
-		cat('data content:' ,  get.content(object), '\n')
+		cat('data content:' ,  data.content(object), '\n')
 		if (object@data@haveminmax) {
-			cat('min value   :' , get.minvalue(object), '\n')
-			cat('max value   :' , get.maxvalue(object), '\n')
+			cat('min value   :' , minvalue(object), '\n')
+			cat('max value   :' , maxvalue(object), '\n')
 		} else { #if (object@data@source == 'disk')  {
 			cat('min value   : NA \n')
 			cat('max value   : NA \n')
@@ -157,12 +157,16 @@ setClass('MultipleRasterData',
 	representation (
 		values='matrix', 
 		content='character', #nodata, all, row, block, sparse
-		indices = 'vector'
+		indices = 'vector',
+		varnames = 'character',
+		nlayers='integer'
 		),
 	prototype (	
 		values=matrix(NA,0,0),
 		content='nodata', 
-		indices =vector(mode='numeric')
+		indices =vector(mode='numeric'),
+		varnames =vector(mode='character'),
+		nlayers=as.integer(0)
 	),	
 	validity = function(object)
 	{
@@ -170,15 +174,17 @@ setClass('MultipleRasterData',
 )
 
 
-setClass ('RasterBrick',
+setClass ('Brick',
 	contains = 'AbstractRaster',
 	representation (
+		data = 'MultipleRasterData',
 		title = 'character',
 		file = 'RasterFile',
-		data = 'MultipleRasterData',
+		sparse = 'logical',
 		history = 'vector'
 		),
 	prototype (
+		sparse = FALSE,
 		history = vector(mode='character')
 		),
 	validity = function(object)
@@ -186,23 +192,43 @@ setClass ('RasterBrick',
 	}
 )
 	
+
+
+setMethod ('show' , 'Brick',
+	function ( object ){
+		cat ('class     :' , class ( object ) , '\n')
+		cat ('filename  :' , object@filename, '\n')
+		cat ('nlayers  :' , object@data@nlayers, '\n')
+		cat ('nrows     :' , nrows(object), '\n')
+		cat ('ncols     :' , ncols(object), '\n')
+		cat ('ncells    :' , ncells(object), '\n')
+		cat ('projection:' , projection(object, TRUE), '\n')
+		cat ('xmin      :' , xmin(object), '\n')
+		cat ('xmax      :' , xmax(object), '\n')
+		cat ('ymin      :' , ymin(object), '\n')
+		cat ('ymax      :' , ymax(object), '\n')
+		cat ('xres      :' , xres(object) , '\n')
+		cat ('yres      :' , yres(object) , '\n')
+		cat ('\n')
+	}
+)
+
+
 	
-setClass ('RasterStack',
+setClass ('Stack',
 	contains = 'AbstractRaster',
 	representation (
 	    filename ='character',
-		nrasters='integer',
 		rasters ='list',
 		data = 'MultipleRasterData'	
 		),
 	prototype (
 		filename='',
-		nrasters=as.integer(0),
 		rasters = list()
 		),
 	validity = function(object)
 	{
-		cond1 <- length(object@rasters) == object@nrasters
+		cond1 <- length(object@rasters) == object@data@nlayers
 		#cond2 <- Are the rasters equal in dimensions etc.? The exact implementation will depend on the format of the raster@data slot (list, array, vector)
 		cond <- cond1 #& cond2
 		return(cond)
@@ -210,11 +236,11 @@ setClass ('RasterStack',
 )
 
 
-setMethod ('show' , 'RasterStack',
+setMethod ('show' , 'Stack',
 	function ( object ){
 		cat ('class     :' , class ( object ) , '\n')
 		cat ('filename  :' , object@filename, '\n')
-		cat ('nrasters  :' , object@nrasters, '\n')
+		cat ('nlayers  :' , object@data@nlayers, '\n')
 		cat ('nrows     :' , nrows(object), '\n')
 		cat ('ncols     :' , ncols(object), '\n')
 		cat ('ncells    :' , ncells(object), '\n')

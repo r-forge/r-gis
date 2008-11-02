@@ -14,11 +14,11 @@ r.overlay <- function(raster1, raster2, fun=function(x,y){return(x+y)}, filename
 	}
 	outraster <- set.raster(raster1)
 	outraster <- set.filename(outraster, filename)
-	if ( get.content(raster1) == 'all' &  get.content(raster2) == 'all') {
+	if ( data.content(raster1) == 'all' &  data.content(raster2) == 'all') {
 		vals <- fun( values(raster1), values(raster2) )
 		outraster <- set.values(outraster, vals)
 		if (filename != "") { write.raster(outraster, overwrite=overwrite) }
-	} else if ( get.source(raster1) == 'disk' &  get.source(raster2) == 'disk') {
+	} else if ( data.source(raster1) == 'disk' &  data.source(raster2) == 'disk') {
 		for (r in 1:nrows(outraster)) {
 			raster1 <- read.row(raster1, r)
 			raster2 <- read.row(raster2, r)
@@ -42,12 +42,12 @@ r.cover <- function(raster1, raster2, filename="", overwrite=TRUE) {
 	}
 	outraster <- set.raster(raster1)
 	outraster <- set.filename(outraster, filename)
-	if ( get.content(raster1) == 'all' &  get.content(raster2) == 'all') {
+	if ( data.content(raster1) == 'all' &  data.content(raster2) == 'all') {
 		vals <- values(raster1)
 		vals[is.na(vals)] <- values(raster2) 
 		outraster <- set.values(outraster, vals)
 		if (filename != "") { write.raster(outraster, overwrite=overwrite) }
-	} else if ( get.source(raster1) == 'disk' &  get.source(raster2) == 'disk') {
+	} else if ( data.source(raster1) == 'disk' &  data.source(raster2) == 'disk') {
 		for (r in 1:nrows(outraster)) {
 			raster1 <- read.row(raster1, r)
 			raster2 <- read.row(raster2, r)

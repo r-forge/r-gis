@@ -6,8 +6,8 @@
 
 
 .hist.raster <- function(x, ...) {
-	if (get.content(x) != 'all') {
-		if (get.source(x) == 'disk') {
+	if (data.content(x) != 'all') {
+		if (data.source(x) == 'disk') {
 		# also make a function that does this by block and combines these for a single histogram
 			x <- read.all(x)
 		} else { stop('cannot do')}
@@ -20,13 +20,13 @@ setMethod('hist', signature(x='Raster'),
 )
 
 
-rasterstack.map <- function(rasterstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
+stack.map <- function(rstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...) {
 	index <- round(index)
-	i <- min(max(1, index), rasterstack@nrasters)
-	if (i != index) {stop("index should be >= 1 and <= rasterstack@nrasters")}
-	raster <- rasterstack@rasters[[i]]
-	if (rasterstack@data@content == 'all') {
-		raster <- set.values(raster, rasterstack@data@values[i,])
+	i <- min(max(1, index), rstack@data@nlayers)
+	if (i != index) {stop("index should be >= 1 and <= rstack@data@nlayers")}
+	raster <- rstack@rasters[[i]]
+	if (rstack@data@content == 'all') {
+		raster <- set.values(raster, rstack@data@values[i,])
 	}
 	raster.map(raster, col=col, subsample=subsample, maxdim=maxdim, ...)
 }
@@ -36,7 +36,7 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 #TODO if xlim and/or ylim are used, only read (and sample) for those areas.
 #	require(fields)
 
-	if ( get.content(raster) == 'all') {
+	if ( data.content(raster) == 'all') {
 		m <- values(raster, format='matrix')
 		if (max(ncols(raster), nrows(raster)) <= maxdim) { subsample=FALSE }
 		

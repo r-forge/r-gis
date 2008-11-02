@@ -1,4 +1,4 @@
-\name{raster.read}
+\name{read}
 \alias{read.all}
 \alias{read.row}
 \alias{read.rows}
@@ -6,41 +6,46 @@
 \alias{read.block}
 \alias{read.cells}
 \alias{read.xy}
+\alias{stack.read.cells}
+\alias{stack.read.xy}
+
 
 \title{ Read from a raster data file }
 \description{
-  Data associated with a raster object are read from file. Either all the data, by row, part of row, block, by cellnumber, or for (x,y) coordinates.
-  Data can be read for Rgis binary files, as well as for many other formats (via a bridge to rgdal).
+  Data associated with a Raster or RasterStackobject are read from file. Either all the data, by row, part of row, block, by cellnumber, or for (x,y) coordinates. Data can be read for 'raster' binary files, as well as for other formats that are supported in rgdal.
   read with read.all, read.row, read.part.of.row, read.block
 }
 
 \usage{
-read.all(raster)
-read.row(raster, rownr)
-read.rows(raster, startrow, nrows = 3)
-read.part.of.row(raster, rownr,  startcol=1, ncols=(raster@ncols-startcol+1)) 
-read.block(raster, startrow, nrows=3, startcol=1, ncols=(raster@ncols-startcol+1)) 
+read.all(object)
+read.row(object, rownr)
+read.rows(object, startrow, nrows = 3)
+read.part.of.row(object, rownr,  startcol=1, ncolumns=(ncols(object)-startcol+1)) 
+read.block(object, startrow, nrows=3, startcol=1, ncolumns=(ncols(object)-startcol+1)) 
 read.cells(raster, cells)
 read.xy(raster, xy)
+stack.read.xy(rstack, xy)
+stack.read.cells(rstack, cells)
 
 }
 
 \arguments{
-  \item{raster}{ A raster object }
+  \item{object}{ a Raster or Stack object }
+  \item{raster}{ a raster object }
+  \item{rstack}{ a Stack object } 
   \item{rownr}{ the row number of the row to read  (between 1 and raster@nrows) }
   \item{startrow}{ the frist row to read  (>= 1 & <= raster@nrows) }
   \item{nrows}{ the number of the rows to read (>= 1 & <= raster@nrows) }
   \item{startcol}{ first column of the block ( (>= 1 & <= raster@ncols) }
-  \item{ncols}{ number of columns to read on this each row ( (>= 1 & <= raster@ncols & > firstcol) }
+  \item{ncolumns}{ number of columns to read on this each row ( (>= 1 & <= raster@ncols & > firstcol) }
   \item{cells}{ vector of cell numbers }
   \item{xy}{ x and y coordinates  }
 }
 \details{
 }
 \value{
-  a rater object containing a vector with raster values.  
-  or rater values for a set of points
-  or a matrix with raster values
+  a raster object containing a vector with raster values or a rasterstack object with a matrix of values.  
+  or raster values for a set of points
 }
 \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} }
 
@@ -64,10 +69,10 @@ read.xy(raster, xy)
   fiverows <- read.rows(rs, startrow=50, nrows=5)
 
 # read part of a row 
-  rowpart <- read.part.of.row(rs, 50,  startcol=30, ncols=10) 
+  rowpart <- read.part.of.row(rs, 50,  startcol=30, ncolumns=10) 
 
 # read a block
-  block <- read.block(rs, startrow=50, nrows=5, startcol=30, ncols=10) 
+  block <- read.block(rs, startrow=50, nrows=5, startcol=30, ncolumns=10) 
 }
   
 \keyword{ spatial }

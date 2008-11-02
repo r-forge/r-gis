@@ -4,6 +4,7 @@
 # Version 0,1
 # Licence GPL v3
 
+
 raster.new <- function(xmin=-180, xmax=180, ymin=-90, ymax=90, nrows=180, ncols=360, projection="+proj=longlat +datum=WGS84") {
 	bb <- new.boundingbox(xmin, xmax, ymin, ymax, projection)
 	return(raster.from.bbox(bb, nrows=nrows, ncols=ncols))

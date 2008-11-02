@@ -15,7 +15,7 @@
 \title{ Get the column, row, or cell number of a raster from coordinates and vice versa }
 
 \description{
-These functions get the column, row, or cell number of a Raster object (and of all other descendants of VirtualRaster, e.g. a RasterStack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
+These functions get the column, row, or cell number of a Raster object (and of all other descendants of VirtualRaster, e.g. a Stack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
 }
 
 \usage{
@@ -33,7 +33,7 @@ is.valid.cell(raster, cell)
 }
 
 \arguments{
-  \item{raster}{ raster or rasterstack object }
+  \item{raster}{ raster or stack object }
   \item{x}{  x coordinate(s) }
   \item{y}{  y coordinate(s) }
   \item{xy}{ matrix of x and y coordinates }

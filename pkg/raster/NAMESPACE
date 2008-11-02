@@ -1,6 +1,6 @@
 importFrom("methods", Ops, Arith, Compare, Logic, Math, Math2, Summary, Complex)
 importFrom("graphics", hist)
 importClassesFrom("sp", Spatial)
-exportClasses(Raster, RasterStack)
-exportMethods(show)
+exportClasses(Raster, Brick, Stack)
+exportMethods(show, hist, ncol, nrow)
 exportPattern("^[^\\.]")

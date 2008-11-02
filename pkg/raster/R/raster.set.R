@@ -12,8 +12,8 @@ set.rowcol <- function(raster, nrows=nrows(raster), ncols=ncols(raster)) {
 }
 
 set.raster <- function(raster, filename=NA, INT=FALSE) {
-	if (class(raster) == 'RasterStack') { raster <- raster@rasters[[1]] }
-	if (class(raster) != 'Raster') { stop('the first argument should be a raster, or rasterstack') }
+	if (class(raster) == 'Stack') { raster <- raster@rasters[[1]] }
+	if (class(raster) != 'Raster') { stop('the first argument should be a Raster or a Stack object') }
 	raster <- clear.values(raster)
 	raster <- set.filename(raster, filename)
 	if (INT) { raster <- set.datatype(raster, "integer")  }
@@ -21,16 +21,18 @@ set.raster <- function(raster, filename=NA, INT=FALSE) {
 	return(raster)
 }
 
-set.filename <- function(raster, filename) {
+set.filename <- function(object, filename) {
 	if (is.na(filename)) {filename <- ""}
-	raster@file@name <- filename
-	shortname <- file.get.name(filename)
-	shortname <- file.change.extension(shortname, "")
-	shortname <- gsub(" ", "_", shortname)
-	if (raster@file@nbands > 1) { shortname <- paste(shortname,"_",raster@file@band) } 
-	raster@file@shortname <- shortname
-	raster@file@gdalhandle <- list()
-	return(raster)
+	object@file@name <- filename
+	if (class(object)=='Raster') {
+		shortname <- file.get.name(filename)
+		shortname <- file.change.extension(shortname, "")
+		shortname <- gsub(" ", "_", shortname)
+		if (object@file@nbands > 1) { shortname <- paste(shortname, "_", object@file@band) } 
+		object@file@shortname <- shortname
+		object@file@gdalhandle <- list()
+	}	
+	return(object)
 }
 
 
@@ -50,6 +52,12 @@ clear.values <- function(raster) {
 set.bbox <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE) {
 	xres <- xres(raster)
 	yres <- yres(raster)
+	if (xmin > xmax) {
+		stop('xmin > xmax')
+	}
+	if (ymin > ymax) {
+		stop('ymin > ymax')
+	}
 	raster@bbox[1,1] <- xmin
 	raster@bbox[1,2] <- xmax
 	raster@bbox[2,1] <- ymin
@@ -101,9 +109,9 @@ new.boundingbox <- function(xmin, xmax, ymin, ymax, projection="") {
 
 
 make.sparse <- function(raster) {
-	if ( get.content(raster) == 'sparse') {return(raster)
+	if ( data.content(raster) == 'sparse') {return(raster)
 	} else {
-		if ( get.content(raster) == 'all') {
+		if ( data.content(raster) == 'all') {
 			vals <- seq(1:ncells(raster))
 			vals <- cbind(vals, values(raster))
 			vals <- as.vector(na.omit(vals))

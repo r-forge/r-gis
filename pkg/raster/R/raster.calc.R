@@ -14,30 +14,30 @@
 r.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALSE) {
 	outraster <- set.raster(raster, filename, INT)
 	
-	if (!(get.content(raster) == 'all' | get.content(raster) == 'sparse' | get.source(raster) == 'disk')) {
+	if (!(data.content(raster) == 'all' | data.content(raster) == 'sparse' | data.source(raster) == 'disk')) {
 		stop('raster has no data on disk, nor a complete set of raster values in memory')
 	}
 	
 # there is data	
-	if ( get.content(raster) == 'all') {
+	if ( data.content(raster) == 'all') {
 		outraster <- set.values(outraster, fun(values(raster))) 
 		if (!is.na(filename) ) { outraster <- write.raster(outraster, overwrite=overwrite)
 		}
-	} else if ( get.content(raster) == 'sparse') {
-		outraster <- set.values.sparse(outraster, fun(values(raster)),  get.indices(raster)) 
+	} else if ( data.content(raster) == 'sparse') {
+		outraster <- set.values.sparse(outraster, fun(values(raster)),  data.indices(raster)) 
 		if (!is.na(filename) ) { outraster <- write.raster(outraster, overwrite=overwrite)
 		}
-	} else if (get.source(raster) == 'disk') {
+	} else if (data.source(raster) == 'disk') {
 		for (r in 1:nrows(raster)) {
 			raster <- read.row(raster, r)
 			outraster <- set.values.row(outraster, fun(values(raster)), r)
 			outraster <- write.row(outraster, overwrite=overwrite)
 		}
 	} else if (is.na(filename) ) {
-		if ( get.content(raster) == 'row') {
-			outraster <- set.values.row(outraster, fun(values(raster)), get.row.from.cell(raster,  get.indices(raster)[1])) 
-		} else if ( get.content(raster) == 'block') {
-			outraster <- set.values.block(outraster, fun(values(raster)),  get.indices(raster)[1],  get.indices(raster)[2])  
+		if ( data.content(raster) == 'row') {
+			outraster <- set.values.row(outraster, fun(values(raster)), get.row.from.cell(raster,  data.indices(raster)[1])) 
+		} else if ( data.content(raster) == 'block') {
+			outraster <- set.values.block(outraster, fun(values(raster)),  data.indices(raster)[1],  data.indices(raster)[2])  
 		}	
 	}
 	return(outraster)
@@ -52,7 +52,7 @@ r.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE, INT=FALSE) {
 	} else { 
 		res <- vector(mode = "numeric", length = ncols(raster))
 	}
-	if ( get.content(raster) == 'all') {
+	if ( data.content(raster) == 'all') {
 		n <- ncells(raster)
 		outraster <- set.values(outraster, fun(n)) 
 	} else {
@@ -82,7 +82,7 @@ r.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, INT=FALSE)  
 		outraster <- set.datatype(outraster, "numeric") 
 		res <- vector(mode = "numeric", length = ncols(raster))
 	}
-	if ( get.content(raster) == 'all' |  get.content(raster) == 'sparse') {
+	if ( data.content(raster) == 'all' |  data.content(raster) == 'sparse') {
 		for (i in 1:length(rclmat[,1])) {
 			if (is.na(rclmat[i,1]) | is.na(rclmat[i,2])) {
 				res[ is.na(values(raster)) ] <- rclmat[i, 3] 
@@ -90,8 +90,8 @@ r.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, INT=FALSE)  
 				res[ (values(raster) > rclmat[i,1]) & (values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
 			}
 		}
-		if ( get.content(raster) == 'all') { outraster <- set.values(outraster, res) }
-		if ( get.content(raster) == 'sparse') { outraster <- set.values.row(outraster, res,  get.indices(raster)) }
+		if ( data.content(raster) == 'all') { outraster <- set.values(outraster, res) }
+		if ( data.content(raster) == 'sparse') { outraster <- set.values.row(outraster, res,  data.indices(raster)) }
 		if (!is.na(filename)) {	outraster <- write.raster(outraster) }
 	}
 

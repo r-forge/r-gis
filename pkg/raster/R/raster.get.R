@@ -92,8 +92,8 @@ get.xy.from.cell <- function(raster, cell) {
 	xy[,2] <- get.y.from.row(raster, rownr) 		
 
 	colnames(xy) <- c("x", "y")
-
-	return(xy) }  
+	return(xy)
+}  
 	
 	
 get.cxy.from.box <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster)) {

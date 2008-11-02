@@ -13,12 +13,12 @@
 \alias{ymax}
 \alias{projection}
 \alias{boundingbox}
-\alias{get.origin}
-\alias{get.maxvalue}
-\alias{get.minvalue}
-\alias{get.indices}
-\alias{get.content}
-\alias{get.source}
+\alias{origin}
+\alias{maxvalue}
+\alias{minvalue}
+\alias{data.indices}
+\alias{data.content}
+\alias{data.source}
 
   
   
@@ -26,7 +26,7 @@
 \description{
   get.values returns data values that are associated with the raster object (e.g. after read.* has been used). Data are returned as a vector. 
   the option format='matrix' will return a matrix, optionally with the row and col numbers (names=TRUE). 
-  get.col.from.cell etc. get the column, row, or cell number of a raster (or rasterstack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
+  get.col.from.cell etc. get the column, row, or cell number of a Raster (or Stack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
   use bbox() (form sp) to get the bounding box of a raster type object.
   
 }
@@ -46,17 +46,17 @@ ymin(object)
 ymax(object)
 projection(object, asText=TRUE)
 boundingbox(object)
-get.origin(object)
-get.minvalue(raster)
-get.maxvalue(raster)
-get.content(raster)
-get.indices(raster)
-get.source(raster)
+origin(object)
+minvalue(raster)
+maxvalue(raster)
+data.content(raster)
+data.indices(raster)
+data.source(raster)
 }
 
 \arguments{
-  \item{raster}{ raster or rasterstack object }
-  \item{object}{ raster or rasterstack object }
+  \item{raster}{ raster or stack object }
+  \item{object}{ raster or stack object }
   \item{format}{ use \code{vector} to get the data as a single vector or \code{matrix} to get them as a matrix }
   \item{asText} { logical. If \code{TRUE}, the projection is returned as text. Otherwise a CRS object is returned}
   \item{names}{ If TRUE, row and col names are provided }
@@ -64,7 +64,7 @@ get.source(raster)
   
 
 \note{
-  Some of these functions simply take the values from the data slots in the Raster or RasterStack object. It is advisable to use these and other 'get' and 'set' functions rather than dirctly accessing the slots of an object. This will ensure object integrity and ensure that code will not break in the future, even if the underlying class definitions change. 
+  Some of these functions simply take the values from the data slots in the Raster or Stack object. It is advisable to use these and other 'get' and 'set' functions rather than dirctly accessing the slots of an object. This will ensure object integrity and ensure that code will not break in the future, even if the underlying class definitions change. 
 }
 
 \value{
@@ -90,19 +90,19 @@ xmax(rs)
 ymin(rs)
 ymax(rs)
 projection(rs)
-get.origin(rs)
+origin(rs)
 boundingbox(rs)
-get.source(rs)
 
-get.minvalue(rs)
-get.maxvalue(rs)
-get.content(rs)
-get.indices(rs)
+minvalue(rs)
+maxvalue(rs)
+data.content(rs)
+data.indices(rs)
 rs <- set.values(rs, 1:ncells(rs))
-get.minvalue(rs)
-get.maxvalue(rs)
-get.content(rs)
-get.indices(rs)
+minvalue(rs)
+maxvalue(rs)
+data.source(rs)
+data.content(rs)
+data.indices(rs)
 
 }
 \keyword{ spatial }

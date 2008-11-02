@@ -37,7 +37,7 @@ r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 	startrow <- get.row.from.y(outraster, ymax(raster))
 	startcol <- get.col.from.x(outraster, xmin(raster))
 	
-	if (get.content(raster) == 'all')  {
+	if (data.content(raster) == 'all')  {
 		d <- vector(length=ncells(outraster))
 		d[] <- NA
 		for (r in 1:nrows(raster)) {
@@ -46,7 +46,7 @@ r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 			d[startcell:(startcell+ncols(raster)-1)] <- v
 			outraster <- set.values(outraster, d)
 		}
-	} else if (get.source(raster) == 'disk')  {
+	} else if (data.source(raster) == 'disk')  {
 		if (filename == "") {stop('invalid filename')}
 		d <- vector(length=ncols(outraster))
 		for (r in 1:nrows(raster)) {
@@ -65,8 +65,8 @@ r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 
 
 get.row <- function(raster, r) {
-	if (get.content(raster) == 'sparse') {return (get.row.sparse(raster, r))
-	} else if (get.content(raster) != 'all') {stop('cannot do. Need all data')
+	if (data.content(raster) == 'sparse') {return (get.row.sparse(raster, r))
+	} else if (data.content(raster) != 'all') {stop('cannot do. Need all data')
 	} else {
 		startcell <- get.cell.from.rowcol(raster, r, 1)
 		endcell <- startcell+ncols(raster)-1
@@ -76,10 +76,10 @@ get.row <- function(raster, r) {
 
 
 get.row.sparse <- function(raster, r, explode=TRUE) {
-	if (get.content(raster) != 'sparse') {stop('cannot do. Need sparse')}
+	if (data.content(raster) != 'sparse') {stop('cannot do. Need sparse')}
 	startcell <- get.cell.from.rowcol(raster, r, 1)
 	endcell <- startcell+ncols(raster)-1
-	d <- cbind(get.indices(raster), values(raster))
+	d <- cbind(data.indices(raster), values(raster))
 	d <- d[d[,1] >= startcell & d[,1] <= endcell, ] 
 	if (explode) { 
 		cells <- startcell:endcell
@@ -96,7 +96,7 @@ r.merge <- function(rasters, filename="", overwrite=FALSE) {
 	res <- compare(rasters, rowcol=FALSE)
 	
 	for (i in 1:length(rasters)) {
-		if (!(get.source(rasters[[i]]) == 'disk' | get.content(rasters[[i]]) == 'all' | get.content(rasters[[i]]) == 'sparse')) { 
+		if (!(data.source(rasters[[i]]) == 'disk' | data.content(rasters[[i]]) == 'all' | data.content(rasters[[i]]) == 'sparse')) { 
 			stop('rasters should be stored on disk or values should be in memory') 
 		}
 	}
@@ -204,11 +204,11 @@ r.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
 	factor <- round(factor)
 	if (factor < 2) { stop('factor should be > 1') }
 	outrs <- set.raster(raster)
-	if ( get.content(raster) != 'all') { 
+	if ( data.content(raster) != 'all') { 
 			stop('raster values should all be in memory for this version of raster.disaggregate()') 
 	} else {
 		outrs <- set.rowcol(outrs, nrows(raster) * factor, ncols(raster) * factor) 
-		if ( get.content(raster)=='all') {
+		if ( data.content(raster)=='all') {
 			cols <- rep(rep(1:ncols(raster), each=factor), times=raster@nrows * factor)
 			rows <- rep(1:nrows(raster), each=raster@ncols*factor*factor)
 			cells <- get.cell.from.rowcol(raster, rows, cols)

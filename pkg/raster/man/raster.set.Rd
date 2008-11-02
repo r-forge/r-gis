@@ -12,8 +12,6 @@
 \alias{clear.values}
 \alias{make.sparse}
 \alias{set.minmax}
-\alias{as.raster}
-\alias{as.spgrid}
 
 \title{ Set properties of a raster object }
 
@@ -25,7 +23,7 @@ Use these functions to set name and datatype properties of a raster object. Whil
 \usage{
 set.raster(raster, filename=NA, INT=FALSE)
 set.projection(object, projection)
-set.filename(raster, filename)
+set.filename(object, filename)
 set.bbox(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE)
 set.datatype(raster, datatype, datasize)
 set.rowcol(raster, nrows=nrows(raster), ncols=ncols(raster)) 
@@ -36,8 +34,6 @@ set.values.block(raster, blockvalues, firstcell, lastcell)
 set.values.sparse(raster, sparsevalues, indices) 
 clear.values(raster)
 make.sparse(raster)
-as.raster(spgrid, getdata=TRUE, dataindex=1) 
-as.spgrid(raster, type='grid') 
 }
 
 \arguments{
@@ -63,10 +59,6 @@ as.spgrid(raster, type='grid')
   \item{ymax}{ the new maximum y coordinate of the raster }
   \item{keepres} {logical. If \code{TRUE}, the resolution will stay the same (by adjusting the number of rows and columns)}
   \item{projection} {a character string describing a projection and datum in PROJ4 format }
-  \item{spgrid} { a sp raster type object (SpatialPixel, SpatialPixelDataFrame , SpatialGrid, or SpatialGridDataFrame }
-  \item{getdata} { logical. If \code{TRUE}, values are added to the Raster object }
-  \item{dataindex} {integer values >= 1 indicating the column in the sp dataframe to take the values from}
-  \item{type} {character. Indicating what type of sp object to return. Should be 'pixel' or 'grid' to create SpatialPixel* or SpatialGrid* objects. If the raster object has data, a *DataFrame object will be returned}
 }
 
 \details{
