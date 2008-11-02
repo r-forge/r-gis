@@ -1,21 +1,21 @@
 \name{change}
-\alias{change.aggregate}
-\alias{change.disaggregate}
-\alias{change.cut}
-\alias{change.cut.bbox}
-\alias{change.merge}
-\alias{change.expand}
+\alias{r.aggregate}
+\alias{r.disaggregate}
+\alias{r.cut}
+\alias{r.cut.bbox}
+\alias{r.merge}
+\alias{r.expand}
 
 \title{ Change raster database }
 \description{
 	Use existing raster(s) to create a new raster with different spatial extent or resolution
 }
 \usage{
-change.aggregate(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
-change.disaggregate(raster, factor=2, filename="", overwrite=FALSE) 
-change.cut(raster, boundingbox, filename="", overwrite=FALSE) 
-change.expand(raster, boundingbox, filename="", overwrite=FALSE)
-change.merge(rasters, filename, overwrite=FALSE) 
+r.aggregate(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
+r.disaggregate(raster, factor=2, filename="", overwrite=FALSE) 
+r.cut(raster, boundingbox, filename="", overwrite=FALSE) 
+r.expand(raster, boundingbox, filename="", overwrite=FALSE)
+r.merge(rasters, filename, overwrite=FALSE) 
 }
 
 \arguments{
@@ -33,7 +33,7 @@ change.merge(rasters, filename, overwrite=FALSE)
 
 \details{
  Objects that have bounding boxes include Raster, and other objects descending from the Spatial class in the sp package. 
- You can check this with get.boundingbox(object)
+ You can check this with boundingbox(object)
  They can be created with the function new.boundingbox
 }
 
@@ -44,20 +44,20 @@ change.merge(rasters, filename, overwrite=FALSE)
 
 \examples{
 	rs <- raster.new()
-	rs <- set.values(rs, runif(get.ncells(rs)))
+	rs <- set.values(rs, runif(ncells(rs)))
 #	raster.map(rs)
-	rsa <- change.aggregate(rs, fact=10, fun=max)
+	rsa <- r.aggregate(rs, fact=10, fun=max)
 #	raster.map(rsa)
 	bb1 <- new.boundingbox(-180, -150, 60, 90)
-	rsc1 <- change.cut(rsa, bb1)	
+	rsc1 <- r.cut(rsa, bb1)	
 	bb2 <- new.boundingbox(0, 50, 0, 90)
-	rsc2 <- change.cut(rsa, bb2)	
-	rsc <- change.merge(c(rsc1, rsc2))
+	rsc2 <- r.cut(rsa, bb2)	
+	rsc <- r.merge(c(rsc1, rsc2))
 #	raster.map(rsc)
 #	rs provides the bounding box for expand
-	rse <- change.expand(rsc, rs)
-	rsd <- change.disaggregate(rse, 3)
-#   rsn <- calc.neighborhood(rse)
+	rse <- r.expand(rsc, rs)
+	rsd <- r.disaggregate(rse, 3)
+#   rsn <- r.neighborhood(rse)
 
 }
 

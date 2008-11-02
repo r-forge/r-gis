@@ -1,19 +1,19 @@
 \name{properties}
-\alias{get.filename}
-\alias{get.values}
-\alias{get.ncols}
-\alias{get.nrows}
-\alias{get.ncells}
-\alias{get.xres}
-\alias{get.yres}
-\alias{get.resolution}
-\alias{get.xmin}
-\alias{get.xmax}
-\alias{get.ymin}
-\alias{get.ymax}
-\alias{get.projection}
+\alias{filename}
+\alias{values}
+\alias{ncols}
+\alias{nrows}
+\alias{ncells}
+\alias{xres}
+\alias{yres}
+\alias{resolution}
+\alias{xmin}
+\alias{xmax}
+\alias{ymin}
+\alias{ymax}
+\alias{projection}
+\alias{boundingbox}
 \alias{get.origin}
-\alias{get.boundingbox}
 \alias{get.maxvalue}
 \alias{get.minvalue}
 \alias{get.indices}
@@ -32,21 +32,21 @@
 }
 
 \usage{
-get.filename(object)
-get.values(object, format='vector', names=FALSE)
-get.ncols(object)
-get.nrows(object)
-get.ncells(object)
-get.xres(object)
-get.yres(object)
-get.resolution(object)
-get.xmin(object)
-get.xmax(object)
-get.ymin(object)
-get.ymax(object)
-get.projection(object, asText=TRUE)
+filename(object)
+values(object, format='vector', names=FALSE)
+ncols(object)
+nrows(object)
+ncells(object)
+xres(object)
+yres(object)
+resolution(object)
+xmin(object)
+xmax(object)
+ymin(object)
+ymax(object)
+projection(object, asText=TRUE)
+boundingbox(object)
 get.origin(object)
-get.boundingbox(object)
 get.minvalue(raster)
 get.maxvalue(raster)
 get.content(raster)
@@ -78,27 +78,27 @@ get.source(raster)
 \examples{
 #using a new default raster (1 degree global)
 rs <- raster.new()
-get.ncells(rs)
-get.ncols(rs)
-get.nrows(rs)
-get.ncells(rs)
-get.xres(rs)
-get.yres(rs)
-get.resolution(rs)
-get.xmin(rs)
-get.xmax(rs)
-get.ymin(rs)
-get.ymax(rs)
-get.projection(rs)
+ncells(rs)
+ncols(rs)
+nrows(rs)
+ncells(rs)
+xres(rs)
+yres(rs)
+resolution(rs)
+xmin(rs)
+xmax(rs)
+ymin(rs)
+ymax(rs)
+projection(rs)
 get.origin(rs)
-get.boundingbox(rs)
+boundingbox(rs)
 get.source(rs)
 
 get.minvalue(rs)
 get.maxvalue(rs)
 get.content(rs)
 get.indices(rs)
-rs <- set.values(rs, 1:get.ncells(rs))
+rs <- set.values(rs, 1:ncells(rs))
 get.minvalue(rs)
 get.maxvalue(rs)
 get.content(rs)

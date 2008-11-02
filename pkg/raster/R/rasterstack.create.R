@@ -66,24 +66,24 @@ rasterstack.add.rasters <- function(rasterstack, rasters) {
 		i <- rasterstack@nrasters + 1
 		if (i == 1) {
 			rasterstack@proj4string = raster@proj4string
-			rasterstack@ncols <- get.ncols(raster)
-			rasterstack@nrows <- get.nrows(raster)
-			rasterstack@bbox[1,1] <- get.xmin(raster)
-			rasterstack@bbox[1,2] <- get.xmax(raster)
-			rasterstack@bbox[2,1] <- get.ymin(raster)
-			rasterstack@bbox[2,2] <- get.ymax(raster)
+			rasterstack@ncols <- ncols(raster)
+			rasterstack@nrows <- nrows(raster)
+			rasterstack@bbox[1,1] <- xmin(raster)
+			rasterstack@bbox[1,2] <- xmax(raster)
+			rasterstack@bbox[2,1] <- ymin(raster)
+			rasterstack@bbox[2,2] <- ymax(raster)
 		} else {
 			if (length(attr(rasterstack@proj4string, "projection")) != 0)
 				{
 				if ( length(attr(raster@proj4string, "projection")) == 0 ) { warning("raster with unknown projection added") 
 				} else if (rasterstack@proj4string != raster@proj4string) { warning("different projections used") }	
 			}	
-			if (get.ncols(rasterstack) != get.ncols(raster)) {addraster <- FALSE}
-			if (get.nrows(rasterstack) != get.nrows(raster)) {addraster <- FALSE}
-			if (get.xmin(rasterstack) != get.xmin(raster)) {addraster <- FALSE}
-			if (get.xmax(rasterstack) != get.xmax(raster)) {addraster <- FALSE}
-			if (get.ymin(rasterstack) != get.ymin(raster)) {addraster <- FALSE}
-			if (get.ymax(rasterstack) != get.ymax(raster)) {addraster <- FALSE}
+			if (ncols(rasterstack) != ncols(raster)) {addraster <- FALSE}
+			if (nrows(rasterstack) != nrows(raster)) {addraster <- FALSE}
+			if (xmin(rasterstack) != xmin(raster)) {addraster <- FALSE}
+			if (xmax(rasterstack) != xmax(raster)) {addraster <- FALSE}
+			if (ymin(rasterstack) != ymin(raster)) {addraster <- FALSE}
+			if (ymax(rasterstack) != ymax(raster)) {addraster <- FALSE}
 			count <- 1
 			for (j in 1:(i-1)) {
 				if (raster@file@shortname == rasterstack@rasters[[j]]@file@shortname) { 

@@ -5,63 +5,66 @@
 # Licence GPL v3
 
 
-get.filename <- function(object) {
+filename <- function(object) {
 	return(object@file@name)
 }
 
-get.ncols <- function(object) {
+ncols <- function(object) {
 	return(object@ncols)
 }
 
-	
-get.nrows <- function(object) {
+nrows <- function(object) {
 	return(object@nrows)
 }
 
-get.ncells <- function(object) {
-	return(return( as.numeric(get.nrows(object)) * get.ncols(object )))
+setMethod('dim', signature(x='Raster'), 
+	function(x){ return(c(nrows(x), ncols(x)))}
+)
+
+ncells <- function(object) {
+	return(return( as.numeric(nrows(object)) * ncols(object )))
 }
 
 
-get.xmin <- function(object) {
+xmin <- function(object) {
 	return (object@bbox[1,1])
 }
 
-get.xmax <- function(object) {
+xmax <- function(object) {
 	return (object@bbox[1,2])
 }
 
-get.ymin <- function(object) {
+ymin <- function(object) {
 	return (object@bbox[2,1])
 }
 
-get.ymax <- function(object) {
+ymax <- function(object) {
 	return (object@bbox[2,2])
 }
 
-.get.zmin <- function(object) {
+.zmin <- function(object) {
 	return (object@bbox[3,1])
 }
 
-.get.zmax <- function(object) {
+.zmax <- function(object) {
 	return (object@bbox[3,2])
 }
 
-get.xres <- function(object) {
-	return ( (get.xmax(object) - get.xmin(object)) / get.ncols(object)  )
+xres <- function(object) {
+	return ( (xmax(object) - xmin(object)) / ncols(object)  )
 }
 
-get.yres <- function(object) {
-	return ( (get.ymax(object) - get.ymin(object)) / get.nrows(object)  )
+yres <- function(object) {
+	return ( (ymax(object) - ymin(object)) / nrows(object)  )
 }
 
-get.resolution <- function(object) {
-	x <- get.xres(object)
-	y <- get.yres(object)
+resolution <- function(object) {
+	x <- xres(object)
+	y <- yres(object)
 	return(c(x, y))
 }
 
-get.boundingbox <- function(object) {
+boundingbox <- function(object) {
 	if (class(object) == 'matrix') {
 		object <- new.boundingbox(object[1,1], object[1,2], object[2,1], object[2,2])
 	}
@@ -70,13 +73,8 @@ get.boundingbox <- function(object) {
 	return(b)
 }
 
-get.origin <- function(object) {
-	x <- get.xmin(object) - get.xres(object)*(round(get.xmin(object) / get.xres(object)))
-	y <- get.ymax(object) - get.yres(object)*(round(get.ymax(object) / get.yres(object)))
-	return(c(x, y))
-}
 
-get.projection <- function(object, asText=TRUE) {
+projection <- function(object, asText=TRUE) {
 	if (asText) {
 		if (is.na(object@proj4string@projargs)) { return('NA') 
 		} else return(object@proj4string@projargs)
@@ -84,7 +82,7 @@ get.projection <- function(object, asText=TRUE) {
 }
 
 
-get.values <- function(object, format='vector', names=FALSE) {
+values <- function(object, format='vector', names=FALSE) {
 	if (object@data@content=="nodata") {stop("first read some data (e.g., read.all()") }
 	if (format=='matrix') {  
 		return(.values.as.matrix(object, names)) 
@@ -109,7 +107,7 @@ get.content <- function(raster) {
 	return(raster@data@content)
 }
 
- get.indices <- function(raster) {
+get.indices <- function(raster) {
 	i <- raster@data@indices
 }
 
@@ -117,8 +115,11 @@ get.source <- function(raster) {
 	return(raster@data@source)
 }
 
-
-
+get.origin <- function(object) {
+	x <- xmin(object) - xres(object)*(round(xmin(object) / xres(object)))
+	y <- ymax(object) - yres(object)*(round(ymax(object) / yres(object)))
+	return(c(x, y))
+}
 
 
 compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) {
@@ -127,26 +128,26 @@ compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projecti
 		res <- F
 		if(stopiffalse) {stop('length(rasters) < 2')}
 	}	
-	res1 <- get.resolution(rasters[[1]])
+	res1 <- resolution(rasters[[1]])
 	origin1 <- get.origin(rasters[[1]])
 	for (i in 2:length(rasters)) { 
 		if (rowcol) {
-			if (get.ncols(rasters[[1]]) != get.ncols(rasters[[i]])) {
+			if (ncols(rasters[[1]]) != ncols(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) { stop('ncols different') } 
 			}	
-			if (get.nrows(rasters[[1]]) != get.nrows(rasters[[i]])) {
+			if (nrows(rasters[[1]]) != nrows(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) { stop('nrows different') }
 			}
 		}
 		if (projection) {
-			if (get.projection(rasters[[1]]) != get.projection(rasters[[2]]) )  { 
+			if (projection(rasters[[1]]) != projection(rasters[[2]]) )  { 
 				res <- F
 				if(stopiffalse) {stop('different projections')}
 			}
 		}
-		resi <- get.resolution(rasters[[i]])
+		resi <- resolution(rasters[[i]])
 		xr <-  min(res1[1], resi[1])
 		yr <-  min(res1[2], resi[2])
 		if (resolution) {

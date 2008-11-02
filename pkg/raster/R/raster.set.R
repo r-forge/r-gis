@@ -5,7 +5,7 @@
 # Licence GPL v3
 
 
-set.rowcol <- function(raster, nrows=get.nrows(raster), ncols=get.ncols(raster)) {
+set.rowcol <- function(raster, nrows=nrows(raster), ncols=ncols(raster)) {
 	raster@ncols <- as.integer(ncols)
 	raster@nrows <- as.integer(nrows)
 	return(raster)
@@ -47,16 +47,16 @@ clear.values <- function(raster) {
 	return(raster)
 }		
 
-set.bbox <- function(raster, xmin=get.xmin(raster), xmax=get.xmax(raster), ymin=get.ymin(raster), ymax=get.ymax(raster), keepres=FALSE) {
-	xres <- get.xres(raster)
-	yres <- get.yres(raster)
+set.bbox <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE) {
+	xres <- xres(raster)
+	yres <- yres(raster)
 	raster@bbox[1,1] <- xmin
 	raster@bbox[1,2] <- xmax
 	raster@bbox[2,1] <- ymin
 	raster@bbox[2,2] <- ymax
 	if (keepres) {
-		raster@ncols <- as.integer(round( (get.xmax(raster) - get.xmin(raster)) / xres ))
-		raster@nrows <- as.integer(round( (get.ymax(raster) - get.ymin(raster)) / xres ))
+		raster@ncols <- as.integer(round( (xmax(raster) - xmin(raster)) / xres ))
+		raster@nrows <- as.integer(round( (ymax(raster) - ymin(raster)) / xres ))
 		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xres
 		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yres
 	}
@@ -104,8 +104,8 @@ make.sparse <- function(raster) {
 	if ( get.content(raster) == 'sparse') {return(raster)
 	} else {
 		if ( get.content(raster) == 'all') {
-			vals <- seq(1:get.ncells(raster))
-			vals <- cbind(vals, get.values(raster))
+			vals <- seq(1:ncells(raster))
+			vals <- cbind(vals, values(raster))
 			vals <- as.vector(na.omit(vals))
 			raster <- set.values.sparse(raster, sparsevalues=vals[,2], indices=vals[,1])
 			return(raster)
@@ -166,12 +166,12 @@ set.values <- function(raster, values) {
 	if (!is.vector(values)) {stop('values must be a vector')}
 	if (length(values) == 0) {	stop('length(values==0). If this is intended then use raster.data.clear(raster)') }
 	if (!(is.numeric(values) | is.integer(values) | is.logical(values))) {stop('data must be values')}
-	if (length(values) != get.ncells(raster) ) { stop('length(values) != get.ncells(raster)') 
+	if (length(values) != ncells(raster) ) { stop('length(values) != ncells(raster)') 
 	} else {	
 		raster@data@values <- values
 		raster@data@content <- 'all'
 		raster@data@source <- 'ram'
-		raster@data@indices <- c(1, get.ncells(raster))
+		raster@data@indices <- c(1, ncells(raster))
 		raster <- set.minmax(raster)
 		return(raster)	
 	}	
@@ -180,7 +180,7 @@ set.values <- function(raster, values) {
 
 set.minmax <- function(raster) {
 	if (raster@data@content == 'nodata') {stop('no data in memory') }
-	vals <- na.omit(get.values(raster)) # min and max values
+	vals <- na.omit(values(raster)) # min and max values
 	if (length(vals) > 0) {
 		raster@data@min <-  min(vals)
 		raster@data@max <- max(vals)

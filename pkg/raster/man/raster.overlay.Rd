@@ -1,14 +1,14 @@
 \name{overlay}
-\alias{calc.overlay}
-\alias{calc.cover}
+\alias{r.overlay}
+\alias{r.cover}
 
 \title{ Raster overlay calculation }
 \description{
   Calculate values for a new raster object, based on two other rasters.  
 }
 \usage{
-	calc.overlay(raster1, raster2, fun=function(x,y){return(x+y)}, filename="", overwrite=TRUE) 
-	calc.cover(raster1, raster2, filename="", overwrite=TRUE) 
+	r.overlay(raster1, raster2, fun=function(x,y){return(x+y)}, filename="", overwrite=TRUE) 
+	r.cover(raster1, raster2, filename="", overwrite=TRUE) 
 }
 
 %- maybe also 'usage' for other objects documented here.
@@ -21,11 +21,11 @@
 }
 
 \details{
-  The default function of calc.overlay sums the two rasters. Here are two other examples of functions that you can use:
+  The default function of r.overlay sums the two rasters. Here are two other examples of functions that you can use:
   multiply: fun=function(x,y){return(x*y)}
   percentage: fun=function(x,y){return(100 * x / y)}
   
-  calc.cover returns the values of the first raster, except where the first raster values are NA
+  r.cover returns the values of the first raster, except where the first raster values are NA
 }
 \value{
   a new raster object (if a filename is provided, a file on disk) 

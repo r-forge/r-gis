@@ -7,26 +7,26 @@
 
 write.ascii <- function(raster, overwrite=FALSE) {
 
-  	resdif <- abs((get.yres(raster) - get.xres(raster)) / get.yres(raster) )
+  	resdif <- abs((yres(raster) - xres(raster)) / yres(raster) )
 	if (resdif > 0.01) {
 		print(paste("raster has unequal horizontal and vertical resolutions","\n", "these data cannot be stored in arc-ascii format"))
 	} else {
 		if (raster@data@indices[1] == 1) {
-			raster <- set.filename(raster, file.change.extension(get.filename(raster), '.asc'))
-			if (!overwrite & file.exists(get.filename(raster))) {
-				stop(paste(get.filename(raster),"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
+			raster <- set.filename(raster, file.change.extension(filename(raster), '.asc'))
+			if (!overwrite & file.exists(filename(raster))) {
+				stop(paste(filename(raster),"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
 
 			thefile <- file(raster@file@name, "w")  # open an txt file connection
-			cat("NCOLS", get.ncols(raster), "\n", file = thefile)
-			cat("NROWS", get.nrows(raster), "\n", file = thefile)
-			cat("XLLCORNER", get.xmin(raster), "\n", file = thefile)
-			cat("YLLCORNER", get.ymin(raster), "\n", file = thefile)
-			cat("CELLSIZE",  get.xres(raster), "\n", file = thefile)
+			cat("NCOLS", ncols(raster), "\n", file = thefile)
+			cat("NROWS", nrows(raster), "\n", file = thefile)
+			cat("XLLCORNER", xmin(raster), "\n", file = thefile)
+			cat("YLLCORNER", ymin(raster), "\n", file = thefile)
+			cat("CELLSIZE",  xres(raster), "\n", file = thefile)
 			cat("NODATA_value", raster@file@nodatavalue, "\n", file = thefile)
 			close(thefile) #close connection
 		}
-		raster@data@values[is.na(get.values(raster))] <- raster@file@nodatavalue 
-		write.table(get.values(raster), get.filename(raster), append = TRUE, quote = FALSE, 
+		raster@data@values[is.na(values(raster))] <- raster@file@nodatavalue 
+		write.table(values(raster), filename(raster), append = TRUE, quote = FALSE, 
 							sep = " ", eol = "\n", dec = ".", row.names = FALSE, col.names = FALSE)
     }
 	return(raster)
@@ -117,7 +117,7 @@ write.row <- function(raster, overwrite=FALSE) {
 #	raster@data@values[is.na(raster@data@values)] <-  raster@file@nodatavalue
 	writeBin(as.vector(raster@data@values), raster@filecon, size = raster@file@datasize)
 	
-	if (raster@data@indices[2] == get.ncells(raster)) {
+	if (raster@data@indices[2] == ncells(raster)) {
 	# LAST  ROW
 		.write.hdr(raster) 
 		close(raster@filecon)
@@ -131,7 +131,7 @@ write.row <- function(raster, overwrite=FALSE) {
 
 
 .write.hdr <- function(raster) {
-	rastergrd <- file.change.extension(get.filename(raster), ".grd")
+	rastergrd <- file.change.extension(filename(raster), ".grd")
 	thefile <- file(rastergrd, "w")  # open an txt file connectionis
 	cat("[General]", "\n", file = thefile)
 	cat("CREATOR=R package:raster", "\n", file = thefile)
@@ -141,12 +141,12 @@ write.row <- function(raster, overwrite=FALSE) {
 	cat("[GeoReference]", "\n", file = thefile)
 	cat("Rows=",  raster@nrows, "\n", file = thefile)
 	cat("Columns=",  raster@ncols, "\n", file = thefile)
-	cat("MinX=", get.xmin(raster), "\n", file = thefile)
-	cat("MinY=", get.ymin(raster), "\n", file = thefile)
-	cat("MaxX=", get.xmax(raster), "\n", file = thefile)
-	cat("MaxY=", get.ymax(raster), "\n", file = thefile)
-	cat("ResolutionX=", get.xres(raster), "\n", file = thefile)
-	cat("ResolutionY=", get.yres(raster), "\n", file = thefile)
+	cat("MinX=", xmin(raster), "\n", file = thefile)
+	cat("MinY=", ymin(raster), "\n", file = thefile)
+	cat("MaxX=", xmax(raster), "\n", file = thefile)
+	cat("MaxY=", ymax(raster), "\n", file = thefile)
+	cat("ResolutionX=", xres(raster), "\n", file = thefile)
+	cat("ResolutionY=", yres(raster), "\n", file = thefile)
 	
 	cat("[Data]", "\n", file = thefile)
 	if (raster@file@datatype == 'integer') {  datatype <- "INT"  } else { datatype <- "FLT" }

@@ -16,9 +16,9 @@
 
 
 
-change.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
-	bbox <- get.boundingbox(boundingbox)
-	res <- get.resolution(raster)
+r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
+	bbox <- boundingbox(boundingbox)
+	res <- resolution(raster)
 # snap points to pixel boundaries
 	xmin <- round(bbox[1,1] / res[1]) * res[1]
 	xmax <- round(bbox[1,2] / res[1]) * res[1]
@@ -26,35 +26,35 @@ change.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 	ymax <- round(bbox[2,2] / res[2]) * res[2]
 	
 # only expanding here, not cutting
-	xmin <- min(xmin, get.xmin(raster))
-	xmax <- max(xmax, get.xmax(raster))
-	ymin <- min(ymin, get.ymin(raster))
-	ymax <- max(ymax, get.ymax(raster))
+	xmin <- min(xmin, xmin(raster))
+	xmax <- max(xmax, xmax(raster))
+	ymin <- min(ymin, ymin(raster))
+	ymax <- max(ymax, ymax(raster))
 	
 	outraster <- set.raster(raster, filename)
 	outraster <- set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
 
-	startrow <- get.row.from.y(outraster, get.ymax(raster))
-	startcol <- get.col.from.x(outraster, get.xmin(raster))
+	startrow <- get.row.from.y(outraster, ymax(raster))
+	startcol <- get.col.from.x(outraster, xmin(raster))
 	
 	if (get.content(raster) == 'all')  {
-		d <- vector(length=get.ncells(outraster))
+		d <- vector(length=ncells(outraster))
 		d[] <- NA
-		for (r in 1:get.nrows(raster)) {
+		for (r in 1:nrows(raster)) {
 			v <- get.row(raster, r) 
-			startcell <- (r + startrow -2) * get.ncols(outraster) + startcol
-			d[startcell:(startcell+get.ncols(raster)-1)] <- v
+			startcell <- (r + startrow -2) * ncols(outraster) + startcol
+			d[startcell:(startcell+ncols(raster)-1)] <- v
 			outraster <- set.values(outraster, d)
 		}
 	} else if (get.source(raster) == 'disk')  {
 		if (filename == "") {stop('invalid filename')}
-		d <- vector(length=get.ncols(outraster))
-		for (r in 1:get.nrows(raster)) {
+		d <- vector(length=ncols(outraster))
+		for (r in 1:nrows(raster)) {
 			raster <- read.row(raster, r)
-			v <- get.values(raster)
+			v <- values(raster)
 			d[] <- NA
-			startcell <- (r + startrow -2) * get.ncols(outraster) + startcol
-			d[startcell:(startcell+get.ncols(raster)-1)] <- v
+			startcell <- (r + startrow -2) * ncols(outraster) + startcol
+			d[startcell:(startcell+ncols(raster)-1)] <- v
 			outraster <- set.values.row(outraster, d, r)
 			outraster <- write.raster(outraster)
 		}
@@ -69,8 +69,8 @@ get.row <- function(raster, r) {
 	} else if (get.content(raster) != 'all') {stop('cannot do. Need all data')
 	} else {
 		startcell <- get.cell.from.rowcol(raster, r, 1)
-		endcell <- startcell+get.ncols(raster)-1
-		return(get.values(raster)[startcell:endcell])
+		endcell <- startcell+ncols(raster)-1
+		return(values(raster)[startcell:endcell])
 	}	
 }
 
@@ -78,8 +78,8 @@ get.row <- function(raster, r) {
 get.row.sparse <- function(raster, r, explode=TRUE) {
 	if (get.content(raster) != 'sparse') {stop('cannot do. Need sparse')}
 	startcell <- get.cell.from.rowcol(raster, r, 1)
-	endcell <- startcell+get.ncols(raster)-1
-	d <- cbind(get.indices(raster), get.values(raster))
+	endcell <- startcell+ncols(raster)-1
+	d <- cbind(get.indices(raster), values(raster))
 	d <- d[d[,1] >= startcell & d[,1] <= endcell, ] 
 	if (explode) { 
 		cells <- startcell:endcell
@@ -92,7 +92,7 @@ get.row.sparse <- function(raster, r, explode=TRUE) {
 }
 
 
-change.merge <- function(rasters, filename='', overwrite=FALSE) {
+r.merge <- function(rasters, filename="", overwrite=FALSE) {
 	res <- compare(rasters, rowcol=FALSE)
 	
 	for (i in 1:length(rasters)) {
@@ -112,23 +112,23 @@ change.merge <- function(rasters, filename='', overwrite=FALSE) {
 	rowcol <- matrix(0, ncol=3, nrow=length(rasters))
 	for (i in 1:length(rasters)) {
 		xy1 <- get.xy.from.cell(rasters[[i]], 1) # first row/col on old raster[[i]]
-		xy2 <- get.xy.from.cell(rasters[[i]], get.ncells(rasters[[i]]) ) #last row/col on old raster[[i]]
+		xy2 <- get.xy.from.cell(rasters[[i]], ncells(rasters[[i]]) ) #last row/col on old raster[[i]]
 		rowcol[i,1] <- get.row.from.y(outrs, xy1[2]) #start row on new raster
 		rowcol[i,2] <- get.row.from.y(outrs, xy2[2]) #end row
 		rowcol[i,3] <- get.col.from.x(outrs, xy1[1]) #start col
 	}
 	v <- vector(length=0)
-	for (r in 1:get.nrows(outrs)) {
-		rd <- as.vector(matrix(NA, nrow=1, ncol=get.ncols(outrs))) 
+	for (r in 1:nrows(outrs)) {
+		rd <- as.vector(matrix(NA, nrow=1, ncol=ncols(outrs))) 
 		for (i in length(rasters):1) {  #reverse order so that the first raster covers the second etc.
 			if (r >= rowcol[i,1] & r <= rowcol[i,2]) { 
 				if (rasters[[i]]@data@source == 'disk') {
 					rasters[[i]] <- read.row(rasters[[i]], r + 1 - rowcol[i,1]) 
-					d <- get.values(rasters[[i]])
+					d <- values(rasters[[i]])
 				} else {
 					d <- get.row(rasters[[i]], r + 1 - rowcol[i,1]) 
 				}
-				id2 <- seq(1:get.ncols(rasters[[i]])) + rowcol[i,3] - 1
+				id2 <- seq(1:ncols(rasters[[i]])) + rowcol[i,3] - 1
 				d <- cbind(id2, d)
 				d <- na.omit(d)
 				rd[d[,1]] <- d[,2]
@@ -146,14 +146,14 @@ change.merge <- function(rasters, filename='', overwrite=FALSE) {
 }
 
 
-change.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
+r.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 # we could also allow the raster to expand but for now let's not and first make a separate expand function
-	bbox <- get.boundingbox(boundingbox)
+	bbox <- boundingbox(boundingbox)
 
-	xmin <- max(bbox[1,1], get.xmin(raster))
-	xmax <- min(bbox[1,2], get.xmax(raster))
-	ymin <- max(bbox[2,1], get.ymin(raster))
-	ymax <- min(bbox[2,2], get.ymax(raster))
+	xmin <- max(bbox[1,1], xmin(raster))
+	xmax <- min(bbox[1,2], xmax(raster))
+	ymin <- max(bbox[2,1], ymin(raster))
+	ymax <- min(bbox[2,2], ymax(raster))
 	
 	if (xmin == xmax) {stop("xmin and xmax are less than one cell apart")}
 	if (ymin == ymax) {stop("ymin and ymax are less than one cell apart")}
@@ -162,8 +162,8 @@ change.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 	outraster <- set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
 	
 	if (raster@data@content == 'all')  {
-		first.start.cell <- get.cell.from.xy(raster, c(xmin + 0.5 * get.xres(raster), ymax - 0.5 * get.yres(raster) ))	
-		last.start.cell <- get.cell.from.xy(raster, c(xmin + 0.5 * get.xres(raster), ymin + 0.5 * get.yres(raster) ))
+		first.start.cell <- get.cell.from.xy(raster, c(xmin + 0.5 * xres(raster), ymax - 0.5 * yres(raster) ))	
+		last.start.cell <- get.cell.from.xy(raster, c(xmin + 0.5 * xres(raster), ymin + 0.5 * yres(raster) ))
 		start.cells <- seq(first.start.cell, last.start.cell, by = raster@ncols)
 		end.cells <- start.cells + outraster@ncols - 1
 		selected.cells <- unlist(mapply(seq, start.cells, end.cells))
@@ -174,8 +174,8 @@ change.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 		outraster@data@content <- 'all'
 		if (nchar(outraster@file@name) > 0 ) { outraster <- try(write.raster(outraster)) }		
 	} else if (raster@data@source == 'disk')  {
-		first.col <- get.col.from.x(raster, xmin + 0.5 * get.xres(outraster))
-		first.row <- get.row.from.y(raster, ymax - 0.5 * get.yres(outraster))
+		first.col <- get.col.from.x(raster, xmin + 0.5 * xres(outraster))
+		first.row <- get.row.from.y(raster, ymax - 0.5 * yres(outraster))
 		last.row <- first.row + outraster@nrows - 1
 		rownr <- 1
 		for (r in first.row:last.row) {
@@ -200,20 +200,20 @@ change.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 
 
 
-change.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
+r.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
 	factor <- round(factor)
 	if (factor < 2) { stop('factor should be > 1') }
 	outrs <- set.raster(raster)
 	if ( get.content(raster) != 'all') { 
 			stop('raster values should all be in memory for this version of raster.disaggregate()') 
 	} else {
-		outrs <- set.rowcol(outrs, get.nrows(raster) * factor, get.ncols(raster) * factor) 
+		outrs <- set.rowcol(outrs, nrows(raster) * factor, ncols(raster) * factor) 
 		if ( get.content(raster)=='all') {
-			cols <- rep(rep(1:get.ncols(raster), each=factor), times=raster@nrows * factor)
-			rows <- rep(1:get.nrows(raster), each=raster@ncols*factor*factor)
+			cols <- rep(rep(1:ncols(raster), each=factor), times=raster@nrows * factor)
+			rows <- rep(1:nrows(raster), each=raster@ncols*factor*factor)
 			cells <- get.cell.from.rowcol(raster, rows, cols)
 #			m <- matrix(cells, ncol=outrs@ncols, nrow=outrs@nrows, byrow=T)
-			d <- get.values(raster)[cells]
+			d <- values(raster)[cells]
 			outrs <- set.values(outrs, d)
 		}	
 	}	
@@ -221,7 +221,7 @@ change.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) 
 }
 
 
-change.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
+r.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
 {
 	factor <- round(factor)
 	if (factor < 2) {
@@ -233,12 +233,12 @@ change.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.N
 		rsteps <- as.integer(floor(raster@nrows/factor))
 		csteps <- as.integer(floor(raster@ncols/factor))
 	}
-	yexpansion <- (rsteps * factor - raster@nrows)  * get.xres(raster)
-	xexpansion <- (csteps * factor - raster@ncols) * get.yres(raster)
+	yexpansion <- (rsteps * factor - raster@nrows)  * xres(raster)
+	xexpansion <- (csteps * factor - raster@ncols) * yres(raster)
 		
 	outraster <- set.filename(raster, filename)
-	outraster@bbox[1,2] <- get.xmax(raster) + xexpansion
-	outraster@bbox[2,1] <- get.ymin(raster) - yexpansion
+	outraster@bbox[1,2] <- xmax(raster) + xexpansion
+	outraster@bbox[2,1] <- ymin(raster) - yexpansion
 	outraster <- set.rowcol(outraster, nrows=rsteps, ncols=csteps) 
 	
 	if (INT) { outraster <- set.datatype(outraster, 'integer')
@@ -246,7 +246,7 @@ change.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.N
 	if (raster@data@content == 'all') 
 	{
 		cols <- rep(rep(1:csteps,each=factor)[1:raster@ncols],times=raster@nrows)
-		rows <- rep(1:rsteps,each=raster@ncols*factor)[1:get.ncells(raster)]
+		rows <- rep(1:rsteps,each=raster@ncols*factor)[1:ncells(raster)]
 #		cell.index <- (csteps * (row.index - 1)) + col.index
 		cells <- get.cell.from.rowcol(raster, rows, cols)
 		

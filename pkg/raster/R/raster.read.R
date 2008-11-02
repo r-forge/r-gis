@@ -42,11 +42,11 @@ read.block <- function(raster, startrow, nrows=3, startcol=1, ncols=(raster@ncol
 		nrows <- endrow - startrow + 1
 	}
 	raster <- read.part.of.row(raster, startrow, startcol, ncols)
-	blockdata <- get.values(raster)
+	blockdata <- values(raster)
 	if (nrows > 1) {
 		for (r in (startrow+1):endrow) {
 			raster <- read.part.of.row(raster, r,  startcol, ncols)
-			blockdata <- c(blockdata, get.values(raster))
+			blockdata <- c(blockdata, values(raster))
 		}	
 	}	
 	startcell <- get.cell.from.rowcol(raster, startrow, startcol)
@@ -77,7 +77,7 @@ read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@ncols-sta
 		if (rownr > 0) {
 			seek(con, ((rownr-1) * raster@ncols + (startcol-1)) * raster@file@datasize)
 			result <- readBin(con, what=dtype, n = ncols, size = raster@file@datasize, endian = raster@file@byteorder) }	
-			else {	result <- readBin(con, what=dtype, n = get.ncells(raster), size = raster@file@datasize, endian = raster@file@byteorder) }
+			else {	result <- readBin(con, what=dtype, n = ncells(raster), size = raster@file@datasize, endian = raster@file@byteorder) }
 		close(con)
 		result[result <=  (0.999 * raster@file@nodatavalue) ] <- NA 
 	}
@@ -101,7 +101,7 @@ read.part.of.row <- function(raster, rownr,  startcol=1, ncols=(raster@ncols-sta
 	} 
 	raster@data@values <- as.vector(result)
 	if (rownr < 0) {
-		raster@data@indices <- c(1, get.ncells(raster))
+		raster@data@indices <- c(1, ncells(raster))
 		raster@data@content <- "all"
 		raster <- set.minmax(raster)
 	} else if (startcol==1 & ncols==(raster@ncols-startcol+1)) {
@@ -194,10 +194,10 @@ read.cells <- function(raster, cells) {
 		colnames(cells) <- c("id", "cell", valuename)
 
 		uniquecells <- na.omit(unique(cells[order(cells[,2]),2]))
-		uniquecells <- uniquecells[(uniquecells > 0) & (uniquecells <= get.ncells(raster) )]
+		uniquecells <- uniquecells[(uniquecells > 0) & (uniquecells <= ncells(raster) )]
 	
-		rastergri <- file.change.extension(get.filename(raster), ".gri")
-		if (!file.exists(raster@file@name)) { stop(paste(get.filename(raster)," does not exist")) }
+		rastergri <- file.change.extension(filename(raster), ".gri")
+		if (!file.exists(raster@file@name)) { stop(paste(filename(raster)," does not exist")) }
 		con <- file(rastergri, "rb")
 
 		for (i in 1:length(uniquecells)) {

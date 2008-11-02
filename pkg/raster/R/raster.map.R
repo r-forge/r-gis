@@ -12,7 +12,7 @@
 			x <- read.all(x)
 		} else { stop('cannot do')}
 	}
-	hist(get.values(x), ...)
+	hist(values(x), ...)
 }
 
 setMethod('hist', signature(x='Raster'), 
@@ -37,38 +37,38 @@ raster.map <- function(raster, col = rev(terrain.colors(25)), subsample=TRUE, ma
 #	require(fields)
 
 	if ( get.content(raster) == 'all') {
-		m <- get.values(raster, format='matrix')
-		if (max(get.ncols(raster), get.nrows(raster)) <= maxdim) { subsample=FALSE }
+		m <- values(raster, format='matrix')
+		if (max(ncols(raster), nrows(raster)) <= maxdim) { subsample=FALSE }
 		
 		if (subsample) {
-			skip <- round(max(get.ncols(raster), get.nrows(raster)) / maxdim)
-			cols <- (0:round(get.ncols(raster)/skip)) * skip + 1
-			cols <- cols[ cols <= get.ncols(raster) ]
-			rows <- (0:round(get.nrows(raster)/skip)) * skip + 1
-			rows <- rows[ rows <= get.nrows(raster) ]
+			skip <- round(max(ncols(raster), nrows(raster)) / maxdim)
+			cols <- (0:round(ncols(raster)/skip)) * skip + 1
+			cols <- cols[ cols <= ncols(raster) ]
+			rows <- (0:round(nrows(raster)/skip)) * skip + 1
+			rows <- rows[ rows <= nrows(raster) ]
 			
 			m <- m[rows, cols]
 
-			xres <- (get.xmax(raster) - get.xmin(raster) ) / dim(m)[2]
-			yres <- (get.ymax(raster) - get.ymin(raster) ) / dim(m)[1]
-			x <- (0:dim(m)[2]) * xres + get.xmin(raster) 
-			y <- (0:dim(m)[1]) * yres + get.ymin(raster) 
+			xres <- (xmax(raster) - xmin(raster) ) / dim(m)[2]
+			yres <- (ymax(raster) - ymin(raster) ) / dim(m)[1]
+			x <- (0:dim(m)[2]) * xres + xmin(raster) 
+			y <- (0:dim(m)[1]) * yres + ymin(raster) 
  		} else {	
-			x <- (0:get.ncols(raster)) * get.xres(raster) + get.xmin(raster) 
-			y <- (0:get.nrows(raster)) * get.yres(raster) + get.ymin(raster) 	
+			x <- (0:ncols(raster)) * xres(raster) + xmin(raster) 
+			y <- (0:nrows(raster)) * yres(raster) + ymin(raster) 	
 		}	
 	} else {
 		if (subsample) {
 			m <- .read.skip(raster, maxdim) 
-			xres <- (get.xmax(raster) - get.xmin(raster)) / dim(m)[2]
-			yres <- (get.ymax(raster) - get.ymin(raster) ) / dim(m)[1]
-			x <- (0:dim(m)[2]) * xres + get.xmin(raster) 
-			y <- (0:dim(m)[1]) * yres + get.ymin(raster) 
+			xres <- (xmax(raster) - xmin(raster)) / dim(m)[2]
+			yres <- (ymax(raster) - ymin(raster) ) / dim(m)[1]
+			x <- (0:dim(m)[2]) * xres + xmin(raster) 
+			y <- (0:dim(m)[1]) * yres + ymin(raster) 
 		} else {
 			raster <- read.all(raster)
-			m <- get.values(raster, format='matrix')
-			x <- (0:get.ncols(raster)) * get.xres(raster) + get.xmin(raster) 
-			y <- (0:get.nrows(raster)) * get.yres(raster) + get.ymin(raster) 
+			m <- values(raster, format='matrix')
+			x <- (0:ncols(raster)) * xres(raster) + xmin(raster) 
+			y <- (0:nrows(raster)) * yres(raster) + ymin(raster) 
 		}	
 	} 
 	z <- t(m[nrow(m):1,])

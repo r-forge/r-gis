@@ -7,7 +7,7 @@
 \description{
   These functions create new raster objects, either from scratch, "raster.new" or from file.
   The created raster object does not contain any cell (pixel) values, it only has the parameters that describe it.
-  See read* and get.values() for access to the values
+  See read* and values() for access to the values
 }
 \usage{
 	raster.new(xmin = -180, xmax = 180, ymin = -90, ymax = 90, nrows = 180, ncols = 360, projection = "+proj=longlat +datum=WGS84")
