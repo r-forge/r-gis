@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<session version="1.0">
-<refactoring comment="Rename resource &apos;JacobCropBiogeography/Analysis.R&apos; to &apos;PermRegr_Analysis.R&apos;" description="Rename resource &apos;Analysis.R&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Analysis.R" name="PermRegr_Analysis.R" stamp="1218790096363" updateReferences="true"/>
-</session>

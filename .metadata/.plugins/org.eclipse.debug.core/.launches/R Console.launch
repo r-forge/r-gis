@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<launchConfiguration type="de.walware.statet.r.launchConfigurationTypes.RConsole">
-<stringAttribute key="de.walware.statet.r.debug/RConsole/arguments.options" value="--silent"/>
-<stringAttribute key="de.walware.statet.r.debug/RConsole/type" value="rterm"/>
-<stringAttribute key="de.walware.statet.r.debug/REnv/REnvSetting" value="SPECIFIC:jvanetten1216353028164:R"/>
-<stringAttribute key="de.walware.statet.r.debug/REnv/workingDirectory" value="E:\documents2\Working_directory"/>
-<booleanAttribute key="org.eclipse.debug.core.capture_output" value="false"/>
-<booleanAttribute key="org.eclipse.debug.ui.ATTR_CONSOLE_OUTPUT_ON" value="false"/>
-</launchConfiguration>
