@@ -1,0 +1,171 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<HEAD></HEAD><HTML><BODY>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="Package gdistance:  Contents">
+<param name="Local" value="00Index.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="Package gdistance:  R objects">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="gdistance-package">
+<param name="Local" value="gdistance-package.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value=".Random.seed">
+<param name="Local" value="aaa-gdistance-internal.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value=".required">
+<param name="Local" value="aaa-gdistance-internal.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="adjacency">
+<param name="Local" value="adjacency.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="adjacency.buffer.from.adjacency">
+<param name="Local" value="adjacency.buffer.from.adjacency.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="adjacency.buffer.from.raster">
+<param name="Local" value="adjacency.buffer.from.raster.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="adjacency.from.transition">
+<param name="Local" value="adjacency.from.transition.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="cluster.parameters">
+<param name="Local" value="cluster.parameters.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="cluster.parameters.difference">
+<param name="Local" value="cluster.parameters.difference.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="distance.from.level">
+<param name="Local" value="distance.from.level.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="distance.joint.hitting.time.all.origins.xy">
+<param name="Local" value="distance.joint.hitting.time.all.origins.xy.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="distance.joint.trajectory.single.origin.xy">
+<param name="Local" value="distance.joint.trajectory.single.origin.xy.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="distance.resistance.xy">
+<param name="Local" value="distance.resistance.xy.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="gdistance">
+<param name="Local" value="gdistance-package.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="gene.distance.spa">
+<param name="Local" value="gene.distance.spa.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="gene.reformat">
+<param name="Local" value="gene.reformat.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="Laplacian">
+<param name="Local" value="Laplacian.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="level.hitting.time.centrality.all.origins.xy">
+<param name="Local" value="level.hitting.time.centrality.all.origins.xy.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="logit">
+<param name="Local" value="logit.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="min.distance.accumulation">
+<param name="Local" value="min.distance.accumulation.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="na.omit.dist">
+<param name="Local" value="na.omit.dist.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="permregression">
+<param name="Local" value="permregression.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="power.model1">
+<param name="Local" value="power.model1.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="power.model2">
+<param name="Local" value="power.model2.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="projection.correction.adjacency">
+<param name="Local" value="projection.correction.adjacency.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="projection.correction.transition.matrix">
+<param name="Local" value="projection.correction.transition.matrix.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="raster.create.from.transition">
+<param name="Local" value="raster.create.from.transition.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="raster.current.single.origin.single.destination">
+<param name="Local" value="raster.current.single.origin.single.destination.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="raster.hitting.time.single.origin">
+<param name="Local" value="raster.hitting.time.single.origin.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="raster.potential.single.origin.single.destination">
+<param name="Local" value="raster.potential.single.origin.single.destination.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="regression.backwardselimination">
+<param name="Local" value="regression.backwardselimination.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="transition.connected.component">
+<param name="Local" value="transition.connected.component.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="transition.create">
+<param name="Local" value="transition.create.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="transition.solidify">
+<param name="Local" value="transition.solidify.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="transitionstack.calc">
+<param name="Local" value="transitionstack.calc.html">
+</OBJECT>
+</UL>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="Package gdistance:  Titles">
+</OBJECT>
+<UL>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="Internal gdistance objects">
+<param name="Local" value="aaa-gdistance-internal.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="What the package does (short line) ~~ package title ~~ ">
+<param name="Local" value="gdistance-package.html">
+</OBJECT>
+<LI> <OBJECT type="text/sitemap">
+<param name="Name" value="~~function to do ... ~~ ">
+<param name="Local" value="transitionstack.calc.html">
+</OBJECT>
+</UL>
+</UL>
+</BODY></HTML>

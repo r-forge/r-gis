@@ -1,0 +1,8 @@
+import("Matrix") #S4 package
+import("raster") #S4 package (final version)
+import("cluster") #Can be removed; only diversity functions (will move to diversity package in the bundle)
+import("igraph") #S3 package.
+importFrom("methods", Ops, Arith, Compare, Logic)
+exportClasses("transition")
+exportPattern("^[^\\.]")
+exportMethods("initialize", "show", "coerce", "Ops", "Arith", "Compare", "Logic")
