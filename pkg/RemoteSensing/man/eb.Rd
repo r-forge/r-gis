@@ -57,7 +57,50 @@ eta(rnet_day,evapfr,surface_temperature)
 \arguments{
   \item{ndvi}{ NDVI layer from \code{vi.ndvi} }
   \item{bbalb}{ albedo layer from \code{albedo.*}  }
-
+  \item{surface_temperature}{}
+  \item{latitude}{} 
+  \item{doy}{} 
+  \item{tsw}{} 
+  \item{solar}{} 
+  \item{rnetd}{} 
+  \item{tempk}{} 
+  \item{roh_w}{} 
+  \item{dtair}{} 
+  \item{e0}{}
+  \item{utc}{} 
+  \item{sunzangle}{} 
+  \item{rnet}{} 
+  \item{time}{} 
+  \item{roerink}{} 
+  \item{t0_dem}{} 
+  \item{tempk_water}{} 
+  \item{tempk_desert}{}
+  \item{dtair_desert}{} 
+  \item{h_desert}{} 
+  \item{roh_air_desert}{} 
+  \item{rah_desert}{} 
+  \item{roh_air}{} 
+  \item{rah}{} 
+  \item{h}{}  
+  \item{U_0}{}
+  \item{zom_0}{} 
+  \item{u_0}{}  
+  \item{psih}{} 
+  \item{ustar}{} 
+  \item{dem}{} 
+  \item{zom0}{} 
+  \item{u2m}{} 
+  \item{zom}{} 
+  \item{ndvi_max}{} 
+  \item{iteration}{} 
+  \item{rnet_desert}{}
+  \item{g0_desert}{} 
+  \item{t0_dem_desert}{} 
+  \item{dem_desert}{} 
+  \item{g0}{} 
+  \item{h0}{} 
+  \item{evapfr}{} 
+  \item{rnet_day}{}
 }
 \details{
   ~~ If necessary, more details than the description above ~~
