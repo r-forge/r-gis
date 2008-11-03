@@ -1,6 +1,6 @@
 setGeneric("transition.create", function(object, transition.function, outer.meridian.connect) standardGeneric("transition.create"))
 
-setMethod("transition.create", signature(object = "raster"), def = function(object, transition.function, outer.meridian.connect=FALSE)
+setMethod("transition.create", signature(object = "Raster"), def = function(object, transition.function, outer.meridian.connect=FALSE)
 		{
 			transition <- new("transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
 			adj <- adjacency(object,outer.meridian.connect=outer.meridian.connect)
@@ -12,7 +12,7 @@ setMethod("transition.create", signature(object = "raster"), def = function(obje
 		}
 )
 
-setMethod("transition.create", signature(object = "rasterstack"), def = function(object, transition.function, outer.meridian.connect=FALSE)
+setMethod("transition.create", signature(object = "RasterStack"), def = function(object, transition.function, outer.meridian.connect=FALSE)
 		{
 			if(transition.function != "mahal"){warning("only mahalanobis distance method implemented for rasterstack; will use this method instead")}
 			adj <- adjacency(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect) 
