@@ -1,0 +1,13 @@
+#Fri Jul 25 09:01:56 CST 2008
+useQuickDiffPrefPage=true
+text_R_rDefault.Assignment.items=assign,detach,rm,remove,setGroupGeneric,removeMethod,removeClass,source,removeGeneric,attach,removeMethods,setMethod,setGeneric
+useAnnotationsPrefPage=true
+text_R_rDefault.Custom1.items=
+de.walware.statet.r.ui.text.r_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+de.walware.statet.r.ui.text.r_editor_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
+text_R_rDefault.Logical.items=xor,any,all
+text_R_rDefault.Flowcontrol.items=stop,ifelse,tryCatch,return,switch,warning,try
+eclipse.preferences.version=1
+RConnector/rconnector.id=de.walware.statet.r.rCodeLaunchConnector.RGuiWin
+text_R_rDefault.Custom2.items=
+de.walware.statet.r.ui.text.rd_code_templates=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><templates/>
