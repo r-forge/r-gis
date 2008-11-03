@@ -3,7 +3,7 @@
 deltat_wim <-function(surface_temperature)
 {
 	# Wim delta T (soil-air) equation
-	result <- 0.3225 * tempk - 91.743
+	result <- 0.3225 * surface_temperature - 91.743
 	result[result<1]<-1.0
 	result[result>13]<-13.0
 	return(result)
@@ -17,7 +17,7 @@ solar_day<-function(latitude, doy, tsw )
 	#Solar declination (delta radians)
 	deltarad <- 0.4093*sin((2*pi*doy/365)-1.39)
 	#Convert latitude in radians
-	latrad <-  lat * pi / 180.0
+	latrad <-  latitude * pi / 180.0
 	#Convert latitude in radians
 	ws <- acos(-tan(latrad)*tan(deltarad))
 	cosun <- ws*sin(deltarad)*sin(latrad)+cos(deltarad)*cos(latrad)*sin(ws)
@@ -50,17 +50,17 @@ rnet<-function( bbalb,  ndvi,  tempk,  dtair,   e0,  tsw,  doy,  utc,  sunzangle
 	# tair <- air temperature (approximative, or met.station) */
 	tsw_for_e_atm<-0.7 #Special tsw, consider it a coefficient
 	#Atmospheric emissivity (Bastiaanssen, 1995)
-	e_atm	<-  1.08 * pow(-log10(tsw_for_e_atm),0.265) 
+	e_atm	<-  1.08 * (-log10(tsw_for_e_atm))^0.265 
 	#Atmospheric emissivity (Pawan, 2004)
-#	e_atm	<- 0.85 * pow(-log10(tsw),0.09)
+#	e_atm	<- 0.85 * (-log10(tsw))^0.09
 	ds <- 1.0 + 0.01672 * sin(2*pi*(doy-93.5)/365)
 	delta <- 0.4093*sin((2*pi*doy/365)-1.39)
 	#Kin is the shortwave incoming radiation
 	Kin	<- 1367.0 * (cos(sunzangle*pi/180) * tsw / (ds*ds) )
 	#Lin is incoming longwave radiation
-	Lin	<- (e_atm) * 5.67 * pow(10,-8) * pow((tempk-dtair),4)
+	Lin	<- (e_atm) * 5.67 * 10^(-8) * (tempk-dtair^4)
 	#Lout is surface grey body emission in Longwave spectrum
-	Lout	<- e0 * 5.67 * pow(10,-8) * pow(tempk,4)
+	Lout	<- e0 * 5.67 * 10^(-8) * (tempk^4)
 	#Lcorr is outgoing longwave radiation "reflected" by the emissivity
 	Lcorr	<- (1.0 - e0) * Lin
 	result	<- (1.0 - bbalb) * Kin + Lin - Lout - Lcorr  
@@ -80,11 +80,11 @@ g0<-function(  bbalb,  ndvi,  tempk,  rnet,  time=11.0, roerink=FALSE)
 		r0_coef <- 1.0
 	}
 	a <- (0.0032 * (bbalb/r0_coef) + 0.0062 * (bbalb/r0_coef) * (bbalb/r0_coef))
-	b <- (1 - 0.978 * pow(ndvi,4))
+	b <- (1 - 0.978 * (ndvi^4))
 	#Spain (Bastiaanssen, 1995)
 	result <- (rnet * (tempk-273.15) / bbalb) * a * b 
 	#HAPEX-Sahel (Roerink, 1995)
-	if(roerink=TRUE){
+	if(roerink==TRUE){
 		result <- result * 1.430 - 0.0845
 	}
 	return(result)
@@ -151,13 +151,13 @@ psi_h<-function( t0_dem, h, U_0, roh_air)
 	#Psichrometric parameter for heat momentum
 	#All inputs are Arrays
 	if(h != 0.0){
-		n5_temp <- (-1004* roh_air*pow(U_0,3)* t0_dem)/(0.41*9.81* h)
+		n5_temp <- (-1004* roh_air*(U_0^3)* t0_dem)/(0.41*9.81* h)
 	} else {
 		n5_temp <- -1000.0
 	}
 	if(n5_temp < 0.0){
-		n12_mem <- pow((1-16*(2/n5_temp)),0.25)
-		n11_mem <- (2*log10((1+pow(n12_mem,2))/2))
+		n12_mem <- ((1-16*(2/n5_temp))^0.25)
+		n11_mem <- (2*log10((1+(n12_mem^2))/2))
 	} else {
 		n12_mem <- 1.0
 		n11_mem <- -5*2/n5_temp
@@ -194,7 +194,7 @@ rohair<-function( dem, tempk, dtair)
 	#Air density standard paramterization
 	a <- tempk - dtair
 	b <- (( a - 0.00627*dem)/a)
-	result <- 349.467 * pow( b , 5.26)/ a 
+	result <- 349.467 * ( b ^ 5.26)/ a 
 	return(result)
 }
 
@@ -215,13 +215,13 @@ ustar<-function( t0_dem, h, ustar, roh_air, zom, u2m)
 	 bh<-200	# blending height (m) 		*/
 	
 	if(h != 0.0){
-		n5_temp <- (-1004* roh_air*pow(ustar,3)* t0_dem)/(0.41*9.81* h)
+		n5_temp <- (-1004* roh_air*(ustar^3)* t0_dem)/(0.41*9.81* h)
 	} else {
 		n5_temp <- -1000.0
 	}
 	if(n5_temp < 0.0){
-		n31_mem <- pow((1-16*(200/n5_temp)),0.25)
-		n10_mem <- (2*log10((1+n31_mem)/2)+log10((1+pow(n31_mem,2))/2)-2*atan(n31_mem)+0.5*pi)
+		n31_mem <- ((1-16*(200/n5_temp))^0.25)
+		n10_mem <- (2*log10((1+n31_mem)/2)+log10((1+(n31_mem^2))/2)-2*atan(n31_mem)+0.5*pi)
 	} else {
 #		n31_mem <- 1.0
 		n10_mem <- -5*2/n5_temp
@@ -275,7 +275,7 @@ sensih<-function( iteration, tempk_water, tempk_desert, t0_dem, tempk, ndvi, ndv
 #----------------------------------------------------------------*/
 #Main iteration loop of SEBAL*/
 	zom[0] <- zom0
-	for(ic in range 1:iteration+1){
+	for(ic in 1:(iteration+1)){
 		# Where is roh_air[i]? */
 		psih <- psi_h(t0_dem,h[ic-1],u_0,roh_air[ic-1])
 		ustar[ic] <- ustar(t0_dem,h[ic-1],u_0,roh_air[ic-1],zom[0],u2m)
@@ -316,16 +316,16 @@ soilmoisture<-function( evapfr )
 {
 	#soil moisture in the root zone
 	#Makin, Molden and Bastiaanssen, 2001
-	result <- (exp((evap_fr-1.2836)/0.4213))/0.511
+	result <- (exp((evapfr-1.2836)/0.4213))/0.511
 	return(result)
 }
 
 
-eta<-function( rnet_day, evapfr, tempk)
+eta<-function( rnet_day, evapfr, surface_temperature)
 {
-#Evapotranspiration from energy balance
-	t_celsius <- tempk - 273.15 
-	latent 	  <- 86400.0/((2.501-0.002361*t_celsius)*pow(10,6))
-	result 	  <- r_net_day * evap_fr * latent 
+	#Evapotranspiration from energy balance
+	t_celsius <- surface_temperature - 273.15 
+	latent 	  <- 86400.0/((2.501-0.002361*t_celsius)*(10^6))
+	result 	  <- rnet_day * evapfr * latent 
 	return(result)
 }
