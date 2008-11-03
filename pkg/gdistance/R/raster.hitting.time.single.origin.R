@@ -49,8 +49,9 @@ ymin = transition@ymin,
 ymax = transition@ymax,
 xres = transition@xres,
 yres = transition@yres)
-raster@data <- vector(length=raster@ncells)
-raster@data[as.integer(rownames(transition@transitionmatrix))] <- AFPT
+datavector <- vector(length=raster@ncells)
+datavector[as.integer(rownames(transition@transitionmatrix))] <- AFPT
+raster@data <- as.array(datavector)
 return(raster)
 }
 
