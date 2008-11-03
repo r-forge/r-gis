@@ -204,7 +204,7 @@ setMethod('read.part.of.row', signature(object='Stack'),
 		rowint <- round(raster@nrows / nr)
 		nc <- trunc(raster@ncols / colint)
 		nr <- trunc(raster@nrows / rowint)
-		cols <- vector(length=ncols)
+		cols <- vector(length=nc)
 		for (i in 1:nc) { 
 			cols[i] <- 1 + (i-1) * colint 
 		}
