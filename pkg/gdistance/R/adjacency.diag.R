@@ -1,4 +1,4 @@
-adjacency <- function(raster, outer.meridian.connect=FALSE) 
+adjacency.diag <- function(raster, outer.meridian.connect=FALSE) 
 {
 	cells <- c(1:raster@ncells)
 	data <- cbind(cells, raster@data)
