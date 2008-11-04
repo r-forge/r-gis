@@ -13,7 +13,7 @@ shortest.cost.distance(id.xy, transition)
   \item{transition}{ transition matrix (defined class) }
 }
 \details{
-Distance is calculated in cost units specified in the distance matrix.\n
+Distance is calculated in cost units specified in the distance matrix. \n
 id.xy is a matrix with three columns: ID, x, and y.
 }
 \value{

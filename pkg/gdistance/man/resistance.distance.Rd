@@ -20,8 +20,10 @@ id.xy is a matrix with three columns: ID, x, and y.
 \value{
 distance matrix
 }
-\references{ Fouss, F., Pirotte, A., Renders, J.-M. & Saerens, M. 2007. Random-walk computation of similarities between nodes of a graph with application to collaborative recommendation. IEEE Transactions on Knowledge and Data Engineering, 19(3), 355-369.\n
-Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensy, R. & Tiwari, P. 1996. The electrical resistance of a graph captures its commute and cover times. Computational Complexity, 6(4), 312-340.\n
+\references{ Fouss, F., Pirotte, A., Renders, J.-M. & Saerens, M. 2007. Random-walk computation of similarities between nodes of a graph with application to collaborative recommendation. IEEE Transactions on Knowledge and Data Engineering, 19(3), 355-369.
+
+Chandra, A.K., Raghavan, P., Ruzzo, W.L., Smolensy, R. & Tiwari, P. 1996. The electrical resistance of a graph captures its commute and cover times. Computational Complexity, 6(4), 312-340.
+
 McRae, B.H. Isolation by resistance. Evolution 60(8), 1551-1561. }
 \author{ Jacob van Etten }
 \note{ ~~further notes~~ 
