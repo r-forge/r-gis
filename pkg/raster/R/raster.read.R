@@ -13,10 +13,10 @@ if (!isGeneric("read.all")) {
 	setGeneric("read.all", function(object)
 		standardGeneric("read.all"))
 }	
-setMethod('read.all', signature(object='Raster'), 
+setMethod('read.all', signature(object='RasterLayer'), 
 	function(object){ return(.raster.read.all(object))}
 )
-setMethod('read.all', signature(object='Stack'), 
+setMethod('read.all', signature(object='RasterStack'), 
 	function(object){ return(.stack.read.all(object))}
 )
 
@@ -25,10 +25,10 @@ if (!isGeneric("read.row")) {
 	setGeneric("read.row", function(object, rownr)
 		standardGeneric("read.row"))
 }
-setMethod('read.row', signature(object='Raster'), 
+setMethod('read.row', signature(object='RasterLayer'), 
 	function(object, rownr){ return(.raster.read.row(object, rownr))}
 )
-setMethod('read.row', signature(object='Stack'), 
+setMethod('read.row', signature(object='RasterStack'), 
 	function(object, rownr){ return(.stack.read.row(object, rownr))}
 )
 
@@ -38,7 +38,7 @@ if (!isGeneric("read.rows")) {
 		standardGeneric("read.rows"))
 }	
 
-setMethod('read.rows', signature(object='Raster'), 
+setMethod('read.rows', signature(object='RasterLayer'), 
 	function(object, startrow, nrows=3) { 
 		return(.raster.read.rows(object, startrow, nrows))}
 )		
@@ -49,7 +49,7 @@ if (!isGeneric("read.block")) {
 		standardGeneric("read.block"))
 }	
 
-setMethod('read.block', signature(object='Raster'), 
+setMethod('read.block', signature(object='RasterLayer'), 
 	function(object, startrow, nrows=3, startcol=1, ncolumns=(ncols(object)-startcol+1)) { 
 		return(.raster.read.block(object, startrow, nrows, ncolumns))}
 )
@@ -59,12 +59,12 @@ if (!isGeneric("read.part.of.row")) {
 		standardGeneric("read.part.of.row"))
 }	
 
-setMethod('read.part.of.row', signature(object='Raster'), 
+setMethod('read.part.of.row', signature(object='RasterLayer'), 
 	function(object, rownr, startcol=1, ncolumns=(ncols(object)-startcol+1)) { 
 		return(.raster.read.part.of.row(object, rownr, startcol, ncolumns))}
 )
 
-setMethod('read.part.of.row', signature(object='Stack'), 
+setMethod('read.part.of.row', signature(object='RasterStack'), 
 	function(object, rownr, startcol=1, ncolumns=(ncols(object)-startcol+1)) { 
 		return(.stack.read.part.of.row(object, rownr, startcol, ncolumns))}
 )

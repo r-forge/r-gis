@@ -19,7 +19,7 @@ write.export(raster, outfile, filetype='ascii', overwrite=FALSE)
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{raster}{ Raster object }
+  \item{raster}{ RasterLayer object }
   \item{outfile}{ The file resulting from import or export }
   \item{filetype}{ The type of file to export to }
   \item{overwrite} { if TRUE existing files are overwritten }

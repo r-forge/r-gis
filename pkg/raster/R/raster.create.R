@@ -16,7 +16,7 @@ raster.from.bbox <- function(boundingbox, nrows=1, ncols=1) {
 	if (nc < 1) { stop("ncols should be larger than 0") }
 	if (nr < 1) { stop("nrows should be larger than 0") }
 	if (validObject(boundingbox)) {
-		raster <- new("Raster", bbox = boundingbox@bbox, proj4string=boundingbox@proj4string, ncols = nc, nrows = nr )
+		raster <- new("RasterLayer", bbox = boundingbox@bbox, proj4string=boundingbox@proj4string, ncols = nc, nrows = nr )
 		raster@data@content <- 'nodata'
 		return(raster) 
 	} else {

@@ -107,7 +107,7 @@ setClass('SingleRasterData',
 )
 
 	
-setClass ('Raster',
+setClass ('RasterLayer',
 	contains = 'AbstractRaster',
 	representation (
 		title = 'character',
@@ -121,7 +121,7 @@ setClass ('Raster',
 	)
 	
 	
-setMethod ('show' , 'Raster', 
+setMethod ('show' , 'RasterLayer', 
 	function(object) {
 		cat('class       :' , class(object), '\n')
 		cat('filename    :' , filename(object), '\n')
@@ -174,7 +174,7 @@ setClass('MultipleRasterData',
 )
 
 
-setClass ('Brick',
+setClass ('RasterBrick',
 	contains = 'AbstractRaster',
 	representation (
 		data = 'MultipleRasterData',
@@ -194,7 +194,7 @@ setClass ('Brick',
 	
 
 
-setMethod ('show' , 'Brick',
+setMethod ('show' , 'RasterRasterBrick',
 	function ( object ){
 		cat ('class     :' , class ( object ) , '\n')
 		cat ('filename  :' , object@filename, '\n')
@@ -215,7 +215,7 @@ setMethod ('show' , 'Brick',
 
 
 	
-setClass ('Stack',
+setClass ('RasterStack',
 	contains = 'AbstractRaster',
 	representation (
 	    filename ='character',
@@ -236,7 +236,7 @@ setClass ('Stack',
 )
 
 
-setMethod ('show' , 'Stack',
+setMethod ('show' , 'RasterStack',
 	function ( object ){
 		cat ('class     :' , class ( object ) , '\n')
 		cat ('filename  :' , object@filename, '\n')

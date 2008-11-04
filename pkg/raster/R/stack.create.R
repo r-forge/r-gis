@@ -29,7 +29,7 @@ stack.from.rasters <- function(rasters) {
 
 
 stack.add.files <- function(rstack, rasterfiles, bands= rep(1, length(rasterfiles))) {
-	if (class(rstack) != "Stack") { rstack <- new("Stack") }
+	if (class(rstack) != "RasterStack") { rstack <- new("RasterStack") }
 	
 	if (is.list(rasterfiles)) {rasterfiles <- unlist(rasterfiles)}
 	if (is.list(bands)) {bands <- unlist(bands)}
@@ -56,7 +56,7 @@ stack.add.files <- function(rstack, rasterfiles, bands= rep(1, length(rasterfile
 
 stack.add.rasters <- function(rstack, rasters) {
 #rasters is a list of raster objects
-	if (class(rstack) != "Stack") { rstack <- new("Stack") }
+	if (class(rstack) != "RasterStack") { rstack <- new("RasterStack") }
 
 	for (i in 1 : length(rasters)) { 
 		if (length(rasters) == 1) { raster <- rasters 

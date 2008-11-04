@@ -1,18 +1,18 @@
-\name{Brick-class}
+\name{RasterBrick-class}
 \docType{class}
-\alias{Brick-class}
-\alias{show,Brick-method}
+\alias{RasterBrick-class}
+\alias{show,RasterBrick-method}
 
-\title{Class "Brick" }
-\description{	Class for handling "Bricks" of rasters.  }
+\title{Class "RasterBrick" }
+\description{	Class for handling "RasterBricks" of rasters.  }
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("Brick", ...)}.
+Objects can be created by calls of the form \code{new("RasterBrick", ...)}.
 }
 
 \section{Slots}{
 	 \describe{
-    \item{\code{filename}:}{Object of class \code{"character"} filename of the Brick (if saved to disk) }
-    \item{\code{nlayers}:}{Object of class \code{"integer"} number of raster objects in the Brick }
+    \item{\code{filename}:}{Object of class \code{"character"} filename of the RasterBrick (if saved to disk) }
+    \item{\code{nlayers}:}{Object of class \code{"integer"} number of raster objects in the RasterBrick }
     \item{\code{rasters}:}{Object of class \code{"list"} list of the raster objects }
     \item{\code{projection}:}{Object of class \code{"character"} proj4 projection string }
     \item{\code{ncols}:}{Object of class \code{"integer"} number of columns of the rasters }
@@ -29,15 +29,15 @@ Objects can be created by calls of the form \code{new("Brick", ...)}.
 }
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "Brick")}: ... }
+    \item{show}{\code{signature(object = "RasterBrick")}: ... }
 	 }
 }
 \author{Robert J. Hijmans  \email{r.hijmans@gmail.com}}
 
-\seealso{ \code{\link[Raster]{Raster}} }
+\seealso{ \code{\link[RasterLayer]{RasterLayer}} }
 
 \examples{
-showClass("Brick")
+showClass("RasterBrick")
 }
 \keyword{classes}
 \keyword{ spatial }

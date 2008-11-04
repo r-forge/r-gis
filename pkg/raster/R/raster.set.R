@@ -12,8 +12,8 @@ set.rowcol <- function(raster, nrows=nrows(raster), ncols=ncols(raster)) {
 }
 
 set.raster <- function(raster, filename=NA, INT=FALSE) {
-	if (class(raster) == 'Stack') { raster <- raster@rasters[[1]] }
-	if (class(raster) != 'Raster') { stop('the first argument should be a Raster or a Stack object') }
+	if (class(raster) == 'RasterStack') { raster <- raster@rasters[[1]] }
+	if (class(raster) != 'RasterLayer') { stop('the first argument should be a RasterLayer or a RasterStack object') }
 	raster <- clear.values(raster)
 	raster <- set.filename(raster, filename)
 	if (INT) { raster <- set.datatype(raster, "integer")  }
@@ -24,7 +24,7 @@ set.raster <- function(raster, filename=NA, INT=FALSE) {
 set.filename <- function(object, filename) {
 	if (is.na(filename)) {filename <- ""}
 	object@file@name <- filename
-	if (class(object)=='Raster') {
+	if (class(object)=='RasterLayer') {
 		shortname <- file.get.name(filename)
 		shortname <- file.change.extension(shortname, "")
 		shortname <- gsub(" ", "_", shortname)

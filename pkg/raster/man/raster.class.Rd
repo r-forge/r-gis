@@ -1,12 +1,12 @@
-\name{Raster-class}
+\name{RasterLayer-class}
 \docType{class}
-\alias{Raster-class}
-\alias{show,Raster-method}
+\alias{RasterLayer-class}
+\alias{show,RasterLayer-method}
 
-\title{Class "Raster" }
-\description{	Class for handling Raster (grid) data  }
+\title{Class "RasterLayer" }
+\description{	Class for handling RasterLayer (grid) data  }
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("Raster", ...)}.
+Objects can be created by calls of the form \code{new("RasterLayer", ...)}.
 	 }
 \section{Slots}{
 	 \describe{
@@ -22,8 +22,8 @@ Objects can be created by calls of the form \code{new("Raster", ...)}.
 }
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "Raster")}: ... }
-    \item{hist}{\code{signature(object = "Raster")}: ... }
+    \item{show}{\code{signature(object = "RasterLayer")}: ... }
+    \item{hist}{\code{signature(object = "RasterLayer")}: ... }
 	
  	 }
 }
@@ -33,7 +33,7 @@ Objects can be created by calls of the form \code{new("Raster", ...)}.
 \note{  }
 
 \examples{
-showClass("Raster")
+showClass("RasterLayer")
 }
 \keyword{classes}
 \keyword{spatial}

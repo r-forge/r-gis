@@ -16,8 +16,8 @@ stack.map(rstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim
   \item{subsample}{ if TRUE, the image is resampled using maxdim}
   \item{maxdim}{ maximum requsted number of pixels in the map display (either vertial or horizontal) }
   \item{...}{ any argument that can be passed to image.plot(fields) and to image(graphics)} 
-  \item{rstack}{ Stack object}
-  \item{index}{ The index of a raster in the Stack  1 <= index <= rstack@nrasters }
+  \item{rstack}{ RasterStack object}
+  \item{index}{ The index of a raster in the RasterStack  1 <= index <= rstack@nrasters }
 
   }
 \details{

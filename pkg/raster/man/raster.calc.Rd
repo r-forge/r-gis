@@ -6,7 +6,7 @@
 \alias{r.setNA}
 \alias{r.init}
 
-\title{ Raster calculate }
+\title{ RasterLayer calculate }
 \description{
   Calculate values for a new raster, from scratch or based on a single existing raster
 }

@@ -22,7 +22,7 @@ setMethod('dim', signature(x='AbstractRaster'),
 	function(x){ return(c(nrow(x), ncol(x)))}
 )
 
-setMethod('dim', signature(x='Stack'), 
+setMethod('dim', signature(x='RasterStack'), 
 	function(x){ return(c(nrow(x), ncol(x), nlayers(x)))}
 )
 

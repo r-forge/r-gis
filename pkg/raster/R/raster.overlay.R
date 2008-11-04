@@ -6,8 +6,8 @@
 
 
 r.overlay <- function(raster1, raster2, fun=function(x,y){return(x+y)}, filename="", overwrite=TRUE) {
-	if (class(raster1) != 'Raster' | class(raster2) != 'Raster') {
-		stop('first two arguments should be objects of class "Raster"')
+	if (class(raster1) != 'RasterLayer' | class(raster2) != 'RasterLayer') {
+		stop('first two arguments should be objects of class "RasterLayer"')
 	}
 	if (!compare(c(raster1, raster2))) { 
 		stop() 
@@ -34,8 +34,8 @@ r.overlay <- function(raster1, raster2, fun=function(x,y){return(x+y)}, filename
 
 
 r.cover <- function(raster1, raster2, filename="", overwrite=TRUE) {
-	if (class(raster1) != 'Raster' | class(raster2) != 'Raster') {
-		stop('first two arguments should be objects of class "Raster"')
+	if (class(raster1) != 'RasterLayer' | class(raster2) != 'RasterLayer') {
+		stop('first two arguments should be objects of class "RasterLayer"')
 	}
 	if (!compare(c(raster1, raster2))) { 
 		stop() 

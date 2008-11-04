@@ -15,7 +15,7 @@
 	hist(values(x), ...)
 }
 
-setMethod('hist', signature(x='Raster'), 
+setMethod('hist', signature(x='RasterLayer'), 
 	function(x, ...){.hist.raster(x, ...)}
 )
 

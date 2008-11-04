@@ -26,7 +26,7 @@
 \description{
   get.values returns data values that are associated with the raster object (e.g. after read.* has been used). Data are returned as a vector. 
   the option format='matrix' will return a matrix, optionally with the row and col numbers (names=TRUE). 
-  get.col.from.cell etc. get the column, row, or cell number of a Raster (or Stack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
+  get.col.from.cell etc. get the column, row, or cell number of a Raster (or RasterStack) for a x and/or y coordinate or get the coordinates of the center of a raster cell from a column, or cell number(s)
   use bbox() (form sp) to get the bounding box of a raster type object.
   
 }
@@ -64,7 +64,7 @@ data.source(raster)
   
 
 \note{
-  Some of these functions simply take the values from the data slots in the Raster or Stack object. It is advisable to use these and other 'get' and 'set' functions rather than dirctly accessing the slots of an object. This will ensure object integrity and ensure that code will not break in the future, even if the underlying class definitions change. 
+  Some of these functions simply take the values from the data slots in the Raster or RasterStack object. It is advisable to use these and other 'get' and 'set' functions rather than dirctly accessing the slots of an object. This will ensure object integrity and ensure that code will not break in the future, even if the underlying class definitions change. 
 }
 
 \value{

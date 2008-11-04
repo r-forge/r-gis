@@ -30,9 +30,9 @@ stack.read.cells(rstack, cells)
 }
 
 \arguments{
-  \item{object}{ a Raster or Stack object }
+  \item{object}{ a Raster or RasterStack object }
   \item{raster}{ a raster object }
-  \item{rstack}{ a Stack object } 
+  \item{rstack}{ a RasterStack object } 
   \item{rownr}{ the row number of the row to read  (between 1 and raster@nrows) }
   \item{startrow}{ the frist row to read  (>= 1 & <= raster@nrows) }
   \item{nrows}{ the number of the rows to read (>= 1 & <= raster@nrows) }

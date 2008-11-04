@@ -1,12 +1,12 @@
-\name{Stack-class}
+\name{RasterStack-class}
 \docType{class}
-\alias{Stack-class}
-\alias{show,Stack-method}
+\alias{RasterStack-class}
+\alias{show,RasterStack-method}
 
-\title{Class "Stack" }
+\title{Class "RasterStack" }
 \description{	Class for handling "Stacks" of rasters.  }
 \section{Objects from the Class}{
-Objects can be created by calls of the form \code{new("Stack", ...)}.
+Objects can be created by calls of the form \code{new("RasterStack", ...)}.
 }
 
 \section{Slots}{
@@ -29,7 +29,7 @@ Objects can be created by calls of the form \code{new("Stack", ...)}.
 }
 \section{Methods}{
   \describe{
-    \item{show}{\code{signature(object = "Stack")}: ... }
+    \item{show}{\code{signature(object = "RasterStack")}: ... }
 	 }
 }
 \author{Robert J. Hijmans  \email{r.hijmans@gmail.com}}
@@ -37,7 +37,7 @@ Objects can be created by calls of the form \code{new("Stack", ...)}.
 \seealso{ \code{\link[Raster]{Raster}} }
 
 \examples{
-showClass("Stack")
+showClass("RasterStack")
 }
 \keyword{classes}
 \keyword{ spatial }

@@ -19,8 +19,8 @@ r.merge(rasters, filename, overwrite=FALSE)
 }
 
 \arguments{
-  \item{raster}{ a Raster object }
-  \item{rasters}{ a list of Raster objects }
+  \item{raster}{ a RasterLayer object }
+  \item{rasters}{ a list of RasterLayer objects }
   \item{boundingbox} {bounding box used to cut a raster. Any object that is or has a bounding box (see below) }
   \item{filename}{ output filename for a new raster }
   \item{fun}{ function used to aggregate values. It should return one number. E.g. mean or max }
@@ -32,7 +32,7 @@ r.merge(rasters, filename, overwrite=FALSE)
 }
 
 \details{
- Objects that have bounding boxes include Raster, and other objects descending from the Spatial class in the sp package. 
+ Objects that have bounding boxes include RasterLayer, and other objects descending from the Spatial class in the sp package. 
  You can check this with boundingbox(object)
  They can be created with the function new.boundingbox
 }
