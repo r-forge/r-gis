@@ -1,8 +1,8 @@
 \name{properties}
 \alias{filename}
 \alias{values}
-\alias{ncols}
-\alias{nrows}
+\alias{ncol}
+\alias{nrow}
 \alias{ncells}
 \alias{xres}
 \alias{yres}
@@ -34,8 +34,8 @@
 \usage{
 filename(object)
 values(object, format='vector', names=FALSE)
-ncols(object)
-nrows(object)
+ncol(x)
+nrow(x)
 ncells(object)
 xres(object)
 yres(object)
@@ -57,6 +57,7 @@ data.source(raster)
 \arguments{
   \item{raster}{ raster or stack object }
   \item{object}{ raster or stack object }
+  \item{x}{ raster or stack object (in a standard generic function ) }
   \item{format}{ use \code{vector} to get the data as a single vector or \code{matrix} to get them as a matrix }
   \item{asText} { logical. If \code{TRUE}, the projection is returned as text. Otherwise a CRS object is returned}
   \item{names}{ If TRUE, row and col names are provided }
@@ -79,8 +80,8 @@ data.source(raster)
 #using a new default raster (1 degree global)
 rs <- raster.new()
 ncells(rs)
-ncols(rs)
-nrows(rs)
+ncol(rs)
+nrow(rs)
 ncells(rs)
 xres(rs)
 yres(rs)

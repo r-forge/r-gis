@@ -4,7 +4,7 @@
 # Version 0,1
 # Licence GPL v3
 
-stack.from.stackfile <- function(stackfile) {
+rasterstack.from.stackfile <- function(stackfile) {
 	st <- read.table(stackfile,  as.is=FALSE, strip.white=TRUE)
 	rasterfiles <- list()
 	bands <- list()
@@ -12,23 +12,23 @@ stack.from.stackfile <- function(stackfile) {
 		rasterfiles[i] <- as.character(st[i,1])
 		bands[i] <- as.integer(st[i,2])
 	}
-	rst <- stack.from.rasterfiles(rasterfiles, bands)
+	rst <- rasterstack.from.rasterfiles(rasterfiles, bands)
 	rst <- set.filename(stackfile)
 	return(rst)
 }
 
 
-stack.from.rasterfiles <- function(rasterfiles, bands= rep(1, length(rasterfiles))) {
-	return(stack.add.files(NA, rasterfiles, bands))
+rasterstack.from.rasterfiles <- function(rasterfiles, bands= rep(1, length(rasterfiles))) {
+	return(rasterstack.add.files(NA, rasterfiles, bands))
 }
 
 
-stack.from.rasters <- function(rasters) {
-	return(stack.add.rasters(NA, rasters))
+rasterstack.from.rasters <- function(rasters) {
+	return(rasterstack.add.rasters(NA, rasters))
 }
 
 
-stack.add.files <- function(rstack, rasterfiles, bands= rep(1, length(rasterfiles))) {
+rasterstack.add.files <- function(rstack, rasterfiles, bands= rep(1, length(rasterfiles))) {
 	if (class(rstack) != "RasterStack") { rstack <- new("RasterStack") }
 	
 	if (is.list(rasterfiles)) {rasterfiles <- unlist(rasterfiles)}
@@ -47,14 +47,14 @@ stack.add.files <- function(rstack, rasterfiles, bands= rep(1, length(rasterfile
 			stop(paste(filename, "does not exist")) 
 		}
 		raster <- raster.from.file(filename, band)
-		rstack <- stack.add.rasters(rstack, raster) 
+		rstack <- rasterstack.add.rasters(rstack, raster) 
 	}
 	return(rstack)
 }
 
 
 
-stack.add.rasters <- function(rstack, rasters) {
+rasterstack.add.rasters <- function(rstack, rasters) {
 #rasters is a list of raster objects
 	if (class(rstack) != "RasterStack") { rstack <- new("RasterStack") }
 
@@ -65,7 +65,7 @@ stack.add.rasters <- function(rstack, rasters) {
 		addraster <- TRUE
 		i <- nlayers(rstack) + 1
 		if (i == 1) {
-			rstack <- set.rowcol(rstack, nrows(raster), ncols(raster))
+			rstack <- set.rowcol(rstack, nrow(raster), ncol(raster))
 			rstack <- set.bbox(rstack, xmin(raster), xmax(raster), ymin(raster), ymax(raster))
 			rstack@proj4string = raster@proj4string
 		} else {
@@ -91,7 +91,7 @@ stack.add.rasters <- function(rstack, rasters) {
 }	
 
 
-stack.remove.rasters <- function(rstack, indices) {
+rasterstack.remove.rasters <- function(rstack, indices) {
 	indices <- sort(indices, decreasing=TRUE)
 	for (i in 1:length(indices)) {
 		index <- -1 * indices[i]
@@ -102,7 +102,7 @@ stack.remove.rasters <- function(rstack, indices) {
 }
 
 
-stack.save <- function(rstack, stackfile, forceext = TRUE) {
+rasterstack.save <- function(rstack, stackfile, forceext = TRUE) {
     if (forceext) { stackfile <- file.change.extension(stackfile, '.stk') }
 	rstack@file@name <- stackfile
 	thefile <- file(stackfile, "w")

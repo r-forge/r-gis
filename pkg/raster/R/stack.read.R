@@ -4,18 +4,18 @@
 # Version 0,1
 # Licence GPL v3
 
-.stack.read.all <- function(rstack) {
-	rstack <- .stack.read.part.of.row(rstack, rownumber=-1)
+.rasterstack.read.all <- function(rstack) {
+	rstack <- .rasterstack.read.part.of.row(rstack, rownumber=-1)
 	return(rstack)
 }
 
 
-.stack.read.row <- function(rstack, rownumber) {
-	return(.stack.read.part.of.row(rstack, rownumber))
+.rasterstack.read.row <- function(rstack, rownumber) {
+	return(.rasterstack.read.part.of.row(rstack, rownumber))
 }
 
 
-.stack.read.part.of.row <- function(rstack, rownumber, startcol=1, ncolumns=(ncols(rstack)-startcol+1)) {
+.rasterstack.read.part.of.row <- function(rstack, rownumber, startcol=1, ncolumns=(ncol(rstack)-startcol+1)) {
 	for (i in 1:length(rstack@rasters)) {
 		rs <- .raster.read.part.of.row(rstack@rasters[[i]], rownumber, startcol, ncolumns)
 		if ( i == 1 )  {
@@ -31,15 +31,15 @@
 }
 
 
-stack.read.xy <- function(rstack, xy) {
-	cells <- get.cell.from.xy(rstack, xy)
-	return(stack.read.cells(rstack, cells))
+.rasterstack.read.xy <- function(rasterstack, xy) {
+	cells <- get.cell.from.xy(rasterstack, xy)
+	return(.rasterstack.read.cells(rasterstack, cells))
 }
 
 
-stack.read.cells <- function(rstack, cells) {
-	for (i in 1:length(rstack@rasters)) {
-		v <- read.cells(rstack@rasters[[i]], cells)
+.rasterstack.read.cells <- function(rasterstack, cells) {
+	for (i in 1:nlayers(rasterstack)) {
+		v <- .read.cells.raster(rasterstack@rasters[[i]], cells)
 		if (i == 1) {
 			result <- v
 		} else {
@@ -47,8 +47,7 @@ stack.read.cells <- function(rstack, cells) {
 #			colnames(result)[length(result[1,])] <- rstack@rasters[[i]]@file@shortname
 		}
 	}
-	rstack@data@values <- as.matrix(result)
-	return(rstack)
+	return(result)
 }
 
 

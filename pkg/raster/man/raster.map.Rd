@@ -1,13 +1,13 @@
 \name{raster.map}
 \alias{raster.map}
-\alias{stack.map}
+\alias{rasterstack.map}
 \title{ Map a raster layer }
 \description{
   Make a map of a raster dataset
 }
 \usage{
 raster.map(raster, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...)
-stack.map(rstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...)
+rasterstack.map(rstack, index=1, col = rev(terrain.colors(25)), subsample=TRUE, maxdim=500, ...)
 }
 
 \arguments{

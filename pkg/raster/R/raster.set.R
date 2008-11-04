@@ -5,7 +5,7 @@
 # Licence GPL v3
 
 
-set.rowcol <- function(raster, nrows=nrows(raster), ncols=ncols(raster)) {
+set.rowcol <- function(raster, nrows=nrow(raster), ncols=ncol(raster)) {
 	raster@ncols <- as.integer(ncols)
 	raster@nrows <- as.integer(nrows)
 	return(raster)

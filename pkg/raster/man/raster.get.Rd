@@ -78,6 +78,6 @@ rs <- raster.from.file(system.file("external/test.ag", package="sp"))
 rs
 get.cell.from.xy(rs, c(180000, 330000))
 #xy for corners of grid:
-get.xy.from.cell(rs, c(1, ncols(rs), nrows(rs), ncells(rs)))
+get.xy.from.cell(rs, c(1, ncol(rs), nrow(rs), ncells(rs)))
 }
 \keyword{ spatial }

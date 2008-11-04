@@ -9,33 +9,8 @@ filename <- function(object) {
 	return(object@file@name)
 }
 
-ncols <- function(object) {
-	return(object@ncols)
-}
-
-nrows <- function(object) {
-	return(object@nrows)
-}
-
-
-setMethod('dim', signature(x='AbstractRaster'), 
-	function(x){ return(c(nrow(x), ncol(x)))}
-)
-
-setMethod('dim', signature(x='RasterStack'), 
-	function(x){ return(c(nrow(x), ncol(x), nlayers(x)))}
-)
-
-setMethod('nrow', signature(x='AbstractRaster'), 
-	function(x){ return(x@nrows)}
-)
-
-setMethod('ncol', signature(x='AbstractRaster'), 
-	function(x){ return(x@ncols) }
-)
-
 ncells <- function(object) {
-	return(return( as.numeric(nrows(object)) * ncols(object )))
+	return(return( as.numeric(nrow(object)) * ncol(object )))
 }
 
 xmin <- function(object) {
@@ -63,11 +38,11 @@ ymax <- function(object) {
 }
 
 xres <- function(object) {
-	return ( (xmax(object) - xmin(object)) / ncols(object)  )
+	return ( (xmax(object) - xmin(object)) / ncol(object)  )
 }
 
 yres <- function(object) {
-	return ( (ymax(object) - ymin(object)) / nrows(object)  )
+	return ( (ymax(object) - ymin(object)) / nrow(object)  )
 }
 
 resolution <- function(object) {
@@ -144,11 +119,11 @@ compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projecti
 	origin1 <- origin(rasters[[1]])
 	for (i in 2:length(rasters)) { 
 		if (rowcol) {
-			if (ncols(rasters[[1]]) != ncols(rasters[[i]])) {
+			if (ncol(rasters[[1]]) != ncol(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) { stop('ncols different') } 
 			}	
-			if (nrows(rasters[[1]]) != nrows(rasters[[i]])) {
+			if (nrow(rasters[[1]]) != nrow(rasters[[i]])) {
 				res <- F
 				if(stopiffalse) { stop('nrows different') }
 			}

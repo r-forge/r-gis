@@ -7,70 +7,6 @@
 
 
 # read entire raster
-
-
-if (!isGeneric("read.all")) {
-	setGeneric("read.all", function(object)
-		standardGeneric("read.all"))
-}	
-setMethod('read.all', signature(object='RasterLayer'), 
-	function(object){ return(.raster.read.all(object))}
-)
-setMethod('read.all', signature(object='RasterStack'), 
-	function(object){ return(.stack.read.all(object))}
-)
-
-
-if (!isGeneric("read.row")) {
-	setGeneric("read.row", function(object, rownr)
-		standardGeneric("read.row"))
-}
-setMethod('read.row', signature(object='RasterLayer'), 
-	function(object, rownr){ return(.raster.read.row(object, rownr))}
-)
-setMethod('read.row', signature(object='RasterStack'), 
-	function(object, rownr){ return(.stack.read.row(object, rownr))}
-)
-
-	
-if (!isGeneric("read.rows")) {
-	setGeneric("read.rows", function(object, startrow, nrows=3)
-		standardGeneric("read.rows"))
-}	
-
-setMethod('read.rows', signature(object='RasterLayer'), 
-	function(object, startrow, nrows=3) { 
-		return(.raster.read.rows(object, startrow, nrows))}
-)		
-
-
-if (!isGeneric("read.block")) {
-	setGeneric("read.block", function(object, startrow, nrows=3, startcol=1, ncolumns=(ncols(object)-startcol+1))
-		standardGeneric("read.block"))
-}	
-
-setMethod('read.block', signature(object='RasterLayer'), 
-	function(object, startrow, nrows=3, startcol=1, ncolumns=(ncols(object)-startcol+1)) { 
-		return(.raster.read.block(object, startrow, nrows, ncolumns))}
-)
-
-if (!isGeneric("read.part.of.row")) {
-	setGeneric("read.part.of.row", function(object, rownr, startcol=1, ncolumns=(ncols(object)-startcol+1))
-		standardGeneric("read.part.of.row"))
-}	
-
-setMethod('read.part.of.row', signature(object='RasterLayer'), 
-	function(object, rownr, startcol=1, ncolumns=(ncols(object)-startcol+1)) { 
-		return(.raster.read.part.of.row(object, rownr, startcol, ncolumns))}
-)
-
-setMethod('read.part.of.row', signature(object='RasterStack'), 
-	function(object, rownr, startcol=1, ncolumns=(ncols(object)-startcol+1)) { 
-		return(.stack.read.part.of.row(object, rownr, startcol, ncolumns))}
-)
-
-
-	
 .raster.read.all <- function(raster) {
 	raster <- .raster.read.row(raster, -1)
 	return(raster)
@@ -88,7 +24,7 @@ setMethod('read.part.of.row', signature(object='RasterStack'),
 }	
 
 #read a block of data  (a rectangular area  of any dimension)  
-.raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncolumns=(ncols(raster)-startcol+1)) {
+.raster.read.block <- function(raster, startrow, nrows=3, startcol=1, ncolumns=(ncol(raster)-startcol+1)) {
 	if (startrow < 1 ) { stop("startrow too small") } 
 	if (startrow > raster@nrows ) { stop("startrow too high") }
 	if (nrows < 1) { stop("nrows should be > 1") } 
@@ -121,19 +57,19 @@ setMethod('read.part.of.row', signature(object='RasterStack'),
 
 
 #read part of a single row
-.raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncolumns=(ncols(raster)-startcol+1)) {
+.raster.read.part.of.row <- function(raster, rownr,  startcol=1, ncolumns=(ncol(raster)-startcol+1)) {
 	rownr <- round(rownr)
-	if (rownr == 0) { stop("rownr == 0. It should be between 1 and nrows(raster), or -1 for all rows") }
-	if (rownr > nrows(raster)) { stop("rownr too high") }
+	if (rownr == 0) { stop("rownr == 0. It should be between 1 and nrow(raster), or -1 for all rows") }
+	if (rownr > nrow(raster)) { stop("rownr too high") }
 	if (startcol < 1) { stop("startcol < 1") }
-	if (startcol > ncols(raster)) { stop("startcol > ncols(raster)") }
+	if (startcol > ncol(raster)) { stop("startcol > ncol(raster)") }
 	if (ncolumns < 1) { stop("ncols should be > 1") }
 
 
 	endcol <- startcol + ncolumns - 1
-	if (endcol > ncols(raster)) { 
-		endcol <- ncols(raster) 
-		ncolumns <- ncols(raster) - startcol + 1  
+	if (endcol > ncol(raster)) { 
+		endcol <- ncol(raster) 
+		ncolumns <- ncol(raster) - startcol + 1  
 	}
 
 	if (raster@file@driver == 'raster') {
@@ -148,7 +84,7 @@ setMethod('read.part.of.row', signature(object='RasterStack'),
 			dtype <- numeric() 
 		}
 		if (rownr > 0) {
-			seek(con, ((rownr-1) * ncols(raster) + (startcol-1)) * raster@file@datasize)
+			seek(con, ((rownr-1) * ncol(raster) + (startcol-1)) * raster@file@datasize)
 			result <- readBin(con, what=dtype, n = ncolumns, size = raster@file@datasize, endian = raster@file@byteorder) }	
 		else {	
 			result <- readBin(con, what=dtype, n = ncells(raster), size = raster@file@datasize, endian = raster@file@byteorder) 
@@ -159,12 +95,12 @@ setMethod('read.part.of.row', signature(object='RasterStack'),
 	else { #use GDAL  
 		if (is.na(raster@file@band)) { result <- NA }
 		else {
-			if (rownr > nrows(raster)) {
+			if (rownr > nrow(raster)) {
 				stop("rownr too high")
 			}
 			if (rownr <= 0) {
 				offs <- c(0, 0) 
-				reg <- c(nrows(raster), ncols(raster)) #	reg <- dim(raster@file@gdalhandle[[1]])
+				reg <- c(nrow(raster), ncol(raster)) #	reg <- dim(raster@file@gdalhandle[[1]])
 			}
 			else {
 				offs= c((rownr-1), (startcol-1)) 
@@ -179,7 +115,7 @@ setMethod('read.part.of.row', signature(object='RasterStack'),
 		raster@data@indices <- c(1, ncells(raster))
 		raster@data@content <- "all"
 		raster <- set.minmax(raster)
-	} else if (startcol==1 & ncolumns==(ncols(raster)-startcol+1)) {
+	} else if (startcol==1 & ncolumns==(ncol(raster)-startcol+1)) {
 		raster@data@indices <- c(get.cell.from.rowcol(raster, rownr, startcol), get.cell.from.rowcol(raster, rownr, endcol))
 		raster@data@content <- "row"
 	} else {
@@ -193,7 +129,7 @@ setMethod('read.part.of.row', signature(object='RasterStack'),
 
 #sample while reading and return matrix (for plotting )
 .read.skip <- function(raster, maxdim=500) {
-	rasdim <- max(ncols(raster), raster@nrows )
+	rasdim <- max(ncol(raster), raster@nrows )
 	if (rasdim <= maxdim) { 
 		dd <- .values.as.matrix(.raster.read.all(raster))
 	} else {
@@ -223,69 +159,77 @@ setMethod('read.part.of.row', signature(object='RasterStack'),
 
 
 #read data on the raster for xy coordinates
-read.xy <- function(raster, xy) {
+.raster.read.xy <- function(raster, xy) {
 	if (!is.matrix(xy)) { xy <- as.matrix(t(xy)) }
-	if (raster@file@driver == 'raster') {
-		cells <- get.cell.from.xy(raster, xy)
-		return(read.cells(raster, cells))
-	}
-	else {
-		colrow <- matrix(ncol=5, nrow=length(xy[,1]))
-		valuename <- raster@file@shortname
-		if (valuename == "") {valuename <- "value" }
-		colnames(colrow) <- c("id", "colnr", "rownr", "cell", valuename)
-		for  (i in 1:length(xy[,1])) {
-			colrow[i,1] <- i
-			colrow[i,2] <- get.col.from.x(raster, xy[i,1])
-			colrow[i,3] <- get.row.from.y(raster, xy[i,2])
-			colrow[i,4] <- get.cell.from.xy(raster, xy[i,])	
-			colrow[i,5] <- NA
-		}	
-		rows <- na.omit(unique(colrow[order(colrow[,3]), 3]))
-		for (i in 1:length(rows)) {
-			raster <- .raster.read.row(raster, rows[i])
-			thisrow <- subset(colrow, colrow[,3] == rows[i])
-			for (j in 1:length(thisrow[,1])) {
-				thisrow[j,5] <- raster@data@values[thisrow[j,2]]
-				colrow[colrow[,4]==thisrow[j,4],5] <- thisrow[j,5]
-			}	
-		}
-		return(colrow[,4:5]) 
-	}	
+	cells <- get.cell.from.xy(raster, xy)
+	return(.raster.read.cells(raster, cells))
 }	
 
+
 #read data on the raster for cell numbers
-read.cells <- function(raster, cells) {
-	if (raster@file@driver == 'gdal') {
-		xy <- get.xy.from.cell(raster, cells)
-		return(read.xy(raster, xy))
-	} else {
-		id <- seq(1:length(cells))
-		value <- NA
-		cells <- cbind(id, cells, value)
-	
-		valuename <- raster@file@shortname
-		if (valuename == "") {valuename <- "value" }
-		colnames(cells) <- c("id", "cell", valuename)
-
-		uniquecells <- na.omit(unique(cells[order(cells[,2]),2]))
-		uniquecells <- uniquecells[(uniquecells > 0) & (uniquecells <= ncells(raster) )]
-	
-		rastergri <- file.change.extension(filename(raster), ".gri")
-		if (!file.exists(raster@file@name)) { stop(paste(filename(raster)," does not exist")) }
-		con <- file(rastergri, "rb")
-
-		for (i in 1:length(uniquecells)) {
-			seek(con, (uniquecells[i]-1) * raster@file@datasize)
-			if (raster@file@datatype == "integer") { dtype <- integer() } else { dtype <- numeric() }
-				result <- readBin(con, what=dtype, n=1, size=raster@file@datasize, endian=raster@file@byteorder) 
-			cells[cells[,2]==uniquecells[i], 3] <- result
+.raster.read.cells <- function(raster, cells) {
+	uniquecells <- na.omit(unique(cells[order(cells)]))
+	uniquecells <- uniquecells[(uniquecells > 0) & (uniquecells <= ncells(raster))]
+	res <- cbind(cells, NA)
+	if (length(uniquecells) > 0) {
+		if (raster@file@driver == 'gdal') {
+			vals <- (.read.cells.gdal(raster, uniquecells))
+		} else {
+			vals <- (.read.cells.raster(raster, uniquecells))
 		}
-		close(con)
-		cells[cells[,3] <=  max(-3e+38, raster@file@nodatavalue)] <- NA
-		return(cells[,2:3])
+		for (i in 1:length(vals[,1])) {
+			res[res[,1]==vals[i,1],2] <- vals[i,2] 
+		}
 	}	
+	return(res[,2])
 }
 
+
+.read.cells.gdal <- function(raster, cells) {
+	colrow <- matrix(ncol=5, nrow=length(cells))
+#	valuename <- raster@file@shortname
+#	if (valuename == "") {valuename <- "value" }
+#	colnames(colrow) <- c("id", "colnr", "rownr", "cell", valuename)
+	for  (i in 1:length(cells)) {
+		colrow[i,1] <- get.col.from.cell(raster, cells[i])
+		colrow[i,2] <- get.row.from.cell(raster, cells[i])
+		colrow[i,3] <- cells[i]
+		colrow[i,4] <- NA
+	}	
+	rows <- na.omit(unique(colrow[order(colrow[,2]), 2]))
+	for (i in 1:length(rows)) {
+		raster <- .raster.read.row(raster, rows[i])
+		thisrow <- subset(colrow, colrow[,2] == rows[i])
+		for (j in 1:length(thisrow[,1])) {
+			colrow[colrow[,3]==thisrow[j,3],4] <- raster@data@values[thisrow[j,1]]
+		}	
+	}
+	return(colrow[,3:4]) 
+}	
+
+
+
+.read.cells.raster <- function(raster, cells) {
+	cells <- cbind(cells, NA)
+#	valuename <- raster@file@shortname
+#	if (valuename == "") {valuename <- "value" }
+#	colnames(cells) <- c("id", "cell", valuename)
+#	uniquecells <- na.omit(unique(cells[order(cells[,2]),2]))
+	
+	rastergri <- file.change.extension(filename(raster), ".gri")
+	if (!file.exists(filename(raster))) { stop(paste(filename(raster)," does not exist")) }
+	con <- file(rastergri, "rb")
+
+	res <- vector(length=length(cells))
+	res[] <- NA
+	for (i in 1:length(cells)) {
+		seek(con, (cells[i]-1) * raster@file@datasize)
+		if (raster@file@datatype == "integer") { dtype <- integer() } else { dtype <- numeric() }
+			res[i] <- readBin(con, what=dtype, n=1, size=raster@file@datasize, endian=raster@file@byteorder) 
+	}
+	close(con)
+	res[res <=  max(-3e+38, raster@file@nodatavalue)] <- NA
+	return(cbind(cells,res))
+}
 
 

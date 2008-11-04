@@ -1,26 +1,26 @@
-\name{stack.create}
-\alias{stack.from.stackfile}
-\alias{stack.from.rasterfiles}
-\alias{stack.from.rasters}
-\alias{stack.add.files}
-\alias{stack.add.rasters}
-\alias{stack.remove.rasters}
-\alias{stack.save}
+\name{rasterstack.create}
+\alias{rasterstack.from.stackfile}
+\alias{rasterstack.from.rasterfiles}
+\alias{rasterstack.from.rasters}
+\alias{rasterstack.add.files}
+\alias{rasterstack.add.rasters}
+\alias{rasterstack.remove.rasters}
+\alias{rasterstack.save}
 
 \title{ Create or change a new stack }
 \description{
   A raster stack is a collection of rasters with the same spatial extent and resolution. They can be crated from raster objects, or from raster files.
-  You can add raster to or remove raster from a stack. You can also save a stack to a file, to recreate it later.  
+  You can add raster to or remove raster from a rasterstack. You can also save a stack to a file, to recreate it later.  
 }
 
 \usage{
-stack.from.stackfile(stackfile)
-stack.from.rasterfiles(rasterfiles, bands= rep(1, length(rasterfiles)))
-stack.from.rasters(rasters)
-stack.add.files(rstack, rasterfiles, bands= rep(1, length(rasterfiles))) 
-stack.add.rasters(rstack, rasters) 
-stack.remove.rasters(rstack, indices) 
-stack.save(rstack, stackfile, forceext = TRUE)
+rasterstack.from.stackfile(stackfile)
+rasterstack.from.rasterfiles(rasterfiles, bands= rep(1, length(rasterfiles)))
+rasterstack.from.rasters(rasters)
+rasterstack.add.files(rstack, rasterfiles, bands= rep(1, length(rasterfiles))) 
+rasterstack.add.rasters(rstack, rasters) 
+rasterstack.remove.rasters(rstack, indices) 
+rasterstack.save(rstack, stackfile, forceext = TRUE)
 }
 
 \arguments{
@@ -44,14 +44,14 @@ stack.save(rstack, stackfile, forceext = TRUE)
 \seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
   rasterfile <- system.file("external/test.ag", package="sp")
-  st <- stack.from.rasterfiles(rasterfile)
+  st <- rasterstack.from.rasterfiles(rasterfile)
 # adding the same file multiple times, in most cases you would add different files  
 # this generates warnings, but it is not an error
-  st <- stack.add.files(st, c(rasterfile, rasterfile))
+  st <- rasterstack.add.files(st, c(rasterfile, rasterfile))
   rs <- raster.from.file(rasterfile)
-  st <- stack.add.rasters(st, c(rs, rs))
+  st <- rasterstack.add.rasters(st, c(rs, rs))
   st
-  st <- stack.remove.rasters(st, c(3, 5))
+  st <- rasterstack.remove.rasters(st, c(3, 5))
   nlayers(st)
 }
 \keyword{ spatial }

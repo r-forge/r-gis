@@ -7,7 +7,7 @@
 # Licence GPL v3
 
 
-#raster.resample <- function(raster, xmin, xmax, ymin, ymax, ncols, nrows, method="bilinear", filename="", overwrite=FALSE) {
+#r.resample <- function(raster, xmin, xmax, ymin, ymax, ncols, nrows, method="bilinear", filename="", overwrite=FALSE) {
 #	stop("sorry, not implemented yet")
 #	if (raster@data@content == 'all')  {
 #	} else if (raster@data@source == 'disk')  {
@@ -40,21 +40,21 @@ r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 	if (data.content(raster) == 'all')  {
 		d <- vector(length=ncells(outraster))
 		d[] <- NA
-		for (r in 1:nrows(raster)) {
+		for (r in 1:nrow(raster)) {
 			v <- get.row(raster, r) 
-			startcell <- (r + startrow -2) * ncols(outraster) + startcol
-			d[startcell:(startcell+ncols(raster)-1)] <- v
+			startcell <- (r + startrow -2) * ncol(outraster) + startcol
+			d[startcell:(startcell+ncol(raster)-1)] <- v
 			outraster <- set.values(outraster, d)
 		}
 	} else if (data.source(raster) == 'disk')  {
 		if (filename == "") {stop('invalid filename')}
-		d <- vector(length=ncols(outraster))
-		for (r in 1:nrows(raster)) {
+		d <- vector(length=ncol(outraster))
+		for (r in 1:nrow(raster)) {
 			raster <- read.row(raster, r)
 			v <- values(raster)
 			d[] <- NA
-			startcell <- (r + startrow -2) * ncols(outraster) + startcol
-			d[startcell:(startcell+ncols(raster)-1)] <- v
+			startcell <- (r + startrow -2) * ncol(outraster) + startcol
+			d[startcell:(startcell+ncol(raster)-1)] <- v
 			outraster <- set.values.row(outraster, d, r)
 			outraster <- write.raster(outraster)
 		}
@@ -69,7 +69,7 @@ get.row <- function(raster, r) {
 	} else if (data.content(raster) != 'all') {stop('cannot do. Need all data')
 	} else {
 		startcell <- get.cell.from.rowcol(raster, r, 1)
-		endcell <- startcell+ncols(raster)-1
+		endcell <- startcell+ncol(raster)-1
 		return(values(raster)[startcell:endcell])
 	}	
 }
@@ -78,7 +78,7 @@ get.row <- function(raster, r) {
 get.row.sparse <- function(raster, r, explode=TRUE) {
 	if (data.content(raster) != 'sparse') {stop('cannot do. Need sparse')}
 	startcell <- get.cell.from.rowcol(raster, r, 1)
-	endcell <- startcell+ncols(raster)-1
+	endcell <- startcell+ncol(raster)-1
 	d <- cbind(data.indices(raster), values(raster))
 	d <- d[d[,1] >= startcell & d[,1] <= endcell, ] 
 	if (explode) { 
@@ -118,8 +118,8 @@ r.merge <- function(rasters, filename="", overwrite=FALSE) {
 		rowcol[i,3] <- get.col.from.x(outrs, xy1[1]) #start col
 	}
 	v <- vector(length=0)
-	for (r in 1:nrows(outrs)) {
-		rd <- as.vector(matrix(NA, nrow=1, ncol=ncols(outrs))) 
+	for (r in 1:nrow(outrs)) {
+		rd <- as.vector(matrix(NA, nrow=1, ncol=ncol(outrs))) 
 		for (i in length(rasters):1) {  #reverse order so that the first raster covers the second etc.
 			if (r >= rowcol[i,1] & r <= rowcol[i,2]) { 
 				if (rasters[[i]]@data@source == 'disk') {
@@ -128,7 +128,7 @@ r.merge <- function(rasters, filename="", overwrite=FALSE) {
 				} else {
 					d <- get.row(rasters[[i]], r + 1 - rowcol[i,1]) 
 				}
-				id2 <- seq(1:ncols(rasters[[i]])) + rowcol[i,3] - 1
+				id2 <- seq(1:ncol(rasters[[i]])) + rowcol[i,3] - 1
 				d <- cbind(id2, d)
 				d <- na.omit(d)
 				rd[d[,1]] <- d[,2]
@@ -207,10 +207,10 @@ r.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
 	if ( data.content(raster) != 'all') { 
 			stop('raster values should all be in memory for this version of raster.disaggregate()') 
 	} else {
-		outrs <- set.rowcol(outrs, nrows(raster) * factor, ncols(raster) * factor) 
+		outrs <- set.rowcol(outrs, nrow(raster) * factor, ncol(raster) * factor) 
 		if ( data.content(raster)=='all') {
-			cols <- rep(rep(1:ncols(raster), each=factor), times=raster@nrows * factor)
-			rows <- rep(1:nrows(raster), each=raster@ncols*factor*factor)
+			cols <- rep(rep(1:ncol(raster), each=factor), times=raster@nrows * factor)
+			rows <- rep(1:nrow(raster), each=raster@ncols*factor*factor)
 			cells <- get.cell.from.rowcol(raster, rows, cols)
 #			m <- matrix(cells, ncol=outrs@ncols, nrow=outrs@nrows, byrow=T)
 			d <- values(raster)[cells]

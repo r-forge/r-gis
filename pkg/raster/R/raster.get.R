@@ -70,7 +70,7 @@ get.cell.from.rowcol <- function(raster, rownr, colnr) {
 
 get.col.from.x <- function ( raster, x )	{
 	colnr <- (trunc((x - xmin(raster)) / xres(raster))) + 1 
-	colnr[x == xmax(raster)] <- ncols(raster)
+	colnr[x == xmax(raster)] <- ncol(raster)
 	colnr[x < xmin(raster) | x > xmax(raster) ] <- NA
 	return(colnr) }
 	

@@ -13,7 +13,7 @@ s.calc <- function(rstack, fun, filename=NA, overwrite=FALSE, ForceIntOutput=FAL
 		outraster <- set.values(outraster, apply(values(rstack), 1, fun)) 
 	} else {
 		if (ForceIntOutput) { outraster <- set.datatype(outraster, "integer") }
-		for (r in 1:nrows(rstack)) {
+		for (r in 1:nrow(rstack)) {
 			rstack <- read.row(rstack, r)
 			vals <- apply(values(rstack), 1, fun)
 			outraster <- set.values.row(outraster, vals, r) 

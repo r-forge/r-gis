@@ -18,3 +18,5 @@ brick.from.bbox <- function(boundingbox, nrows=1, ncols=1) {
 		return <- NA 
 	}
 }
+
+

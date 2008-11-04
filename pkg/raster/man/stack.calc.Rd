@@ -1,4 +1,4 @@
-\name{stack.calc}
+\name{rasterstack.calc}
 \alias{s.calc}
 \title{ Cell based calculations for a stack }
 \description{

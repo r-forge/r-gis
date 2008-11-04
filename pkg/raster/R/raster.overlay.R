@@ -19,7 +19,7 @@ r.overlay <- function(raster1, raster2, fun=function(x,y){return(x+y)}, filename
 		outraster <- set.values(outraster, vals)
 		if (filename != "") { write.raster(outraster, overwrite=overwrite) }
 	} else if ( data.source(raster1) == 'disk' &  data.source(raster2) == 'disk') {
-		for (r in 1:nrows(outraster)) {
+		for (r in 1:nrow(outraster)) {
 			raster1 <- read.row(raster1, r)
 			raster2 <- read.row(raster2, r)
 			vals <- fun(values(raster1), values(raster2))
@@ -48,7 +48,7 @@ r.cover <- function(raster1, raster2, filename="", overwrite=TRUE) {
 		outraster <- set.values(outraster, vals)
 		if (filename != "") { write.raster(outraster, overwrite=overwrite) }
 	} else if ( data.source(raster1) == 'disk' &  data.source(raster2) == 'disk') {
-		for (r in 1:nrows(outraster)) {
+		for (r in 1:nrow(outraster)) {
 			raster1 <- read.row(raster1, r)
 			raster2 <- read.row(raster2, r)
 			vals <- values(raster1)

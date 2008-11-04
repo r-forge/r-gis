@@ -17,8 +17,8 @@ write.ascii <- function(raster, overwrite=FALSE) {
 				stop(paste(filename(raster),"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
 
 			thefile <- file(raster@file@name, "w")  # open an txt file connection
-			cat("NCOLS", ncols(raster), "\n", file = thefile)
-			cat("NROWS", nrows(raster), "\n", file = thefile)
+			cat("NCOLS", ncol(raster), "\n", file = thefile)
+			cat("NROWS", nrow(raster), "\n", file = thefile)
 			cat("XLLCORNER", xmin(raster), "\n", file = thefile)
 			cat("YLLCORNER", ymin(raster), "\n", file = thefile)
 			cat("CELLSIZE",  xres(raster), "\n", file = thefile)

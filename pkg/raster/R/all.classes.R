@@ -2,8 +2,8 @@
 # Authors: Robert J. Hijmans and Jacob van Etten, 
 # International Rice Research Institute. Philippines
 # contact: r.hijmans@gmail.com
-# Date : October 2008
-# Version 0,4
+# Date : November 2008
+# Version 0.8
 # Licence GPL v3
 
 
@@ -82,7 +82,7 @@ setClass('RasterFile',
 )	
 
 
-setClass('SingleRasterData', 
+setClass('SingleLayerData', 
 	representation (
 		values='vector', 
 		content='character', #nodata, all, row, block, sparse
@@ -112,7 +112,7 @@ setClass ('RasterLayer',
 	representation (
 		title = 'character',
 		file = 'RasterFile',
-		data = 'SingleRasterData',
+		data = 'SingleLayerData',
 		history = 'vector'
 		),
 	prototype (
@@ -129,8 +129,8 @@ setMethod ('show' , 'RasterLayer',
 #			cat('nbands      :' , object@file@nbands, '\n')
 			cat('band        :' , object@file@band, '\n')
 		}	
-		cat('nrow        :' , nrows(object), '\n')
-		cat('ncol        :' , ncols(object), '\n')
+		cat('nrow        :' , nrow(object), '\n')
+		cat('ncol        :' , ncol(object), '\n')
 		cat('ncells      :' , ncells(object), '\n')
 		cat('data type   :' , object@file@datanotation, '\n')
 		cat('data content:' ,  data.content(object), '\n')
@@ -194,13 +194,13 @@ setClass ('RasterBrick',
 	
 
 
-setMethod ('show' , 'RasterRasterBrick',
+setMethod ('show' , 'RasterBrick',
 	function ( object ){
 		cat ('class     :' , class ( object ) , '\n')
 		cat ('filename  :' , object@filename, '\n')
 		cat ('nlayers   :' , object@data@nlayers, '\n')
-		cat ('nrow      :' , nrows(object), '\n')
-		cat ('ncol      :' , ncols(object), '\n')
+		cat ('nrow      :' , nrow(object), '\n')
+		cat ('ncol      :' , ncol(object), '\n')
 		cat ('ncells    :' , ncells(object), '\n')
 		cat ('projection:' , projection(object, TRUE), '\n')
 		cat ('xmin      :' , xmin(object), '\n')
@@ -241,8 +241,8 @@ setMethod ('show' , 'RasterStack',
 		cat ('class     :' , class ( object ) , '\n')
 		cat ('filename  :' , object@filename, '\n')
 		cat ('nlayers   :' , object@data@nlayers, '\n')
-		cat ('nrow      :' , nrows(object), '\n')
-		cat ('ncol      :' , ncols(object), '\n')
+		cat ('nrow      :' , nrow(object), '\n')
+		cat ('ncol      :' , ncol(object), '\n')
 		cat ('ncells    :' , ncells(object), '\n')
 		cat ('projection:' , projection(object, TRUE), '\n')
 		cat ('xmin      :' , xmin(object), '\n')
