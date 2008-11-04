@@ -1,5 +1,5 @@
 `level.hitting.time.centrality.all.origins.xy` <-
-function(transition,weights.raster,id.xy)
+function(id.xy, transition, weights.raster)
 {
 #A check to see if the transition matrix and the weights.raster have the same resolution and extent should be done here.
 weights <- weights.raster@data[as.integer(rownames(transition@transitionmatrix))]

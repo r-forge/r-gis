@@ -18,6 +18,6 @@ shortest.cost.distance <- function(id.xy, transition)
 	{
 		shpaths[i,] <- shortest.paths(adj.graph, pointsofinterest[i])[,index]
 	}
-	return(shpaths)
+	return(as.dist(shpaths))
 }
 

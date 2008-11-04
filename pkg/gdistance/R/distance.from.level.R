@@ -1,5 +1,5 @@
 `distance.from.level` <-
-function(levels,fun,diag=T)
+function(levels,fun,diag=TRUE)
 {
 result <- matrix(NA,ncol=length(levels),nrow=length(levels))
 rownames(result) <- names(levels)

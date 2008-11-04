@@ -6,13 +6,13 @@
   Calculates the (weighted) sum of the average first-hitting time from all cells to a location.
 }
 \usage{
-level.hitting.time.centrality.all.origins.xy(transition, raster.weights, id.xy)
+level.hitting.time.centrality.all.origins.xy(id.xy, transition, weights.raster)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{transition}{ transition matrix }
-  \item{weights}{ raster with weight values for each cell }
   \item{id.xy}{ point locations }
+  \item{transition}{ transition matrix }
+  \item{weights.raster}{ raster with weight values for each cell }
 }
 \details{
   ~~ If necessary, more details than the description above ~~

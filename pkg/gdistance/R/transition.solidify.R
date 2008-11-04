@@ -1,13 +1,13 @@
-setGeneric("transition.solidify", function(tm) standardGeneric("transition.solidify"))
+setGeneric("transition.solidify", function(transition) standardGeneric("transition.solidify"))
 
-setMethod("transition.solidify", signature(tm = "transition"), def = function(tm)
+setMethod("transition.solidify", signature(transition = "transition"), def = function(transition)
 	{
-		tm.dsC <- as(tm,"dsCMatrix")
-		selection <- which(rowSums(tm.dsC)>0)
-		tm.dsC <- tm.dsC[selection,selection]
-		tm <- dsCMatrix.to.transition(tm.dsC,tm)
-		tm@zerorowcol <- FALSE
-		return(tm)
+		transition.dsC <- as(transition,"dsCMatrix")
+		selection <- which(rowSums(transition.dsC)>0)
+		transition.dsC <- transition.dsC[selection,selection]
+		transition <- dsCMatrix.to.transition(transition.dsC,transition)
+		transition@zerorowcol <- FALSE
+		return(transition)
 	}
 ) 
 

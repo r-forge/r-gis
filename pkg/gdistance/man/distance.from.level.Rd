@@ -6,13 +6,13 @@
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-distance.from.level(levels, fun,diag=TRUE)
+distance.from.level(levels, fun, diag=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{levels}{ ~~Describe \code{levels} here~~ }
   \item{fun}{ ~~Describe \code{fun} here~~ }
-  \item{fun}{ ~~Describe \code{diag} here~~ }
+  \item{diag}{ ~~Describe \code{diag} here~~ }
 }
 \details{
   ~~ If necessary, more details than the description above ~~
