@@ -49,7 +49,7 @@ function(origin.xy,goal.xy,transition)
 		xres = transition@xres,
 		yres = transition@yres,
 		data = as.array(rep(NA,times=transition@ncells))
-	)
+	}
 
 	datavector <- vector(length=length(raster@data))
 	datavector[as.integer(rownames(transition@transitionmatrix))] <- Current

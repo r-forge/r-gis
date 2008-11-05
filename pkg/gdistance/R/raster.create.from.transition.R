@@ -29,7 +29,7 @@ raster.create.from.transition <- function(transition)
 		xres = transition@xres,
 		yres = transition@yres,
 		data = as.array(rep(NA,times=transition@ncells))
-	)
+	}
 	raster@data[as.integer(transition@transitionmatrix@Dimnames[[1]])] <- colSums(as(transition,"dsCMatrix"))
 	}
 	return(raster)
