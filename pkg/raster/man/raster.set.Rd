@@ -24,7 +24,7 @@ Use these functions to set name and datatype properties of a raster object. Whil
 set.raster(raster, filename=NA, INT=FALSE)
 set.projection(object, projection)
 set.filename(object, filename)
-set.bbox(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE)
+set.bbox(raster, xmn=xmin(raster), xmx=xmax(raster), ymn=ymin(raster), ymx=ymax(raster), keepres=FALSE)
 set.datatype(raster, datatype, datasize)
 set.rowcol(raster, nrows=nrow(raster), ncols=ncol(raster)) 
 set.minmax(raster)
@@ -53,10 +53,10 @@ make.sparse(raster)
   \item{indices}{ the cell numbers corresponding to the sparse data }
   \item{nrows}{ the new number of rows for the raster }
   \item{ncols}{ the new number of cols for the raster }  
-  \item{xmin}{ the new minimum x coordinate of the raster }
-  \item{xmax}{ the new maximum x coordinate of the raster }
-  \item{ymin}{ the new minimum y coordinate of the raster }
-  \item{ymax}{ the new maximum y coordinate of the raster }
+  \item{xmn}{ the new minimum x coordinate of the raster }
+  \item{xmx}{ the new maximum x coordinate of the raster }
+  \item{ymn}{ the new minimum y coordinate of the raster }
+  \item{ymx}{ the new maximum y coordinate of the raster }
   \item{keepres} {logical. If \code{TRUE}, the resolution will stay the same (by adjusting the number of rows and columns)}
   \item{projection} {a character string describing a projection and datum in PROJ4 format }
 }

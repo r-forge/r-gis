@@ -1,5 +1,6 @@
 
 
+
 setMethod('dim', signature(x='AbstractRaster'), 
 	function(x){ return(c(nrow(x), ncol(x)))}
 )
@@ -110,4 +111,19 @@ setMethod('extract.xy', signature(object='RasterStack'),
 	function(object, xy) { 
 		return(.rasterstack.read.xy(object, xy))}
 )
+
+
+setMethod('hist', signature(x='RasterLayer'), 
+	function(x, ...){.hist.raster(x, ...)}
+)
+
+.hist.raster <- function(x, ...) {
+	if (data.content(x) != 'all') {
+		if (data.source(x) == 'disk') {
+		# also make a function that does this by block and combines  all data into a single histogram
+			x <- .read.skip(x, 1000) 
+		} else { stop('cannot do; there should be data that is either on disk or in memory')}
+	}
+	hist(values(x), ...)
+}
 

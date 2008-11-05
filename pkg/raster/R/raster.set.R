@@ -47,26 +47,27 @@ clear.values <- function(raster) {
 	raster@data@indices <- ""
 	raster@data@values <- ""
 	return(raster)
-}		
+}
 
-set.bbox <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster), keepres=FALSE) {
-	xres <- xres(raster)
-	yres <- yres(raster)
-	if (xmin > xmax) {
-		stop('xmin > xmax')
+
+set.bbox <- function(raster, xmn=xmin(raster), xmx=xmax(raster), ymn=ymin(raster), ymx=ymax(raster), keepres=FALSE) {
+	xrs <- xres(raster)
+	yrs <- yres(raster)
+	if (xmn > xmx) {
+		stop('xmn > xmx')
 	}
-	if (ymin > ymax) {
-		stop('ymin > ymax')
+	if (ymn > ymx) {
+		stop('ymn > ymx')
 	}
-	raster@bbox[1,1] <- xmin
-	raster@bbox[1,2] <- xmax
-	raster@bbox[2,1] <- ymin
-	raster@bbox[2,2] <- ymax
+	raster@bbox[1,1] <- xmn
+	raster@bbox[1,2] <- xmx
+	raster@bbox[2,1] <- ymn
+	raster@bbox[2,2] <- ymx
 	if (keepres) {
-		raster@ncols <- as.integer(round( (xmax(raster) - xmin(raster)) / xres ))
-		raster@nrows <- as.integer(round( (ymax(raster) - ymin(raster)) / xres ))
-		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xres
-		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yres
+		raster@ncols <- as.integer(round( (xmax(raster) - xmin(raster)) / xrs ))
+		raster@nrows <- as.integer(round( (ymax(raster) - ymin(raster)) / xrs ))
+		raster@bbox[1,2] <- raster@bbox[1,1] + raster@ncols * xrs
+		raster@bbox[2,2] <- raster@bbox[2,1] + raster@nrows * yrs
 	}
 	return(raster)
 }
@@ -187,7 +188,9 @@ set.values <- function(raster, values) {
 
 
 set.minmax <- function(raster) {
-	if (raster@data@content == 'nodata') {stop('no data in memory') }
+	if (raster@data@content == 'nodata') {
+		stop('no data in memory')
+	}
 	vals <- na.omit(values(raster)) # min and max values
 	if (length(vals) > 0) {
 		raster@data@min <-  min(vals)

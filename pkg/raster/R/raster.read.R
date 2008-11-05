@@ -129,32 +129,36 @@
 
 #sample while reading and return matrix (for plotting )
 .read.skip <- function(raster, maxdim=500) {
-	rasdim <- max(ncol(raster), raster@nrows )
+	rasdim <- max(ncol(raster), nrow(raster) )
 	if (rasdim <= maxdim) { 
-		dd <- .values.as.matrix(.raster.read.all(raster))
+		outras <- .raster.read.all(raster)
 	} else {
 		fact <- maxdim / rasdim
-		nc <- trunc(fact * raster@ncols)
-		nr <- trunc(fact * raster@nrows)
-		colint <- round(raster@ncols / nc)
-		rowint <- round(raster@nrows / nr)
-		nc <- trunc(raster@ncols / colint)
-		nr <- trunc(raster@nrows / rowint)
-		cols <- vector(length=nc)
-		for (i in 1:nc) { 
-			cols[i] <- 1 + (i-1) * colint 
-		}
+		nc <- trunc(fact * ncol(raster))
+		nr <- trunc(fact * nrow(raster))
+		colint <- round(ncol(raster) / nc)
+		rowint <- round(nrow(raster) / nr)
+		nc <- trunc(ncol(raster) / colint)
+		nr <- trunc(nrow(raster) / rowint)
+		cols <- 1:nc
+		cols <- 1 + (cols-1) * colint 
 		for (i in 1:nr) {
 			row <- 1 + (i-1) * rowint
-			raster <- .raster.read.row(raster, row)
+			raster <- read.row(raster, row)
 			if (i == 1) {
-				dd <- t(raster@data@values[cols])
+				dd <- values(raster)[cols]
 			} else {
-				dd <- rbind(dd, raster@data@values[cols])
+				dd <- c(dd, values(raster)[cols])
 			}
 		}	
+		outras <- set.raster(raster)
+		outras <- set.rowcol(outras, nr, nc)
+		xmx <- xmax(raster) - (ncol(raster) - cols[nc]) * xres(raster)
+		ymn <- ymin(raster) + (nrow(raster) - row) * yres(raster)
+		outras <- set.bbox(outras, xmx=xmx, ymn=ymn)
+		outras <- set.values(outras, dd)
 	}
-	return(dd)
+	return(outras)
 }
 
 

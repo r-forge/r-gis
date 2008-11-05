@@ -20,19 +20,19 @@ r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 	bbox <- boundingbox(boundingbox)
 	res <- resolution(raster)
 # snap points to pixel boundaries
-	xmin <- round(bbox[1,1] / res[1]) * res[1]
-	xmax <- round(bbox[1,2] / res[1]) * res[1]
-	ymin <- round(bbox[2,1] / res[2]) * res[2]
-	ymax <- round(bbox[2,2] / res[2]) * res[2]
+	xmn <- round(bbox[1,1] / res[1]) * res[1]
+	xmx <- round(bbox[1,2] / res[1]) * res[1]
+	ymn <- round(bbox[2,1] / res[2]) * res[2]
+	ymx <- round(bbox[2,2] / res[2]) * res[2]
 	
 # only expanding here, not cutting
-	xmin <- min(xmin, xmin(raster))
-	xmax <- max(xmax, xmax(raster))
-	ymin <- min(ymin, ymin(raster))
-	ymax <- max(ymax, ymax(raster))
+	xmn <- min(xmn, xmin(raster))
+	xmx <- max(xmx, xmax(raster))
+	ymn <- min(ymn, ymin(raster))
+	ymx <- max(ymx, ymax(raster))
 	
 	outraster <- set.raster(raster, filename)
-	outraster <- set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
+	outraster <- set.bbox(outraster, xmn, xmx, ymn, ymx, keepres=T)
 
 	startrow <- get.row.from.y(outraster, ymax(raster))
 	startcol <- get.col.from.x(outraster, xmin(raster))
@@ -150,20 +150,20 @@ r.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 # we could also allow the raster to expand but for now let's not and first make a separate expand function
 	bbox <- boundingbox(boundingbox)
 
-	xmin <- max(bbox[1,1], xmin(raster))
-	xmax <- min(bbox[1,2], xmax(raster))
-	ymin <- max(bbox[2,1], ymin(raster))
-	ymax <- min(bbox[2,2], ymax(raster))
+	xmn <- max(bbox[1,1], xmin(raster))
+	xmx <- min(bbox[1,2], xmax(raster))
+	ymn <- max(bbox[2,1], ymin(raster))
+	ymx <- min(bbox[2,2], ymax(raster))
 	
-	if (xmin == xmax) {stop("xmin and xmax are less than one cell apart")}
-	if (ymin == ymax) {stop("ymin and ymax are less than one cell apart")}
+	if (xmn == xmx) {stop("xmin and xmax are less than one cell apart")}
+	if (ymn == ymx) {stop("ymin and ymax are less than one cell apart")}
 	
 	outraster <- set.raster(raster, filename)
-	outraster <- set.bbox(outraster, xmin, xmax, ymin, ymax, keepres=T)
+	outraster <- set.bbox(outraster, xmn, xmx, ymn, ymx, keepres=T)
 	
 	if (raster@data@content == 'all')  {
-		first.start.cell <- get.cell.from.xy(raster, c(xmin + 0.5 * xres(raster), ymax - 0.5 * yres(raster) ))	
-		last.start.cell <- get.cell.from.xy(raster, c(xmin + 0.5 * xres(raster), ymin + 0.5 * yres(raster) ))
+		first.start.cell <- get.cell.from.xy(raster, c(xmn + 0.5 * xres(raster), ymx - 0.5 * yres(raster) ))	
+		last.start.cell <- get.cell.from.xy(raster, c(xmn + 0.5 * xres(raster), ymn + 0.5 * yres(raster) ))
 		start.cells <- seq(first.start.cell, last.start.cell, by = raster@ncols)
 		end.cells <- start.cells + outraster@ncols - 1
 		selected.cells <- unlist(mapply(seq, start.cells, end.cells))
@@ -174,8 +174,8 @@ r.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 		outraster@data@content <- 'all'
 		if (nchar(outraster@file@name) > 0 ) { outraster <- try(write.raster(outraster)) }		
 	} else if (raster@data@source == 'disk')  {
-		first.col <- get.col.from.x(raster, xmin + 0.5 * xres(outraster))
-		first.row <- get.row.from.y(raster, ymax - 0.5 * yres(outraster))
+		first.col <- get.col.from.x(raster, xmn + 0.5 * xres(outraster))
+		first.row <- get.row.from.y(raster, ymx - 0.5 * yres(outraster))
 		last.row <- first.row + outraster@nrows - 1
 		rownr <- 1
 		for (r in first.row:last.row) {
