@@ -1,12 +1,12 @@
-\name{raster.current.single.origin.single.destination}
-\alias{raster.current.single.origin.single.destination}
+\name{flow.map}
+\alias{ flow.map }
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-raster.current.single.origin.single.destination(transition, origin.xy, goal.xy)
+flow.map (origin.xy, goal.xy, transition)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
