@@ -20,37 +20,6 @@ function(origin.xy,goal.xy,transition)
 	V <- - V + d
 	Current <- colSums(abs(V)*-L)/2
 
-	if(transition@zerorowcol == TRUE)
-	{
-		raster <- new("raster",
-		projection = transition@projection,
-		ncols = transition@ncols,
-		nrows = transition@nrows,
-		ncells = transition@ncells,
-		xmin = transition@xmin,
-		xmax = transition@xmax,
-		ymin = transition@ymin,
-		ymax = transition@ymax,
-		xres = transition@xres,
-		yres = transition@yres,
-		raster@data <- colSums(as("dsCMatrix",transition)))
-	}
-	if(transition@zerorowcol == FALSE)
-	{
-		raster <- new("raster",
-		projection = transition@projection,
-		ncols = transition@ncols,
-		nrows = transition@nrows,
-		ncells = transition@ncells,
-		xmin = transition@xmin,
-		xmax = transition@xmax,
-		ymin = transition@ymin,
-		ymax = transition@ymax,
-		xres = transition@xres,
-		yres = transition@yres,
-		data = as.array(rep(NA,times=transition@ncells))
-	}
-
 	datavector <- vector(length=length(raster@data))
 	datavector[as.integer(rownames(transition@transitionmatrix))] <- Current
 	raster@data <- as.array(datavector)
