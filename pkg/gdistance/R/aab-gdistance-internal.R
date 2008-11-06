@@ -40,7 +40,7 @@ setMethod ("initialize", "transition",
 
 setAs("transition", "dsCMatrix", function(from){from@transitionmatrix})
 
-setAs("transition", "raster" function(from)
+setAs("transition", "raster", function(from)
 	{
 		new("raster",
 			projection = from@projection,

@@ -1,7 +1,7 @@
 joint.trajectory.distance <-
 function(id.xy, origin.xy, transition, weights.raster)
 {
-	weightsvector <- weights.raster@data[rownames(transition@transitionmatrix)]
+	weightsvector <- weights.raster@data[as.integer(rownames(transition@transitionmatrix))]
 	pointsofinterestin <- cbind(id.xy[,1:3],raster.get.cell.from.xy(transition, id.xy[,2:3]))
 	pointsofinterest <- pointsofinterestin[,4][pointsofinterestin[,4] %in% as.integer(rownames(transition@transitionmatrix))]
 	if (length(pointsofinterest) < length(pointsofinterestin[,4])) {warning(length(pointsofinterest)," out of ",length(pointsofinterestin[,4])," locations were found in the adjacency matrix.","\n")}
