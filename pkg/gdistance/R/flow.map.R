@@ -19,8 +19,12 @@ function(origin.xy,goal.xy,transition)
 	d <- t(t(A) * diag(V))
 	V <- - V + d
 	Current <- colSums(abs(V)*-L)/2
+	names(Current) <- rownames(transition@transitionmatrix)[1:n]
+	Current[as.character(origin.cell)] <- 1
+	Current[as.character(goal.cell)] <- 1
 
-	datavector <- vector(length=length(raster@data))
+	raster <- as(transition,"raster")
+	datavector <- rep(NA,times=length(raster@data))
 	datavector[as.integer(rownames(transition@transitionmatrix))] <- Current
 	raster@data <- as.array(datavector)
 	return(raster)

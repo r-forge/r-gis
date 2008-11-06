@@ -1,5 +1,4 @@
-joint.hitting.time.distance <-
-function(id.xy, transition, weights.raster)
+joint.hitting.time.distance <- function(id.xy, transition, weights.raster)
 {
 	weightsvector <- weights.raster@data[rownames(transition@transitionmatrix)]
 	pointsofinterestin <- cbind(id.xy[,1:3],raster.get.cell.from.xy(transition, id.xy[,2:3]))
@@ -55,12 +54,12 @@ function(id.xy, transition, weights.raster)
 	JCindex <- cbind(pmax(JCindex[,1],JCindex[,2]),pmin(JCindex[,1],JCindex[,2]))
 	JCout[JCoutindex] <- JC[JCindex]
 	JCtout <- matrix(nrow=length(pointsofinterestin[,1]),ncol=length(pointsofinterestin[,1]))
-	JCtout[JCoutindex] <- JCt[JCindex] #as.dist etc.
+	JCtout[JCoutindex] <- JCt[JCindex]
 	rownames(JCout) <- as.character(pointsofinterestin[,1])
 	colnames(JCout) <- as.character(pointsofinterestin[,1])
 	rownames(JCtout) <- as.character(pointsofinterestin[,1])
 	colnames(JCtout) <- as.character(pointsofinterestin[,1])
-	result <- list(unw=JCout,w=JCtout)
+	result <- list(unw=as.dist(JCout),w=as.dist(JCtout))
 	return(result)
 }
 

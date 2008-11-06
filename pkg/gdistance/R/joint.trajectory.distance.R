@@ -1,5 +1,5 @@
 joint.trajectory.distance <-
-function(id.xy, origin.xy, transition, weights.raster) #transition is a sparse matrix. transition is a sparse matrix with as row/column names the cell numbers. Points of interest are locations (cellnumbers) for which we want to know mutual resistance distance. Procedure based on Fouss et al. (2007))
+function(id.xy, origin.xy, transition, weights.raster)
 {
 	weightsvector <- weights.raster@data[rownames(transition@transitionmatrix)]
 	pointsofinterestin <- cbind(id.xy[,1:3],raster.get.cell.from.xy(transition, id.xy[,2:3]))
@@ -65,12 +65,12 @@ function(id.xy, origin.xy, transition, weights.raster) #transition is a sparse m
 	CMSindex <- cbind(pmax(CMSindex[,1],CMSindex[,2]),pmin(CMSindex[,1],CMSindex[,2]))
 	CMSout[CMSoutindex] <- CMS[CMSindex]
 	CMStout <- matrix(nrow=length(pointsofinterestin[,1]),ncol=length(pointsofinterestin[,1]))
-	CMStout[CMSoutindex] <- CMSt[CMSindex] #as.dist etc.
+	CMStout[CMSoutindex] <- CMSt[CMSindex] 
 	rownames(CMSout) <- as.character(pointsofinterestin[,1])
 	colnames(CMSout) <- as.character(pointsofinterestin[,1])
 	rownames(CMStout) <- as.character(pointsofinterestin[,1])
 	colnames(CMStout) <- as.character(pointsofinterestin[,1])
-	result <- list(w=CMSout,unw=CMStout)
+	result <- list(w=as.dist(CMSout),unw=as.dist(CMStout))
 	return(result)
 }
 

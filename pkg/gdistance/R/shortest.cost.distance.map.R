@@ -15,9 +15,10 @@ shortest.cost.distance.map <- function(id.xy, transition)
 	shpaths <- rep(Inf, times=length(rownames(transition@transitionmatrix)))	
 	for (i in 1:length(pointsofinterest))
 	{
-		shpaths <- pmin(shpaths,shortest.paths(adj.graph, pointsofinterest[i]))
+		shpaths <- pmin(shpaths,shortest.paths(adj.graph, match(pointsofinterest[i],V(adj.graph)$name)))
 	}
 	
+	raster <- as(transition, "raster")
 	datavector <- vector(length=length(raster@data))
 	datavector[as.integer(rownames(transition@transitionmatrix))] <- shpaths
 	raster@data <- as.array(datavector)

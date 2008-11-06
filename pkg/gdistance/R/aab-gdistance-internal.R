@@ -40,6 +40,24 @@ setMethod ("initialize", "transition",
 
 setAs("transition", "dsCMatrix", function(from){from@transitionmatrix})
 
+setAs("raster","transition", function(from)
+	{
+		new("raster",
+			projection = from@projection,
+			ncols = from@ncols,
+			nrows = from@nrows,
+			ncells = from@ncells,
+			xmin = from@xmin,
+			xmax = from@xmax,
+			ymin = from@ymin,
+			ymax = from@ymax,
+			xres = from@xres,
+			yres = from@yres,
+			data = as.array(rep(NA,times=from@ncells))
+			)
+	}
+)
+	
 setGeneric("dsCMatrix.to.transition", function(dsCMatrix,transition) standardGeneric("dsCMatrix.to.transition"))
 
 setMethod ("dsCMatrix.to.transition", signature(dsCMatrix = "dsCMatrix", transition = "transition"),
