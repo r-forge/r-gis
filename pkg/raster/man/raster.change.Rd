@@ -38,7 +38,7 @@ r.merge(rasters, filename, overwrite=FALSE)
 }
 
 \value{
-  a new raster object (in the R environment) and in some cases which is in some cases written to disk 
+  a new raster object (in the R environment) which is in some cases written to disk 
 }
 \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} }
 
