@@ -33,5 +33,16 @@
 \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} }
 
 \examples{
+	r <- raster.new()
+	r1 <- r.init(r)
+	r2 <- r.init(r)
+	r3 <- r.overlay(r1, r2)
+	r4 <- r.setNA(r3, value=1)
+	r5 <- r.cover(r4, r1)
+# hist(r1) 
+# hist(r3)	
+# hist(r4)	
+# hist(r5)	
+
 }
 \keyword{ spatial }

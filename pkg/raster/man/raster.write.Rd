@@ -22,13 +22,13 @@ write.export(raster, outfile, filetype='ascii', overwrite=FALSE)
   \item{raster}{ RasterLayer object }
   \item{outfile}{ The file resulting from import or export }
   \item{filetype}{ The type of file to export to }
-  \item{overwrite} { if TRUE existing files are overwritten }
-%  \item{sparse} { if TRUE a sparse format file is written }
+  \item{overwrite} { Logical. if \code{TRUE} existing files are overwritten }
+
 }
 \details{
-	data in \code{raster@data} is written to a file. Small datasets can be loaded into memory manipulated, 
+	data in a \code{RasterLayer} object is written to a file. Small datasets can be loaded into memory manipulated, 
 	and saved to disk again. For large datasets, you can read and write by row. 
-	}
+}
 
 \author{Robert J. Hijmans \email{r.hijmans@gmail.com}}
 
@@ -41,32 +41,36 @@ write.export(raster, outfile, filetype='ascii', overwrite=FALSE)
 #read all data
  rs <- read.all(rs)
 
-# write all to binary file
+# write all to a new binary file
  rs <- set.filename(rs, "binall.grd")
- rs <- write.binary(rs, overwrite=TRUE)
+ rs <- write.raster(rs, overwrite=TRUE)
  
 # write all to integer binary file
  rs <- set.filename(rs, "binallint.grd")
  rs <- set.datatype(rs, "integer")
- rs <- write.binary(rs, overwrite=TRUE)
+ rs <- write.raster(rs, overwrite=TRUE)
  
 # write all to ascii file
  rs <- set.filename(rs, "ascall.asc")
- write.ascii(rs, overwrite=TRUE)
+ rs <- write.ascii(rs, overwrite=TRUE)
  
 # read and write row by row; write to ascii file
+ rs <- raster.from.file(system.file("external/test.ag", package="sp"))
  ascrow <- set.filename(rs, "ascrow.asc")
- for (r in 1:rs@nrows) {
+ for (r in 1:nrow(rs)) {
 	rs <- read.row(rs, r)
-	ascrow@data <- rs@data
-	ascrow <- write.ascii.row(ascrow, r, overwrite=TRUE) }
+	ascrow <- set.values.row(ascrow, values(rs), r)
+	ascrow <- write.ascii(ascrow, overwrite=TRUE) 
+ }
 	
 # read and write row by row; write to binary file
- binrow <- set.filename(rs, "binrow.grd")
- for (r in 1:rs@nrows) {
-	binrow@data <- read.row(rs, r)@data
-	binrow <- write.binary.row(binrow, r, overwrite=TRUE) }
-  }
+ binras <- set.raster(rs, "binbyrow.grd")
+ for (r in 1:nrow(rs)) {
+#	binras <- set.values.row(binras, values(read.row(rs, r)), r)
+# a shortcut for this:	
+    binras@data <- read.row(rs, r)@data
+	binras <- write.row(binras, overwrite=TRUE) }
+}
 }
 
 \keyword{ spatial }

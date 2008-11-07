@@ -20,7 +20,7 @@ r.reclass(raster, rclmat, filename="", overwrite=FALSE, INT = FALSE)
 }
 
 \arguments{
-  \item{raster}{ a raster object }
+  \item{raster}{ a RasterLayer object }
   \item{fun}{ the function to be applied, for \code{calc} this should be a function that takes a single number as an argument }
   \item{value}{ the (threshold) value to replace with NA or that should be set to NA }
   \item{operator}{ the operator in setNA relative to the \code{value}, to set e.g. all values <= 2 to NA}
@@ -28,7 +28,7 @@ r.reclass(raster, rclmat, filename="", overwrite=FALSE, INT = FALSE)
   \item{filename}{ output filename for a new raster; if NA the result is not written to a file but returned with the raster object, in the data slot }
   \item{overwrite}{ logical to indicate whether an existing output file should be overwritten }
   \item{INT}{ logical. If \code{TRUE}, output will be integer values }
-  \item{ngb} {neighborhood size in number of cells}
+  \item{ngb} { neighborhood size in number of cells }
   \item{keepdata} {logical. If \code{TRUE}, NA will be removed for neighborhood computations. The result will only be NA if all cells are NA }
 }
 
@@ -52,9 +52,32 @@ r.reclass(raster, rclmat, filename="", overwrite=FALSE, INT = FALSE)
 \examples{
 
  r <- raster.new(ncols=36, nrows=18)
- r <- set.values(r, seq(1:ncells(r)))
- r2 <- r.init(r, fun=runif)
+ 
+# two ways to set all value to 1 
+#1, with a function
+ set1function <- function(x){rep(1, x)}
+ r <- r.init(r, fun=set1function)
+# 2, "manually" 
+ r <- set.values(r, rep(1, ncells(r)))
+ 
+# random values (see ?runif )
+ r <- r.init(r, fun=runif)
 
-
+# all values below 0.5 become NA
+ r2 <- r.setNA(r, operator ="<", value=0.5)
+# change the NAs to -9999
+ r3 <- r.isNA(r2, -9999)  
+ 
+# reclassify the values into three groups 
+# all values between 0 and 0.25 become 1, etc.
+ m <- c(0, 0.25, 1,  0.25, 0.5, 2,  0.5, 1, 3)
+ rclmat <- matrix(m, ncol=3, byrow=TRUE)
+ r4 <- r.reclass(r, rclmat)
+ 
+#hist(r)
+#hist(r2)
+#hist(r3)
+#hist(r4)
+ 
 }
 \keyword{ spatial }

@@ -40,11 +40,10 @@ r.cover <- function(raster1, raster2, filename="", overwrite=TRUE) {
 	if (!compare(c(raster1, raster2))) { 
 		stop() 
 	}
-	outraster <- set.raster(raster1)
-	outraster <- set.filename(outraster, filename)
+	outraster <- set.raster(raster1, filename)
 	if ( data.content(raster1) == 'all' &  data.content(raster2) == 'all') {
 		vals <- values(raster1)
-		vals[is.na(vals)] <- values(raster2) 
+		vals[is.na(vals)] <- values(raster2)[is.na(vals)]
 		outraster <- set.values(outraster, vals)
 		if (filename != "") { write.raster(outraster, overwrite=overwrite) }
 	} else if ( data.source(raster1) == 'disk' &  data.source(raster2) == 'disk') {

@@ -159,12 +159,12 @@ set.values.row <- function(raster, rowvalues, rownr) {
 	if (!is.vector(rowvalues)) {	stop('data must be a vector') }
 	if (length(rowvalues) == 0) {	stop('length(rowdata==0). If this is intended then use raster.data.clear(raster)') }
 	if (!(is.numeric(rowvalues) | is.integer(rowvalues) | is.logical(rowvalues))) { stop(paste('data must be values, but class =',class(rowvalues))) }
-	if (length(rowvalues) != raster@ncols) { stop('length(rowdata) != raster@ncols') 
+	if (length(rowvalues) != ncol(raster)) { stop('length(rowdata) != ncol(raster)') 
 	} else {	
 		raster@data@values <- rowvalues
 		raster@data@content <- 'row' 
 		firstcell <- get.cell.from.rowcol(raster, rownr=rownr, colnr=1)
-		lastcell <- get.cell.from.rowcol(raster, rownr=rownr, colnr=raster@ncols)
+		lastcell <- get.cell.from.rowcol(raster, rownr=rownr, colnr=ncol(raster))
 		raster@data@indices <- c(firstcell, lastcell)
 		return(raster)
 	}	

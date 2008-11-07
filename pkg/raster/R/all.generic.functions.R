@@ -1,5 +1,13 @@
 
 
+setAs('RasterLayer', 'SpatialGridDataFrame', 
+	function(from){ return(as.raster (from)) }
+)
+
+setAs('SpatialGridDataFrame', 'RasterLayer', 
+	function(from){ return(as.spgrid (from)) }
+)
+
 
 setMethod('dim', signature(x='AbstractRaster'), 
 	function(x){ return(c(nrow(x), ncol(x)))}

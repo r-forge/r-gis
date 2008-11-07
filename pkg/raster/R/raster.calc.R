@@ -47,21 +47,17 @@ r.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALSE) {
 
 r.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE, INT=FALSE) {
 	outraster <- set.raster(raster, filename, INT)
-	if (INT) { 
-		res <- vector(mode = "integer", length = ncol(raster))
-	} else { 
-		res <- vector(mode = "numeric", length = ncol(raster))
-	}
-	if ( data.content(raster) == 'all') {
+	if ( data.content(raster) == 'all' | data.source(raster) == 'ram' ) {
 		n <- ncells(raster)
 		outraster <- set.values(outraster, fun(n)) 
-	} else {
+		if (!is.na(filename)) {	outraster <- write.raster(outraster) }
+	} else if (!is.na(filename)) {
 		n <- length(ncol(raster))
 		for (r in 1:nrow(raster)) {
 			outraster <- set.values.row(outraster, fun(n), r) 
 			outraster <- write.row(outraster, overwrite=overwrite)	
 		}	
-	}	
+	} else {stop('cannot do')}
 	return(outraster)
 }
 
@@ -93,18 +89,18 @@ r.reclass <- function(raster, rclmat, filename=NA, overwrite=FALSE, INT=FALSE)  
 		if ( data.content(raster) == 'all') { outraster <- set.values(outraster, res) }
 		if ( data.content(raster) == 'sparse') { outraster <- set.values.row(outraster, res,  data.indices(raster)) }
 		if (!is.na(filename)) {	outraster <- write.raster(outraster) }
-	}
-
-	for (r in 1:nrow(raster)) {
-		raster <- read.row(raster, r)
-		for (i in 1:length(rclmat[,1])) {
-			if (is.na(rclmat[i,1]) | is.na(rclmat[i,2])) {
-				res[ is.na(values(raster)) ] <- rclmat[i, 3] 
-			} else if (is.na(rclmat[i,1]) == is.na(rclmat[i,2])) {
-				res[ values(raster) == rclmat[i,1] ] <- rclmat[i , 3] 
-			} else {
-				res[ (values(raster) > rclmat[i,1]) & (values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
-			}
+	} else {
+		for (r in 1:nrow(raster)) {
+			raster <- read.row(raster, r)
+			for (i in 1:length(rclmat[,1])) {
+				if (is.na(rclmat[i,1]) | is.na(rclmat[i,2])) {
+					res[ is.na(values(raster)) ] <- rclmat[i, 3] 
+				} else if (is.na(rclmat[i,1]) == is.na(rclmat[i,2])) {
+					res[ values(raster) == rclmat[i,1] ] <- rclmat[i , 3] 
+				} else {
+					res[ (values(raster) > rclmat[i,1]) & (values(raster) <= rclmat[i,2]) ] <- rclmat[i , 3] 
+				}
+			}	
 		}
 		outraster <- set.values.row(outraster, res, r)
 		outraster <- write.row(outraster, overwrite=overwrite)
