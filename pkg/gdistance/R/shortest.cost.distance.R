@@ -6,7 +6,7 @@ shortest.cost.distance <- function(id.xy, transition)
 	#adj.graph <- graph.edgelist(cbind(as.character(adjacency[,1]),as.character(adjacency[,2])))
 	
 	adj.graph <- graph.adjacency(transition@transitionmatrix, mode="undirected", weighted=TRUE)
-	
+	E(adj.graph)$weight <- 1/E(adj.graph)$weight
 	pointsofinterest <- subset(pointsofinterestin, pointsofinterestin %in% V(adj.graph)$name)
 	if (length(pointsofinterest) < length (pointsofinterestin)) 
 	{
