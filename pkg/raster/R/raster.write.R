@@ -73,7 +73,9 @@ write.raster <- function(raster, overwrite=FALSE) {
 	raster@data@values[is.nan(raster@data@values)] <- NA
 	raster@data@values[is.infinite(raster@data@values)] <- NA
 
-	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
+	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) 
+	} else if (class(values(raster)) == "integer") { raster <- set.datatype(raster, integer) }
+
 	raster <- set.minmax(raster)
 
 	binraster <- file.change.extension(raster@file@name, ".gri")
@@ -104,8 +106,9 @@ write.row <- function(raster, overwrite=FALSE) {
 		raster@file@gdalhandle <- list()
 	}	
 
-	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
-
+	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values)  }
+	if (class(values(raster)) == "integer" & raster@file@datatype == "numeric") { raster@data@values  <- raster@data@values * 1.0 }
+	
 	raster@data@values[is.nan(raster@data@values)] <- NA
 	raster@data@values[is.infinite(raster@data@values)] <- NA
 	rsd <- na.omit(raster@data@values) # min and max values

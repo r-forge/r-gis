@@ -12,7 +12,8 @@
 
 
 r.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALSE) {
-	outraster <- set.raster(raster, filename, INT)
+	outraster <- set.raster(raster, filename)
+	if (INT) {set.datatype(outraster, 'integer')}
 	
 	if (!(data.content(raster) == 'all' | data.content(raster) == 'sparse' | data.source(raster) == 'disk')) {
 		stop('raster has no data on disk, nor a complete set of raster values in memory')
@@ -46,7 +47,8 @@ r.calc <- function(raster, fun=sqrt, filename=NA, overwrite=FALSE, INT=FALSE) {
 
 
 r.init <- function(raster, fun=runif, filename=NA, overwrite=FALSE, INT=FALSE) {
-	outraster <- set.raster(raster, filename, INT)
+	outraster <- set.raster(raster, filename)
+	if (INT) {set.datatype(outraster, 'integer')}
 	if ( data.content(raster) == 'all' | data.source(raster) == 'ram' ) {
 		n <- ncells(raster)
 		outraster <- set.values(outraster, fun(n)) 

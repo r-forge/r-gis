@@ -14,7 +14,7 @@
 \usage{
 compare(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projection=TRUE, slack=0.01, stopiffalse=TRUE) 
 new.CRS(projection)
-new.boundingbox(xmin, xmax, ymin, ymax, projection="")
+new.boundingbox(xmn, xmx, ymn, ymx, projection="")
 
 }
 
@@ -27,10 +27,10 @@ new.boundingbox(xmin, xmax, ymin, ymax, projection="")
   \item{slack} {}
   \item{stopiffalse}{}
   
-  \item{xmin}{ the minimum x coordinate of the bounding box }
-  \item{xmax}{ the maximum x coordinate of the bounding box }
-  \item{ymin}{ the minimum y coordinate of the bounding box }
-  \item{ymax}{ the maximum y coordinate of the bounding box }
+  \item{xmn}{ the minimum x coordinate of the bounding box }
+  \item{xmx}{ the maximum x coordinate of the bounding box }
+  \item{ymn}{ the minimum y coordinate of the bounding box }
+  \item{ymx}{ the maximum y coordinate of the bounding box }
  }
   
 \value{

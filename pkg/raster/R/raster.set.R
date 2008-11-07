@@ -11,13 +11,13 @@ set.rowcol <- function(raster, nrows=nrow(raster), ncols=ncol(raster)) {
 	return(raster)
 }
 
-set.raster <- function(raster, filename=NA, INT=FALSE) {
+set.raster <- function(raster, filename=NA) {
 	if (class(raster) == 'RasterStack') { raster <- raster@rasters[[1]] }
 	if (class(raster) != 'RasterLayer') { stop('the first argument should be a RasterLayer or a RasterStack object') }
 	raster <- clear.values(raster)
 	raster <- set.filename(raster, filename)
-	if (INT) { raster <- set.datatype(raster, "integer")  }
-	else { raster <- set.datatype(raster, "numeric") }
+#	if (INT) { raster <- set.datatype(raster, "integer")  }
+#	else { raster <- set.datatype(raster, "numeric") }
 	return(raster)
 }
 
@@ -85,23 +85,23 @@ new.CRS <- function(projection) {
 	return(projs)
 }
 
-new.boundingbox <- function(xmin, xmax, ymin, ymax, projection="") {
-	if (xmin > xmax) {
-		x <- xmin
-		xmin <- xmax
-		xmax <- x
+new.boundingbox <- function(xmn, xmx, ymn, ymx, projection="") {
+	if (xmn > xmx) {
+		x <- xmn
+		xmn <- xmx
+		xmx <- x
 	}
-	if (ymin > ymax) {
-		y <- ymin
-		ymin <- ymax
-		ymax <- y
+	if (ymn > ymx) {
+		y <- ymn
+		ymn <- ymx
+		ymx <- y
 	}
 	projs <- new.CRS(projection)
 	bb <- new("Spatial")
-	bb@bbox[1,1] <- xmin
-	bb@bbox[1,2] <- xmax
-	bb@bbox[2,1] <- ymin
-	bb@bbox[2,2] <- ymax
+	bb@bbox[1,1] <- xmn
+	bb@bbox[1,2] <- xmx
+	bb@bbox[2,1] <- ymn
+	bb@bbox[2,2] <- ymx
 	bb@bbox[3,1] <- 0
 	bb@bbox[3,2] <- 1
 	bb@proj4string <- projs

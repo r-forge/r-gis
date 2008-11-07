@@ -21,7 +21,7 @@ Use these functions to set name and datatype properties of a raster object. Whil
 }
 
 \usage{
-set.raster(raster, filename=NA, INT=FALSE)
+set.raster(raster, filename=NA)
 set.projection(object, projection)
 set.filename(object, filename)
 set.bbox(raster, xmn=xmin(raster), xmx=xmax(raster), ymn=ymin(raster), ymx=ymax(raster), keepres=FALSE)
@@ -40,7 +40,6 @@ make.sparse(raster)
   \item{object} {A spatial object (i.e. any Raster* objecty or Spatial* object from the SP package}
   \item{raster}{ A \code{Raster} object }
   \item{filename}{ filename of raster, can be blank }
-  \item{INT}{ logical }
   \item{datatype}{ the type of data ('numeric' or 'integer' that will be written to disk }
   \item{datasize}{ The size, in number of bytes, that wil be written to disk. typically 4 for integer, and 8 for numeric datatype }
   \item{values}{ Data values to associate with the raster object. There should be values for all cells }
