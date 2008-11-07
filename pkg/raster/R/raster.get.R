@@ -9,6 +9,7 @@ get.y.from.row <- function(raster, rownr) {
 	rownr <- round(rownr)
 	rownr[rownr < 1 | rownr > raster@nrows] <- NA
 	y <- ymax(raster) - ((rownr-0.5) * yres(raster))
+	#hello
 	return(y) }	
 	
 	

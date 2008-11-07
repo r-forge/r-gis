@@ -65,7 +65,6 @@
 	if (startcol > ncol(raster)) { stop("startcol > ncol(raster)") }
 	if (ncolumns < 1) { stop("ncols should be > 1") }
 
-
 	endcol <- startcol + ncolumns - 1
 	if (endcol > ncol(raster)) { 
 		endcol <- ncol(raster) 
@@ -90,6 +89,7 @@
 			result <- readBin(con, what=dtype, n = ncells(raster), size = raster@file@datasize, endian = raster@file@byteorder) 
 		}
 		close(con)
+		result[is.nan(result)] <- NA
 		result[result <=  (0.999 * raster@file@nodatavalue) ] <- NA 
 	}
 	else { #use GDAL  

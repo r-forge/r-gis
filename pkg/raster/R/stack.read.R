@@ -22,7 +22,7 @@
 			rstack@data@values <- as.matrix( values(rs) )
 		}
 		else {
-			rstack@data@values <- cbind(values(rstack), values(rs)) 
+			rstack@data@values <- cbind(rstack@data@values, values(rs)) 
 		}	   
 	}
 	rstack@data@content <- data.content(rs)
