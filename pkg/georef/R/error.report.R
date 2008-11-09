@@ -1,29 +1,36 @@
+
 error.report <- function(xyxy,threshold) 
 {	
-	error.dist <- function(x,a){
-		if(any(is.na(c(x[1], x[2], x[3], x[4])))){out <- NA}
-		else{
-			difference <- distance.greatcircle.xy(x[1], x[2], x[3], x[4]) 
-			xy.exchange <- distance.greatcircle.xy(x[2], x[1], x[3], x[4]) 
-			signch.lat <- distance.greatcircle.xy(x[1], -x[2], x[3], x[4]) 
-			signch.lon <- distance.greatcircle.xy(-x[1], x[2], x[3], x[4]) 
-			signch.latlon <- distance.greatcircle.xy(-x[2], -x[1], x[3], x[4])
+	error.dist <- function(pp,a){
+		x1 <- pp[1]
+		y1 <- pp[2]
+		x2 <- pp[3]
+		y2 <- pp[4]
+
+		if(any(is.na(c(x1, y1, x2, y2)))){
+			out <- NA
+		} else {	
+			difference <- distance.greatcircle(c(x1, y1), c(x2, y2)) 
+			xy.exchange <- distance.greatcircle(c(y1, x1), c(x2, y2)) 
+			signch.lat <- distance.greatcircle(c(x1, -y1), c(x2, y2)) 
+			signch.lon <- distance.greatcircle(c(-x1, y1), c(x2, y2))
+			signch.latlon <- distance.greatcircle(c(-y1), c(-x1, x2, y2))
 			
-			xy.signch.lat <- distance.greatcircle.xy(x[2], -x[1], x[3], x[4])
-			xy.signch.lon <- distance.greatcircle.xy(-x[2], x[1], x[3], x[4])
-			xy.signch.latlon <- distance.greatcircle.xy(-x[2], -x[1], x[3], x[4])
+			xy.signch.lat <- distance.greatcircle(c(y1, -x1), c(x2, y2))
+			xy.signch.lon <- distance.greatcircle(c(-y1, x1), c(x2, y2))
+			xy.signch.latlon <- distance.greatcircle(c(-y1, -x1), c(x2, y2))
 			
-			wrong.lon <- distance.greatcircle.xy(0, x[2], a, x[4])
-			wrong.lat <- distance.greatcircle.xy(x[1], 0, x[3], a)
+			wrong.lon <- distance.greatcircle(c(0, y1), c(a, y2))
+			wrong.lat <- distance.greatcircle(c(x1, 0), c(x2, a))
 			
-			xy.wrong.lon <- distance.greatcircle.xy(x[2], 0, x[3], a)
-			xy.wrong.lat <- distance.greatcircle.xy(0, x[1], a, x[4])
-			signch.lat.wrong.lon <- distance.greatcircle.xy(0, -x[2], a, x[4])
-			signch.lon.wrong.lat <- distance.greatcircle.xy(-x[1], 0, x[3], a)
+			xy.wrong.lon <- distance.greatcircle(c(y1, 0), c(x2, a))
+			xy.wrong.lat <- distance.greatcircle(c(0, x1), c(a, y2))
+			signch.lat.wrong.lon <- distance.greatcircle(c(0, -y1), c(a, y2))
+			signch.lon.wrong.lat <- distance.greatcircle(c(-x1, 0), c(x2, a))
 			
-			signch.lat.xy.wrong.lon <- distance.greatcircle.xy(-x[2], 0, x[3], a)
-			signch.lon.xy.wrong.lat <- distance.greatcircle.xy(0, -x[1], a, x[4])
-			out <- c(difference,xy.exchange,signch.lat,signch.lon,signch.latlon,xy.signch.lat,xy.signch.lon,xy.signch.latlon,wrong.lon,wrong.lat,xy.wrong.lon,xy.wrong.lat,signch.lat.wrong.lon,signch.lon.wrong.lat,signch.lat.xy.wrong.lon,signch.lon.xy.wrong.lat)
+			signch.lat.xy.wrong.lon <- distance.greatcircle(c(-y1, 0), c(x2, a))
+			signch.lon.xy.wrong.lat <- distance.greatcircle(c(0, -x1), c(a, y2))
+			out <- c(difference, xy.exchange, signch.lat, signch.lon, signch.latlon, xy.signch.lat, xy.signch.lon, xy.signch.latlon, wrong.lon, wrong.lat, xy.wrong.lon, xy.wrong.lat, signch.lat.wrong.lon, signch.lon.wrong.lat, signch.lat.xy.wrong.lon, signch.lon.xy.wrong.lat)
 			return(out)
 		}
 	}

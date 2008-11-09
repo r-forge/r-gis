@@ -8,12 +8,13 @@
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-get.country(latitude, longitude, radius = 0)
+get.country(lonlat, radius = 0)
 get.admin.division(latitude, longitude, radius = 0, maxrows = 1)
 get.elevation(latitude, longitude)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
+  \item{lonlat}{ ~~Describe \code{latitude} here~~ }
   \item{latitude}{ ~~Describe \code{latitude} here~~ }
   \item{longitude}{ ~~Describe \code{longitude} here~~ }
   \item{radius}{ ~~Describe \code{radius} here~~ }
