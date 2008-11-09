@@ -137,7 +137,7 @@ diversity.reserve.rebelo <- function(xy) {
 }
 
 	
-diversity.point.to.raster <- function(rs, filename, xya, fun=diversity.index.richness) {
+point.to.raster <- function(rs, filename, xya, fun=diversity.index.richness) {
 	xya <- xya[,1:3]
 	rsout <- set.filename(rs, filename)
 	cells <- get.cell.from.xy(rs, xya[,1:2])

@@ -1,14 +1,14 @@
-\name{diversity.calc}
-\alias{diversity.calc.point.to.raster}
-\alias{diversity.calc.richness}
+\name{diversity indices}
+\alias{point.to.raster}
+\alias{diversity.index.richness}
 
 \title{ Point to raster diversity functions }
 \description{
   Call diversity.calc.point.to.raster with a function like diversity.calc.richness
 }
 \usage{
-diversity.calc.point.to.raster(rs, filename, xya, fun=diversity.calc.richness)
-diversity.calc.richness(x) }  
+point.to.raster(rs, filename, xya, fun=diversity.index.richness)
+diversity.index.richness(x) }  
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
