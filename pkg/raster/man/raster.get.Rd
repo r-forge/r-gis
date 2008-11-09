@@ -9,7 +9,9 @@
 \alias{get.y.from.row}
 \alias{get.xy.from.cell}
 \alias{get.cxy.from.box}
-\alias{is.valid.cell}
+\alias{valid.cells}
+\alias{valid.cols}
+\alias{valid.rows}
 
   
 \title{ Get the column, row, or cell number of a raster from coordinates and vice versa }
@@ -29,7 +31,9 @@ get.x.from.col(raster, colnr)
 get.y.from.row(raster, rownr)
 get.xy.from.cell(raster, cell)
 get.cxy.from.box(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=ymin(raster), ymax=ymax(raster))
-is.valid.cell(raster, cell) 
+valid.cells(raster, cell) 
+valid.cols(raster, colnr) 
+valid.rows(raster, rownr) 
 }
 
 \arguments{

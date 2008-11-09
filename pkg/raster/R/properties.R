@@ -69,15 +69,6 @@ projection <- function(object, asText=TRUE) {
 }
 
 
-values <- function(object, format='vector', names=FALSE) {
-	if (object@data@content=="nodata") {stop("first read some data (e.g., read.all()") }
-	if (format=='matrix') { 
-		return(.values.as.matrix(object, names)) 
-	} else {
-		return(object@data@values) 
-	}
-}
-
 
 origin <- function(object) {
 	x <- xmin(object) - xres(object)*(round(xmin(object) / xres(object)))
@@ -162,67 +153,4 @@ compare <- function(rasters, origin=TRUE, resolution=TRUE, rowcol=TRUE, projecti
 	return(res)
 }
 
-
-.values.as.matrix <- function(raster, names=FALSE) {
-	if (raster@data@content=="nodata") {stop("first read some data (e.g., read.all() or read.row()") }
-	
-	if (is.matrix(raster@data@values)) {
-		return(raster@data@values)
-		
-	} else if (raster@data@content=="all") {
-		mdata <- matrix(raster@data@values, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE)
-		if (names) {
-			colnames(mdata) <- seq(1:raster@ncols)
-			rownames(mdata) <- seq(1:raster@nrows)
-		}	
-		return(mdata)
-
-	} else if (raster@data@content=="sparse") {
-		mdata <- matrix(NA, nrow=raster@nrows, ncol=raster@ncols, byrow=TRUE)
-		vals <- cbind(raster@data@indices, raster@data@values)
-		mdata[vals[,1]] <- vals[1,2]
-		if (names) {
-			colnames(mdata) <- seq(1:raster@ncols)
-			rownames(mdata) <- seq(1:raster@nrows)
-		}	
-		return(mdata)
-		
-	} else if (raster@data@content=="row") {
-		mdata <- matrix(raster@data@values, nrow=1, ncol=raster@ncols, byrow=TRUE)
-		if (names) {
-			colnames(mdata) <- seq(1:raster@ncols)
-			therow <- get.row.from.cell(raster, raster@data@indices[1])
-			rownames(mdata) <- therow
-		}
-		return(mdata)
-		
-	} else if (raster@data@content=="block") {
-		startrow <- get.row.from.cell(raster, raster@data@indices[1])
-		startcol <- get.col.from.cell(raster, raster@data@indices[1])
-		endrow <- get.row.from.cell(raster, raster@data@indices[2])
-		endcol <- get.col.from.cell(raster, raster@data@indices[2])
-		ncols <- 1 + endcol - startcol
-		nrows <- 1 + endrow - startrow
-		
-		mdata <- as.matrix(t(raster@data@values[1:ncols]))
-		
-		if (nrows > 1) {
-			for (i in 2:nrows) {
-				arow <- raster@data@values[((i-1)*ncols+1):((i-1)*ncols+ncols)]
-				mdata <- rbind(mdata, t(arow))
-			}
-		}
-		
-		if (names) {
-			rowlist <- list()
-			for (i in 1:nrows) {
-				r <- startrow + i - 1
-				rowlist[i] <- paste(r, sep="")
-				rownames(mdata) <- rowlist
-				colnames(mdata) <- seq(1:ncols)+startcol-1
-			}	
-		}
-		return(mdata)
-	}	
-}
 

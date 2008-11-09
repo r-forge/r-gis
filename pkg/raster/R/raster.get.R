@@ -114,10 +114,24 @@ get.cxy.from.box <- function(raster, xmin=xmin(raster), xmax=xmax(raster), ymin=
 }
 
 
-is.valid.cell <- function(raster, cell) {
+valid.cells <- function(raster, cell) {
 	cell <- round(cell)
 	validcell <- vector(length=length(cell))
 	validcell[cell > 0 & cell <= ncells(raster)] <- TRUE
 	return(validcell)
 }
 
+valid.rows <- function(raster, rownr) {
+	rownr <- round(rownr)
+	validrows <- vector(length=length(rownr))
+	validrows[rownr > 0 & rownr <= nrow(raster)] <- TRUE
+	return(validrows)
+}
+
+
+valid.cols <- function(raster, colnr) {
+	colnr <- round(colnr)
+	validcols <- vector(length=length(colnr))
+	validcols[colnr > 0 & colnr <= nrow(raster)] <- TRUE
+	return(validcols)
+}

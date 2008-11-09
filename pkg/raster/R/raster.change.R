@@ -41,7 +41,7 @@ r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 		d <- vector(length=ncells(outraster))
 		d[] <- NA
 		for (r in 1:nrow(raster)) {
-			v <- get.row(raster, r) 
+			v <- row.values(raster, r) 
 			startcell <- (r + startrow -2) * ncol(outraster) + startcol
 			d[startcell:(startcell+ncol(raster)-1)] <- v
 			outraster <- set.values(outraster, d)
@@ -63,33 +63,6 @@ r.expand <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 }
 
 
-
-get.row <- function(raster, r) {
-	if (data.content(raster) == 'sparse') {return (get.row.sparse(raster, r))
-	} else if (data.content(raster) != 'all') {stop('cannot do. Need all data')
-	} else {
-		startcell <- get.cell.from.rowcol(raster, r, 1)
-		endcell <- startcell+ncol(raster)-1
-		return(values(raster)[startcell:endcell])
-	}	
-}
-
-
-get.row.sparse <- function(raster, r, explode=TRUE) {
-	if (data.content(raster) != 'sparse') {stop('cannot do. Need sparse')}
-	startcell <- get.cell.from.rowcol(raster, r, 1)
-	endcell <- startcell+ncol(raster)-1
-	d <- cbind(data.indices(raster), values(raster))
-	d <- d[d[,1] >= startcell & d[,1] <= endcell, ] 
-	if (explode) { 
-		cells <- startcell:endcell
-		cells[] <- NA
-		cells[d[,1]] <- d[,2]	
-		return(cells)
-	} else {
-		return(d)
-	}	
-}
 
 
 r.merge <- function(rasters, filename="", overwrite=FALSE) {
@@ -126,7 +99,7 @@ r.merge <- function(rasters, filename="", overwrite=FALSE) {
 					rasters[[i]] <- read.row(rasters[[i]], r + 1 - rowcol[i,1]) 
 					d <- values(rasters[[i]])
 				} else {
-					d <- get.row(rasters[[i]], r + 1 - rowcol[i,1]) 
+					d <- row.values(rasters[[i]], r + 1 - rowcol[i,1]) 
 				}
 				id2 <- seq(1:ncol(rasters[[i]])) + rowcol[i,3] - 1
 				d <- cbind(id2, d)
@@ -161,34 +134,30 @@ r.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 	outraster <- set.raster(raster, filename)
 	outraster <- set.bbox(outraster, xmn, xmx, ymn, ymx, keepres=T)
 	
-	if (raster@data@content == 'all')  {
+	if (data.content(raster) == 'all')  {
 		first.start.cell <- get.cell.from.xy(raster, c(xmn + 0.5 * xres(raster), ymx - 0.5 * yres(raster) ))	
 		last.start.cell <- get.cell.from.xy(raster, c(xmn + 0.5 * xres(raster), ymn + 0.5 * yres(raster) ))
-		start.cells <- seq(first.start.cell, last.start.cell, by = raster@ncols)
-		end.cells <- start.cells + outraster@ncols - 1
+		start.cells <- seq(first.start.cell, last.start.cell, by = ncol(raster))
+		end.cells <- start.cells + ncol(outraster) - 1
 		selected.cells <- unlist(mapply(seq, start.cells, end.cells))
-		outraster@data@values <- raster@data@values[selected.cells]
-		outraster@data@min <- min(raster@data@values, na.rm=TRUE)
-		outraster@data@max <- max(raster@data@values, na.rm=TRUE)
-		outraster@data@haveminmax <- TRUE
-		outraster@data@content <- 'all'
-		if (nchar(outraster@file@name) > 0 ) { outraster <- try(write.raster(outraster)) }		
-	} else if (raster@data@source == 'disk')  {
+		outraster <- set.values(outraster, values(raster)[selected.cells])
+		outraster <- set.minmax(outraster)
+		if (nchar(filename(outraster)) > 0 ) { outraster <- try(write.raster(outraster)) }		
+	} else if (data.content(raster) == 'disk')  {
 		first.col <- get.col.from.x(raster, xmn + 0.5 * xres(outraster))
 		first.row <- get.row.from.y(raster, ymx - 0.5 * yres(outraster))
 		last.row <- first.row + outraster@nrows - 1
 		rownr <- 1
 		for (r in first.row:last.row) {
-			raster <- read.part.of.row(raster, r, first.col, outraster@ncols )
-			if (outraster@file@name == '') {
+			raster <- read.part.of.row(raster, r, first.col, ncol(outraster) )
+			if (filename(outraster) == '') {
 				if (r == first.row) {
-					outraster@data@values  <- raster@data@values
-					outraster@data@content <- 'all'
+					outraster <- set.values(values(raster))
 				} else {
-					outraster@data@values  <- c(outraster@data@values, raster@data@values)
+					outraster <- set.values(c(values(outraster), values(raster)))
 				}		
 			} else {
-				outraster <- set.values.row(outraster, raster@data@values, rownr)
+				outraster <- set.values.row(outraster, values(raster), rownr)
 				outraster <- write.row(outraster, overwrite)
 			}	
 			rownr <- rownr + 1
@@ -198,97 +167,123 @@ r.cut <- function(raster, boundingbox, filename="", overwrite=FALSE) {
 }
 
 
-
-
-r.disaggregate <- function(raster, factor=2, filename="", overwrite=FALSE) {
-	factor <- round(factor)
-	if (factor < 2) { stop('factor should be > 1') }
-	outrs <- set.raster(raster)
-	if ( data.content(raster) != 'all') { 
-			stop('raster values should all be in memory for this version of raster.disaggregate()') 
+r.disaggregate <- function(raster, fact=2, filename="", overwrite=FALSE) {
+	if (length(fact)==1) {
+		fact <- round(fact)
+		if (fact < 2) { stop('fact should be > 1') }
+		xfact <- yfact <- fact
+	} else if (length(fact)==2) {
+		xfact <- round(fact[1])
+		yfact <- round(fact[2])
+		if (xfact < 2) { stop('fact[1] should be > 1') } 
+		if (yfact < 2) { stop('fact[2] should be > 1') }
 	} else {
-		outrs <- set.rowcol(outrs, nrow(raster) * factor, ncol(raster) * factor) 
-		if ( data.content(raster)=='all') {
-			cols <- rep(rep(1:ncol(raster), each=factor), times=raster@nrows * factor)
-			rows <- rep(1:nrow(raster), each=raster@ncols*factor*factor)
-			cells <- get.cell.from.rowcol(raster, rows, cols)
-#			m <- matrix(cells, ncol=outrs@ncols, nrow=outrs@nrows, byrow=T)
-			d <- values(raster)[cells]
-			outrs <- set.values(outrs, d)
-		}	
-	}	
+		stop('length(fact) should be 1 or 2')
+	}
+	
+	outrs <- set.raster(raster, filename)
+	outrs <- set.rowcol(outrs, nrow(raster) * yfact, ncol(raster) * xfact) 
+	if ( data.content(raster)=='all') {
+		
+		cols <- rep(rep(1:ncol(raster), each=xfact), times=nrow(raster)*yfact)
+		rows <- rep(1:nrow(raster), each=ncol(raster)*xfact*yfact)
+		cells <- get.cell.from.rowcol(raster, rows, cols)
+		outrs <- set.values(outrs, values(raster)[cells])
+		if (filename != "") {write.raster(outrs)}
+		
+	} else if ( data.source(raster) == 'disk') { 
+
+		cols <- rep(1:ncol(raster), each=xfact)
+		for (r in 1:nrow(raster)) {
+			raster <- read.row(raster, r)
+			for (i in 1:yfact) {
+				outrs <- set.values.row(outrs, values(raster)[cols], (r-1) * xfact + i)
+				outrs <- write.row(outrs)
+			}	
+		}
+	}
 	return(outrs)
 }
 
 
-r.aggregate <- function(raster, factor = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE) 
-{
-	factor <- round(factor)
-	if (factor < 2) {
-		stop("factor should be > 1") }
-	if (expand) {
-		rsteps <- as.integer(ceiling(raster@nrows/factor))
-		csteps <- as.integer(ceiling(raster@ncols/factor))
-	} else 	{
-		rsteps <- as.integer(floor(raster@nrows/factor))
-		csteps <- as.integer(floor(raster@ncols/factor))
+r.aggregate <- function(raster, fact = 2, fun = mean, expand = TRUE, rm.NA = TRUE, INT = FALSE, filename="", overwrite=FALSE)  {
+	if (length(fact)==1) {
+		fact <- round(fact)
+		if (fact < 2) { stop('fact should be > 1') }
+		xfact <- yfact <- fact
+	} else if (length(fact)==2) {
+		xfact <- round(fact[1])
+		yfact <- round(fact[2])
+		if (xfact < 2) { stop('fact[1] should be > 1') } 
+		if (yfact < 2) { stop('fact[2] should be > 1') }
+	} else {
+		stop('length(fact) should be 1 or 2')
 	}
-	yexpansion <- (rsteps * factor - raster@nrows)  * xres(raster)
-	xexpansion <- (csteps * factor - raster@ncols) * yres(raster)
+
+	if (expand) {
+		rsteps <- as.integer(ceiling(nrow(raster)/yfact))
+		csteps <- as.integer(ceiling(ncol(raster)/xfact))
+	} else 	{
+		rsteps <- as.integer(floor(nrow(raster)/yfact))
+		csteps <- as.integer(floor(ncol(raster)/xfact))
+	}
+	yexpansion <- rsteps * yfact - nrow(raster) * xres(raster)
+	xexpansion <- csteps * xfact - ncol(raster) * yres(raster)
 		
-	outraster <- set.filename(raster, filename)
-	outraster@bbox[1,2] <- xmax(raster) + xexpansion
-	outraster@bbox[2,1] <- ymin(raster) - yexpansion
+	outraster <- set.raster(raster, filename)
+	outraster <- set.bbox(outraster, xmx = xmax(raster) + xexpansion, ymn = ymin(raster) - yexpansion)
 	outraster <- set.rowcol(outraster, nrows=rsteps, ncols=csteps) 
 	
-	if (INT) { outraster <- set.datatype(outraster, 'integer')
-	} else { outraster <- set.datatype(outraster, 'numeric') }
-	if (raster@data@content == 'all') 
-	{
-		cols <- rep(rep(1:csteps,each=factor)[1:raster@ncols],times=raster@nrows)
-		rows <- rep(1:rsteps,each=raster@ncols*factor)[1:ncells(raster)]
-#		cell.index <- (csteps * (row.index - 1)) + col.index
+	if (INT) { 
+		outraster <- set.datatype(outraster, 'integer')
+	} else { 
+		outraster <- set.datatype(outraster, 'numeric') 
+	}
+	
+	
+	if (data.content(raster) == 'all') {
+		cols <- rep(rep(1:csteps, each=xfact)[1:ncol(raster)], times=nrow(raster))
+		rows <- rep(1:rsteps, each=ncol(raster) * yfact)[1:ncells(raster)]
 		cells <- get.cell.from.rowcol(raster, rows, cols)
 		
-		if (rm.NA) {outraster@data@values <- as.vector(tapply(raster@data@values, cells, function(x){fun(na.omit(x))}))}
-		else {outraster@data@values <- as.vector(tapply(raster@data@values, cells, fun))}
+		if (rm.NA) { outraster <- set.values(outraster, as.vector(tapply(values(raster), cells, function(x){fun(na.omit(x))}))) 
+		} else {outraster <- set.values(outraster, as.vector(tapply(values(raster), cells, fun))) }
 
-		outraster@data@min <- min(raster@data@values, na.rm=TRUE)
-		outraster@data@max <- max(raster@data@values, na.rm=TRUE)
-		outraster@data@haveminmax <- TRUE
-		outraster@data@content <- 'all'
-		if (nchar(outraster@file@name) > 0 ) { 
+		if (nchar(filename(outraster)) > 0 ) { 
 			outraster <- try(write.raster(outraster))
 		}
 
-	} else if (raster@data@source == 'disk') {
-		cols <- rep(rep(1:csteps,each=factor)[1:raster@ncols],times=factor)
+	} else if (data.source(raster) == 'disk') {
+	
+		cols <- rep(rep(1:csteps,each=xfact)[1:ncol(raster)], times=xfact)
 		newdata <- vector(length=rsteps*csteps)
 		for (r in 1:rsteps) 
 		{
-			startrow <- 1 + (r - 1) * factor
-			endrow <- min(raster@nrows, startrow + factor - 1)
+			startrow <- 1 + (r - 1) * yfact
+			endrow <- min(nrow(raster), startrow + yfact - 1)
 			nrows <- endrow - startrow + 1
-			data_selected_rows <- read.rows(raster, startrow = startrow, nrows = nrows)
-			raster@data@values <- as.vector(raster@data@values)
-			cols <- cols[1:(nrows * raster@ncols)]
-			rows <- rep(startrow:endrow, each=raster@ncols * nrows)
+			raster <- read.rows(raster, startrow = startrow, nrows = nrows)
+			cols <- cols[1:(nrows * ncol(raster))]
+			rows <- rep(startrow:endrow, each=ncol(raster) * nrows)
 			cells <- (as.integer(csteps * (rows - 1)) + cols)
-			if (rm.NA) { values <- as.vector(tapply(raster@data@values, cells, function(x){fun(na.omit(x))}))}
-			else { values <- as.vector(tapply(raster@data@values, cells, fun))}
 			
-			if (outraster@file@name == '') {
+			if (rm.NA) { vals <- tapply(values(raster), cells, function(x){fun(na.omit(x))} ) 
+			} else { vals <- tapply(values(raster), cells, fun) }
+			vals <- as.vector(vals)
+			
+			if (filename(outraster) == '') {
 				if (r == 1) {
-					outraster@data@values  <- values
-					outraster@data@content <- 'all'
+					allvals <- vals
 				} else {
-					outraster@data@values  <- c(outraster@data@values, values)
+					allvals <- c(allvals, vals)
 				}		
+				if (r == rsteps) {
+					outraster <- set.values(outraster, allvals)
+				}
 			} else {
-				outraster <- set.values.row(outraster, values, rownr)
+				outraster <- set.values.row(outraster, vals, r)
 				outraster <- write.row(outraster, overwrite)
 			}	
-			rownr <- rownr + 1
 		} 			
 	}
 	return(outraster)

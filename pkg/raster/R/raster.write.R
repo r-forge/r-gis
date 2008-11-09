@@ -14,7 +14,7 @@ write.ascii <- function(raster, overwrite=FALSE) {
 		if (raster@data@indices[1] == 1) {
 			raster <- set.filename(raster, file.change.extension(filename(raster), '.asc'))
 			if (!overwrite & file.exists(filename(raster))) {
-				stop(paste(filename(raster),"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
+				stop(paste(filename(raster), "exists. Use 'overwrite=TRUE'")) }
 
 			thefile <- file(raster@file@name, "w")  # open an txt file connection
 			cat("NCOLS", ncol(raster), "\n", file = thefile)
@@ -29,25 +29,40 @@ write.ascii <- function(raster, overwrite=FALSE) {
 		write.table(values(raster), filename(raster), append = TRUE, quote = FALSE, 
 							sep = " ", eol = "\n", dec = ".", row.names = FALSE, col.names = FALSE)
     }
+	if ( data.indices(raster)[2] >= ncells(raster)) {
+		if ( data.indices(raster)[2] > ncells(raster)) {
+			stop(paste('writing beyond end of file. last cell:', raster@data@indices[2], '>', ncells(raster)))
+		} else {
+		# create a new object with gdal handle tfrom the new file
+			raster <- raster.from.file(filename(raster)) 
+		}
+	}
 	return(raster)
 }
  
  
 .write.sparse <- function(raster, overwrite=FALSE) {
-	raster@file@name <- file.change.extension(raster@file@name, ".grd")
-	if (!overwrite & file.exists(raster@file@name)) {
-		stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
 
-	raster@file@driver == 'raster'
+	raster@file@driver <- 'raster'
+    raster@file@gdalhandle <- list()
+	raster <- set.filename(raster, file.change.extension(filename(raster), ".grd"))
+	if (!overwrite & file.exists(filename(raster))) {
+		stop(paste(filename(raster), "exists. Use 'overwrite=TRUE' if you want to overwrite it")) 
+	}
 
-	raster@data@values[is.nan(raster@data@values)] <- NA
-	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) }
+	raster@data@values[is.nan(values(raster))] <- NA
+	if (raster@file@datatype == "integer") { 
+		raster@data@values <- as.integer(values(raster)) 
+	}
+	if (class(values(raster))=='integer') {
+		raster <- set.datatype(raster, 'integer')
+	}	
 	raster <- set.minmax(raster)
 
 	binraster <- file.change.extension(raster@file@name, ".gri")
 	con <- file(binraster, "wb")
-	writeBin( as.vector(raster@data@indices), con, size = as.integer(4)) 
-	writeBin( as.vector(raster@data@values), con, size = raster@file@datasize) 
+	writeBin( as.vector(data.indices(raster)), con, size = as.integer(4)) 
+	writeBin( as.vector(values(raster)), con, size = raster@file@datasize) 
 	close(con)
 
 	# add the 'sparse' key word to the hdr file!!!
@@ -58,14 +73,13 @@ write.ascii <- function(raster, overwrite=FALSE) {
 
  
 write.raster <- function(raster, overwrite=FALSE) {
-
 	if (raster@data@content == 'sparse') { .write.sparse(raster, overwrite) }
 
-	if (raster@data@content != 'all') {stop('first use set.values()') }
+	if (raster@data@content != 'all') {stop('there are not (enough) values to write the file. first use set.values()') }
 
 	raster@file@driver <- 'raster'
     raster@file@gdalhandle <- list()
-	raster@file@name <- file.change.extension(raster@file@name, ".grd")
+	raster <- set.filename(raster, file.change.extension(filename(raster), ".grd"))
 
 	if (!overwrite & file.exists(raster@file@name)) {
 		stop(paste(raster@file@name,"exists.","use 'overwrite=TRUE' if you want to overwrite it")) }
@@ -73,14 +87,16 @@ write.raster <- function(raster, overwrite=FALSE) {
 	raster@data@values[is.nan(raster@data@values)] <- NA
 	raster@data@values[is.infinite(raster@data@values)] <- NA
 
-	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(raster@data@values) 
+	if (raster@file@datatype == "integer") { raster@data@values <- as.integer(values(raster)) 
 	} else if (class(values(raster)) == "integer") { raster <- set.datatype(raster, integer) }
-
+	if (class(values(raster))=='integer') {
+		raster <- set.datatype(raster, 'integer')
+	}	
 	raster <- set.minmax(raster)
 
-	binraster <- file.change.extension(raster@file@name, ".gri")
+	binraster <- file.change.extension(filename(raster), ".gri")
 	con <- file(binraster, "wb")
-	writeBin( raster@data@values, con, size = raster@file@datasize) 
+	writeBin( values(raster), con, size = raster@file@datasize) 
 	close(con)
 
 	.write.hdr(raster) 
@@ -129,6 +145,9 @@ write.row <- function(raster, overwrite=FALSE) {
 		raster@data@content <- 'nodata'
 		raster@data@values <- vector(length=0)
 	}		
+	if (raster@data@indices[2] > ncells(raster)) {
+		stop(paste('writing beyond end of file. last cell:', raster@data@indices[2], '>', ncells(raster)))
+	}
 	return(raster)	
 }
 
@@ -176,7 +195,7 @@ write.row <- function(raster, overwrite=FALSE) {
 write.import <- function(raster, outfile, overwrite=FALSE) {
 # check extension
 	rsout <- set.raster(raster, filename=outfile)
-	for (r in 1:raster@nrows) {
+	for (r in 1:nrow(raster)) {
 		d <- read.row(raster, r)
 		write.row(rsout, overwrite)
 		}
@@ -186,7 +205,7 @@ write.import <- function(raster, outfile, overwrite=FALSE) {
 write.export <- function(raster, outfile, filetype='ascii', overwrite=FALSE) {
 	rsout <- set.raster(raster, filename=outfile)
 	if (filetype == 'ascii') {
-		for (r in 1:raster@rows) {
+		for (r in 1:nrow(raster)) {
 			d <- read.row(raster, r)
 			write.ascii(rsout, overwrite) 
 		}
