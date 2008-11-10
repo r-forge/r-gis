@@ -7,6 +7,7 @@ shortest.cost.distance <- function(id.xy, transition)
 	
 	adj.graph <- graph.adjacency(transition@transitionmatrix, mode="undirected", weighted=TRUE)
 	E(adj.graph)$weight <- 1/E(adj.graph)$weight
+	
 	pointsofinterest <- subset(pointsofinterestin, pointsofinterestin %in% V(adj.graph)$name)
 	if (length(pointsofinterest) < length (pointsofinterestin)) 
 	{
@@ -16,8 +17,13 @@ shortest.cost.distance <- function(id.xy, transition)
 	index <- match(pointsofinterest,V(adj.graph)$name)
 	for (i in 1:length(pointsofinterest))
 	{
-		shpaths[i,] <- shortest.paths(adj.graph, pointsofinterest[i])[,index]
+		shpaths[i,] <- shortest.paths(adj.graph, match(pointsofinterest[i],V(adj.graph)$name))[,index]
 	}
-	return(as.dist(shpaths))
+	#insert this into a full distance matrix
+	intermediate.matrix <- shpaths[,match(pointsofinterestin,pointsofinterest)]
+	sh.dist <- intermediate.matrix[match(pointsofinterestin,pointsofinterest),]
+	rownames(sh.dist) <- as.character(id.xy[,1])
+	colnames(sh.dist) <- as.character(id.xy[,1])
+	return(as.dist(sh.dist))
 }
 
