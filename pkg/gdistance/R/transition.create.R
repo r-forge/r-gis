@@ -1,17 +1,26 @@
-setGeneric("transition.create", function(object, transition.function, outer.meridian.connect) standardGeneric("transition.create"))
+setGeneric("transition.create", function(object, transition.function, outer.meridian.connect, diagonal) standardGeneric("transition.create"))
 
-setMethod("transition.create", signature(object = "raster"), def = function(object, transition.function, outer.meridian.connect=FALSE)
+setMethod("transition.create", signature(object = "raster"), def = function(object, transition.function, outer.meridian.connect=FALSE, diagonal=FALSE)
 		{
 			transition <- new("transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
-			adj <- adjacency(object,outer.meridian.connect=outer.meridian.connect)
-			transition.values <- apply(cbind(object@data[adj[,1]],object@data[adj[,2]]),1,transition.function)
 			transition.dsC <- as(transition,"dsCMatrix")
-			transition.dsC[adj] <- as.vector(transition.values)
+			
+			adj.str <- .adjacency.straight(object,outer.meridian.connect=outer.meridian.connect)
+			transition.values.str <- apply(cbind(object@data[adj.str[,1]],object@data[adj.str[,2]]),1,transition.function)
+			transition.dsC[adj.str] <- as.vector(transition.values.str)
+			
+			if (diagonal)
+			{
+				adj.diag <- .adjacency.diag(object,outer.meridian.connect=outer.meridian.connect)
+				transition.values.diag <- apply(cbind(object@data[adj.diag[,1]],object@data[adj.diag[,2]]),1,transition.function)
+				transition.dsC[adj.diag] <- as.vector(transition.values.diag*sqrt(2))
+			}
 			transition <- dsCMatrix.to.transition(transition.dsC,transition)
 			return(transition)
 		}
 )
 
+#Needs to be adapted to diagonal adjacency
 setMethod("transition.create", signature(object = "rasterstack"), def = function(object, transition.function, outer.meridian.connect=FALSE)
 		{
 			if(transition.function != "mahal"){warning("only mahalanobis distance method implemented for rasterstack; will use this method instead")}

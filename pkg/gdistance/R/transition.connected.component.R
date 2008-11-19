@@ -1,9 +1,9 @@
-`transition.connected.component` <-
+transition.connected.component <-
 		function(transition, id.xy)
 {
-	adjacency <- adjacency.from.transition(transition)
+	adjacency <- .adjacency.from.transition(transition)
 	pointsofinterestin <- raster.get.cell.from.xy(transition, id.xy[,2:3])
-	adj.graph <- graph.edgelist(cbind(as.character(adjacency[,1]),as.character(adjacency[,2])))
+	adj.graph <- graph.edgelist(cbind(as.character(adjacency[,1]),as.character(adjacency[,2]))) #could also be done directly through forcing transitionmatrix into graph (graph.adjacency)
 	pointsofinterest <- subset(pointsofinterestin, pointsofinterestin %in% V(adj.graph)$name)
 	if (length(pointsofinterest) < length (pointsofinterestin)) 
 	{

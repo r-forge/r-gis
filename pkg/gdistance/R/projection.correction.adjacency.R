@@ -1,4 +1,4 @@
-`projection.correction.adjacency` <- function(raster, adjacency) 
+projection.correction.adjacency <- function(raster, adjacency) 
 {
 	correction <- matrix(NA, nrow=length(adjacency[,1]),ncol=3)
 	correction[,1:2] <- cbind(raster.get.row.from.cell(raster,adjacency[,1]),raster.get.row.from.cell(raster,adjacency[,2]))
