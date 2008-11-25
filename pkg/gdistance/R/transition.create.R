@@ -20,11 +20,14 @@ setMethod("transition.create", signature(object = "raster"), def = function(obje
 		}
 )
 
-#Needs to be adapted to diagonal adjacency
-setMethod("transition.create", signature(object = "rasterstack"), def = function(object, transition.function, outer.meridian.connect=FALSE)
+setMethod("transition.create", signature(object = "rasterstack"), def = function(object, transition.function, outer.meridian.connect=FALSE, diagonal=FALSE)
 		{
 			if(transition.function != "mahal"){warning("only mahalanobis distance method implemented for rasterstack; will use this method instead")}
-			adj <- adjacency(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect) 
+			adj <- .adjacency.straight(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect)
+			if(diagonal=TRUE)
+			{
+				adj <- rbind(adj,.adjacency.diagonal(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect))
+			}
 			x <- matrix(object@rasters[[1]]@data,ncol=1,nrow=object@ncells)
 			rownames(x) <- as.character(1:object@ncells)
 			for (i in 2:object@nrasters) 

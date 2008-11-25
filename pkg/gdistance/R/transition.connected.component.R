@@ -1,5 +1,4 @@
-transition.connected.component <-
-		function(transition, id.xy)
+transition.connected.component <- function(transition, id.xy)
 {
 	adjacency <- .adjacency.from.transition(transition)
 	pointsofinterestin <- raster.get.cell.from.xy(transition, id.xy[,2:3])
