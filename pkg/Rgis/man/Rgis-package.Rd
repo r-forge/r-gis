@@ -30,10 +30,6 @@ Maintainer: Robert J. Hijmans \email{r.hijmans@gmail.com}
 }
 \keyword{ package }
 \keyword{ spatial }
-\seealso{
-~~ Optional links to other man pages, e.g. ~~
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
 
 \examples{
 }
