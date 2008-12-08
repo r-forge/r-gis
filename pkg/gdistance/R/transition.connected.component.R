@@ -1,3 +1,10 @@
+.connected.components <- function(transition)
+{
+	adj.graph <- graph.adjacency(transition@transitionmatrix)
+	clustermembership <- cbind(rownames(transition@transitionmatrix),clusters(adj.graph)$membership+1)
+	return(clustermembership)
+}
+
 transition.connected.component <- function(transition, id.xy)
 {
 	adjacency <- .adjacency.from.transition(transition)

@@ -107,7 +107,7 @@ setMethod("Ops", signature(e1 = "transition", e2 = "transition"),
 		}
 )
 
-.adjacency.from.transition <- function(transition)
+.adjacency.from.transition <- function(transition) #TODO should not be necessary, check
 {
 	transition.dsC <- as(transition,"dsCMatrix")
 	transition.dgT <- as(transition.dsC,"dgTMatrix")
@@ -196,34 +196,24 @@ setMethod("Ops", signature(e1 = "transition", e2 = "transition"),
 	datacell.upperright <- as.integer(intersect(datacells,upperright))
 	datacell.lowerleft <- as.integer(intersect(datacells,lowerleft))
 	datacell.lowerright <- as.integer(intersect(datacells,lowerright))
-	
 	from.core <- as.integer(rep(datacells.core, times=4))
 	to.core <- as.integer(c(datacells.core+raster@ncols+1,datacells.core-raster@ncols+1,datacells.core+raster@ncols-1,datacells.core-raster@ncols-1))
-	
 	from.upper <- as.integer(rep(datacells.upper, times=2))
 	to.upper <- as.integer(c(datacells.upper+raster@ncols+1,datacells.upper+raster@ncols-1))
-	
 	from.lower <- as.integer(rep(datacells.lower, times=2))
 	to.lower <- as.integer(c(datacells.lower-raster@ncols-1,datacells.lower-raster@ncols+1))
-	
 	from.left <- as.integer(rep(datacells.left, times=2))
 	to.left <- as.integer(c(datacells.left+raster@ncols+1,datacells.left-raster@ncols+1))
-	
 	from.right <- as.integer(rep(datacells.right, times=2))
 	to.right <- as.integer(c(datacells.right+raster@ncols-1,datacells.right-raster@ncols-1))
-	
 	from.upperleft <- as.integer(datacell.upperleft)
 	to.upperleft <- as.integer(datacell.upperleft+raster@ncols+1)
-	
 	from.upperright <- as.integer(datacell.upperright)
 	to.upperright <- as.integer(datacell.upperright+raster@ncols-1)
-	
 	from.lowerleft <- as.integer(datacell.lowerleft)
 	to.lowerleft <- as.integer(datacell.lowerleft-raster@ncols+1)
-	
 	from.lowerright <- as.integer(datacell.lowerright)
 	to.lowerright <- as.integer(datacell.lowerright-raster@ncols-1)
-	
 	fromto <- rbind(cbind(from.core,to.core),cbind(from.upper,to.upper),cbind(from.lower,to.lower),cbind(from.left,to.left),cbind(from.right,to.right),cbind(from.upperleft,to.upperleft),cbind(from.upperright,to.upperright),cbind(from.lowerleft,to.lowerleft),cbind(from.lowerright,to.lowerright))
 	if (outer.meridian.connect==TRUE) 
 	{
@@ -231,7 +221,6 @@ setMethod("Ops", signature(e1 = "transition", e2 = "transition"),
 		cbind(rep(datacells.left,times=2),as.integer(c(datacells.left+2*raster@ncols-1,datacells.left-1))),
 		cbind(datacell.upperleft,as.integer(datacell.upperleft+2*raster@ncols-1)),
 		cbind(datacell.lowerleft,as.integer(datacell.lowerleft-1))) 
-		
 		mer.from.right <- rbind(
 		cbind(rep(datacells.right,times=2),as.integer(c(datacells.right-2*raster@ncols+1,datacells.right+1))),
 		cbind(datacell.upperright,as.integer(datacell.upperright+1)),

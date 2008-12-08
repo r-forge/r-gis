@@ -1,4 +1,4 @@
-shortest.cost.distance <- function(id.xy, transition)
+shortest.cost.distance <- function(id.xy, transition) #TODO only within cc
 {
 	pointsofinterestin <- raster.get.cell.from.xy(transition, id.xy[,2:3])
 	

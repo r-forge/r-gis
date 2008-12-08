@@ -1,5 +1,4 @@
-joint.trajectory.distance <-
-function(id.xy, origin.xy, transition, weights.raster)
+joint.trajectory.distance <- function(id.xy, origin.xy, transition, weights.raster) #TODO 1) overloading: with and without weights.raster, 2) id.xy in same cc as origin.xy
 {
 	weightsvector <- weights.raster@data[as.integer(rownames(transition@transitionmatrix))]
 	pointsofinterestin <- cbind(id.xy[,1:3],raster.get.cell.from.xy(transition, id.xy[,2:3]))
