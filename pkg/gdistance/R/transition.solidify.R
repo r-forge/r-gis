@@ -8,5 +8,4 @@ setMethod("transition.solidify", signature(transition = "transition"), def = fun
 		transition <- dsCMatrix.to.transition(transition.dsC,transition)
 		return(transition)
 	}
-) 
-
+)

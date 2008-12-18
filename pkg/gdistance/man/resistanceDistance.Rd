@@ -1,11 +1,11 @@
-\name{resistance.distance}
-\alias{ resistance.distance }
+\name{resistanceDistance}
+\alias{ resistanceDistance }
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
 Calculates the resistance distance between points. }
 \usage{
-resistance.distance (id.xy, transition)
+resistanceDistance (id.xy, transition)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

@@ -1,11 +1,11 @@
-\name{shortest.cost.distance}
-\alias{shortest.cost.distance}
+\name{costDistance}
+\alias{costDistance}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
 Calculates the shortest cost-distance between points. }
 \usage{
-shortest.cost.distance(id.xy, transition)
+costDistance(id.xy, transition)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
