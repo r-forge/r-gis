@@ -1,15 +1,21 @@
-.adjacency.from.transition <- function(transition) #TODO should not be necessary, check
+# Author: Jacob van Etten jacobvanetten@yahoo.com
+# International Rice Research Institute
+# Date :  January 2009
+# Version 1.0
+# Licence GPL v3
+
+.cs <- function(a,b)
+{
+	aRep <- rep(a,times=length(b))
+	out <- cbind(aRep,as.integer(aRep+rep(b,each=length(a))),deparse.level=0)
+	return(out)
+}
+
+.adjacency.from.transition <- function(transition)
 {
 	transition.dsC <- as(transition,"dsCMatrix")
 	transition.dgT <- as(transition.dsC,"dgTMatrix")
-	if (transition@zerorowcol == TRUE)
-	{
-		adjacency <- cbind(transition.dgT@i+1,transition.dgT@j+1)
-	}
-	if (transition@zerorowcol == FALSE)
-	{
-		adjacency <- cbind(as.integer(transition@transitionmatrix@Dimnames[[1]][transition.dgT@i+1]),as.integer(transition@transitionmatrix@Dimnames[[2]][transition.dgT@j+1]))
-	}
+	adjacency <- cbind(transitionCells(transition)[transition.dgT@i+1],transitionCells(transition)[transition.dgT@j+1])
 	return(adjacency)
 }
 
@@ -126,17 +132,35 @@
 .connected.components <- function(transition)
 {
 	adj.graph <- graph.adjacency(transition@transitionmatrix)
-	clustermembership <- cbind(as.integer(rownames(transition@transitionmatrix)),as.integer(clusters(adj.graph)$membership)+1)
+	clustermembership <- cbind(transitionCells(transition),as.integer(clusters(adj.graph)$membership)+1)
 	return(clustermembership)
 }
 
-.Laplacian <- function(transitionmatrix) 
+.Laplacian <- function(transition) 
 {
-Laplacian <- Diagonal(x = colSums(transitionmatrix)) - transitionmatrix
-return(Laplacian)
+	
+	Laplacian <- Diagonal(x = colSums(transition@transitionMatrix)) - transition@transitionMatrix
+	return(Laplacian)
 }
 
-.projectionCorrection <- function(transition, type="resistance") 
+.reducedLaplacian <- function(transition,index)
+{
+	L <- Diagonal(x = colSums(transition@transitionMatrix)) - transition@transitionMatrix
+	Lr <- L[-max(which(!(transitionCells(transition) %in% as.character(index)))),-max(which(!(transitionCells(transition) %in% as.character(index))))]
+	return(Lr)
+}
+
+.transitionSolidify <- function(transition) #TODO transitionCells
+{
+	transition.dsC <- as(transition,"dsCMatrix")
+	selection <- which(rowSums(transition.dsC)>0)
+	transition.dsC <- transition.dsC[selection,selection]
+	transition <- dsCMatrix.to.transition(transition.dsC,transition)
+	return(transition)
+}
+
+
+.projectionCorrection <- function(transition, type="resistance") #TODO improve speed: processing by row
 {
 	adjacency <- .adjacency.from.transition(transition)
 	correction <- cbind(adjacency,raster.get.xy.from.cell(transition,adjacency[,1]),raster.get.xy.from.cell(transition,adjacency[,2]))
@@ -156,3 +180,20 @@ return(Laplacian)
 	transition <- dsCMatrix.to.transition(transition.corrected,transition)
 	return(transition)
 }
+
+.current <- function(L, Lr, n, indexFrom, indexTo)
+{
+	e <- matrix(0, ncol=1, nrow=n)
+	e[indexFrom,] <- 1
+ 	e[indexTo,] <- -1
+	x <- solve(Lr,e)
+	x <- as.vector(x)
+	Lplusallrows <- c(x-sum(x/(n+1)),(sum(x)/(n+1)))
+	V <- A * Lplusallrows
+	d <- t(t(A) * diag(V))
+	V <- - V + d
+	Current <- colSums(abs(V)*-L)/2
+	Current[indexFrom] <- 1
+	Current[indexTo] <- 1
+}
+

@@ -1,11 +1,11 @@
-\name{shortest.cost.distance.map}
-\alias{shortest.cost.distance.map}
+\name{costDistanceMap}
+\alias{costDistanceMap}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
 Calculates the shortest cost-distance between points. }
 \usage{
-shortest.cost.distance.map(id.xy, transition)
+costDistanceMap(id.xy, transition)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

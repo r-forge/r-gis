@@ -5,16 +5,16 @@
 \description{
 Calculates the shortest cost-distance between points. }
 \usage{
-costDistance(id.xy, transition)
+costDistance(transition, fromCoords, toCoords)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{id.xy}{ point locations (see below) }
-  \item{transition}{ transition matrix (defined class) }
+  \item{transition}{ transition matrix (class Transition) }
+  \item{fromCoords}{ first set of point locations (of SpatialPoints class)}  
+  \item{toCoords}{ second, optional set of point locations (of SpatialPoints class)}
 }
 \details{
 Distance is calculated in cost units specified in the distance matrix. \n
-id.xy is a matrix with three columns: ID, x, and y.
 }
 \value{
 distance matrix

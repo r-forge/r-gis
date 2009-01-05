@@ -1,18 +1,16 @@
-\name{raster.potential.single.origin.single.destination}
-\alias{raster.potential.single.origin.single.destination}
+\name{rasterFromTransition}
+\alias{rasterFromTransition}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-raster.potential.single.origin.single.destination(transition, origin.xy, goal.xy)
+rasterFromTransition(transition)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{transition}{ ~~Describe \code{transition} here~~ }
-  \item{origin.xy}{ ~~Describe \code{origin.xy} here~~ }
-  \item{goal.xy}{ ~~Describe \code{goal.xy} here~~ }
 }
 \details{
   ~~ If necessary, more details than the description above ~~
@@ -37,23 +35,39 @@ raster.potential.single.origin.single.destination(transition, origin.xy, goal.xy
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function(transition,origin.xy,goal.xy)
+function(transition)
 {
-origin.cell <- raster.get.cell.from.xy(transition, origin.xy)
-goal.cell <- raster.get.cell.from.xy(transition, goal.xy)
-L <- Laplacian(transition)
-Lr <- L[1:L@Dim[1]-1,1:L@Dim[2]-1]
-n <- max(Lr@Dim)
-e <- matrix(0, ncol=1, nrow=n)
-rownames(e) <- rownames(transition)[1:n]
-e[as.character(origin.cell),] <- 1 
-e[as.character(goal.cell),] <- -1
-x <- solve(Lr,e) 
-x <- as.vector(x)
-Lplusallrows <- c(xi-sum(xi/(n+1)),(sum(xi)/(n+1)))
-Lplusallrows <- Lplusallrows - min(Lplusallrows)
-names(Lplusallrows) <- as.character(rownames(transition))
-return(Lplusallrows)
+if(transition@rowcolzero == TRUE)
+{raster <- new("raster",
+projection = transition@projection,
+ncols = transition@ncols,
+nrows = transition@nrows,
+ncells = transition@ncells,
+xmin = transition@xmin,
+xmax = transition@xmax,
+ymin = transition@ymin,
+ymax = transition@ymax,
+xres = transition@xres,
+yres = transition@yres,
+raster@data <- colSums(as("dsCMatrix",transition)))
+  }
+if(transition@rowcolzero == TRUE)
+{raster <- new("raster",
+projection = transition@projection,
+ncols = transition@ncols,
+nrows = transition@nrows,
+ncells = transition@ncells,
+xmin = transition@xmin,
+xmax = transition@xmax,
+ymin = transition@ymin,
+ymax = transition@ymax,
+xres = transition@xres,
+yres = transition@yres,
+data = rep(NA,times=transition@ncells)
+)
+raster@data[as.integer(transition@Dimnames[[1]])] <- colSums(as("dsCMatrix",transition))
+  }
+return(raster)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

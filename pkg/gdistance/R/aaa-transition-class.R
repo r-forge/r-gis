@@ -1,4 +1,12 @@
-setClass(
+# Author: Jacob van Etten jacobvanetten@yahoo.com
+# International Rice Research Institute
+# Date :  January 2009
+# Version 1.0
+# Licence GPL v3
+
+#TODO The whole thing needs to work with getters and setters from raster
+
+setClass( #TODO replace with VirtualRaster from raster package eg eliminate
 		Class="rasterchar",
 		representation = representation(
 				projection="character",
@@ -22,20 +30,21 @@ setClass(
 		}
 )
 
-setClass(Class="transition",
-		contains = "rasterchar",
+setClass(Class="Transition",
+		contains = "rasterchar", #TODO change to virtual raster from raster package
 		representation = representation(
-			transitionmatrix = "dsCMatrix"			
+			transitionMatrix = "dsCMatrix",
+			transitionCells = "integer"
 		),
 		validity = function(object){
-			cond1 <- isTRUE(all.equal(object@transitionmatrix@Dim[1], object@transitionmatrix@Dim[2]))
-			cond2 <- object@ncells >= object@transitionmatrix@Dim[1]
+			cond1 <- isTRUE(all.equal(object@transitionMatrix@Dim[1], object@transitionMatrix@Dim[2]))
+			cond2 <- object@ncells >= object@transitionMatrix@Dim[1]
 			cond <- cond1 & cond2
 			return(cond)
 		}
 )
 
-setMethod ("show" , "transition", 
+setMethod ("show" , "Transition", 
 		function(object) {
 			cat("class     :" , class(object), "\n")
 			cat("nrows     :" , object@nrows, "\n")
@@ -52,32 +61,31 @@ setMethod ("show" , "transition",
 		}
 )
 
-setMethod ("initialize", "transition",
+setMethod ("initialize", "Transition",
 		function(.Object,nrows,ncols,xmin,xmax,ymin,ymax)
 		{
 			ncells = as.integer(nrows*ncols)
-			.Object@zerorowcol = TRUE
 			.Object@nrows = as.integer(nrows)
 			.Object@ncols = as.integer(ncols)
-			.Object@ncells = as.integer(ncells)
+			.Object@ncells = as.integer(ncells) #TODO properties
 			.Object@xmin = xmin
 			.Object@xmax = xmax
 			.Object@ymin = ymin
 			.Object@ymax = ymax
 			.Object@xres = (xmax-xmin)/ncols
 			.Object@yres = (ymax-ymin)/nrows
-			.Object@transitionmatrix@uplo = "U"
-			.Object@transitionmatrix@p = as.integer(rep(0,ncells+1))
-			.Object@transitionmatrix@i = integer(0)
-			.Object@transitionmatrix@Dim = as.integer(c(ncells,ncells))
-			.Object@transitionmatrix@Dimnames = list(as.character(1:ncells),as.character(1:ncells))
+			.Object@transitionMatrix@uplo = "U"
+			.Object@transitionMatrix@p = as.integer(rep(0,ncells+1))
+			.Object@transitionMatrix@i = integer(0)
+			.Object@transitionMatrix@Dim = as.integer(c(ncells,ncells))
+			.Object@transitionCells = 1:ncells
 			return(.Object)
 		}
 )
 
-setAs("transition", "dsCMatrix", function(from){from@transitionmatrix})
+setAs("Transition", "dsCMatrix", function(from){from@transitionMatrix})
 
-setAs("transition", "raster", function(from)
+setAs("Transition", "raster", function(from)
 	{
 		new("raster",
 			projection = from@projection,
@@ -97,49 +105,9 @@ setAs("transition", "raster", function(from)
 	
 setGeneric("dsCMatrix.to.transition", function(dsCMatrix,transition) standardGeneric("dsCMatrix.to.transition"))
 
-setMethod ("dsCMatrix.to.transition", signature(dsCMatrix = "dsCMatrix", transition = "transition"),
+setMethod ("dsCMatrix.to.transition", signature(dsCMatrix = "dsCMatrix", transition = "Transition"),
 	function(dsCMatrix,transition){
-		transition@transitionmatrix <- dsCMatrix
+		transition@transitionMatrix <- dsCMatrix
 		return(transition)
 	}
-)
-
-setMethod("Arith", signature(e1 = "transition", e2 = "transition"),
-		function(e1, e2){
-			if(
-				isTRUE(all.equal(e1@nrows,e2@nrows)) &
-				isTRUE(all.equal(e1@ncols, e2@ncols)) &
-				isTRUE(all.equal(e1@ncells, e2@ncells)) &
-				isTRUE(all.equal(e1@projection, e2@projection)) &
-				isTRUE(all.equal(e1@xmin, e2@xmin)) &
-				isTRUE(all.equal(e1@xmax, e2@xmax)) &
-				isTRUE(all.equal(e1@ymin, e2@ymin)) &
-				isTRUE(all.equal(e1@ymax, e2@ymax)) &
-				isTRUE(all.equal(e1@xres, e2@xres)) &
-				isTRUE(all.equal(e1@yres, e2@yres)))
-				{
-					return(dsCMatrix.to.transition(callGeneric(as(e1,"dsCMatrix"),as(e2,"dsCMatrix")),e1))
-				}
-			else {stop("transition matrices do not coincide in resolution and extent")}
-		}
-)
-
-setMethod("Ops", signature(e1 = "transition", e2 = "transition"),
-		function(e1, e2){
-			if(
-				isTRUE(all.equal(e1@nrows,e2@nrows)) &
-				isTRUE(all.equal(e1@ncols, e2@ncols)) &
-				isTRUE(all.equal(e1@ncells, e2@ncells)) &
-				isTRUE(all.equal(e1@projection, e2@projection)) &
-				isTRUE(all.equal(e1@xmin, e2@xmin)) &
-				isTRUE(all.equal(e1@xmax, e2@xmax)) &
-				isTRUE(all.equal(e1@ymin, e2@ymin)) &
-				isTRUE(all.equal(e1@ymax, e2@ymax)) &
-				isTRUE(all.equal(e1@xres, e2@xres)) &
-				isTRUE(all.equal(e1@yres, e2@yres)))
-				{
-					return(dsCMatrix.to.transition(callGeneric(as(e1,"dsCMatrix"),as(e2,"dsCMatrix")),e1))
-				}
-			else {stop("transition matrices do not coincide in resolution and extent")}
-		}
 )

@@ -1,5 +1,10 @@
-`distance.from.level` <-
-function(levels,fun,diag=FALSE)
+# Author: Jacob van Etten jacobvanetten@yahoo.com
+# International Rice Research Institute
+# Date :  January 2009
+# Version 1.0
+# Licence GPL v3
+
+distance.from.level <- function(levels,fun,diag=FALSE)
 {
 result <- matrix(NA,ncol=length(levels),nrow=length(levels))
 rownames(result) <- names(levels)

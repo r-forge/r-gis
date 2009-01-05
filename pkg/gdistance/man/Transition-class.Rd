@@ -1,6 +1,6 @@
-\name{transition-class}
+\name{Transition-class}
 \docType{class}
-\alias{transition-class}
+\alias{Transition-class}
 \alias{Arith,transition,transition-method}
 \alias{coerce,transition,dsCMatrix-method}
 \alias{dsCMatrix.to.transition,dsCMatrix,transition-method}

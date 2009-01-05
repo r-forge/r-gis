@@ -1,12 +1,12 @@
-\name{transition.create }
-\alias{transition.create }
+\name{transitionCreate }
+\alias{transitionCreate }
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-transition.create (object, transition.function, outer.meridian.connect)
+transitionCreate (object, transition.function, outer.meridian.connect)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{

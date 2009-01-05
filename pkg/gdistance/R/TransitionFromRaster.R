@@ -1,14 +1,18 @@
-setGeneric("transition.create", function(object, transition.function, outer.meridian.connect, diagonal) standardGeneric("transition.create"))
+# Author: Jacob van Etten jacobvanetten@yahoo.com
+# International Rice Research Institute
+# Date :  January 2009
+# Version 1.0
+# Licence GPL v3
 
-setMethod("transition.create", signature(object = "raster"), def = function(object, transition.function, outer.meridian.connect=FALSE, diagonal=FALSE)
+setGeneric("TransitionFromRaster", function(object, transition.function, outer.meridian.connect=TRUE, diagonal=FALSE) standardGeneric("transitionCreate"))
+
+setMethod("TransitionFromRaster", signature(object = "raster"), def = function(object, transition.function, outer.meridian.connect, diagonal)
 		{
-			transition <- new("transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
+			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
 			transition.dsC <- as(transition,"dsCMatrix")
-			
 			adj.str <- .adjacency.straight(object,outer.meridian.connect=outer.meridian.connect)
 			transition.values.str <- apply(cbind(object@data[adj.str[,1]],object@data[adj.str[,2]]),1,transition.function)
 			transition.dsC[adj.str] <- as.vector(transition.values.str)
-			
 			if (diagonal)
 			{
 				adj.diag <- .adjacency.diag(object,outer.meridian.connect=outer.meridian.connect)
@@ -20,13 +24,16 @@ setMethod("transition.create", signature(object = "raster"), def = function(obje
 		}
 )
 
-setMethod("transition.create", signature(object = "rasterstack"), def = function(object, transition.function="mahal", outer.meridian.connect=FALSE, diagonal=FALSE)
+setMethod("TransitionFromRaster", signature(object = "rasterstack"), def = function(object, transition.function="mahal", outer.meridian.connect, diagonal)
 		{
-			if(transition.function != "mahal"){warning("only Mahalanobis distance method implemented for RasterStack; will use this method instead")}
-			adj <- .adjacency.straight(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect)
-			if(diagonal==TRUE)
+			if(transition.function != "mahal")
 			{
-				adj <- rbind(adj,.adjacency.diagonal(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect))
+				stop("only Mahalanobis distance method implemented for RasterStack")
+			}
+			adj <- .adjacency.straight(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect)
+			if(diagonal)
+			{
+				adj <- rbind(adj,.adjacency.diag(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect))
 			}
 			x <- matrix(object@rasters[[1]]@data,ncol=1,nrow=object@ncells)
 			rownames(x) <- as.character(1:object@ncells)
@@ -46,7 +53,7 @@ setMethod("transition.create", signature(object = "rasterstack"), def = function
 					Dimnames = list(as.character(1:object@ncells),as.character(1:object@ncells))
 			)
 			transition.dsC[adj] <- mahaldistance
-			transition <- new("transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
+			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
 			transition <- dsCMatrix.to.transition(transition.dsC,transition)
 			return(transition)
 		}

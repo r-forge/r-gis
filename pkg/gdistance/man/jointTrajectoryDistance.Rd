@@ -1,16 +1,19 @@
-\name{transition.solidify}
-\alias{transition.solidify}
+\name{jointTrajectoryDistance}
+\alias{ jointTrajectoryDistance }
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-transition.solidify(transition)
+jointTrajectoryDistance (transition, originCoord, fromCoords, toCoords)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{transition}{ ~~Describe \code{transition} here~~ }
+  \item{originCoord}{ origin of flow point location (of SpatialPoints class)} 
+  \item{fromCoords}{ first set of point locations (of SpatialPoints class)}  
+  \item{toCoords}{ second, optional set of point locations (of SpatialPoints class)}  
 }
 \details{
   ~~ If necessary, more details than the description above ~~
@@ -34,13 +37,6 @@ transition.solidify(transition)
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
 
-## The function is currently defined as
-function(transition)
-{
-selection <- which(rowSums(transition)>0)
-transition <- transition[selection,selection]
-return(transition)
-  }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

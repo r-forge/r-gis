@@ -1,77 +1,85 @@
+# Author: Jacob van Etten jacobvanetten@yahoo.com
+# International Rice Research Institute
+# Date :  January 2009
+# Version 1.0
+# Licence GPL v3
+
 #TODO check if coordinate systems are equal.
 #TODO check if bounding box of coordinates falls inside bb of transition
 
 setGeneric("costDistance", function(transition, fromCoords, toCoords) standardGeneric("costDistance"))
 
-setMethod("costDistance", signature(transition = "transition", fromCoords = "SpatialPoints", toCoords = "SpatialPoints"), def = function(transition, fromCoords, toCoords)
+setMethod("costDistance", signature(transition = "Transition", fromCoords = "SpatialPoints", toCoords = "SpatialPoints"), def = function(transition, fromCoords, toCoords)
 	{
-		xy.from <- coordinates(fromCoords)
-		xy.to <- coordinates(toCoords)
+		fromCoords <- coordinates(fromCoords)
+		toCoords <- coordinates(toCoords)
 		transition <- .projectionCorrection(transition, type="cost") 
-		pointsofinterestin.from <- raster.get.cell.from.xy(transition, xy.from)
-		pointsofinterestin.to <- raster.get.cell.from.xy(transition, xy.to)
-		sh.dist <- matrix(NA, nrow=length(xy.from[,1]),ncol=length(xy.to[,1]))
-		rownames(sh.dist) <- rownames(xy.from)
-		colnames(sh.dist) <- rownames(xy.to)
-		adj.graph <- graph.adjacency(transition@transitionmatrix, mode="undirected", weighted=TRUE)
-		E(adj.graph)$weight <- 1/E(adj.graph)$weight
-		pointsofinterest.from <- subset(pointsofinterestin.from, pointsofinterestin.from %in% V(adj.graph)$name)
-		pointsofinterest.to <- subset(pointsofinterestin.to, pointsofinterestin.to %in% V(adj.graph)$name)
-		if (length(pointsofinterest.from) < length (pointsofinterestin.from)) 
+		fromCoordsCells cbind(fromCoords, raster.get.cell.from.xy(transition, fromCoords))
+		toCoordsCells <- cbind(toCoords,raster.get.cell.from.xy(transition, toCoords))
+		costDist <- matrix(NA, nrow=length(fromCoords[,1]),ncol=length(toCoords[,1]))
+		rownames(costDist) <- rownames(fromCoords)
+		colnames(costDist) <- rownames(toCoords)
+		adjacencyGraph <- graph.adjacency(transitionMatrix(transition), mode="undirected", weighted=TRUE)
+		E(adjacencyGraph)$weight <- 1/E(adjacencyGraph)$weight
+		fromCells <- subset(fromCoordsCells[,3], fromCoordsCells[,3] %in% V(adjacencyGraph)$name)
+		toCells <- subset(toCoordsCells[,3], toCoordsCells[,3] %in% V(adjacencyGraph)$name)
+		if (length(fromCells) < length (fromCoordsCells[,1])) 
 		{
-			warning(length(pointsofinterest.from), " out of ", length(pointsofinterestin.from), " origin locations were found in the transition matrix.")
+			warning(length(fromCells), " out of ", length(fromCoordsCells[,1]), " origin locations were found in the transition matrix.")
 		}
 		else{}
-		if (length(pointsofinterest.to) < length (pointsofinterestin.to)) 
+		if (length(toCells) < length (toCoordsCells[,1])) 
 		{
-			warning(length(pointsofinterest.to), " out of ", length(pointsofinterestin.to), " destination locations were found in the transition matrix.")
+			warning(length(toCells), " out of ", length(toCoordsCells[,1]), " destination locations were found in the transition matrix.")
 		}
 		else{}
-		#TODO pairs of origin-destination warning (like resistanceDistance)
-		pointsofinterest.unique.from <- unique(pointsofinterest.from)
-		pointsofinterest.unique.to <- unique(pointsofinterest.to)		
-		sh.paths <- matrix(nrow=length(pointsofinterest.unique.from),ncol=length(pointsofinterest.unique.to))
-		index <- match(pointsofinterest.unique.to,V(adj.graph)$name)
-		for (i in 1:length(pointsofinterest.unique.from))
+		uniqueFromCells <- unique(fromCells)
+		uniqueToCells <- unique(toCells)		
+		shortestPaths <- matrix(nrow=length(uniqueFromCells),ncol=length(uniqueToCells))
+		index <- match(uniqueToCells,V(adjacencyGraph)$name)
+		for (i in 1:length(uniqueFromCells))
 		{
-			sh.paths[i,] <- shortest.paths(adj.graph, match(pointsofinterest.unique[i],V(adj.graph)$name))[,index]
+			shortestPaths[i,] <- shortest.paths(adjacencyGraph, match(uniqueFromCells[i],V(adjacencyGraph)$name))[,index]
 		}
-		index1 <- as.character(rownames(sh.dist)[pointsofinterestin.from %in% pointsofinterest.from])
-		index2 <- as.character(colnames(sh.dist)[pointsofinterestin.to %in% pointsofinterest.to])
-		index3 <- match(pointsofinterest.from,pointsofinterest.unique.from)
-		index3 <- match(pointsofinterest.to,pointsofinterest.unique.to)
-		sh.dist[index1,index2] <- sh.paths[index3,index4]
-		return(as.dist(sh.dist))
+		index1 <- which(fromCoordsCells[,3] %in% fromCells)
+		index2 <- which(toCoordsCells[,3] %in% toCells)
+		index3 <- match(fromCoordsCells[,3][fromCoordsCells[,3] %in% fromCells],uniqueFromCells)
+		index4 <- match(toCoordsCells[,3][toCoordsCells[,3] %in% toCells],uniqueToCells)
+		costDist[index1,index2] <- shortestPaths[index3,index4]
+		costDist <- as.dist(costDist)
+		return(costDist)
 	}
 )
 
-setMethod("costDistance", signature(transition = "transition", fromCoords = "SpatialPoints", toCoords = "missing"), def = function(transition, fromCoords)
+setMethod("costDistance", signature(transition = "Transition", fromCoords = "SpatialPoints", toCoords = "missing"), def = function(transition, fromCoords)
 	{
-		xy <- coordinates(fromCoords)
+		fromCoords <- coordinates(fromCoords)
 		transition <- .projectionCorrection(transition, type="cost") 
-		pointsofinterestin <- raster.get.cell.from.xy(transition, xy)
-		sh.dist <- matrix(NA, nrow=length(xy[,1]),ncol=length(xy[,1]))
-		rownames(sh.dist) <- rownames(xy)
-		colnames(sh.dist) <- rownames(xy)
-		adj.graph <- graph.adjacency(transition@transitionmatrix, mode="undirected", weighted=TRUE)
-		E(adj.graph)$weight <- 1/E(adj.graph)$weight
-		pointsofinterest <- subset(pointsofinterestin, pointsofinterestin %in% V(adj.graph)$name)
-		if (length(pointsofinterest) < length (pointsofinterestin)) 
+		fromCoordsCells <- raster.get.cell.from.xy(transition, fromCoords)
+		costDist <- matrix(NA, nrow=length(fromCoords[,1]),ncol=length(fromCoords[,1]))
+		rownames(costDist) <- rownames(Coords)
+		colnames(costDist) <- rownames(Coords)
+		adjacencyGraph <- graph.adjacency(transition@transitionmatrix, mode="undirected", weighted=TRUE)
+		E(adjacencyGraph)$weight <- 1/E(adjacencyGraph)$weight
+		fromCells <- subset(fromCoordsCells[,3], fromCoordsCells[,3] %in% V(adjacencyGraph)$name)
+		if (length(fromCells) < length (fromCoordsCells[,1])) 
 		{
-			warning(length(pointsofinterest), " out of ", length(pointsofinterestin), " locations were found in the transition matrix.","\n")
+			warning(length(fromCells), " out of ", length(fromCoordsCells), " locations were found in the transition matrix.","\n")
 		}
 		else{}
-		pointsofinterest.unique <- unique(pointsofinterest)
-		sh.paths <- matrix(ncol=length(pointsofinterest.unique),nrow=length(pointsofinterest.unique))
-		index <- match(pointsofinterest.unique,V(adj.graph)$name)
-		for (i in 1:length(pointsofinterest.unique))
+		uniqueFromCells <- unique(fromCells)
+		shortestPaths <- matrix(ncol=length(uniqueFromCells),nrow=length(uniqueFromCells))
+		index <- match(uniqueFromCells,V(adjacencyGraph)$name)
+		for (i in 1:length(uniqueFromCells))
 		{
-			sh.paths[i,] <- shortest.paths(adj.graph, match(pointsofinterest.unique[i],V(adj.graph)$name))[,index]
+			shortestPaths[i,] <- shortest.paths(adjacencyGraph, match(uniqueFromCells[i],V(adjacencyGraph)$name))[,index]
 		}
-		index1 <- as.character(rownames(sh.dist)[pointsofinterestin %in% pointsofinterest])
-		index2 <- match(pointsofinterest,pointsofinterest.unique)
-		sh.dist[index1,index1] <- sh.paths[index2,index2]
-		return(as.dist(sh.dist))
+
+		index1 <- which(fromCoordsCells[,3] %in% fromCells)
+		index2 <- match(fromCoordsCells[,3][fromCoordsCells[,3] %in% fromCells],uniqueFromCells)
+		costDist[index1,index1] <- shortestPaths[index2,index2]
+		costDist <- as.dist(costDist)
+		return(costDist)
 	}
 )
 

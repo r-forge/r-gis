@@ -5,17 +5,17 @@
 \description{
 Calculates the resistance distance between points. }
 \usage{
-resistanceDistance (id.xy, transition)
+resistanceDistance (transition, fromCoords, toCoords)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{id.xy}{ point locations (see below) }  
-  \item{transition}{ transition matrix (defined class) }
+  \item{transition}{ transition object (transition class) }
+  \item{fromCoords}{ first set of point locations (of SpatialPoints class)}  
+  \item{toCoords}{ second, optional set of point locations (of SpatialPoints class)}  
+
 }
 \details{
-Resistance distance is equivalent to the expected commute time between nodes in a graph (Chandra et al. 1997). The graph is represented by a transition matrix. The transition matrix should have a single connected component. The function issues a warning if one or more point locations are not present in the transition matrix.\n
-id.xy is a matrix with three columns: ID, x, and y.
-
+Resistance distance is equivalent to the expected random-walk commute time between nodes in a graph (Chandra et al. 1997). The graph is represented by a transition matrix. The function issues a warning if one or more point locations are not present in the transition matrix or if locations are not connected.\n
 }
 \value{
 distance matrix
@@ -32,5 +32,5 @@ McRae, B.H. Isolation by resistance. Evolution 60(8), 1551-1561. }
 }
 \seealso{ \code{\link{transition.solidify}}, ~~~ }
 \examples{}
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ spatial }
+

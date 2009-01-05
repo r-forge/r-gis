@@ -1,18 +1,18 @@
-\name{cluster.parameters}
-\alias{cluster.parameters}
+\name{flowMap}
+\alias{ flowMap }
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
 \description{
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-cluster.parameters(gendistance, clusters, accuracy)
+flowMap (transition, originCoord, goalCoord)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{gendistance}{ ~~Describe \code{gendistance} here~~ }
-  \item{clusters}{ ~~Describe \code{clusters} here~~ }
-  \item{accuracy}{ ~~Describe \code{accuracy} here~~ }
+  \item{transition}{ ~~Describe \code{transition} here~~ }
+  \item{originCoord}{ ~~Describe \code{origin.xy} here~~ }
+  \item{goalCoord}{ ~~Describe \code{goal.xy} here~~ }
 }
 \details{
   ~~ If necessary, more details than the description above ~~
@@ -37,21 +37,28 @@ cluster.parameters(gendistance, clusters, accuracy)
 ##--	or do  help(data=index)  for the standard data sets.
 
 ## The function is currently defined as
-function(gendistance,clusters,accuracy)
+function(transition,origin.xy,goal.xy)
 {
-parameters.per.cluster <- vector(length=max(clusters))
-for (cluster in 1:max(clusters))
-{
-selection <- names(clusters[clusters==cluster])
-if(length(selection)>3)
-{
-gendistance.selection <- as.matrix(gendistance)[selection,selection]
-mda <- min.distance.accumulation(gendistance.selection,accuracy)
-x <- (0:(length(mda)-1))*mean(as.dist(gendistance.selection))
-parameters.per.cluster[cluster] <- power.model1(x,mda)
-  }
-  }
-return(parameters.per.cluster)
+origin.cell <- raster.get.cell.from.xy(transition, origin.xy)
+goal.cell <- raster.get.cell.from.xy(transition, goal.xy)
+L <- Laplacian(transition)
+Lr <- L[1:L@Dim[1]-1,1:L@Dim[2]-1]
+A <- as(L,"lMatrix")
+A <- as(A,"dMatrix")
+n <- max(Lr@Dim)
+e <- matrix(0, ncol=1, nrow=n)
+rownames(e) <- rownames(transition)[1:n]
+e[as.character(origin.cell),] <- 1 
+e[as.character(goal.cell),] <- -1
+x <- solve(Lr,e) 
+x <- as.vector(x)
+Lplusallrows <- c(x-sum(x/(n+1)),(sum(x)/(n+1)))
+V <- A * Lplusallrows
+d <- t(t(A) * diag(V))
+V <- - V + d
+Current <- colSums(abs(V)*-L)/2
+names(Current) <- rownames(transition)
+return(Current)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
