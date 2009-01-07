@@ -16,21 +16,24 @@ setMethod("Arith", signature(e1 = "Transition", e2 = "Transition"),
 
 setMethod("Compare", signature(e1 = "Transition", e2 = "Transition"),
 		function(e1, e2){
+			c1 <- e1@transitionMatrix == e2@transitionMatrix
+			#compare AbstractRaster
 			stop("not implemented yet")
 		}
 )
 
-setMethod("[", signature(e1 = "Transition", e2="integer"),
-		function(e1){
-			stop("not implemented yet") #works with cellnumbers @index
-			e2 <- match(e2,e1@index)
-			e1@transitionMatrix <- e1@transitionMatrix[e2,e2]
-			e1@transitionCells <- e2
+setMethod("[", signature(x = "Transition", i="index", j="missing", drop="missing"),
+		function(x,i){
+			if (!all(i %in% x@index)){stop("wrong cell numbers")}
+			else{}
+			ind <- match(i,x@index)
+			x@transitionMatrix <- x@transitionMatrix[ind,ind]
+			x@transitionCells <- i
 			return(e1)
 		}
 )
 
-setMethod("[<-", signature(e1 = "Transition"),
+setMethod("[<-", signature(x = "Transition"),
 		function(e1){
 			stop("not implemented yet") #works with cellnumbers @index
 		}
