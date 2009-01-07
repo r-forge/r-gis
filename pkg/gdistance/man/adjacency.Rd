@@ -3,24 +3,26 @@
 
 \title{ adjacency }
 \description{
-	calculate adjacent cells of a vector of cells
+	calculate adjacent cells in a grid
 }
 \usage{
 adjacency(raster, fromCells, toCells, mode, outerMeridianConnect) 
 }
 
 \arguments{
-  \item{raster}{ an object of the raster family }
+  \item{raster}{ an object of the Raster family (raster package) }
   \item{fromCells}{ a vector of cell numbers for which adjacent cells should be calculated }
-  \item{toCells}{ a second vector of cell numbers from which adjacent cells are selected (can be identical to fromCells) }
-  \item{directions}{ in how many direction cells should be connected:  4 (one-cell rook moves), 8 (one-cell queen moves), or 16 (knight and one-cell queen moves) }
-  \item{outerMeridianConnect}{ logical value indicating whether the outer columns of the raster should be connected as a torus}
+  \item{toCells}{ a vector of cell numbers from which adjacent cells are selected (can be identical to fromCells) }
+  \item{directions}{ in how many direction cells should be connected: 4, 8 or 16. }
+  \item{outerMeridianConnect}{ logical value indicating whether the outer columns of the raster should be connected as a cylinder }
 }
 
 \details{
 The main use of calculating adjacent cells is to provide indices for transition matrices (Transition-class). 
-In the case of geometric and cost distances the highest number of directions is recommended.
-In the case of resistance distance and flow calculations 4 directions are recommended.
+Cell numbers follow the raster package. They start with 1 in the upperleft corner and increase from left to right and from top to bottom.
+Number of directions: 4 connects cells with one-cell rook moves, 8 with one-cell queen moves, and 16 with knight and one-cell queen moves.
+In the case of cost distances more directions add to accuracy.
+In the case of resistance distance and flow calculations 4 is recommended.
 }
 
 \value{
@@ -29,8 +31,8 @@ In the case of resistance distance and flow calculations 4 directions are recomm
 \author{ Jacob van Etten \email{jacobvanetten@yahoo.com} }
 
 \examples{
-	rs <- newRaster()
-	adjacency(raster = rs, fromCells = c(1:5), toCells = c(1:ncells(rs)), directions=16, outerMeridianConnect = TRUE) 
+	rs <- newRaster(nrows=10, ncols=10)
+	adjacency(raster = rs, fromCells = c(1,30,55,72,100), toCells = c(1:ncells(rs)), directions=16, outerMeridianConnect = TRUE) 
 }
 
 \keyword{ spatial }
