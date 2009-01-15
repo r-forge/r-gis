@@ -48,7 +48,7 @@ setMethod("jointTrajectoryDistance", signature(transition = "transition", origin
 		count <- 0
 		indexCoords <- match(fromCells,transitionCells(transition))
 		indexOrigin <- match(originCell,transitionCells(transition))
-		if( ((n * length(fromCells) * 8) + 112)/1048576 > (memory.limit()-memory.size())/10) #depending on memory availability, all currents could be calculated at once
+		if( ((n * length(fromCells) * 8) + 112)/1048576 > (memory.limit()-memory.size())/10) #depending on memory availability, currents are calculated in a piecemeal fashion or all at once
 		{
 			for (i in 1:(length(fromCells)))
 			{

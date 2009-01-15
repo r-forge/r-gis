@@ -4,57 +4,44 @@
 # Version 1.0
 # Licence GPL v3
 
-setGeneric("TransitionFromRaster", function(object, transition.function, outer.meridian.connect=TRUE, diagonal=FALSE) standardGeneric("transitionCreate"))
+setGeneric("TransitionFromRaster", function(object, transitionFunction, directions, outerMeridianConnect=TRUE) standardGeneric("TransitionFromRaster"))
 
-setMethod("TransitionFromRaster", signature(object = "raster"), def = function(object, transition.function, outer.meridian.connect, diagonal)
+setMethod("TransitionFromRaster", signature(object = "RasterLayer"), def = function(object, transitionFunction, directions, outerMeridianConnect)
 		{
-			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
+			if(dataContent(object) != 'all'){stop("only implemented for rasters with all values in memory; use readAll() to read values")}
+			else{}
+			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax,projection=object@crs)
 			transition.dsC <- as(transition,"dsCMatrix")
-			adj.str <- .adjacency.straight(object,outer.meridian.connect=outer.meridian.connect)
-			transition.values.str <- apply(cbind(object@data[adj.str[,1]],object@data[adj.str[,2]]),1,transition.function)
-			transition.dsC[adj.str] <- as.vector(transition.values.str)
-			if (diagonal)
-			{
-				adj.diag <- .adjacency.diag(object,outer.meridian.connect=outer.meridian.connect)
-				transition.values.diag <- apply(cbind(object@data[adj.diag[,1]],object@data[adj.diag[,2]]),1,transition.function)
-				transition.dsC[adj.diag] <- as.vector(transition.values.diag*sqrt(2))
-			}
-			transition <- dsCMatrix.to.transition(transition.dsC,transition)
+			adj <- adjacency(object,which(!is.na(values(object))),which(!is.na(values(object))),directions=directions,outerMeridianConnect=outerMeridianConnect)
+			transition.values <- apply(cbind(values(object)[adj[,1]],values(object)[adj[,2]]),1,transitionFunction)
+			transition.dsC[adj] <- as.vector(transition.values)
+			transitionMatrix(transition) <- transition.dsC
 			return(transition)
 		}
 )
 
-setMethod("TransitionFromRaster", signature(object = "rasterstack"), def = function(object, transition.function="mahal", outer.meridian.connect, diagonal)
+setMethod("TransitionFromRaster", signature(object = "RasterBrick"), def = function(object, transitionFunction="mahal", directions, outerMeridianConnect)
 		{
-			if(transition.function != "mahal")
+			if(dataContent(object) != 'all'){stop("only implemented for rasters with all values in memory; use readAll() to read values")}
+			if(transitionFunction != "mahal")
 			{
 				stop("only Mahalanobis distance method implemented for RasterStack")
 			}
-			adj <- .adjacency.straight(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect)
-			if(diagonal)
-			{
-				adj <- rbind(adj,.adjacency.diag(object@rasters[[1]],outer.meridian.connect=outer.meridian.connect))
-			}
-			x <- matrix(object@rasters[[1]]@data,ncol=1,nrow=object@ncells)
-			rownames(x) <- as.character(1:object@ncells)
-			for (i in 2:object@nrasters) 
-			{
-				x <- cbind(x,object@rasters[[i]]@data[as.integer(rownames(x))])
-				x <- na.omit(x)
-			}
-			adj <- subset(adj, adj[,1] %in% as.integer(rownames(x)) & adj[,2] %in% as.integer(rownames(x)))
-			x.minus.y <- x[as.character(adj[,1]),]-x[as.character(adj[,2]),]
-			cov.inv <- solve(cov(x))
+			x <- cbind(1:ncells(object),values(object))
+			dataCells <- na.omit(x)[,1]
+			adj <- adjacency(object,dataCells,dataCells,directions=directions,outerMeridianConnect=OuterMeridianConnect)
+			x.minus.y <- x[match(adj[,1],x[,1]),-1]-x[match(adj[,2],x[,1]),-1]
+			cov.inv <- solve(cov(x[,-1]))
 			mahaldistance <- apply(x.minus.y,1,function(x){sqrt((x%*%cov.inv)%*%x)})
 			mahaldistance <- mean(mahaldistance)/(mahaldistance+mean(mahaldistance))
 			transition.dsC <- new("dsCMatrix", 
 					p = as.integer(rep(0,object@ncells+1)),
-					Dim = as.integer(c(object@ncells,object@ncells)),
-					Dimnames = list(as.character(1:object@ncells),as.character(1:object@ncells))
+					Dim = as.integer(c(ncells(object),ncells(object))),
+					Dimnames = list(as.character(1:ncells(object)),as.character(1:ncells(object)))
 			)
 			transition.dsC[adj] <- mahaldistance
-			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax)
-			transition <- dsCMatrix.to.transition(transition.dsC,transition)
+			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax,projection=object@crs)
+			transitionMatrix(transition) <- transition.dsC
 			return(transition)
 		}
 )

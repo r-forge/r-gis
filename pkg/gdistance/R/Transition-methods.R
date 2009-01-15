@@ -6,39 +6,91 @@
 
 setMethod("Arith", signature(e1 = "Transition", e2 = "Transition"),
 		function(e1, e2){
-			if(1==1) #(as(e1,"virtualRaster") == as(e2,"virtualRaster"))  but first define Compare in raster
+			if(as(e1, "BasicRaster") == as(e2, "BasicRaster"))
 				{
-					return(dsCMatrix.to.transition(callGeneric(as(e1,"dsCMatrix"),as(e2,"dsCMatrix")),e1))
+					matrix.dsC <- callGeneric(as(e1,"dsCMatrix"),as(e2,"dsCMatrix"))
+					transitionMatrix(e1) <- matrix.dsC
+					return(e1)
 				}
-			else {stop("transition matrices do not coincide in resolution and extent")}
+			else {stop("transition matrices do not coincide in resolution, extent and/or projection")}
 		}
 )
 
-setMethod("Compare", signature(e1 = "Transition", e2 = "Transition"),
+setMethod("Logic", signature(e1 = "Transition", e2 = "Transition"),
+		function(e1, e2){
+			if(as(e1, "BasicRaster") == as(e2, "BasicRaster"))
+				{
+					matrix.dsC <- callGeneric(as(e1,"dsCMatrix"),as(e2,"dsCMatrix"))
+					transitionMatrix(e1) <- matrix.dsC
+					return(e1)
+				}
+			else {stop("transition matrices do not coincide in resolution, extent and/or projection")}
+		}
+)
+
+setMethod("Math", signature(e1 = "Transition", e2 = "Transition"),
+		function(e1, e2){
+			if(as(e1, "BasicRaster") == as(e2, "BasicRaster"))
+				{
+					matrix.dsC <- callGeneric(as(e1,"dsCMatrix"),as(e2,"dsCMatrix"))
+					transitionMatrix(e1) <- matrix.dsC
+					return(e1)
+				}
+			else {stop("transition matrices do not coincide in resolution, extent and/or projection")}
+		}
+)
+
+setMethod("Arith", signature(e1 = "Transition", e2 = "ANY"),
+		function(e1, e2){
+			matrix.dsC <- callGeneric(as(e1,"dsCMatrix"),e2)
+			transitionMatrix(e1) <- matrix.dsC
+			return(e1)
+		}
+)
+
+setMethod("Logic", signature(e1 = "Transition", e2 = "ANY"),
+		function(e1, e2){
+			matrix.dsC <- callGeneric(as(e1,"dsCMatrix"),e2)
+			transitionMatrix(e1) <- matrix.dsC
+			return(e1)
+		}
+)
+
+setMethod("Math", signature(e1 = "Transition", e2 = "ANY"),
+		function(e1, e2){
+			matrix.dsC <- callGeneric(as(e1,"dsCMatrix"),e2)
+			transitionMatrix(e1) <- matrix.dsC
+			return(e1)
+		}
+)
+
+setMethod("==", signature(e1 = "Transition", e2 = "Transition"),
 		function(e1, e2){
 			c1 <- e1@transitionMatrix == e2@transitionMatrix
-			#compare AbstractRaster
-			stop("not implemented yet")
+			c2 <- as(e1, "BasicRaster") == as(e2, "BasicRaster")
+			cond <- c1 & c2
+			return(cond)
 		}
 )
 
 setMethod("[", signature(x = "Transition", i="index", j="missing", drop="missing"),
 		function(x,i){
-			if (!all(i %in% x@index)){stop("wrong cell numbers")}
+			if (!all(i %in% x@transitionCells)){stop("wrong cell numbers")}
 			else{}
-			ind <- match(i,x@index)
+			ind <- match(i,x@transitionCells)
 			x@transitionMatrix <- x@transitionMatrix[ind,ind]
 			x@transitionCells <- i
-			return(e1)
+			return(x)
 		}
 )
 
-setMethod("[<-", signature(x = "Transition"),
-		function(e1){
-			stop("not implemented yet") #works with cellnumbers @index
+setReplaceMethod("[", signature(x = "Transition", i="index", j,="missing", value="ANY"),
+		function(x, i, value){
+			if (!all(i %in% x@transitionCells)){stop("wrong cell numbers")}
+			else{}
+			ind <- match(i,x@transitionCells)
+			x@transitionMatrix[ind,ind] <- value
+			x@transitionCells <- i
+			return(x)
 		}
 )
-
-
-
-#Define for other Ops

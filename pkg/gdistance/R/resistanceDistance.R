@@ -1,9 +1,8 @@
 # Author: Jacob van Etten jacobvanetten@yahoo.com
 # International Rice Research Institute
 # Date :  January 2009
-# Version 1.0
+# Version beta
 # Licence GPL v3
-
 
 #TODO check if coordinate systems are equal.
 #TODO check if bounding box of coordinates falls inside bb of transition
@@ -22,8 +21,8 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 		colnames(rd) <- rownames(toCoords) 
 		fromCoordsCells <- cbind(fromCoords,raster.get.cell.from.xy(transition, fromCoords))
 		toCoordsCells <- cbind(toCoords,raster.get.cell.from.xy(transition, toCoords))
-		fromCells <- fromCoordsCells[,3][fromCoordsCells[,3] %in% transitionCells(transition)] #TODO ncells(transition) + link to raster classes
-		toCells <- toCoordsCells[,3][toCoordsCells[,3] %in% transitionCells(transition)] #TODO ncells(transition) + link to raster classes
+		fromCells <- fromCoordsCells[,3][fromCoordsCells[,3] %in% transitionCells(transition)] 
+		toCells <- toCoordsCells[,3][toCoordsCells[,3] %in% transitionCells(transition)] 
 		uniqueCells <- unique(c(fromCells,toCells))
 		if (length(fromCells) < length(fromCoordsCells[,1])) 
 		{

@@ -14,7 +14,7 @@ setMethod("costDistance", signature(transition = "Transition", fromCoords = "Spa
 		fromCoords <- coordinates(fromCoords)
 		toCoords <- coordinates(toCoords)
 		transition <- .projectionCorrection(transition, type="cost") 
-		fromCoordsCells cbind(fromCoords, raster.get.cell.from.xy(transition, fromCoords))
+		fromCoordsCells <- cbind(fromCoords, raster.get.cell.from.xy(transition, fromCoords))
 		toCoordsCells <- cbind(toCoords,raster.get.cell.from.xy(transition, toCoords))
 		costDist <- matrix(NA, nrow=length(fromCoords[,1]),ncol=length(toCoords[,1]))
 		rownames(costDist) <- rownames(fromCoords)
