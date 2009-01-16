@@ -3,6 +3,7 @@ Type: Package
 Title: Climate data manipulation
 Version: 0.1
 Date: 2008-10-17
+Depends: methods
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 Description: nothing much so far
