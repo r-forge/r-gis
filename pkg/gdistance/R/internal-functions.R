@@ -21,16 +21,16 @@
 
 .Laplacian <- function(transition) 
 {
-	
-	Laplacian <- Diagonal(x = colSums(transition@transitionMatrix)) - transition@transitionMatrix
+	Laplacian <- Diagonal(x = colSums(transitionMatrix(transition))) - transitionMatrix(transition)
 	return(Laplacian)
 }
 
 .reducedLaplacian <- function(transition,excludeCells)
 {
 	L <- Diagonal(x = colSums(transition@transitionMatrix)) - transition@transitionMatrix
-	exclude <- as.integer(max(which(!(transitionCells(transition) %in% excludeCells))))
+	exclude <- as.integer(max(which(!(transition@transitionCells %in% excludeCells))))
 	Lr <- L[-exclude,-exclude]
+	#transition@transitionCells <- transition@transitionCells[-exclude]
 	return(Lr)
 }
 
@@ -38,7 +38,7 @@
 {
 	transition.dsC <- as(transition,"dsCMatrix")
 	selection <- which(rowSums(transition.dsC)>0)
-	transitionCells(transition) <- transitionCells(transition)[selection]
+	transition@transitionCells <- transition@transitionCells[selection]
 	transition.dsC <- transition.dsC[selection,selection]
 	transitionMatrix(transition) <- transition.dsC
 	return(transition)

@@ -7,7 +7,7 @@
 #TODO check if coordinate systems are equal.
 #TODO check if bounding box of coordinates falls inside bb of transition
 
-setGeneric("jointTrajectoryDistance", function(Transition, originCoord, fromCoords, toCoords) standardGeneric("jointTrajectoryDistance"))
+setGeneric("jointTrajectoryDistance", function(transition, originCoord, fromCoords, toCoords) standardGeneric("jointTrajectoryDistance"))
 
 setMethod("jointTrajectoryDistance", signature(transition = "Transition", originCoord = "SpatialPoints", fromCoords = "SpatialPoints", toCoords = "missing"), def = function(transition, originCoord, fromCoords)
 	{
@@ -20,7 +20,7 @@ setMethod("jointTrajectoryDistance", signature(transition = "Transition", origin
 			stop("the origin was not found in the transition matrix")
 		}
 		transition <- .transitionSolidify(transition)
-		fromCoordsCells <- cbind(fromCoords,raster.get.cell.from.xy(transition, fromCoords))
+		fromCoordsCells <- cbind(fromCoords,cellFromXY(transition, fromCoords))
 		fromCells <- fromCoordsCells[,3][fromCoordsCells[,3] %in% transitionCells(transition)]
 		cc <- .connected.components(transition)
 		ccOrigin <- subset(cc,cc[,1] %in% originCell)
@@ -37,6 +37,7 @@ setMethod("jointTrajectoryDistance", signature(transition = "Transition", origin
 		else{}
 		fromCells <- unique(fromCells)
 		Lr <- .reducedLaplacian(transition,fromCells)
+		L <- .Laplacian(transition)
 		A <- as(L,"lMatrix")
 		A <- as(A,"dMatrix")
 		n <- max(Lr@Dim)
@@ -88,20 +89,20 @@ setMethod("jointTrajectoryDistance", signature(transition = "Transition", origin
 	}
 )
 
-setMethod("jointTrajectoryDistance", signature(transition = "transition", originCoord = "SpatialPoints", fromCoords = "SpatialPoints", toCoords = "SpatialPoints"), def = function(transition, originCoord, fromCoords, toCoords)
+setMethod("jointTrajectoryDistance", signature(transition = "Transition", originCoord = "SpatialPoints", fromCoords = "SpatialPoints", toCoords = "SpatialPoints"), def = function(transition, originCoord, fromCoords, toCoords)
 	{
 		originCoord <- coordinates(originCoord)
 		fromCoords <- coordinates(fromCoords)
 		toCoords <- coordinates(toCoords)
-		originCell <- raster.get.cell.from.xy(transition, originCoord)
+		originCell <- cellFromXY(transition, originCoord)
 		if (originCell %in% transitionCells(transition)) {} 
 		else 
 		{
 			stop("the origin was not found in the transition matrix")
 		}
 		transition <- .transitionSolidify(transition)
-		fromCoordsCells <- cbind(fromCoords,raster.get.cell.from.xy(transition, fromCoords))
-		toCoordsCells <- cbind(toCoords,raster.get.cell.from.xy(transition, toCoords))
+		fromCoordsCells <- cbind(fromCoords,cellFromXY(transition, fromCoords))
+		toCoordsCells <- cbind(toCoords,cellFromXY(transition, toCoords))
 		fromCells <- fromCoordsCells[,3][fromCoordsCells[,3] %in% transitionCells(transition)] 
 		toCells <- toCoordsCells[,3][toCoordsCells[,3] %in% transitionCells(transition)] 
 		cc <- .connected.components(transition)
@@ -129,7 +130,7 @@ setMethod("jointTrajectoryDistance", signature(transition = "transition", origin
 		}
 		else{}
 		uniqueCells <- unique(c(fromCells,toCells))
-		transition <- .projectionCorrection(transition, type="resistance")
+		L <- .Laplacian(transition)
 		Lr <- .reducedLaplacian(transition,fromCells)
 		A <- as(L,"lMatrix")
 		A <- as(A,"dMatrix")
@@ -169,7 +170,7 @@ setMethod("jointTrajectoryDistance", signature(transition = "transition", origin
 				jtDistance[j,] <- colMeans(Current[,j]*Current)
 			}
 		}
-		jtDistance <- jtDistance * sqrt(matrix(diag(jtDistance),nrow=length(uniqueCells),nrow=length(uniqueCells)) * t(matrix(diag(jtDistance),nrow=length(uniqueCells),nrow=length(uniqueCells)))) #this is to normalize the dot product to get a cosine similarity
+		jtDistance <- jtDistance * sqrt(matrix(diag(jtDistance),nrow=length(uniqueCells),ncol=length(uniqueCells)) * t(matrix(diag(jtDistance),nrow=length(uniqueCells),ncol=length(uniqueCells)))) #this is to normalize the dot product to get a cosine similarity
 		cat("|","\n")
 		jtDist <- matrix(nrow=length(fromCoordsCells[,1]),ncol=length(fromCoordsCells[,1]))
 		rownames(jtDist) <- rownames(fromCoords)

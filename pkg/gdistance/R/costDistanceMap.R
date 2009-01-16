@@ -7,7 +7,7 @@
 costDistanceMap <- function(transition, fromCoords)
 {
 	fromCoords <- coordinates(fromCoords)
-	fromCoordsCells <- cbind(fromCoords,raster.get.cell.from.xy(transition, fromCoords))
+	fromCoordsCells <- cbind(fromCoords,cellFromXY(transition, fromCoords))
 	adjacencyGraph <- graph.adjacency(transitionMatrix(transition), mode="undirected", weighted=TRUE)
 	E(adjacencyGraph)$weight <- 1/E(adjacencyGraph)$weight
 	fromCells <- subset(fromCoordsCells, fromCoordsCells %in% V(adjacencyGraph)$name)

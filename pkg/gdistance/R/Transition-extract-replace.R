@@ -30,24 +30,44 @@ setMethod ("transitionCells", signature(transition = "Transition"),
 	}
 )
 
-setMethod("[", signature(x = "Transition", i="index", j="missing", drop="missing"),
+setMethod("[", signature(x = "Transition", i="integer", j="missing", drop="missing"),
 		function(x,i){
-			if (!all(i %in% x@transitionCells)){stop("wrong cell numbers")}
-			else{}
-			ind <- match(i,x@transitionCells)
-			x@transitionMatrix <- x@transitionMatrix[ind,ind]
-			x@transitionCells <- i
+			if (!all(i %in% x@transitionCells) && !all(-i %in% x@transitionCells)){stop("wrong cell numbers")}
+			else
+			{
+				if (!all(i %in% x@transitionCells))
+				{
+					ind <- match(i,x@transitionCells)
+					x@transitionMatrix <- x@transitionMatrix[ind,ind]
+					x@transitionCells <- i
+				}
+				if (!all(-i %in% x@transitionCells))
+				{
+					ind <- match(-i,x@transitionCells)
+					x@transitionMatrix <- x@transitionMatrix[-ind,-ind]
+					x@transitionCells <- x@transitionCells[!(x@transitionCells %in% -i)]
+				}
+			}
 			return(x)
 		}
 )
 
-setMethod("[<-", signature(x = "Transition", i="index", j="missing", value="ANY"),
+setMethod("[<-", signature(x = "Transition", i="integer", j="missing", value="ANY"),
 		function(x, i, value){
-			if (!all(i %in% x@transitionCells)){stop("wrong cell numbers")}
-			else{}
-			ind <- match(i,x@transitionCells)
-			x@transitionMatrix[ind,ind] <- value
-			x@transitionCells <- i
+			if (!all(i %in% x@transitionCells) && !all(-i %in% x@transitionCells)){stop("wrong cell numbers")}
+			else
+			{
+				if (!all(i %in% x@transitionCells))
+				{
+					ind <- match(i,x@transitionCells)
+					x@transitionMatrix[ind,ind] <- value
+				}
+				if (!all(-i %in% x@transitionCells))
+				{
+					ind <- match(-i,x@transitionCells)
+					x@transitionMatrix[-ind,-ind] <- value
+				}
+			}
 			return(x)
 		}
 )

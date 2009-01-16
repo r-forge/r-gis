@@ -29,7 +29,7 @@ setMethod("TransitionFromRaster", signature(object = "RasterBrick"), def = funct
 			}
 			x <- cbind(1:ncells(object),values(object))
 			dataCells <- na.omit(x)[,1]
-			adj <- adjacency(object,dataCells,dataCells,directions=directions,outerMeridianConnect=OuterMeridianConnect)
+			adj <- adjacency(object,dataCells,dataCells,directions=directions,outerMeridianConnect=outerMeridianConnect)
 			x.minus.y <- x[match(adj[,1],x[,1]),-1]-x[match(adj[,2],x[,1]),-1]
 			cov.inv <- solve(cov(x[,-1]))
 			mahaldistance <- apply(x.minus.y,1,function(x){sqrt((x%*%cov.inv)%*%x)})
