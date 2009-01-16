@@ -1,4 +1,4 @@
-﻿\name{gdistance-package}
+\name{gdistance-package}
 \alias{gdistance-package}
 \alias{gdistance}
 \docType{package}
