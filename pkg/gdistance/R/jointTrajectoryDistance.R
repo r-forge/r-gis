@@ -7,13 +7,13 @@
 #TODO check if coordinate systems are equal.
 #TODO check if bounding box of coordinates falls inside bb of transition
 
-setGeneric("jointTrajectoryDistance", function(transition, originCoord, fromCoords, toCoords) standardGeneric("jointTrajectoryDistance"))
+setGeneric("jointTrajectoryDistance", function(Transition, originCoord, fromCoords, toCoords) standardGeneric("jointTrajectoryDistance"))
 
-setMethod("jointTrajectoryDistance", signature(transition = "transition", originCoord = "SpatialPoints", fromCoords = "SpatialPoints", toCoords = "missing"), def = function(transition, originCoord, fromCoords)
+setMethod("jointTrajectoryDistance", signature(transition = "Transition", originCoord = "SpatialPoints", fromCoords = "SpatialPoints", toCoords = "missing"), def = function(transition, originCoord, fromCoords)
 	{
 		originCoord <- coordinates(originCoord)
 		fromCoords <- coordinates(fromCoords)
-		originCell <- raster.get.cell.from.xy(transition, originCoord)
+		originCell <- cellFromXY(transition, originCoord)
 		if (originCell %in% transitionCells(transition)) {} 
 		else 
 		{
@@ -36,7 +36,6 @@ setMethod("jointTrajectoryDistance", signature(transition = "transition", origin
 		}
 		else{}
 		fromCells <- unique(fromCells)
-		transition <- .projectionCorrection(transition, type="resistance")
 		Lr <- .reducedLaplacian(transition,fromCells)
 		A <- as(L,"lMatrix")
 		A <- as(A,"dMatrix")

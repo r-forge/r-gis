@@ -15,12 +15,11 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 		fromCoords <- coordinates(fromCoords)
 		toCoords <- coordinates(toCoords)
 		transition <- .transitionSolidify(transition)
-		transition <- .projectionCorrection(transition, type="resistance") 
 		rd <- matrix(Inf,nrow=length(fromCoords[,1]),ncol=length(toCoords[,1]))
 		rownames(rd) <- rownames(fromCoords)
 		colnames(rd) <- rownames(toCoords) 
-		fromCoordsCells <- cbind(fromCoords,raster.get.cell.from.xy(transition, fromCoords))
-		toCoordsCells <- cbind(toCoords,raster.get.cell.from.xy(transition, toCoords))
+		fromCoordsCells <- cbind(fromCoords,cellFromXY(transition, fromCoords))
+		toCoordsCells <- cbind(toCoords,cellFromXY(transition, toCoords))
 		fromCells <- fromCoordsCells[,3][fromCoordsCells[,3] %in% transitionCells(transition)] 
 		toCells <- toCoordsCells[,3][toCoordsCells[,3] %in% transitionCells(transition)] 
 		uniqueCells <- unique(c(fromCells,toCells))

@@ -6,8 +6,8 @@
 
 flowMap <- function(originCoord,goalCoord,transition)
 {
-	originCell <- raster.get.cell.from.xy(transition, originCoord)
-	goalCell <- raster.get.cell.from.xy(transition, goalCoord)
+	originCell <- cellFromXY(transition, originCoord)
+	goalCell <- cellFromXY(transition, goalCoord)
 	Lr <- .reducedLaplacian(transition,c(originCell,goalCell))
 	A <- .Laplacian(transition)
 	A <- as(A,"lMatrix")

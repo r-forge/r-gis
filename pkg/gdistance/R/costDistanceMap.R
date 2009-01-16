@@ -6,7 +6,6 @@
 
 costDistanceMap <- function(transition, fromCoords)
 {
-	transition <- .projectionCorrection(transition, type="cost") 
 	fromCoords <- coordinates(fromCoords)
 	fromCoordsCells <- cbind(fromCoords,raster.get.cell.from.xy(transition, fromCoords))
 	adjacencyGraph <- graph.adjacency(transitionMatrix(transition), mode="undirected", weighted=TRUE)

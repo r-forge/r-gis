@@ -13,9 +13,8 @@ setMethod("costDistance", signature(transition = "Transition", fromCoords = "Spa
 	{
 		fromCoords <- coordinates(fromCoords)
 		toCoords <- coordinates(toCoords)
-		transition <- .projectionCorrection(transition, type="cost") 
-		fromCoordsCells <- cbind(fromCoords, raster.get.cell.from.xy(transition, fromCoords))
-		toCoordsCells <- cbind(toCoords,raster.get.cell.from.xy(transition, toCoords))
+		fromCoordsCells <- cbind(fromCoords, cellFromXY(transition, fromCoords))
+		toCoordsCells <- cbind(toCoords, cellFromXY(transition, toCoords))
 		costDist <- matrix(NA, nrow=length(fromCoords[,1]),ncol=length(toCoords[,1]))
 		rownames(costDist) <- rownames(fromCoords)
 		colnames(costDist) <- rownames(toCoords)
@@ -54,8 +53,7 @@ setMethod("costDistance", signature(transition = "Transition", fromCoords = "Spa
 setMethod("costDistance", signature(transition = "Transition", fromCoords = "SpatialPoints", toCoords = "missing"), def = function(transition, fromCoords)
 	{
 		fromCoords <- coordinates(fromCoords)
-		transition <- .projectionCorrection(transition, type="cost") 
-		fromCoordsCells <- raster.get.cell.from.xy(transition, fromCoords)
+		fromCoordsCells <- cellFromXY(transition, fromCoords)
 		costDist <- matrix(NA, nrow=length(fromCoords[,1]),ncol=length(fromCoords[,1]))
 		rownames(costDist) <- rownames(Coords)
 		colnames(costDist) <- rownames(Coords)
