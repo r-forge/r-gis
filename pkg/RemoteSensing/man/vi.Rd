@@ -1,4 +1,4 @@
-\name{vi}
+\name{Vegetation indices}
 \alias{arvi}
 \alias{wdvi}
 \alias{sr}
@@ -15,9 +15,7 @@
 \alias{dvi}
 \alias{vari}
 
-
-
-\title{ Vegetation Indices }
+\title{Vegetation indices}
 \description{
   Compute vegetation indices from remote sensing data. 
 }
@@ -42,36 +40,38 @@ vari(blue, green, red)
 
 
 \arguments{
-  \item{red}{ red channel (band) data}
-  \item{nir}{ nir channel (band) data }
-  \item{blue}{ blue channel (band) data }
-  \item{green}{ green channel (band) data }
-  \item{ch5}{ Channel5 channel (band) data }
-  \item{ch7}{ Channel7 channel (band) data }
-  \item{slslope} { value of soil line slope }  
+  \item{red}{red channel (band) data}
+  \item{nir}{nir channel (band) data}
+  \item{blue}{blue channel (band) data}
+  \item{green}{green channel (band) data}
+  \item{ch5}{Channel5 channel (band) data}
+  \item{ch7}{Channel7 channel (band) data}
+  \item{slslope}{value of soil line slope}  
 }
 
 \value{
   vegetation index
 }
 
-\author{ Yann Chemin }
+\author{Yann Chemin}
 
 \examples{
-require(raster)
-
 #MODIS NDVI PROCESSING EXAMPLE
 
+require(raster)
+
 #Create RasterLayer objects, and load data
-red <- rasterFromFile( system.file("external/MOD09A1_b1.tif", package="RemoteSensing"), TRUE  )
-nir <- rasterFromFile( system.file("external/MOD09A1_b2.tif", package="RemoteSensing"), TRUE )
+red <- rasterFromFile( system.file("external/MOD09A1_b1.tif", package="RemoteSensing"))
+nir <- rasterFromFile( system.file("external/MOD09A1_b2.tif", package="RemoteSensing"))
 
 #Scale values
 #This approach also works for data that is on disk)
-modisscale <- function(band){ return(band / 10000) }
-red <- calc(red, fun=modisscale)
+modisscale <- function(band){return(band / 10000)}
 
-#But this is a shortcut for data that is loaded into memory:
+#provide a filename if your files are very large and the values cannot be loaded into memory. Here we load them into memory
+red <- calc(red, fun=modisscale, filename="")
+
+#This does the same for nir what was done for red above, using a shortcut when data can be loaded into memory:
 nir <- nir / 10000 
 
 #Set null values
@@ -81,10 +81,10 @@ nir <- setNA(nir, value=-2.8672)
 
 #NDVI CALCULATIONS
 #Create double input processing function
-ndvi <- overlay(red, nir, fun=ndvi)
+NDVI <- Overlay(red, nir, fun=ndvi)
 
 #Plot the raster output
-plot(ndvi, col=grey(0:255/255))
+plot(NDVI, col=grey(0:255/255))
 #add Philippines country administrative boundary
 #require(Rgis)
 #plot(read.adm("PHL"), add=T, border="red")
@@ -92,5 +92,5 @@ plot(ndvi, col=grey(0:255/255))
 }
 
 }
-\keyword{ spatial }
+\keyword{spatial}
 
