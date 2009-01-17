@@ -42,85 +42,55 @@ vari(blue, green, red)
 
 
 \arguments{
-  \item{red}{ array of red channel (band) data}
-  \item{nir}{ array of nir channel (band) data }
-  \item{blue}{ array of blue channel (band) data }
-  \item{green}{ array of green channel (band) data }
-  \item{ch5}{ array of Channel5 channel (band) data }
-  \item{ch7}{ array of Channel7 channel (band) data }
+  \item{red}{ red channel (band) data}
+  \item{nir}{ nir channel (band) data }
+  \item{blue}{ blue channel (band) data }
+  \item{green}{ green channel (band) data }
+  \item{ch5}{ Channel5 channel (band) data }
+  \item{ch7}{ Channel7 channel (band) data }
   \item{slslope} { value of soil line slope }  
 }
-\details{
-  ~~ If necessary, more details than the description above ~~
-}
+
 \value{
   vegetation index
 }
-\references{ ~put references to the literature/web site here ~ }
+
 \author{ Yann Chemin }
-\note{ ~~further notes~~ 
 
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
 \examples{
-#
+require(raster)
+
 #MODIS NDVI PROCESSING EXAMPLE
-#
-#require(Rgis)
-#require(RemoteSensing)
 
-#Set filenames
-\dontrun{filename1<-"afilename"}
-\dontrun{filename2<-anotherfilename}
+#Create RasterLayer objects, and load data
+red <- rasterFromFile( system.file("external/MOD09A1_b1.tif", package="RemoteSensing"), TRUE  )
+nir <- rasterFromFile( system.file("external/MOD09A1_b2.tif", package="RemoteSensing"), TRUE )
 
-#Create raster object
-\dontrun{red <- raster.create.from.file(filename1)}
-\dontrun{nir <- raster.create.from.file(filename2)}
+#Scale values
+#This approach also works for data that is on disk)
+modisscale <- function(band){ return(band / 10000) }
+red <- calc(red, fun=modisscale)
 
-#Load data into raster object
-\dontrun{red <- raster.read.all(red)}
-\dontrun{nir <- raster.read.all(nir)}
-
-#Modis scaling processing function
-\dontrun{
-modisscale<-function (band){
-result <- band / 10000.0
-result[is.nan(result)] <- NA
-return(result)}
-}
-
-#Scale bands
-\dontrun{red <- raster.calc(red, fun=modisscale)}
-\dontrun{nir <- raster.calc(nir, fun=modisscale)}
+#But this is a shortcut for data that is loaded into memory:
+nir <- nir / 10000 
 
 #Set null values
-\dontrun{red <- raster.calc.setNA(red, value=-2.8672)}
-\dontrun{nir <- raster.calc.setNA(nir, value=-2.8672)}
+red <- setNA(red, value=-2.8672)
+nir <- setNA(nir, value=-2.8672)
+
 
 #NDVI CALCULATIONS
 #Create double input processing function
-\dontrun{
-calc.x <- function(rsstack, fun, filename=NA, overwrite=FALSE) {
-res <- fun(raster.values(rsstack@rasters[[1]]), raster.values(rsstack@rasters[[2]]))
-res[is.infinite(res)] <- NA
-res[res < -1] <- -1
-res[res > 1] <- 1
-out.raster <- raster.set.filename(rsstack@rasters[[1]] , "")
-out.raster <- raster.set.data(out.raster, res)
-return(out.raster)}
-}
-
-#For calculating NDVI
-\dontrun{stack1 <- rasterstack.create.from.rasters(c(red,nir))}
-\dontrun{outndvi <- raster.create.new()}
-\dontrun{outndvi <- raster.set.datatype(outndvi,"numeric")}
-\dontrun{outndvi <- calc.x(stack1, ndvi)}
+ndvi <- overlay(red, nir, fun=ndvi)
 
 #Plot the raster output
-\dontrun{raster.map(outndvi, col=grey(0:255/255))}
+plot(ndvi, col=grey(0:255/255))
 #add Philippines country administrative boundary
-\dontrun{plot(read.adm("PHL"), add=T, border="red")}
+#require(Rgis)
+#plot(read.adm("PHL"), add=T, border="red")
+
+}
+
 }
 \keyword{ spatial }
 
