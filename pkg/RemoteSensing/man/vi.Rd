@@ -91,6 +91,5 @@ plot(NDVI, col=grey(0:255/255))
 
 }
 
-}
 \keyword{spatial}
 
