@@ -1,11 +1,13 @@
 \name{date}
 
-\alias{date.from.doy}
-\alias{doy.from.date}
-\alias{is.leapyear}
-\alias{days.in.year}
-\alias{get.daylength}
-\alias{get.daylength2}
+\alias{dateFromDoy}
+\alias{doyFromDate}
+\alias{yearFromDate}
+\alias{isLeapYear}
+\alias{daysInYear}
+\alias{daysOfYear}
+\alias{daylength}
+\alias{daylength2}
 
 \title{ date routines }
 \description{
@@ -13,19 +15,20 @@
 }
 
 \usage{
-date.from.doy(doy, year)
-doy.from.date(date)
-is.leapyear(year)
-days.in.year(year)
-get.daylength(lat, doy)
-get.daylength2(lat, doy)
+dateFromDoy(doy, year)
+doyFromDate(date)
+yearFromDate(date)
+isLeapYear(year)
+daysInYear(year)
+daylength(lat, doy)
+daylength2(lat, doy)
 }
 
 \arguments{
-  \item{doy}{ Day of the year (1..365) or (1:366) for leap years }
-  \item{year}{ year, e.g. 1982 }
-  \item{date}{ date (Date or character class) as 'yyyy-mm-dd', e.g. '1982-11-23' }  
-  \item{lat}{ latitude, in degrees. I.e. between -90.0 and 90.0 }
+  \item{doy}{Day of the year (1..365) or (1:366) for leap years }
+  \item{year}{year, e.g. 1982 }
+  \item{date}{date (Date or character class) as 'yyyy-mm-dd', e.g. '1982-11-23' }  
+  \item{lat}{latitude, in degrees. I.e. between -90.0 and 90.0 }
 }
 
 \value{
@@ -36,12 +39,12 @@ get.daylength2(lat, doy)
 \examples{
 	doy <- 88
 	year <- 1970
-	date <- date.from.doy(doy, year)
+	date <- dateFromDoy(doy, year)
 	date
-	date.from.doy(-15, 2000)
-	doy.from.date(date)
-	is.leapyear(2000)
-	days.in.year(2000)
-	days.in.year(1999)
+	dateFromDoy(-15, 2000)
+	doyFromDate(date)
+	isLeapYear(2000)
+	daysInYear(2000)
+	daysInYear(1999)
 }
 \keyword{ spatial }

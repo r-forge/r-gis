@@ -1,6 +1,6 @@
 
 
-get.daylength <- function(lat, doy) {
+daylength <- function(lat, doy) {
 	if (lat > 90) { stop("lat should be <= 90")
 	} else if (lat < -90) { stop("lat should be >= -90")}	
 	if (doy == 366) {  doy <- 365	}
@@ -20,7 +20,7 @@ get.daylength <- function(lat, doy) {
 
 
 
-get.daylength2 <- function(lat, doy) {
+daylength2 <- function(lat, doy) {
 	if (lat > 90) { stop("lat should be <= 90")
 	} else if (lat < -90) { stop("lat should be >= -90")}	
 	if (doy == 366) {  doy <- 365	}
