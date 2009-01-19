@@ -36,8 +36,8 @@ setMethod("jointTrajectoryDistance", signature(transition = "Transition", origin
 		}
 		else{}
 		fromCells <- unique(fromCells)
-		Lr <- .reducedLaplacian(transition,fromCells)
 		L <- .Laplacian(transition)
+		Lr <- L[-dim(L)[1],-dim(L)[1]]
 		A <- as(L,"lMatrix")
 		A <- as(A,"dMatrix")
 		n <- max(Lr@Dim)
@@ -131,7 +131,7 @@ setMethod("jointTrajectoryDistance", signature(transition = "Transition", origin
 		else{}
 		uniqueCells <- unique(c(fromCells,toCells))
 		L <- .Laplacian(transition)
-		Lr <- .reducedLaplacian(transition,fromCells)
+		Lr <- L[-dim(L)[1],-dim(L)[1]]
 		A <- as(L,"lMatrix")
 		A <- as(A,"dMatrix")
 		n <- max(Lr@Dim)

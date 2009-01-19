@@ -25,15 +25,6 @@
 	return(Laplacian)
 }
 
-.reducedLaplacian <- function(transition,excludeCells)
-{
-	L <- Diagonal(x = colSums(transition@transitionMatrix)) - transition@transitionMatrix
-	exclude <- as.integer(max(which(!(transition@transitionCells %in% excludeCells))))
-	Lr <- L[-exclude,-exclude]
-	#transition@transitionCells <- transition@transitionCells[-exclude]
-	return(Lr)
-}
-
 .transitionSolidify <- function(transition)
 {
 	transition.dsC <- as(transition,"dsCMatrix")
@@ -44,7 +35,7 @@
 	return(transition)
 }
 
-.current <- function(L, Lr, A, n, indexFrom, indexTo)
+.current <- function(L, Lr, A, n, indexFrom, indexTo) 
 {
 	e <- matrix(0, ncol=1, nrow=n)
 	e[indexFrom,] <- 1

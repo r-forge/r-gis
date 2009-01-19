@@ -28,10 +28,10 @@ Jacob van Etten <jacobvanetten@yahoo.com>
 }
 \references{
 Ray, N. 2005. PATHMATRIX: a geographical information system tool to compute effective distances among samples. Molecular Ecology Notes 5, 177–180.
-http://cmpg.unibe.ch/software/pathmatrix/
+\url{http://cmpg.unibe.ch/software/pathmatrix/}
 
 McRae, B.H. 2006. Isolation by resistance. Evolution 60(8), 1551-1561.
-http://www.circuitscape.org
+\url{http://www.circuitscape.org}
 }
 \keyword{package}
 \keyword{spatial}
@@ -41,5 +41,9 @@ http://www.circuitscape.org
 \examples{
 #Create a raster (with raster package)
 
+#Create a Transition object
 
+#Correct for the projection distortion
+
+#Calculate distances
 }

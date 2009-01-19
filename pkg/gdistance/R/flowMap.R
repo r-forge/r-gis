@@ -8,11 +8,11 @@ flowMap <- function(originCoord,goalCoord,transition)
 {
 	originCell <- cellFromXY(transition, originCoord)
 	goalCell <- cellFromXY(transition, goalCoord)
-	Lr <- .reducedLaplacian(transition,c(originCell,goalCell))
 	L <- .Laplacian(transition)
+	Lr <- L[-dim(L)[1],-dim(L)[1]]
 	A <- as(L,"lMatrix")
 	A <- as(A,"dMatrix")
-	n <- max(Lr@Dim)
+	n <- max(dim(Lr))
 	indexGoal <- match(goalCell,transitionCells(transition))
 	indexOrigin <- match(originCell,transitionCells(transition))
 	Current <- .current(L, Lr, A, n, indexOrigin, indexGoal)

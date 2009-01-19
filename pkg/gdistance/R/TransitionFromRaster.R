@@ -10,7 +10,7 @@ setMethod("TransitionFromRaster", signature(object = "RasterLayer"), def = funct
 		{
 			if(dataContent(object) != 'all'){stop("only implemented for rasters with all values in memory; use readAll() to read values")}
 			else{}
-			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax,projection=object@crs)
+			transition <- new("Transition",nrows=nrow(object),ncols=ncol(object),xmin=xmin(object),xmax=xmax(object),ymin=ymin(object),ymax=ymax(object),projection=projection(object, asText=FALSE))
 			transition.dsC <- as(transition,"dsCMatrix")
 			adj <- adjacency(object,which(!is.na(values(object))),which(!is.na(values(object))),directions=directions,outerMeridianConnect=outerMeridianConnect)
 			transition.values <- apply(cbind(values(object)[adj[,1]],values(object)[adj[,2]]),1,transitionFunction)
@@ -40,7 +40,7 @@ setMethod("TransitionFromRaster", signature(object = "RasterBrick"), def = funct
 					Dimnames = list(as.character(1:ncells(object)),as.character(1:ncells(object)))
 			)
 			transition.dsC[adj] <- mahaldistance
-			transition <- new("Transition",nrows=object@nrows,ncols=object@ncols,xmin=object@xmin,xmax=object@xmax,ymin=object@ymin,ymax=object@ymax,projection=object@crs)
+			transition <- new("Transition",nrows=nrow(object),ncols=ncol(object),xmin=xmin(object),xmax=xmax(object),ymin=ymin(object),ymax=ymax(object),projection=projection(object, asText=FALSE))req
 			transitionMatrix(transition) <- transition.dsC
 			return(transition)
 		}

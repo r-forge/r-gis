@@ -21,16 +21,16 @@ setClass(Class="Transition",
 setMethod ("show" , "Transition", 
 		function(object) {
 			cat("class     :" , class(object), "\n")
-			cat("nrows     :" , object@nrows, "\n")
-			cat("ncols     :" , object@ncols, "\n")
-			cat("ncells    :" , object@nrows * object@ncols, "\n")
-			cat("projection:" , object@crs, "\n")
-			cat("xmin      :" , object@xmin, "\n")
-			cat("xmax      :" , object@xmax, "\n")
-			cat("ymin      :" , object@ymin, "\n")
-			cat("ymax      :" , object@ymax, "\n")
-			cat("xres      :" , object@ncols / (object@xmax - object@xmin) , "\n")
-			cat("yres      :" , object@yrows / (object@ymax - object@ymin) , "\n")
+			cat("nrows     :" , nrow(object), "\n")
+			cat("ncols     :" , ncol(object), "\n")
+			cat("ncells    :" , nrow(object) * ncol(object), "\n")
+			cat("xmin      :" , xmin(object), "\n")
+			cat("xmax      :" , xmax(object), "\n")
+			cat("ymin      :" , ymin(object), "\n")
+			cat("ymax      :" , ymax(object), "\n")
+			cat("xres      :" , ncol(object) / (xmax(object) - xmin(object)) , "\n")
+			cat("yres      :" , nrow(object) / (ymax(object) - ymin(object)) , "\n")
+			cat("projection:", projection(object))
 			cat ("\n")
 		}
 )
@@ -38,13 +38,11 @@ setMethod ("show" , "Transition",
 setMethod ("initialize", "Transition",
 		function(.Object,nrows,ncols,xmin,xmax,ymin,ymax,projection)
 		{
-			ncells = as.integer(nrows*ncols)
+			ncells <- as.integer(nrows*ncols)
+			bbox <- newBbox(xmin, xmax, ymin, ymax)
+			.Object@bbox <- bbox
 			.Object@nrows <- as.integer(nrows)
 			.Object@ncols <- as.integer(ncols)
-			.Object@xmin <- xmin
-			.Object@xmax <- xmax
-			.Object@ymin <- ymin
-			.Object@ymax <- ymax
 			.Object@crs <- projection
 			.Object@transitionMatrix@uplo <- "U"
 			.Object@transitionMatrix@p <- as.integer(rep(0,ncells+1))
@@ -59,7 +57,7 @@ setAs("Transition", "dsCMatrix", function(from){from@transitionMatrix})
 
 setAs("Transition", "RasterLayer", function(from)
 	{
-		newRaster(xmn=from@xmin, xmx=from@xmax, ymn=from@ymin, ymx=from@ymax, nrows=from@nrows, ncols=from@ncols, projstring=from@crs)
+		newRaster(xmn=xmin(from), xmx=xmax(from), ymn=ymin(from), ymx=ymax(from), nrows=nrow(from), ncols=ncol(from), projstring=projection(from))
 	}
 )
 

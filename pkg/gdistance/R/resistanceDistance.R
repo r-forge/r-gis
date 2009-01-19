@@ -58,19 +58,19 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 			{
 				subsetCells <- uniqueCells[uniqueCells %in% cc[,1][cc[,2] == ccWithCoords[i]]]
 				tm <- transition[cc[,1][cc[,2]==ccWithCoords[i]],cc[,1][cc[,2]==ccWithCoords[i]]]
-				Lr <- .reducedLaplacian(tm,subsetCells)
+				Lr <- .Laplacian(tm)[-dim(tm)[1],-dim(tm)[1]] #warning if dim(tm) happens to be inside uniqueCells?
 				n <- max(Lr@Dim)
 				Lstarplus <- matrix(ncol=1,nrow=length(subsetCells))
 				Lplus <- matrix(ncol=length(subsetCells),nrow=length(subsetCells))
-				index <- match(subsetCells,rownames(Lr))
-				for (i in 1:length(subsetCells))
+				index <- match(subsetCells,transitionCells(tm))
+				for (j in 1:length(subsetCells))
 				{
 					ei <- matrix((-1/(n+1)), ncol=1, nrow=n)
-					ei[index[i],] <- 1-(1/(n+1))
+					ei[index[j],] <- 1-(1/(n+1))
 					xi <- solve(Lr,ei) 
 					xi <- as.vector(xi)
 					Lplusallrows <- c(xi-sum(xi/(n+1)),(sum(xi)/(n+1)))
-					Lplus[,i] <- Lplusallrows[index]
+					Lplus[,j] <- Lplusallrows[index]
 				}
 				rd.subset <- -2*Lplus + matrix(diag(Lplus),nrow=length(subsetCells),ncol=length(subsetCells)) + t(matrix(diag(Lplus),nrow=length(subsetCells),ncol=length(subsetCells)))
 				index1 <- which(fromCoordsCells[,3] %in% subsetCells)
@@ -88,7 +88,6 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 	{
 		fromCoords <- coordinates(fromCoords)
 		transition <- .transitionSolidify(transition)
-		transition <- .projectionCorrection(transition, type="resistance") 
 		rd <- matrix(Inf,nrow=length(fromCoords[,1]),ncol=length(fromCoords[,1]))
 		rownames(rd) <- rownames(fromCoords)
 		colnames(rd) <- rownames(fromCoords)
@@ -117,12 +116,12 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 			for (i in 1:length(ccWithFromCoords))
 			{
 				subsetCells <- unique(fromCells[,3][fromCells[,3] %in% cc[,1][cc[,2] == ccWithFromCoords[i]]])
-				tm <- transition@transitionmatrix[as.character(cc[,1][cc[,2]==ccWithFromCoords[i]]),as.character(cc[,1][cc[,2]==ccWithFromCoords[i]])]
-				Lr <- .reducedLaplacian(tm, subsetCells)
+				tm <- transitionMatrix(transition)[as.character(cc[,1][cc[,2]==ccWithFromCoords[i]]),as.character(cc[,1][cc[,2]==ccWithFromCoords[i]])]
+				Lr <- .Laplacian(tm)[-dim(tm)[1],-dim(tm)[1]]
 				n <- max(Lr@Dim)
 				Lstarplus <- matrix(ncol=1,nrow=length(subsetCells))
 				Lplus <- matrix(ncol=length(subsetCells),nrow=length(subsetCells))
-				index <- match(subsetCells,rownames(tm))
+				index <- match(subsetCells,transitionCells(tm))
 				for (i in 1:length(subsetCells))
 				{
 					ei <- matrix((-1/(n+1)), ncol=1, nrow=n)
