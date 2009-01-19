@@ -28,8 +28,8 @@ setMethod ("show" , "Transition",
 			cat("xmax      :" , xmax(object), "\n")
 			cat("ymin      :" , ymin(object), "\n")
 			cat("ymax      :" , ymax(object), "\n")
-			cat("xres      :" , ncol(object) / (xmax(object) - xmin(object)) , "\n")
-			cat("yres      :" , nrow(object) / (ymax(object) - ymin(object)) , "\n")
+			cat("xres      :" , (xmax(object) - xmin(object)) / ncol(object) , "\n")
+			cat("yres      :" , (ymax(object) - ymin(object)) / nrow(object)  , "\n")
 			cat("projection:", projection(object))
 			cat ("\n")
 		}

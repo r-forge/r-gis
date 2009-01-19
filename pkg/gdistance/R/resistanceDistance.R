@@ -91,7 +91,7 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 		rd <- matrix(Inf,nrow=length(fromCoords[,1]),ncol=length(fromCoords[,1]))
 		rownames(rd) <- rownames(fromCoords)
 		colnames(rd) <- rownames(fromCoords)
-		fromCoordsCells <- cbind(fromCoords, raster.get.cell.from.xy(transition, fromCoords))
+		fromCoordsCells <- cbind(fromCoords, cellFromXY(transition, fromCoords))
 		fromCells <- fromCoordsCells[,3][fromCoordsCells[,3] %in% transitionCells(transition)]
 		if (length(fromCells) < length(fromCoordsCells[,4])) 
 		{

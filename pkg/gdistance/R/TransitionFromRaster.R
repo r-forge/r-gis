@@ -40,7 +40,7 @@ setMethod("TransitionFromRaster", signature(object = "RasterBrick"), def = funct
 					Dimnames = list(as.character(1:ncells(object)),as.character(1:ncells(object)))
 			)
 			transition.dsC[adj] <- mahaldistance
-			transition <- new("Transition",nrows=nrow(object),ncols=ncol(object),xmin=xmin(object),xmax=xmax(object),ymin=ymin(object),ymax=ymax(object),projection=projection(object, asText=FALSE))req
+			transition <- new("Transition",nrows=nrow(object),ncols=ncol(object),xmin=xmin(object),xmax=xmax(object),ymin=ymin(object),ymax=ymax(object),projection=projection(object, asText=FALSE))
 			transitionMatrix(transition) <- transition.dsC
 			return(transition)
 		}
