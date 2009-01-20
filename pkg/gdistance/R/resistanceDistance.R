@@ -30,7 +30,7 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 		else{}
 		if (length(toCells) < length(toCoordsCells[,1])) 
 		{
-			warning(length(toCells)," out of ",length(toCoordsCells[,4])," destination locations were found in the transition matrix. NAs introduced.")
+			warning(length(toCells)," out of ",length(toCoordsCells[,1])," destination locations were found in the transition matrix. NAs introduced.")
 		}
 		else{}
 		cc <- .connected.components(transition)
@@ -57,7 +57,7 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 			for (i in 1:length(ccWithCoords))
 			{
 				subsetCells <- uniqueCells[uniqueCells %in% cc[,1][cc[,2] == ccWithCoords[i]]]
-				tm <- transition[cc[,1][cc[,2]==ccWithCoords[i]],cc[,1][cc[,2]==ccWithCoords[i]]]
+				tm <- transition[cc[,1][cc[,2]==ccWithCoords[i]]]
 				Lr <- .Laplacian(tm)[-dim(tm)[1],-dim(tm)[1]] #warning if dim(tm) happens to be inside uniqueCells?
 				n <- max(Lr@Dim)
 				Lstarplus <- matrix(ncol=1,nrow=length(subsetCells))
@@ -93,9 +93,9 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 		colnames(rd) <- rownames(fromCoords)
 		fromCoordsCells <- cbind(fromCoords, cellFromXY(transition, fromCoords))
 		fromCells <- fromCoordsCells[,3][fromCoordsCells[,3] %in% transitionCells(transition)]
-		if (length(fromCells) < length(fromCoordsCells[,4])) 
+		if (length(fromCells) < length(fromCoordsCells[,1])) 
 		{
-			warning(length(fromCells[,1])," out of ",length(fromCoordsCells[,4])," locations were found in the transition matrix. NAs introduced.")
+			warning(length(fromCells)," out of ",length(fromCoordsCells[,1])," locations were found in the transition matrix. NAs introduced.")
 		}
 		else{}
 		cc <- .connected.components(transition)
@@ -115,8 +115,8 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 		{
 			for (i in 1:length(ccWithFromCoords))
 			{
-				subsetCells <- unique(fromCells[,3][fromCells[,3] %in% cc[,1][cc[,2] == ccWithFromCoords[i]]])
-				tm <- transitionMatrix(transition)[as.character(cc[,1][cc[,2]==ccWithFromCoords[i]]),as.character(cc[,1][cc[,2]==ccWithFromCoords[i]])]
+				subsetCells <- unique(fromCells[fromCells %in% cc[,1][cc[,2] == ccWithFromCoords[i]]])
+				tm <- transition[cc[,1][cc[,2]==ccWithFromCoords[i]]]
 				Lr <- .Laplacian(tm)[-dim(tm)[1],-dim(tm)[1]]
 				n <- max(Lr@Dim)
 				Lstarplus <- matrix(ncol=1,nrow=length(subsetCells))

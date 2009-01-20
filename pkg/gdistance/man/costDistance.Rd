@@ -24,7 +24,7 @@ In the case of grid data for a large area in a geographic (latlon) projection, a
 distance matrix
 }
 \references{ 
-E.W. Dijkstra. 1959. A note on two problems in connexion with graphs. emph{Numerische Mathematik} 1, 269–271.
+E.W. Dijkstra. 1959. A note on two problems in connexion with graphs. \emph{Numerische Mathematik} 1, 269–271.
 
 }
 \author{ Jacob van Etten <jacobvanetten@yahoo.com>}

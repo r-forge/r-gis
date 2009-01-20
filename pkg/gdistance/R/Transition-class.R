@@ -5,17 +5,15 @@
 # Licence GPL v3
 
 setClass(Class="Transition",
-		contains = "Raster",
+		contains = "BasicRaster",
 		representation = representation(
 			transitionMatrix = "dsCMatrix",
 			transitionCells = "integer"
 		),
 		validity = function(object){
-			cond1 <- isTRUE(all.equal(object@transitionMatrix@Dim[1], object@transitionMatrix@Dim[2]))
-			cond2 <- (nrows(object) * ncols(object)) >= object@transitionMatrix@Dim[1]
-			cond <- cond1 & cond2
+			cond <- (nrow(object) * ncol(object)) >= object@transitionMatrix@Dim[1]
 			return(cond)
-		}
+	}
 )
 
 setMethod ("show" , "Transition", 
@@ -48,6 +46,7 @@ setMethod ("initialize", "Transition",
 			.Object@transitionMatrix@p <- as.integer(rep(0,ncells+1))
 			.Object@transitionMatrix@i <- integer(0)
 			.Object@transitionMatrix@Dim <- as.integer(c(ncells,ncells))
+			#.Object@transitionMatrix@x can stay this way?
 			.Object@transitionCells <- 1:ncells
 			return(.Object)
 		}

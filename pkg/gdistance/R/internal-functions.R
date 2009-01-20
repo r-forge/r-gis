@@ -14,7 +14,7 @@
 
 .connected.components <- function(transition)
 {
-	adj.graph <- graph.adjacency(transition@transitionmatrix)
+	adj.graph <- graph.adjacency(transition@transitionMatrix)
 	clustermembership <- cbind(transitionCells(transition),as.integer(clusters(adj.graph)$membership)+1)
 	return(clustermembership)
 }
@@ -51,3 +51,16 @@
 	Current[indexTo] <- 1
 }
 
+#Tryout code
+.dsCMatrixFromTransition <- function(transition)
+{
+	sparseMatrix <- new("dsCMatrix",
+		uplo = transition@transitionMatrix@uplo,
+		p = transition@transitionMatrix@p,
+		i = transition@transitionMatrix@i,
+		Dim = transition@transitionMatrix@Dim,
+		x = transition@transitionMatrix@x,
+		Dimnames = list(NULL,NULL)
+	)
+	return(sparseMatrix)
+}

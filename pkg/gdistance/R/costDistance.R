@@ -13,37 +13,35 @@ setMethod("costDistance", signature(transition = "Transition", fromCoords = "Spa
 	{
 		fromCoords <- coordinates(fromCoords)
 		toCoords <- coordinates(toCoords)
-		fromCoordsCells <- cbind(fromCoords, cellFromXY(transition, fromCoords))
-		toCoordsCells <- cbind(toCoords, cellFromXY(transition, toCoords))
+		fromCoordsCells <- cellFromXY(transition, fromCoords)
+		toCoordsCells <- cellFromXY(transition, toCoords)
 		costDist <- matrix(NA, nrow=length(fromCoords[,1]),ncol=length(toCoords[,1]))
 		rownames(costDist) <- rownames(fromCoords)
 		colnames(costDist) <- rownames(toCoords)
 		adjacencyGraph <- graph.adjacency(transitionMatrix(transition), mode="undirected", weighted=TRUE)
 		E(adjacencyGraph)$weight <- 1/E(adjacencyGraph)$weight
-		fromCells <- subset(fromCoordsCells[,3], fromCoordsCells[,3] %in% V(adjacencyGraph)$name)
-		toCells <- subset(toCoordsCells[,3], toCoordsCells[,3] %in% V(adjacencyGraph)$name)
-		if (length(fromCells) < length (fromCoordsCells[,1])) 
+		fromCells <- subset(fromCoordsCells, fromCoordsCells %in% transitionCells(transition))
+		toCells <- subset(toCoordsCells, toCoordsCells %in% transitionCells(transition))
+		if (length(fromCells) < length (fromCoordsCells)) 
 		{
-			warning(length(fromCells), " out of ", length(fromCoordsCells[,1]), " origin locations were found in the transition matrix.")
+			warning(length(fromCells), " out of ", length(fromCoordsCells), " origin locations were found in the transition matrix.")
 		}
-		else{}
-		if (length(toCells) < length (toCoordsCells[,1])) 
+		if (length(toCells) < length (toCoordsCells)) 
 		{
-			warning(length(toCells), " out of ", length(toCoordsCells[,1]), " destination locations were found in the transition matrix.")
+			warning(length(toCells), " out of ", length(toCoordsCells), " destination locations were found in the transition matrix.")
 		}
-		else{}
 		uniqueFromCells <- unique(fromCells)
 		uniqueToCells <- unique(toCells)		
 		shortestPaths <- matrix(nrow=length(uniqueFromCells),ncol=length(uniqueToCells))
-		index <- match(uniqueToCells,V(adjacencyGraph)$name)
+		index <- match(uniqueToCells,transitionCells(transition))
 		for (i in 1:length(uniqueFromCells))
 		{
-			shortestPaths[i,] <- shortest.paths(adjacencyGraph, match(uniqueFromCells[i],V(adjacencyGraph)$name))[,index]
+			shortestPaths[i,] <- shortest.paths(adjacencyGraph, match(uniqueFromCells[i],transitionCells(transition))-1)[,index]
 		}
-		index1 <- which(fromCoordsCells[,3] %in% fromCells)
-		index2 <- which(toCoordsCells[,3] %in% toCells)
-		index3 <- match(fromCoordsCells[,3][fromCoordsCells[,3] %in% fromCells],uniqueFromCells)
-		index4 <- match(toCoordsCells[,3][toCoordsCells[,3] %in% toCells],uniqueToCells)
+		index1 <- which(fromCoordsCells %in% fromCells)
+		index2 <- which(toCoordsCells %in% toCells)
+		index3 <- match(fromCoordsCells[fromCoordsCells %in% fromCells],uniqueFromCells)
+		index4 <- match(toCoordsCells[toCoordsCells %in% toCells],uniqueToCells)
 		costDist[index1,index2] <- shortestPaths[index3,index4]
 		costDist <- as.dist(costDist)
 		return(costDist)
@@ -55,26 +53,24 @@ setMethod("costDistance", signature(transition = "Transition", fromCoords = "Spa
 		fromCoords <- coordinates(fromCoords)
 		fromCoordsCells <- cellFromXY(transition, fromCoords)
 		costDist <- matrix(NA, nrow=length(fromCoords[,1]),ncol=length(fromCoords[,1]))
-		rownames(costDist) <- rownames(Coords)
-		colnames(costDist) <- rownames(Coords)
-		adjacencyGraph <- graph.adjacency(transition@transitionmatrix, mode="undirected", weighted=TRUE)
+		rownames(costDist) <- rownames(fromCoords)
+		colnames(costDist) <- rownames(fromCoords)
+		adjacencyGraph <- graph.adjacency(transition@transitionMatrix, mode="undirected", weighted=TRUE, diag=FALSE)
 		E(adjacencyGraph)$weight <- 1/E(adjacencyGraph)$weight
-		fromCells <- subset(fromCoordsCells[,3], fromCoordsCells[,3] %in% V(adjacencyGraph)$name)
-		if (length(fromCells) < length (fromCoordsCells[,1])) 
+		fromCells <- subset(fromCoordsCells, fromCoordsCells %in% transitionCells(transition))
+		if (length(fromCells) < length (fromCoordsCells)) 
 		{
 			warning(length(fromCells), " out of ", length(fromCoordsCells), " locations were found in the transition matrix.","\n")
 		}
-		else{}
 		uniqueFromCells <- unique(fromCells)
 		shortestPaths <- matrix(ncol=length(uniqueFromCells),nrow=length(uniqueFromCells))
-		index <- match(uniqueFromCells,V(adjacencyGraph)$name)
+		index <- match(uniqueFromCells,transitionCells(transition))
 		for (i in 1:length(uniqueFromCells))
 		{
-			shortestPaths[i,] <- shortest.paths(adjacencyGraph, match(uniqueFromCells[i],V(adjacencyGraph)$name))[,index]
+			shortestPaths[i,] <- shortest.paths(adjacencyGraph, match(uniqueFromCells[i],transitionCells(transition))-1)[,index]
 		}
-
-		index1 <- which(fromCoordsCells[,3] %in% fromCells)
-		index2 <- match(fromCoordsCells[,3][fromCoordsCells[,3] %in% fromCells],uniqueFromCells)
+		index1 <- which(fromCoordsCells %in% fromCells)
+		index2 <- match(fromCoordsCells[fromCoordsCells %in% fromCells],uniqueFromCells)
 		costDist[index1,index1] <- shortestPaths[index2,index2]
 		costDist <- as.dist(costDist)
 		return(costDist)
