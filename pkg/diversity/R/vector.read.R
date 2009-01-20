@@ -1,7 +1,7 @@
 
 vector.read <- function(filename) {
-	fn <- file.get.name(filename) 
-	fn <- file.change.extension(fn, '')
+	fn <- fileName(filename) 
+	fn <- setFileExtension(fn, '')
 	vec <- readOGR(filename, fn) 
 	if (class(vec) == "SpatialPointsDataFrame") {
 		xy <- coordinates(vec)

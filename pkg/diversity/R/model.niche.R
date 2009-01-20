@@ -1,7 +1,7 @@
 
 model.niche.generate.absence <- function(rasterstack, prescells, npoints = (length(prescells[,1] * 5)), bboxfact=0.1) {
 # stub function
-	presence <- get.xy.from.cell(rasterstack, prescells)
+	presence <- xyFromCell(rasterstack, prescells)
 	xmin <- min(presence[,1])
 	xmax <- max(presence[,1])
 	ymin <- min(presence[,2])
@@ -17,10 +17,10 @@ model.niche.generate.absence <- function(rasterstack, prescells, npoints = (leng
 	x <- runif(n, min=xmin, max=xmax)
 	y <- runif(n, min=ymin, max=ymax)
 	xy <- cbind(x, y)
-	cells <- get.cell.from.xy(rasterstack, xy)
+	cells <- cellFromXY(rasterstack, xy)
 	cells <- unique(na.omit(cells))
 	
-	absvals <- values.cell(rasterstack, cells)
+	absvals <- cellValues(rasterstack, cells)
 	absvals <- na.omit(absvals)
 	if (length(absvals[,1]) > npoints) { absvals <- absvals[1:npoints,]	
 	} else {
@@ -43,7 +43,7 @@ model.niche.read.values.presence <- function(rasterstack, presence) {
 		warning(paste("unique presence cells=", frac,"times total" )) 
 	}
 	rm(cell)
-	vals <- values.cell(rasterstack, ucells[,2])
+	vals <- cellValues(rasterstack, ucells[,2])
 	vals <- na.omit(vals)
 	if (length(vals[,1]) < length(ucells)) {
 		frac <- length(vals[,1]) / length(ucells)
@@ -55,7 +55,7 @@ model.niche.read.values.presence <- function(rasterstack, presence) {
 
 
 model.niche.read.values.absence <- function(rasterstack, absence) {
-	cells <- get.cell.from.xy(rasterstack, absence) 
+	cells <- cellFromXY(rasterstack, absence) 
 	cells <- na.omit(cells)
 	if (length(cells) < length(absence[,1])) {
 		frac <- length(cells) / length(absence[,1])
@@ -68,7 +68,7 @@ model.niche.read.values.absence <- function(rasterstack, absence) {
 		warning(paste("unique absence cells=", frac,"times total" )) 
 	}
 		
-	vals <- values.cell(rasterstack, ucells)
+	vals <- cellValues(rasterstack, ucells)
 	vals <- na.omit(vals)
 	if (length(vals[,1]) < length(ucells)) {
 		frac <- length(vals[,1]) / length(ucells)
@@ -81,7 +81,7 @@ model.niche.read.values.absence <- function(rasterstack, absence) {
 
 model.niche.presence.absence.fit <- function(rasterstack, model, presence, absence=NA, testsample=0.2, abssize=5, absbboxfact=0.1) {
 # models that use absence data, either supplied or generated
-	cell <- get.cell.from.xy(rasterstack, presence)
+	cell <- cellFromXY(rasterstack, presence)
 	id <- seq(1:length(cell))
 	cell <- cbind(id, cell)
 	prsvals <- model.niche.read.values.presence(rasterstack, cell) 

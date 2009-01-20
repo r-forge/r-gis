@@ -139,23 +139,23 @@ diversity.reserve.rebelo <- function(xy) {
 	
 point.to.raster <- function(rs, filename, xya, fun=diversity.index.richness) {
 	xya <- xya[,1:3]
-	rsout <- set.filename(rs, filename)
-	cells <- get.cell.from.xy(rs, xya[,1:2])
-	rows <- get.row.from.cell(rs, cells)
-	cols <- get.col.from.cell(rs, cells)
+	rsout <- setFilename(rs, filename)
+	cells <- cellFromXY(rs, xya[,1:2])
+	rows <- rowFromCell(rs, cells)
+	cols <- colFromCell(rs, cells)
 	xyarc <- cbind(xya, rows, cols)
 	urows <- unique(rows)
 	urows <- urows[order(urows)]
-	allrows <- seq(1:rs@nrows)
+	allrows <- seq(1:nrow(rs))
 	allrows <- cbind(allrows, FALSE)
 	allrows[urows, 2] <- TRUE
-	d <- vector(length=rs@ncols)
+	d <- vector(length=ncol(rs))
 	d[!is.na(d)] <- NA
 	dna <- d
 	for (r in 1 : rs@nrows) {
 		if (!allrows[r, 2]) {	
-			rsout <- set.values.row(rsout, dna, r)
-			rsout <- write.row(rsout) 
+			rsout <- setValues(rsout, dna, r)
+			rsout <- writeRaster(rsout, r) 
 		}
 		else {
 			dd <- subset(xyarc, xyarc[,4] == r)
@@ -167,8 +167,8 @@ point.to.raster <- function(rs, filename, xya, fun=diversity.index.richness) {
 				ddd <- subset(dd, dd[,5] == ucols[c] )
 				d[ucols[c]] <- fun(ddd)	
 			}
-			rsout <- set.values.row(rsout, d, r)
-			rsout <- write.row(rsout)
+			rsout <- setValues(rsout, d, r)
+			rsout <- writeRaster(rsout)
 		}	
 	}	
 	return(rsout)

@@ -10,26 +10,26 @@ error.report <- function(xyxy,threshold)
 		if(any(is.na(c(x1, y1, x2, y2)))){
 			out <- NA
 		} else {	
-			difference <- distance.greatcircle(c(x1, y1), c(x2, y2)) 
-			xy.exchange <- distance.greatcircle(c(y1, x1), c(x2, y2)) 
-			signch.lat <- distance.greatcircle(c(x1, -y1), c(x2, y2)) 
-			signch.lon <- distance.greatcircle(c(-x1, y1), c(x2, y2))
-			signch.latlon <- distance.greatcircle(c(-y1), c(-x1, x2, y2))
+			difference <- distanceGreatcircle(c(x1, y1), c(x2, y2)) 
+			xy.exchange <- distanceGreatcircle(c(y1, x1), c(x2, y2)) 
+			signch.lat <- distanceGreatcircle(c(x1, -y1), c(x2, y2)) 
+			signch.lon <- distanceGreatcircle(c(-x1, y1), c(x2, y2))
+			signch.latlon <- distanceGreatcircle(c(-y1), c(-x1, x2, y2))
 			
-			xy.signch.lat <- distance.greatcircle(c(y1, -x1), c(x2, y2))
-			xy.signch.lon <- distance.greatcircle(c(-y1, x1), c(x2, y2))
-			xy.signch.latlon <- distance.greatcircle(c(-y1, -x1), c(x2, y2))
+			xy.signch.lat <- distanceGreatcircle(c(y1, -x1), c(x2, y2))
+			xy.signch.lon <- distanceGreatcircle(c(-y1, x1), c(x2, y2))
+			xy.signch.latlon <- distanceGreatcircle(c(-y1, -x1), c(x2, y2))
 			
-			wrong.lon <- distance.greatcircle(c(0, y1), c(a, y2))
-			wrong.lat <- distance.greatcircle(c(x1, 0), c(x2, a))
+			wrong.lon <- distanceGreatcircle(c(0, y1), c(a, y2))
+			wrong.lat <- distanceGreatcircle(c(x1, 0), c(x2, a))
 			
-			xy.wrong.lon <- distance.greatcircle(c(y1, 0), c(x2, a))
-			xy.wrong.lat <- distance.greatcircle(c(0, x1), c(a, y2))
-			signch.lat.wrong.lon <- distance.greatcircle(c(0, -y1), c(a, y2))
-			signch.lon.wrong.lat <- distance.greatcircle(c(-x1, 0), c(x2, a))
+			xy.wrong.lon <- distanceGreatcircle(c(y1, 0), c(x2, a))
+			xy.wrong.lat <- distanceGreatcircle(c(0, x1), c(a, y2))
+			signch.lat.wrong.lon <- distanceGreatcircle(c(0, -y1), c(a, y2))
+			signch.lon.wrong.lat <- distanceGreatcircle(c(-x1, 0), c(x2, a))
 			
-			signch.lat.xy.wrong.lon <- distance.greatcircle(c(-y1, 0), c(x2, a))
-			signch.lon.xy.wrong.lat <- distance.greatcircle(c(0, -x1), c(a, y2))
+			signch.lat.xy.wrong.lon <- distanceGreatcircle(c(-y1, 0), c(x2, a))
+			signch.lon.xy.wrong.lat <- distanceGreatcircle(c(0, -x1), c(a, y2))
 			out <- c(difference, xy.exchange, signch.lat, signch.lon, signch.latlon, xy.signch.lat, xy.signch.lon, xy.signch.latlon, wrong.lon, wrong.lat, xy.wrong.lon, xy.wrong.lat, signch.lat.wrong.lon, signch.lon.wrong.lat, signch.lat.xy.wrong.lon, signch.lon.xy.wrong.lat)
 			return(out)
 		}
