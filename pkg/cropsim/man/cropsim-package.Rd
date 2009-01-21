@@ -1,10 +1,10 @@
-\name{simmodels-package}
-\alias{simmodels-package}
-\alias{simmodels}
+\name{cropsim-package}
+\alias{cropsim-package}
+\alias{cropsim}
 \docType{package}
 \title{
 What the package does (short line)
-	Dynamic eco(physio)logical simulation models
+	Dynamic eco(physio)logical crop and crop disease simulation models
 }
 \description{
 More about what it does (maybe more than one line)

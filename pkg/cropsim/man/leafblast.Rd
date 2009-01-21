@@ -7,12 +7,13 @@
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-leafblast(wth, duration=120, startday=1) 
+leafblast(wth, duration=120, startday=1, rhlim=90) 
 }
 \arguments{
   \item{wth}{ Describe \code{xy} here }
   \item{duration}{ Describe \code{x} here }  
   \item{startday}{ Describe \code{x} here }    
+  \item{rhlim}{ threshold to decide whethere leaves are wet or not }      
 }
 \details{
   ~~ If necessary, more details than the description above ~~
