@@ -5,6 +5,7 @@
 # Version 0.1
 # Licence GPL v3
 
+
 leafblast <- function(wth, duration=120, startday=1) {
 # this is  a draft model. Not suited for reserach or applications. 
     tmp <- (wth$tmax + wth$tmin) / 2
