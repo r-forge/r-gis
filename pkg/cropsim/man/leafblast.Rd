@@ -1,5 +1,6 @@
 \name{leafblast}
 \alias{leafblast}
+\alias{leafblast_v1}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{ ~~function to do ... ~~ }
@@ -8,6 +9,7 @@
 }
 \usage{
 leafblast(wth, duration=120, startday=1, rhlim=90) 
+leafblast_v1(wth, duration=120, startday=1) 
 }
 \arguments{
   \item{wth}{ Describe \code{xy} here }

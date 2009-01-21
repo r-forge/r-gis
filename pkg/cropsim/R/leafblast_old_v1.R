@@ -5,7 +5,7 @@
 # Version 0.1
 # Licence GPL v3
 
-.leafblast_1 <- function(wth, duration=120, startday=1) {
+leafblast_v1 <- function(wth, duration=120, startday=1) {
 # this is  a draft model. Not suited for reserach or applications. 
     tmp <- (wth$tmax + wth$tmin) / 2
 	rh <- wth$rh
