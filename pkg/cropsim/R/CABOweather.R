@@ -1,8 +1,12 @@
 
+.yearFromDate <- function(date) {
+	as.numeric(format(as.Date(date), "%Y"))
+}
+
 writeCABOwth <- function(wth, lon, lat, alt, path=getwd(), rainfact=1, tempfact=0) {
 	
 #	wth[is.na(wth)] <- -9999
-	wth$yr <- yearFromDate(wth$day)
+	wth$yr <- .yearFromDate(wth$day)
 	syear <- min(wth$yr)
 	eyear <- max(wth$yr)
 

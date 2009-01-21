@@ -3,7 +3,7 @@ Type: Package
 Title: Simulation modeling of crops and their diseases
 Version: 0.1
 Date: 2008-10-17
-Depends: methods, raster, climate, RODBC
+Depends: methods, raster, RODBC
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 Description: nothing much so far
