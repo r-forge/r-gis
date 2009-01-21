@@ -32,14 +32,28 @@ Fouss, F., Pirotte, A., Renders, J.-M. & Saerens, M. 2007. Random-walk computati
 McRae, B.H. 2006. Isolation by resistance. \emph{Evolution} 60(8), 1551-1561. 
 \url{http://www.circuitscape.org}
 }
-\author{ Jacob van Etten <jacobvanetten@yahoo.com> }
+\author{ Jacob van Etten \email{jacobvanetten@yahoo.com} }
 \note{ 
 
 }
 \seealso{ \code{\link{projectionCorrection}}, ~~~ }
 \examples{
-raster1 <- newRaster(nrows=18, ncols=36)
+#create a new raster and set all its values to unity.
+raster <- newRaster(nrows=18, ncols=36) 
+raster <- setValues(raster,rep(1,ncell(raster)))
 
+#create a Transition object from the raster
+tr <- TransitionFromRaster(raster,mean,4)
+
+#create two sets of coordinates
+sP1 <- SpatialPoints(cbind(c(65,5,-65),c(55,35,-35)))
+sP2 <- SpatialPoints(cbind(c(50,15,-40),c(80,20,-5)))
+
+#from and to identical
+resistanceDistance(tr,sP1)
+
+#from and to different
+resistanceDistance(tr,sP1,sP2)
 
 }
 \keyword{ spatial }

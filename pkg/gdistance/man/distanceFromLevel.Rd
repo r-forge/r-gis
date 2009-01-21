@@ -1,53 +1,31 @@
-\name{distance.from.level}
-\alias{distance.from.level}
+\name{distanceFromLevel}
+\alias{distanceFromLevel}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{ Distance from level }
 \description{
-  ~~ A concise (1-5 lines) description of what the function does. ~~
+  Convenience function to create a distance matrix from a vector of levels, using a function specified by the user
 }
 \usage{
-distance.from.level(levels, fun, diag=TRUE)
+distanceFromLevel(levels, fun, diag=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{levels}{ ~~Describe \code{levels} here~~ }
-  \item{fun}{ ~~Describe \code{fun} here~~ }
-  \item{diag}{ ~~Describe \code{diag} here~~ }
+  \item{levels}{ vector of values }
+  \item{fun}{ distance function }
+  \item{diag}{ should the diagonal be included? }
 }
 \details{
-  ~~ If necessary, more details than the description above ~~
+  Distance function should be commutative: f(a,b) = f(b,a).
 }
-\value{
-  ~Describe the value returned
-  If it is a LIST, use
-  \item{comp1 }{Description of 'comp1'}
-  \item{comp2 }{Description of 'comp2'}
-  ...
+\value{distance matrix
 }
-\references{ ~put references to the literature/web site here ~ }
-\author{ ~~who you are~~ }
-\note{ ~~further notes~~ 
-
- ~Make other sections like Warning with \section{Warning }{....} ~
-}
-\seealso{ ~~objects to See Also as \code{\link{help}}, ~~~ }
+\author{Jacob van Etten \email{jacobvanetten@yahoo.com} }
 \examples{
-##---- Should be DIRECTLY executable !! ----
-##-- ==>  Define data, use random,
-##--	or do  help(data=index)  for the standard data sets.
-
-## The function is currently defined as
-function(levels,fun)
-{
-result <- matrix(NA,ncol=length(levels),nrow=length(levels))
-rownames(result) <- names(levels)
-colnames(result) <- names(levels)
-index <- cbind(rep(1:length(levels), each=length(levels)),rep(1:length(levels), times=length(levels)))
-result[index] <- apply(cbind(levels[index[,1]],levels[index[,2]]),1,fun)
-return(as.dist(result, diag=T))
+lv <- 1:5
+dst <- distanceFromLevel(lv,function(x){abs(x[1]-x[2])},diag=FALSE)
   }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\keyword{ spatial }
+

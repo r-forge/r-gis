@@ -10,7 +10,7 @@ costDistanceMap <- function(transition, fromCoords)
 	fromCoordsCells <- cbind(fromCoords,cellFromXY(transition, fromCoords))
 	adjacencyGraph <- graph.adjacency(transitionMatrix(transition), mode="undirected", weighted=TRUE)
 	E(adjacencyGraph)$weight <- 1/E(adjacencyGraph)$weight
-	fromCells <- subset(fromCoordsCells, fromCoordsCells %in% V(adjacencyGraph)$name)
+	fromCells <- subset(fromCoordsCells, fromCoordsCells %in% transitionCells(transition))
 	if (length(fromCells) < length (fromCoordsCells)) 
 	{
 		warning(length(fromCells), " out of ", length(fromCoordsCells[,1]), " locations were found in the transition matrix.","\n")
@@ -18,7 +18,7 @@ costDistanceMap <- function(transition, fromCoords)
 	shortestPaths <- rep(Inf, times=length(transitionCells(transition)))	
 	for (i in 1:length(fromCells))
 	{
-		shortestPaths <- pmin(shortestPaths,shortest.paths(adjacencyGraph, match(fromCells[i],V(adjacencyGraph)$name)))
+		shortestPaths <- pmin(shortestPaths,shortest.paths(adjacencyGraph, match(fromCells[i],transitionCells(transition))))
 	}
 	result <- as(transition, "RasterLayer")
 	dataVector <- vector(length=ncells(result)) 

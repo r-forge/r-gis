@@ -43,7 +43,6 @@ setMethod("costDistance", signature(transition = "Transition", fromCoords = "Spa
 		index3 <- match(fromCoordsCells[fromCoordsCells %in% fromCells],uniqueFromCells)
 		index4 <- match(toCoordsCells[toCoordsCells %in% toCells],uniqueToCells)
 		costDist[index1,index2] <- shortestPaths[index3,index4]
-		costDist <- as.dist(costDist)
 		return(costDist)
 	}
 )

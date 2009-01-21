@@ -24,7 +24,7 @@ Distances can be calculated following these steps.
 4. Calculate distances from the Transition object. Outputs include matrices of mutual distances between spatial points or rasters with distance surfaces from one or more points.
 }
 \author{
-Jacob van Etten <jacobvanetten@yahoo.com>
+Jacob van Etten \email{jacobvanetten@yahoo.com}
 }
 \references{
 Ray, N. 2005. PATHMATRIX: a geographical information system tool to compute effective distances among samples. Molecular Ecology Notes 5, 177–180.

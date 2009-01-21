@@ -1,11 +1,11 @@
-# Author: Jacob van Etten jacobvanetten@yahoo.com
+# Author: Jacob van Etten, jacobvanetten@yahoo.com
 # International Rice Research Institute
 # Date :  January 2009
 # Version 1.0
 # Licence GPL v3
 
 setClass(Class="Transition",
-		contains = "BasicRaster",
+		contains = "Raster",
 		representation = representation(
 			transitionMatrix = "dsCMatrix",
 			transitionCells = "integer"

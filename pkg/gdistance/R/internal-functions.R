@@ -1,4 +1,4 @@
-# Author: Jacob van Etten jacobvanetten@yahoo.com
+# Author: Jacob van Etten, jacobvanetten@yahoo.com
 # International Rice Research Institute
 # Date :  January 2009
 # Version 1.0
@@ -49,18 +49,4 @@
 	Current <- colSums(abs(V)*-L)/2
 	Current[indexFrom] <- 1
 	Current[indexTo] <- 1
-}
-
-#Tryout code
-.dsCMatrixFromTransition <- function(transition)
-{
-	sparseMatrix <- new("dsCMatrix",
-		uplo = transition@transitionMatrix@uplo,
-		p = transition@transitionMatrix@p,
-		i = transition@transitionMatrix@i,
-		Dim = transition@transitionMatrix@Dim,
-		x = transition@transitionMatrix@x,
-		Dimnames = list(NULL,NULL)
-	)
-	return(sparseMatrix)
 }

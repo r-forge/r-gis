@@ -1,31 +1,38 @@
 \name{costDistanceMap}
 \alias{costDistanceMap}
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{ ~~function to do ... ~~ }
+\title{ Cost-distance map }
 \description{
-Calculates the shortest cost-distance between points. }
+Calculates the shortest cost-distance from one or more origins to each cell of a raster. }
 \usage{
-costDistanceMap(id.xy, transition)
+costDistanceMap(transition, fromCoords)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{id.xy}{ point locations (see below) }
-  \item{transition}{ transition matrix (defined class) }
+  \item{transition}{ object of class Transition }
+  \item{fromCoords}{ origin point locations }
 }
 \details{
-Distance is calculated in cost units specified in the distance matrix. \n
-id.xy is a matrix with three columns: ID, x, and y.
+If more than more coordinate is supplied in fromCoords, the function calculates the minimum cost distance from any origin point.
+
+The function uses Dijkstra's algorithm, as implemented in the igraph package.
+
+In the case of grid data for a large area in a geographic (latlon) projection, a projection correction is needed for accuracy (see function \code{\link{projectionCorrection}}). 
 }
 \value{
-raster
+RasterLayer
 }
-\references{ }
-\author{ Jacob van Etten }
+\references{
+E.W. Dijkstra. 1959. A note on two problems in connexion with graphs. \emph{Numerische Mathematik} 1, 269–271.
+}
+\author{ Jacob van Etten \email{jacobvanetten@yahoo.com}}
 \note{ ~~further notes~~ 
 
  ~Make other sections like Warning with \section{Warning }{....} ~
 }
-\seealso{ \code{\link{transition.solidify}}, ~~~ }
-\examples{}
-\keyword{ ~kwd1 }
-\keyword{ ~kwd2 }% __ONLY ONE__ keyword per line
+\seealso{ \code{\link{projectionCorrection}}, \code{\link{costDistance}} }
+\examples{
+
+
+}
+\keyword{ spatial }

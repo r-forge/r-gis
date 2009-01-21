@@ -79,7 +79,7 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 				index4 <- match(toCoordsCells[,3][toCoordsCells[,3] %in% subsetCells],subsetCells)
 				rd[index1,index2] <- rd.subset[index3,index4]
 			}	
-			return(as.dist(rd))
+			return(rd)
 		}
 	}
 )
