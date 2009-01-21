@@ -1,8 +1,8 @@
 # Author: Serge Savary & Rene Pangga. 
-# R translation: Robert J. Hijmans, r.hijmans@gmail.com
+# R translation: Robert J. Hijmans & Rene Pangga, r.hijmans@gmail.com
 # International Rice Research Institute
 # Date :  November 2008
-# Version 0,1
+# Version 0.1
 # Licence GPL v3
 
 
