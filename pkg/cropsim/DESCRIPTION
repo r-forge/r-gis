@@ -1,6 +1,6 @@
-Package: simmodels
+Package: cropsim
 Type: Package
-Title: Simulation modeling
+Title: Simulation modeling of crops and their diseases
 Version: 0.1
 Date: 2008-10-17
 Depends: methods, raster, climate, RODBC

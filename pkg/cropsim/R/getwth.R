@@ -10,7 +10,8 @@ getWthCell <- function(database, table, cell) {
 	query <- paste("SELECT * FROM", table, "WHERE cell = ", cell, sep="")
 	data <- sqlQuery(db, query)
 	odbcClose(db)
-	return(data)
+	colnames(data) <- c("cell", "day", "prec", "relh", "srad", "tmax", "tmin")
+	return(data[,2:7])     
 }	
 
 AccessGetWthXY <- function(database, table, x, y, raster=newRaster()) {
@@ -23,4 +24,6 @@ AccessGetWthCell <- function(database, table, cell) {
 	db <- odbcConnectAccess(database)
 	data <- sqlQuery(db, query)
 	odbcClose(db)
-	return(data)     }	
+	colnames(data) <- c("cell", "day", "prec", "relh", "srad", "tmax", "tmin")
+	return(data[,2:7])     
+}	
