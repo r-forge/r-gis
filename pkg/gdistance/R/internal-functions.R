@@ -19,6 +19,22 @@
 	return(clustermembership)
 }
 
+.current <- function(L, Lr, A, n, indexFrom, indexTo) 
+{
+	e <- matrix(0, ncol=1, nrow=n)
+	e[indexFrom,] <- 1
+ 	e[indexTo,] <- -1
+	x <- solve(Lr,e)
+	x <- as.vector(x)
+	Lplusallrows <- c(x-sum(x/(n+1)),(sum(x)/(n+1)))
+	V <- A * Lplusallrows
+	d <- t(t(A) * diag(V))
+	V <- - V + d
+	Current <- colSums(abs(V)*-L)/2
+	Current[indexFrom] <- 1
+	Current[indexTo] <- 1
+}
+
 .Laplacian <- function(transition) 
 {
 	Laplacian <- Diagonal(x = colSums(transitionMatrix(transition))) - transitionMatrix(transition)
@@ -35,18 +51,3 @@
 	return(transition)
 }
 
-.current <- function(L, Lr, A, n, indexFrom, indexTo) 
-{
-	e <- matrix(0, ncol=1, nrow=n)
-	e[indexFrom,] <- 1
- 	e[indexTo,] <- -1
-	x <- solve(Lr,e)
-	x <- as.vector(x)
-	Lplusallrows <- c(x-sum(x/(n+1)),(sum(x)/(n+1)))
-	V <- A * Lplusallrows
-	d <- t(t(A) * diag(V))
-	V <- - V + d
-	Current <- colSums(abs(V)*-L)/2
-	Current[indexFrom] <- 1
-	Current[indexTo] <- 1
-}

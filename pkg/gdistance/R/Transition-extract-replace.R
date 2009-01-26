@@ -30,38 +30,72 @@ setMethod ("transitionCells", signature(transition = "Transition"),
 	}
 )
 
-setMethod("[", signature(x = "Transition", i="index", j="missing", drop="missing"),
-		function(x,i){
-			i <- as.integer(i)
-			x <- subs(x,i)
-			return(x)
+setMethod("[", signature(x = "Transition", i="index", j="missing", drop="missing"), function(x,i)
+	{
+		i <- as.integer(i)
+		if (all(i %in% x@transitionCells) || all(-i %in% x@transitionCells)){stop("wrong cell numbers")}
+		else
+		{
+			if (all(i %in% x@transitionCells))
+			{
+				ind <- match(i,x@transitionCells)
+				tm <- as(x,"dsCMatrix")
+				x@transitionMatrix <- tm[ind,ind]
+				x@transitionCells <- i
+			}
+			if (all(-i %in% x@transitionCells))
+			{
+				ind <- match(-i,x@transitionCells)
+				tm <- as(x,"dsCMatrix")
+				x@transitionMatrix <- tm[-ind,-ind]
+				x@transitionCells <- x@transitionCells[!(x@transitionCells %in% -i)]
+			}
 		}
+	return(x)
+	}
 )
 
-subs <- function(x,i)
-{
-if (!all(i %in% x@transitionCells) && !all(-i %in% x@transitionCells)){stop("wrong cell numbers")}
-else
+setMethod("[", signature(x = "Transition", i="index", j="index", drop="missing"), function(x,i,j)
 	{
-		if (all(i %in% x@transitionCells))
+		i <- as.integer(i)
+		if (!((all(i %in% x@transitionCells) || all(-i %in% x@transitionCells)) && (all(j %in% x@transitionCells) || all(-j %in% x@transitionCells)))){stop("wrong cell numbers")}
+		else
 		{
-			ind <- match(i,x@transitionCells)
-			tm <- as(x,"dsCMatrix")
-			x@transitionMatrix <- tm[ind,ind]
-			x@transitionCells <- i
+			if (all(i %in% x@transitionCells))
+			{
+				indi <- match(i,x@transitionCells)
+				indj <- match(j,x@transitionCells)
+				tm <- as(x,"dsCMatrix")
+				tm <- tm[indi,indj]
+			}
+			if (all(-i %in% x@transitionCells))
+			{
+				indi <- match(-i,x@transitionCells)
+				indj <- match(-j,x@transitionCells)
+				tm <- as(x,"dsCMatrix")
+				tm <- tm[-indi,-indj]
+			}
 		}
-		if (all(-i %in% x@transitionCells))
-		{
-			ind <- match(-i,x@transitionCells)
-			tm <- as(x,"dsCMatrix")
-			x@transitionMatrix <- tm[-ind,-ind]
-			x@transitionCells <- x@transitionCells[!(x@transitionCells %in% -i)]
-		}
+	return(tm)
 	}
-return(x)
-}
+)
 
-setMethod("[<-", signature(x = "Transition", i="index", j="missing", value="ANY"),
+setMethod("[", signature(x = "Transition", i="matrix", j="missing", drop="missing"), function(x,i)
+	{
+		if (!(all(i[,1] %in% x@transitionCells)  && all(i[,2] %in% x@transitionCells))){stop("wrong cell numbers")}
+		else
+		{
+			indi <- match(i[,1],x@transitionCells)
+			indj <- match(i[,2],x@transitionCells)
+			ind <- cbind(indi,indj)
+			tm <- as(x,"dsCMatrix")
+			tm <- tm[ind]
+		}
+	return(tm)
+	}
+)
+
+setMethod("[<-", signature(x = "Transition", i="index", j="missing", value="dsCMatrix"),
 		function(x, i, value){
 			if (!all(i %in% x@transitionCells) && !all(-i %in% x@transitionCells)){stop("wrong cell numbers")}
 			else
@@ -82,5 +116,11 @@ setMethod("[<-", signature(x = "Transition", i="index", j="missing", value="ANY"
 				}
 			}
 			return(x)
+		}
+)
+
+setMethod("[<-", signature(x = "Transition", i="index", j="index", value="ANY"),
+		function(x, i, j, value){
+		stop("not yet implemented; request package author to implement this method")
 		}
 )

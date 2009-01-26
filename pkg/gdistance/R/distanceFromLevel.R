@@ -4,7 +4,7 @@
 # Version 1.0
 # Licence GPL v3
 
-distance.from.level <- function(levels,fun,diag=FALSE)
+distanceFromLevel <- function(levels,fun,diag=FALSE)
 {
 result <- matrix(NA,ncol=length(levels),nrow=length(levels))
 rownames(result) <- names(levels)

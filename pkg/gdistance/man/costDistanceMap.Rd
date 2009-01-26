@@ -1,23 +1,24 @@
 \name{costDistanceMap}
 \alias{costDistanceMap}
-%- Also NEED an '\alias' for EACH other topic documented here.
 \title{ Cost-distance map }
 \description{
 Calculates the shortest cost-distance from one or more origins to each cell of a raster. }
 \usage{
-costDistanceMap(transition, fromCoords)
+costDistanceMap(transition, object)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{transition}{ object of class Transition }
-  \item{fromCoords}{ origin point locations }
+  \item{object}{ origin point locations (SpatialPoints class) or surface (RasterLayer class) }
 }
 \details{
 If more than more coordinate is supplied in fromCoords, the function calculates the minimum cost distance from any origin point.
 
-The function uses Dijkstra's algorithm, as implemented in the igraph package.
+The function uses Dijkstra's algorithm, as implemented in the igraph package if an object of the class SpatialPoints is provided.
 
-In the case of grid data for a large area in a geographic (latlon) projection, a projection correction is needed for accuracy (see function \code{\link{projectionCorrection}}). 
+It uses a slower iterative algorithm when an object of the class RasterLayer is provided.
+
+If the Transition object is based on grid data for a large area in a geographic (latlon) projection, a projection correction is needed for accuracy (see function \code{\link{projectionCorrection}}). 
 }
 \value{
 RasterLayer
@@ -32,7 +33,13 @@ E.W. Dijkstra. 1959. A note on two problems in connexion with graphs. \emph{Nume
 }
 \seealso{ \code{\link{projectionCorrection}}, \code{\link{costDistance}} }
 \examples{
-
-
+r1 <- newRaster(ncol=36,nrow=18)
+r2 <- r1
+data <- rep(NA,length=ncell(r1))
+data[c(50,300,400)] <- 1
+r1 <- setValues(r1,data)
+r2 <- setValues(r2,rep(1,times=ncell(r2)))
+tr <- TransitionFromRaster(r2,mean,directions=8,outerMeridianConnect=FALSE)
+cmd <- costDistanceMap(tr,r1)
 }
 \keyword{ spatial }

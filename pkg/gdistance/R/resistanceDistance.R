@@ -58,7 +58,7 @@ setMethod("resistanceDistance", signature(transition = "Transition", fromCoords 
 			{
 				subsetCells <- uniqueCells[uniqueCells %in% cc[,1][cc[,2] == ccWithCoords[i]]]
 				tm <- transition[cc[,1][cc[,2]==ccWithCoords[i]]]
-				Lr <- .Laplacian(tm)[-dim(tm)[1],-dim(tm)[1]] #warning if dim(tm) happens to be inside uniqueCells?
+				Lr <- .Laplacian(tm)[-dim(tm)[1],-dim(tm)[1]] #TODO warning if dim(tm) happens to be inside uniqueCells
 				n <- max(Lr@Dim)
 				Lstarplus <- matrix(ncol=1,nrow=length(subsetCells))
 				Lplus <- matrix(ncol=length(subsetCells),nrow=length(subsetCells))

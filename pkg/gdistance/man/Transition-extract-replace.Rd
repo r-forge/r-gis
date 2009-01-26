@@ -1,7 +1,9 @@
 \name{[-methods}
 \docType{methods}
 \alias{[,Transition,index,missing,missing-method}
-\alias{[<-,Transition,index,missing,ANY-method}
+\alias{[,Transition,index,index,missing-method}
+\alias{[<-,Transition,index,missing,dsCMatrix-method}
+\alias{[<-,Transition,index,index,ANY-method}
 \alias{transitionMatrix,Transition-method}
 \alias{transitionMatrix<-,Transition,dsCMatrix-method}
 \alias{transitionCells,Transition-method}
