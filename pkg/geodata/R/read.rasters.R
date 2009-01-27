@@ -5,15 +5,15 @@
 # Version 1, October 2008
 
 
-read.srtm <- function(x=106, y=-6, download=TRUE) {
+SRTM <- function(x=106, y=-6, download=TRUE) {
 	varname <- 'srtm'
-	path <- get.data.path()
+	path <- dataPath()
 	
 	x <- min(180, max(-180, x))
 	y <- min(60, max(-60, y))
-	rs <- raster.new(nrows=24, ncols=72, ymin=-60, ymax=60 )
-	row <- get.row.from.y(rs, y)
-	col <- get.col.from.x(rs, x)
+	rs <- newRaster(nrows=24, ncols=72, xmn=-180, xmx=180, ymn=-60, ymx=60 )
+	row <- rowFromY(rs, y)
+	col <- colFromX(rs, x)
 	if (row < 10) { row <- paste('0', row, sep='') }
 	if (col < 10) { col <- paste('0', col, sep='') }
 	
@@ -42,8 +42,8 @@ read.srtm <- function(x=106, y=-6, download=TRUE) {
 		}	
 	}
 	if (file.exists(tiffilename)) { 
-		rs <- raster.from.file(tiffilename)
-		rs <- set.projection(rs, "+proj=longlat +datum=WGS84")
+		rs <- rasterFromFile(tiffilename)
+		rs <- setProjection(rs, "+proj=longlat +datum=WGS84")
 		return(rs)
 	}	
 }

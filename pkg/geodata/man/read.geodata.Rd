@@ -1,30 +1,30 @@
-\name{read.data}
-\alias{read.adm}
-\alias{list.adm}
-\alias{remove.adm}
-\alias{list.country.codes}
-\alias{read.srtm}
+\name{read data}
+\alias{adm}
+\alias{admList}
+\alias{admRemove}
+\alias{countryCodes}
+\alias{SRTM}
 
 
 \title{ Read geographic data into an object (and download the data first if necessary) }
 \description{
-	read.adm - Load (if necessary after downloading) adminstrative boundaries into a SpatialPolygonsDataFrame.
+	adm - Load (if necessary after downloading) adminstrative boundaries into a SpatialPolygonsDataFrame.
 	The boundaries are available at different levels. They range from 0 to 2. 0 is country, 1 is first level of subdivision, etc. 
 		Not all levels are available for all countries.
-	list.adm shows which data layers are locally available (have been downloaded)
-	remove.adm can be used to remove layers from the local disk
+	admList shows which data layers are locally available (have been downloaded)
+	admRemove can be used to remove layers from the local disk
 	
-	list.country.codes shows names (in English) and their corresponding ISO3 codes for all countries
+	countryCodes shows names (in English) and their corresponding ISO3 codes for all countries
 	
-	read.srtm reads (after download) SRTM elevation data (90 m resolution) by 5 x 5 degrees tile. Only available between 60 S and 60 N
+	SRTM reads (after download) SRTM elevation data (90 m resolution) by 5 x 5 degrees tile. Only available between 60 S and 60 N
 
 }
 \usage{
-read.adm(country="ABW", level = 0, download=TRUE)
-list.adm(country=NA, level=NA)
-remove.adm(country=NA, level=NA)
-list.country.codes(start=1, end=243)
-read.srtm(x=106, y=-6, download=TRUE)
+adm(country="ABW", level = 0, download=TRUE)
+admList(country=NA, level=NA)
+admRemove(country=NA, level=NA)
+countryCodes(start=1, end=243)
+SRTM(x=106, y=-6, download=TRUE)
 }
 
 \arguments{

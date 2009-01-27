@@ -1,4 +1,0 @@
-variable	subvar1	subvar2	path	type	tilesize	format	zipped	download	description	source
-adm	ISO	0,1,2	<RGIS>adm	vector		Rdata	No	http://www.r-gis.org/rgis/data/adm/	Administrative areas	GADM
-srtm90m			<RGIS>srtm90	raster	5	tif	Yes	http://hypersphere.telascience.org/elevation/cgiar_srtm_v4/tiff/zip/	Elevation	CSI-SRTM
-srtm1km			<RGIS>srtm1000							

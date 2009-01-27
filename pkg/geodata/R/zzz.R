@@ -3,14 +3,14 @@
 
 #  library.dynam("Rgis", package = pkg, lib.loc = lib)
 	path <- ''
-	path <- paste(system.file(package="Rgis"), "/data", sep='' ) 
+	path <- paste(system.file(package="geodata"), "/data", sep='' ) 
 	filename <- paste(path, "/datadir", sep='')
 	datapath <- ''
 	if (file.exists(filename)) {	try(  datapath <- readLines(filename) , silent=TRUE)  }
 	if (file.exists(datapath)) { path <- datapath } 
 	Sys.setenv(R_GIS_DATA_DIR=path)
  
-	messages <- as.logical(ifelse(is.null(getOption("Rgis.messages")), TRUE, getOption("Rgis.messages")))
+	messages <- as.logical(ifelse(is.null(getOption("geodata.messages")), TRUE, getOption("geodata.messages")))
 	messages <- TRUE  
 	if(messages){
 		pkg.info <- drop(read.dcf(file=system.file("DESCRIPTION", package="Rgis"), fields=c("Version","Date")))

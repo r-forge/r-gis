@@ -6,7 +6,7 @@
 
 
 .get.indices <- function() {
-	path <- get.data.path.default()
+	path <- dataPathDefault()
 	d <- read.table(paste(path, "/index", sep=""), header=T, sep="\t")
 	return(as.matrix(d))
 }
@@ -19,8 +19,8 @@
 }
 
 
-read.country.data <- function(country="ABW", varname="adm", level=0, rasterformat="raster", download=TRUE) {
-	path <- paste(get.data.path(), "/", varname, sep="")
+countryData <- function(country="ABW", varname="adm", level=0, rasterformat="raster", download=TRUE) {
+	path <- paste(dataPath(), "/", varname, sep="")
 	if (!file.exists(path)) {  dir.create(path, recursive=T)  }
 	path <- paste(path, "/", sep="")
 	
@@ -59,9 +59,9 @@ read.country.data <- function(country="ABW", varname="adm", level=0, rasterforma
 }
 
 
-read.adm <- function(country="ABW", level=0, download=TRUE ) {
+adm <- function(country="ABW", level=0, download=TRUE ) {
 	varname <- "adm"
-	path <- paste(get.data.path(), "/", varname, sep="")
+	path <- paste(dataPath(), "/", varname, sep="")
 	if (!file.exists(path)) {  dir.create(path, recursive=T)  }
 	path <- paste(path, "/", sep="")
 		
@@ -86,14 +86,14 @@ read.adm <- function(country="ABW", level=0, download=TRUE ) {
 
 
 .get.country.list <- function() {
-	path <- get.data.path.default()
+	path <- dataPathDefault()
 	d <- read.table(paste(path, "/countries", sep=""), header=T, sep="\t",  quote = "!@!")
 	return(as.matrix(d))
 }
 
 
 
-list.country.codes <- function(start=1, end=243) {
+countryCodes <- function(start=1, end=243) {
 	d <- .get.country.list()
 	showrange <- c(start:end)
 	showrange <- showrange[showrange>0 && showrange<244]
@@ -101,9 +101,9 @@ list.country.codes <- function(start=1, end=243) {
 }
 
 
-list.adm <- function(country=NA, level=NA) {
+admList <- function(country=NA, level=NA) {
 	varname <- 'adm'
-	path <- paste(get.data.path(), "/", varname, sep="")
+	path <- paste(dataPath(), "/", varname, sep="")
 	
 	if (is.na(country)) {
 		if (is.na(level)) {
@@ -132,9 +132,9 @@ list.adm <- function(country=NA, level=NA) {
 }
 
 
-remove.adm <- function(country=NA, level=NA) {
+admRemove <- function(country=NA, level=NA) {
 	varname <- 'adm'
-	path <- paste(get.data.path(), "/", varname, sep="")
+	path <- paste(dataPath(), "/", varname, sep="")
 
 	if (is.na(country)) {cat("\nSpecify a country (country) code.\n") 
 	} else if (country == "ALL") {

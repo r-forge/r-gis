@@ -10,15 +10,16 @@
    return(path)
 }
 
-get.data.path.default <- function() {
-	path <- paste(system.file(package="Rgis"), "/data", sep='')
+dataPathDefault <- function() {
+#	path <- paste(system.file(package="geodata"), "/data", sep='')
+	path <- getwd()
 }
 
-set.data.path.default <- function() {
-	set.data.path(get.data.path.default(), TRUE)
+setDataPathDefault <- function() {
+	setDataPath(dataPathDefault(), TRUE)
 }
 
-set.data.path <- function(path, create=FALSE) {
+setDataPath <- function(path, create=FALSE) {
 	path <- .remove.trailing.slash(path)
 	if (!(file.exists(path))) { 
 		if (create) {
@@ -28,21 +29,21 @@ set.data.path <- function(path, create=FALSE) {
 	if (file.exists(path)) { 
 		Sys.setenv(R_GIS_DATA_DIR=path)
 	}
-	try(   write(path, paste(system.file(package="Rgis"), "/data/datadir", sep=''))  )
+	try(   write(path, paste(system.file(package="geodata"), "/data/datadir", sep=''))  )
 }	
 
-get.data.path <- function() {
+dataPath <- function() {
 	path <- Sys.getenv("R_GIS_DATA_DIR")
 	if (path == "") {
-		path <- try(  readLines(paste(system.file(package="Rgis"), "/data/datadir", sep='')) )  
+		path <- try(  readLines(paste(system.file(package="geodata"), "/data/datadir", sep='')) )  
 	}
 	if (path == "") {
-		set.data.path.default()
+		dataPathDefault()
 	}
 	path <- .remove.trailing.slash(path) 
 	if (!(file.exists(path))) {
-		set.data.path.default()
-		path <- get.data.path.default() 
+		setDataPathDefault()
+		path <- dataPathDefault() 
 	}
 	return(path)
 }
