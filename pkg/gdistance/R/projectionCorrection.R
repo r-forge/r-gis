@@ -6,6 +6,9 @@
 
 setGeneric("projectionCorrection", function(transition, ...) standardGeneric("projectionCorrection"))
 
+#a simple diagonal correction should be added: sqrt(2*d) for bishop moves; function name  becomes geographicCorrection
+#this wont work for Transition with transitionCells not 1:n
+
 setMethod("projectionCorrection", signature(transition = "Transition"), def = function(transition, type)
 	{
 		if(isLatLon(transition)){}
@@ -21,7 +24,7 @@ setMethod("projectionCorrection", signature(transition = "Transition"), def = fu
 		}
 		i <- as.integer(adjacency[,1] - 1)
 		j <- as.integer(adjacency[,2] - 1)
-		x <- as.vector(correctionValues) 
+		x <- as.vector(correctionValues)
 		dims <- ncell(transition)
 		correctionMatrix <- new("dgTMatrix", i = as.integer(i), j = as.integer(j), x = as.numeric(x), Dim = as.integer(c(dims,dims)))
 		correctionMatrix <- (as(correctionMatrix,"symmetricMatrix"))

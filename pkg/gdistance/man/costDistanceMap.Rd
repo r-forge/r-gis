@@ -36,10 +36,11 @@ E.W. Dijkstra. 1959. A note on two problems in connexion with graphs. \emph{Nume
 r1 <- newRaster(ncol=36,nrow=18)
 r2 <- r1
 data <- rep(NA,length=ncell(r1))
-data[c(50,300,400)] <- 1
+data[50] <- 1
 r1 <- setValues(r1,data)
 r2 <- setValues(r2,rep(1,times=ncell(r2)))
-tr <- TransitionFromRaster(r2,mean,directions=8,outerMeridianConnect=FALSE)
+tr <- TransitionFromRaster(r2,mean,directions=4,outerMeridianConnect=FALSE)
+tr <- projectionCorrection(tr,type="cost")
 cmd <- costDistanceMap(tr,r1)
 }
 \keyword{ spatial }

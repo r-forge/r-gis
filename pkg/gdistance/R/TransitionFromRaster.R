@@ -8,6 +8,12 @@ setGeneric("TransitionFromRaster", function(object, transitionFunction, directio
 
 setMethod("TransitionFromRaster", signature(object = "RasterLayer"), def = function(object, transitionFunction, directions, outerMeridianConnect)
 		{
+		return(tfr(object,transitionFunction,directions,outerMeridianConnect))
+		}
+)
+
+tfr <- function(object, transitionFunction, directions, outerMeridianConnect)
+{
 			if(dataContent(object) != 'all'){stop("only implemented for rasters with all values in memory; use readAll() to read values")}
 			transition <- new("Transition",nrows=nrow(object),ncols=ncol(object),xmin=xmin(object),xmax=xmax(object),ymin=ymin(object),ymax=ymax(object),projection=projection(object, asText=FALSE))
 			transition.dsC <- as(transition,"dsCMatrix")
@@ -17,7 +23,6 @@ setMethod("TransitionFromRaster", signature(object = "RasterLayer"), def = funct
 			transitionMatrix(transition) <- transition.dsC
 			return(transition)
 		}
-)
 
 setMethod("TransitionFromRaster", signature(object = "RasterStack"), def = function(object, transitionFunction="mahal", directions, outerMeridianConnect)
 		{
