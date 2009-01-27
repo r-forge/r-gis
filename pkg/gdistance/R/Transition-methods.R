@@ -24,6 +24,14 @@ setMethod("Arith", signature(e1 = "Transition", e2 = "ANY"),
 		}
 )
 
+setMethod("Arith", signature(e1 = "ANY", e2 = "Transition"),
+		function(e1, e2){
+			matrix.dsC <- callGeneric(e1,as(e2,"dsCMatrix"))
+			transitionMatrix(e1) <- matrix.dsC
+			return(e1)
+		}
+)
+
 setMethod("Math", signature(x = "Transition"),
 		function(x){
 			transitionMatrix(x) <- callGeneric(transitionMatrix(x))

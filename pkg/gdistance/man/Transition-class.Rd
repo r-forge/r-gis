@@ -4,7 +4,6 @@
 \alias{Arith,Transition,transition-method}
 \alias{coerce,Transition,dsCMatrix-method}
 \alias{initialize,Transition-method}
-\alias{Ops,transition,Transition-method}
 \alias{show,Transition-method}
 
 \title{Class "Transition" }

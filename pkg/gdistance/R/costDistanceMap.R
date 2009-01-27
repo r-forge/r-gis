@@ -39,7 +39,7 @@ setMethod("costDistanceMap", signature(transition = "Transition", object = "Rast
 		accCostDist <- rep(0,times=n)
 		while(length(toCells)>0)
 		{			
-			adj <- adjacency(transition,fromCells=fromCells,toCells=toCells,directions=directions,outerMeridianConnect=TRUE)
+			adj <- adjacency(transition,fromCells=fromCells,toCells=toCells,directions=directions)
 			transitionValues <- accCostDist[adj[,1]] + 1/transition[adj]
 			transitionValues <- tapply(transitionValues,adj[,2],min)
 			transitionValues <- transitionValues[transitionValues < Inf]
@@ -49,7 +49,6 @@ setMethod("costDistanceMap", signature(transition = "Transition", object = "Rast
 			
 		}
 		result <- as(transition, "RasterLayer")
-		accCostDist[accCostDist == 0] <- NA
 		result <- setValues(result, accCostDist)	
 		return(result)
 	}
