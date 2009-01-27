@@ -12,7 +12,7 @@
 	if (file.exists(datapath)) { path <- datapath } 
 	Sys.setenv(geodata__DATA__DIR=path)
  
-	pkg.info <- drop(read.dcf(file=system.file("DESCRIPTION", package="Rgis"), fields=c("Version","Date")))
+	pkg.info <- drop(read.dcf(file=system.file("DESCRIPTION", package="geodata"), fields=c("Version","Date")))
 	cat(paste(pkg, " version ", pkg.info["Version"], " (", pkg.info["Date"], "). dataPath=", path, "\n", sep=""))
   			
 	return(invisible(0))
