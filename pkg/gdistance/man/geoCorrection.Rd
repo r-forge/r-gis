@@ -1,15 +1,16 @@
-\name{projectionCorrection-methods}
+\name{geoCorrection-methods}
 \docType{methods}
-\alias{projectionCorrection-methods}
-\alias{projectionCorrection,Transition-method}
+\alias{geoCorrection-methods}
+\alias{geoCorrection,Transition-method}
 \title{ ~~ Methods for Function projectionCorrection in Package `gdistance' ~~}
 \description{
- ~~ Methods for function \code{projectionCorrection} in Package `gdistance' ~~
+ ~~ Methods for function \code{geoCorrection} in Package `gdistance' ~~
 }
 \section{Methods}{
 \describe{
 
 \item{transition = "Transition"}{ ~~describe this method here }
+\item{type = "character"}{ diagonal, cost or resistance }
 }}
 \keyword{methods}
 \keyword{ ~~ other possible keyword(s)}
