@@ -54,7 +54,7 @@ This R-forge project contains a number of related packages, that might eventuall
 <br>
 'diversity' contains functions for the analysis of biodiversity data (not much there right now, and have a look at adehabitat instead if this is what you are looking for.)
 <br>
-'gdistance' deals with complex distance calculations, based on circuit theory and graph theory.
+
 
 <p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
 
