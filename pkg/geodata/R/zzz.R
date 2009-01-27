@@ -3,24 +3,17 @@
 
 #  library.dynam("Rgis", package = pkg, lib.loc = lib)
 	path <- ''
-	path <- paste(system.file(package="geodata"), "/data", sep='' ) 
-	filename <- paste(path, "/datadir", sep='')
+#	path <- paste(system.file(package="geodata"), "/data", sep='' ) 
+#	filename <- paste(path, "/datadir", sep='')
+	path <- getwd()
+	filename <- paste(path, "/R_geodata", sep='')	
 	datapath <- ''
 	if (file.exists(filename)) {	try(  datapath <- readLines(filename) , silent=TRUE)  }
 	if (file.exists(datapath)) { path <- datapath } 
 	Sys.setenv(geodata__DATA__DIR=path)
  
-	messages <- as.logical(ifelse(is.null(getOption("geodata.messages")), TRUE, getOption("geodata.messages")))
-	messages <- TRUE  
-	if(messages){
-		pkg.info <- drop(read.dcf(file=system.file("DESCRIPTION", package="Rgis"), fields=c("Version","Date")))
-		cat("\n")
-		cat("-------------------------------------------------------------\n")
-			cat(paste(pkg, " version ", pkg.info["Version"], " (built on ", pkg.info["Date"], ")\n", sep=""))
-			cat(paste("Data path =", path, "\n"))
-		cat("-------------------------------------------------------------\n")
-		cat("\n")
-	}
+	pkg.info <- drop(read.dcf(file=system.file("DESCRIPTION", package="Rgis"), fields=c("Version","Date")))
+	cat(paste(pkg, " version ", pkg.info["Version"], " (", pkg.info["Date"], "). dataPath=", path, "\n", sep=""))
   			
 	return(invisible(0))
 }

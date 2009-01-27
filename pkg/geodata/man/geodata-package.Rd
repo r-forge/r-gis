@@ -1,6 +1,6 @@
-\name{Rgis-package}
-\alias{Rgis-package}
-\alias{Rgis}
+\name{geodata-package}
+\alias{geodata-package}
+\alias{geodata}
 \docType{package}
 \title{ Geographic Data for mapping and analysis
 }
@@ -9,7 +9,7 @@ Download (if necessary) and read geographic data into a standard format for mapp
 }
 \details{
 	\tabular{ll}{
-		Package: \tab Rgis\cr
+		Package: \tab geodata\cr
 		Type: \tab Package\cr
 		Version: \tab 0.1\cr
 		Date: \tab 2008-10-07\cr

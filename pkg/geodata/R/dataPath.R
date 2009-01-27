@@ -31,7 +31,7 @@ setDataPath <- function(path, create=FALSE) {
 	}
 #	try(   write(path, paste(system.file(package="geodata"), "/data/datadir", sep=''))  )
 	try( 
-		write(path, paste(getwd(), "/R_geodata.txt", sep=""))  
+		write(path, paste(getwd(), "/R_geodata", sep=""))  
 	)
 }	
 
@@ -39,7 +39,7 @@ dataPath <- function() {
 	path <- Sys.getenv("geodata__DATA__DIR")
 	if (path == "") {
 #		path <- try(  readLines(paste(system.file(package="geodata"), "/data/datadir", sep='')) )  
-		path <- try(  readLines(paste(getwd(), "/R_geodata.txt", sep=""))  )  
+		path <- try(  readLines(paste(getwd(), "/R_geodata", sep=""))  )  
 	}
 	if (path == "") {
 		dataPathDefault()
@@ -49,7 +49,7 @@ dataPath <- function() {
 		setDataPathDefault()
 		path <- dataPathDefault() 
 	}
-	return(path)
+	return(path[[1]])
 }
 
 
