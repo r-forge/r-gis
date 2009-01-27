@@ -39,7 +39,7 @@ data <- rep(NA,length=ncell(r1))
 data[cellFromXY(r1,c(0,0))] <- 1
 r1 <- setValues(r1,data)
 r2 <- setValues(r2,rep(1,times=ncell(r2)))
-tr <- TransitionFromRaster(r2,mean,directions=4,outerMeridianConnect=TRUE)
+tr <- TransitionFromRaster(r2,mean,directions=16,outerMeridianConnect=TRUE)
 tr <- projectionCorrection(tr,type="cost")
 cmd <- costDistanceMap(tr,r1)
 }
