@@ -1,8 +1,8 @@
 Package: geodata
 Type: Package
 Title: Geographic data for mapping and analysis
-Version: 0.1.3
-Date: 2008-10-07
+Version: 0.2
+Date: 2009-01-27
 Depends: sp, raster
 Author: Robert Hijmans
 Maintainer: <r.hijmans@gmail.com>

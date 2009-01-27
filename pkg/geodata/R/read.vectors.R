@@ -5,15 +5,15 @@
 # Version 1,.1 October 2008
 
 
-.get.indices <- function() {
+.getIndices <- function() {
 	path <- dataPathDefault()
 	d <- read.table(paste(path, "/index", sep=""), header=T, sep="\t")
 	return(as.matrix(d))
 }
 
-.read.country.data <- function(var="adm", country="ABW", level=0, download=TRUE ) {
+.readCountryData <- function(var="adm", country="ABW", level=0, download=TRUE ) {
 #  under development
-	indices <- .get.indices()
+	indices <- .getIndices()
 	record <- subset(indices, indices[,1] == var)
 	if (record["subvar1"] != "ISO") { stop( 'not a country dataset' ) }
 }
@@ -33,7 +33,7 @@ countryData <- function(country="ABW", varname="adm", level=0, rasterformat="ras
 	}	
 	
 	if (!file.exists(filename)) {
-		isos <- .get.country.list()
+		isos <- .getCountryList()
 		iso <- subset(isos, isos[,2] == country) 
 		if (length(iso)==0) { stop('this is not a valid country country code. You can use list.country() to find one') }
 	
@@ -85,7 +85,7 @@ adm <- function(country="ABW", level=0, download=TRUE ) {
 
 
 
-.get.country.list <- function() {
+.getCountryList <- function() {
 	path <- dataPathDefault()
 	d <- read.table(paste(path, "/countries", sep=""), header=T, sep="\t",  quote = "!@!")
 	return(as.matrix(d))
@@ -94,7 +94,7 @@ adm <- function(country="ABW", level=0, download=TRUE ) {
 
 
 countryCodes <- function(start=1, end=243) {
-	d <- .get.country.list()
+	d <- .getCountryList()
 	showrange <- c(start:end)
 	showrange <- showrange[showrange>0 && showrange<244]
 	d[showrange,1:2]
@@ -134,7 +134,7 @@ admList <- function(country=NA, level=NA) {
 
 admRemove <- function(country=NA, level=NA) {
 	varname <- 'adm'
-	path <- paste(dataPath(), "/", varname, sep="")
+	path <- paste(dataPath(), "/", varname, "/", sep="")
 
 	if (is.na(country)) {cat("\nSpecify a country (country) code.\n") 
 	} else if (country == "ALL") {
@@ -151,7 +151,7 @@ admRemove <- function(country=NA, level=NA) {
 		if (is.na(level)) {
 			for (i in 0:5) {
 				filename <- paste(path, "adm_", country, i, ".RData", sep="")
-				if (nchar(filename) > 0) { 
+				if (file.exists(filename)) { 
 					res <- file.remove(filename) 
 					if (res) {cat("removed", country, i, "\n") }
 				}	

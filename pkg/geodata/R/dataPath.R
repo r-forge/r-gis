@@ -1,5 +1,5 @@
 
-.remove.trailing.slash <- function(path) {
+.removeTrailingSlash <- function(path) {
 #  adapted from code by Henrik Bengtsson
 # Remove trailing "/", 
    path <- gsub("/$", "", path)
@@ -20,27 +20,31 @@ setDataPathDefault <- function() {
 }
 
 setDataPath <- function(path, create=FALSE) {
-	path <- .remove.trailing.slash(path)
+	path <- .removeTrailingSlash(path)
 	if (!(file.exists(path))) { 
 		if (create) {
 			dir.create(path, recursive=T)
 		} else { stop("path does not exist, use create=T to create it") }
 	}
 	if (file.exists(path)) { 
-		Sys.setenv(R_GIS_DATA_DIR=path)
+		Sys.setenv(geodata__DATA__DIR=path)
 	}
-	try(   write(path, paste(system.file(package="geodata"), "/data/datadir", sep=''))  )
+#	try(   write(path, paste(system.file(package="geodata"), "/data/datadir", sep=''))  )
+	try( 
+		write(path, paste(getwd(), "/R_geodata.txt", sep=""))  
+	)
 }	
 
 dataPath <- function() {
-	path <- Sys.getenv("R_GIS_DATA_DIR")
+	path <- Sys.getenv("geodata__DATA__DIR")
 	if (path == "") {
-		path <- try(  readLines(paste(system.file(package="geodata"), "/data/datadir", sep='')) )  
+#		path <- try(  readLines(paste(system.file(package="geodata"), "/data/datadir", sep='')) )  
+		path <- try(  readLines(paste(getwd(), "/R_geodata.txt", sep=""))  )  
 	}
 	if (path == "") {
 		dataPathDefault()
 	}
-	path <- .remove.trailing.slash(path) 
+	path <- .removeTrailingSlash(path) 
 	if (!(file.exists(path))) {
 		setDataPathDefault()
 		path <- dataPathDefault() 

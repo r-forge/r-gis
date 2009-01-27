@@ -8,7 +8,7 @@
 	datapath <- ''
 	if (file.exists(filename)) {	try(  datapath <- readLines(filename) , silent=TRUE)  }
 	if (file.exists(datapath)) { path <- datapath } 
-	Sys.setenv(R_GIS_DATA_DIR=path)
+	Sys.setenv(geodata__DATA__DIR=path)
  
 	messages <- as.logical(ifelse(is.null(getOption("geodata.messages")), TRUE, getOption("geodata.messages")))
 	messages <- TRUE  
