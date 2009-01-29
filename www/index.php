@@ -44,17 +44,18 @@ echo $contents; } ?>
 <!-- end of project description -->
 
 <br>
-This R-forge project contains a number of related packages, that might eventually grow-up and move out to their own repository. 
+<p>
+The R-forge project contains a number of related packages. It is an incubator for package ideas, that might eventually grow-up and move out to their own repository. This has happend for <a href="http://r-forge.r-project.org/projects/raster/">raster</a>, <a href="http://r-forge.r-project.org/projects/gdistance/">gdistance</a>, and the packages in <a href="http://r-forge.r-project.org/projects/gdistance/">cropsim</a>.</p>
 <br>
-'raster' deals with low level raster (grid) data manipulation. It is used by the other packages, so you need to install it first if you want to use the others. raster depends on a number of packages, notably sp and rgdal. We hope this package to CRAN before the end of this year (2008). 
+<p>Most of these packages depend on the <a href="http://r-forge.r-project.org/projects/raster/">raster</a> package that provides basic classes and methods for raster (grid) data manipulation. So you will need to install that package first if you want to use the others. The raster package itsels depends on sp and rgdal. </p>
 <br>
-'Rgis' is to become partly meta-package, partly GUI GIS package, and partly an easy access to on-line spatial data (this is the only bit that has been implemented, to a small extent, so far).
+<p>'geodata' is for easy access to on-line spatial data. We are currently working on links to GADM boundaries, SRTM, worlclim, and DCW data. </p>
 <br>
-'RemoteSensing' contains remote sensing functions (right now mainly a set of vegetation indices). 
+<p>'RemoteSensing' contains remote sensing functions (right now mainly a set of vegetation indices). </p>
 <br>
-'diversity' contains functions for the analysis of biodiversity data (not much there right now, and have a look at adehabitat instead if this is what you are looking for.)
+<p>'diversity' contains functions for the analysis of biodiversity data (not much there right now, and have a look at adehabitat instead if this is what you are looking for.), and will focus macroecology and niche modeling
 <br>
-
+</p>
 
 <p> The <strong>project summary page</strong> you can find <a href="http://<?php echo $domain; ?>/projects/<?php echo $group_name; ?>/"><strong>here</strong></a>. </p>
 
