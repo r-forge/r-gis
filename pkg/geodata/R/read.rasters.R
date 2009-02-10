@@ -11,7 +11,7 @@ SRTM <- function(x=106, y=-6, download=TRUE) {
 	
 	x <- min(180, max(-180, x))
 	y <- min(60, max(-60, y))
-	rs <- newRaster(nrows=24, ncols=72, xmn=-180, xmx=180, ymn=-60, ymx=60 )
+	rs <- raster(nrows=24, ncols=72, xmn=-180, xmx=180, ymn=-60, ymx=60 )
 	row <- rowFromY(rs, y)
 	col <- colFromX(rs, x)
 	if (row < 10) { row <- paste('0', row, sep='') }
