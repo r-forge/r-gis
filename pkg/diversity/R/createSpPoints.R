@@ -22,7 +22,7 @@ db2SpPoints <- function(database, table, xfield='lat', yfield='lon', includeNULL
 createSpPoints <- function(dataframe, x='LON', y='LAT', projection="+proj=longlat +datum=WGS84") {
 	coords <- cbind(dataframe[x], dataframe[y])
 	row.names(coords) <- 1:nrow(coords)
-	proj4 <- new.CRS(projection)
+	proj4 <- newCRS(projection)
 	spatpoints <- SpatialPointsDataFrame(coords=coords, data=dataframe, proj4string=proj4)
 	return(spatpoints)
 }
