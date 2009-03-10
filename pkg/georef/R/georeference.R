@@ -19,7 +19,7 @@ get.elevation <- function(latitude, longitude) {
 
 .get.country.list <- function() {
 	path <- paste(system.file(package="Rgis"), "/data", sep='')
-	d <- read.table(paste(path, "/external/countries", sep=""), header=T, sep="\t",  quote = "!@!")
+	d <- read.table(paste(path, "/countries", sep=""), header=T, sep="\t",  quote = "!@!")
 	return(as.matrix(d))
 }
 
