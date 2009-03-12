@@ -8,7 +8,7 @@
   ~~ A concise (1-5 lines) description of what the function does. ~~
 }
 \usage{
-get.country(lonlat, radius = 0)
+get.country(lonlat, radius = 0, retries=3, interval=60)
 get.admin.division(latitude, longitude, radius = 0, maxrows = 1)
 get.elevation(latitude, longitude)
 }
@@ -18,7 +18,9 @@ get.elevation(latitude, longitude)
   \item{latitude}{ ~~Describe \code{latitude} here~~ }
   \item{longitude}{ ~~Describe \code{longitude} here~~ }
   \item{radius}{ ~~Describe \code{radius} here~~ }
-  \item{maxrows}{ ~~Describe \code{maxrows} here~~ }  
+  \item{maxrows}{ ~~Describe \code{maxrows} here~~ }
+  \item{retries}{ ~~Describe \code{radius} here~~ }
+  \item{interval}{ ~~Describe \code{radius} here~~ }  
 }
 \details{
   ~~ If necessary, more details than the description above ~~

@@ -23,12 +23,29 @@ get.elevation <- function(latitude, longitude) {
 	return(as.matrix(d))
 }
 
-get.country <- function(lonlat, radius=0) {
+get.country <- function(lonlat, radius=0, retries=3, interval=60) {
 	cnts <- .get.country.list()
 	res <- matrix(ncol=3,nrow=length(lonlat[,1]))
-	for (i in 1:length(lonlat[,1])) {
+	
+    country <- F
+    
+    for (i in 1:length(lonlat[,1])) {
 		theurl <- paste("http://ws.geonames.org/countryCode?lat=", lonlat[i,2], "&lng=", lonlat[i,1], "&radius=", radius, sep='')
-		country <- scan(theurl, what='character', quiet=TRUE)
+		cnt <- 0
+		repeat{
+            try(country <- scan(theurl, what='character', quiet=TRUE), silent=T)
+            cnt <- cnt + 1
+            if (nchar(country)==2){
+                break                
+            }
+            else if (cnt==retries){                
+                cat(paste(i,lonlat[i,],collapse=","),"failed to connect to webservice \n")
+                stop()
+            }
+            else {
+                Sys.sleep(interval*cnt)
+            }
+        }
 		if (length(country) > 1) { res[i,] <- c(NA,NA,NA)
 		} else {
 			rec <- subset(cnts, cnts[,3] == country) 
