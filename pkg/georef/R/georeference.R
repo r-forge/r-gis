@@ -39,8 +39,8 @@ get.country <- function(lonlat, radius=0, retries=3, interval=60) {
                 break                
             }
             else if (cnt==retries){                
-                cat(paste(i,lonlat[i,],collapse=","),"failed to connect to webservice \n")
-                stop()
+                cat(i, paste(lonlat[i,],collapse=","),"failed to connect to webservice \n Will now assign blanks. \n")
+                break
             }
             else {
                 Sys.sleep(interval*cnt)
