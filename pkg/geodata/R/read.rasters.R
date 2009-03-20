@@ -43,7 +43,7 @@ SRTM <- function(x=106, y=-6, download=TRUE) {
 	}
 	if (file.exists(tiffilename)) { 
 		rs <- rasterFromFile(tiffilename)
-		rs <- setProjection(rs, "+proj=longlat +datum=WGS84")
+		projection(rs) <- "+proj=longlat +datum=WGS84"
 		return(rs)
 	}	
 }
