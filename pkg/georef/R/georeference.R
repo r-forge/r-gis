@@ -18,12 +18,11 @@ get.elevation <- function(latitude, longitude) {
 
 
 .get.country.list <- function() {
-	path <- paste(system.file(package="Rgis"), "/data", sep='')
-	d <- read.table(paste(path, "/countries", sep=""), header=T, sep="\t",  quote = "!@!")
+	d <- read.table(system.file("data/external/countries", package="georef"))
 	return(as.matrix(d))
 }
 
-get.country <- function(lonlat, radius=0, retries=3, interval=60) {
+get.country <- function(lonlat, radius=0, retries=3, interval=10) {
 	cnts <- .get.country.list()
 	res <- matrix(ncol=3,nrow=length(lonlat[,1]))
 	
@@ -35,7 +34,7 @@ get.country <- function(lonlat, radius=0, retries=3, interval=60) {
 		repeat{
             try(country <- scan(theurl, what='character', quiet=TRUE), silent=T)
             cnt <- cnt + 1
-            if (nchar(country)==2){
+            if (length(country) == 1 & nchar(country)==2 || length(country)>5){
                 break                
             }
             else if (cnt==retries){                
