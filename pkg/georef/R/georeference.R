@@ -18,7 +18,7 @@ get.elevation <- function(latitude, longitude) {
 
 
 .get.country.list <- function() {
-	d <- read.table(system.file("data/external/countries", package="georef"))
+	d <- data("countries")
 	return(as.matrix(d))
 }
 
