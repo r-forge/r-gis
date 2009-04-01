@@ -34,7 +34,7 @@ get.country <- function(lonlat, radius=0, retries=3, interval=10) {
 		repeat{
             try(country <- scan(theurl, what='character', quiet=TRUE), silent=T)
             cnt <- cnt + 1
-            if (length(country) == 1 & nchar(country)==2 || length(country)>5){
+            if ((length(country) == 1 & nchar(country)==2) || length(country)>5){
                 break                
             }
             else if (cnt==retries){                
