@@ -19,7 +19,7 @@ get.elevation <- function(latitude, longitude) {
 
 .get.country.list <- function() {
 	path <- paste(system.file(package="georef"), "/data", sep='')
-	d <- read.csv(paste(path, "/countries.csv", sep=""), header=T, sep="\t",  quote = "!@!")
+	d <- read.csv(paste(path, "/countries.csv", sep=""), header=T, quote = "!@!")
 	return(as.matrix(d))
 }
 

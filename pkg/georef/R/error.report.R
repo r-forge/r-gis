@@ -80,7 +80,7 @@ errorGenerate <- function(pp){
 			xy.exchange <- c(y1, x1)
 			signch.lat <- c(x1, -y1)
 			signch.lon <- c(-x1, y1)
-			signch.latlon <- c(-y1, -x1)
+			signch.latlon <- c(-x1, -y1)
 			
 			xy.signch.lat <- c(y1, -x1)
 			xy.signch.lon <- c(-y1, x1)
