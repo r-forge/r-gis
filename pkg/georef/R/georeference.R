@@ -22,29 +22,12 @@ get.elevation <- function(latitude, longitude) {
 	return(as.matrix(d))
 }
 
-get.country <- function(lonlat, radius=0, retries=3, interval=10) {
+get.country <- function(lonlat, radius=0) {
 	cnts <- .get.country.list()
 	res <- matrix(ncol=3,nrow=length(lonlat[,1]))
-	
-    country <- F
-    
-    for (i in 1:length(lonlat[,1])) {
+	for (i in 1:length(lonlat[,1])) {
 		theurl <- paste("http://ws.geonames.org/countryCode?lat=", lonlat[i,2], "&lng=", lonlat[i,1], "&radius=", radius, sep='')
-		cnt <- 0
-		repeat{
-            try(country <- scan(theurl, what='character', quiet=TRUE), silent=T)
-            cnt <- cnt + 1
-            if ((length(country) == 1 & nchar(country)==2) || length(country)>5){
-                break                
-            }
-            else if (cnt==retries){                
-                cat(i, paste(lonlat[i,],collapse=","),"failed to connect to webservice \n Will now assign blanks. \n")
-                break
-            }
-            else {
-                Sys.sleep(interval*cnt)
-            }
-        }
+		country <- scan(theurl, what='character', quiet=TRUE)
 		if (length(country) > 1) { res[i,] <- c(NA,NA,NA)
 		} else {
 			rec <- subset(cnts, cnts[,3] == country) 
@@ -55,7 +38,6 @@ get.country <- function(lonlat, radius=0, retries=3, interval=10) {
 	colnames(res) <- c("NAME_ENGLISH", "ISO3", "ISO2")
 	return(res)
 }
-
 
 get.admin.division <- function(latitude, longitude, radius=0, maxrows=1) {
 	theurl <- paste("http://ws.geonames.org/countrySubdivision?lat=", latitude, "&lng=", longitude, "&radius=", radius, "&maxrows=", maxrows, sep='')
