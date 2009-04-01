@@ -8,17 +8,17 @@ get.coordinates <- function(cy='', sp='', co='', loc='') {
 }
 
 
-#get.elevation <- function(latitude, longitude) {
-#	theurl <- paste("http://ws.geonames.org/srtm3?lat=", latitude, "&lng=", longitude, sep='')
-#	elevation <- scan(theurl, what='character', quiet=TRUE)
-#	if (elevation < -32000) { elevation <- NA }
-#	return(elevation)
-#}
+get.elevation <- function(latitude, longitude) {
+	theurl <- paste("http://ws.geonames.org/srtm3?lat=", latitude, "&lng=", longitude, sep='')
+	elevation <- scan(theurl, what='character', quiet=TRUE)
+	if (elevation < -32000) { elevation <- NA }
+	return(elevation)
+}
 
 
 
 .get.country.list <- function() {
-	d <- data("countries")
+	d <- data("countries.csv")
 	return(as.matrix(d))
 }
 
