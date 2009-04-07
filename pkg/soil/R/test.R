@@ -1,2 +1,0 @@
-test <- function(a) { return(a + a - 1) }
-

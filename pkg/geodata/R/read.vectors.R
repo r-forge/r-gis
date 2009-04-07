@@ -25,11 +25,11 @@ countryData <- function(country="ABW", varname="adm", level=0, rasterformat="ras
 	path <- paste(path, "/", sep="")
 	
 	if (varname == "adm") {
-		filename <- paste(path, varname, '_', country, level, ".RData", sep="")
-		theurl <- paste("http://www.r-gis.org/rgis/data/", varname, "/", varname, '_', country, level, ".RData", sep="")
+		filename <- paste(path, country, '_', varname, level, ".RData", sep="")
+		theurl <- paste("http://www.r-gis.org/rgis/data/", varname, "/", country, '_', varname, level, ".RData", sep="")
 	} else {
-		filename <- paste(path, varname, '_', country, ".RData", sep="") 
-		theurl <- paste("http://www.r-gis.org/rgis/data/", varname, "/", varname, '_', country, ".RData", sep="")
+		filename <- paste(path, country, '_', varname, ".RData", sep="") 
+		theurl <- paste("http://www.r-gis.org/rgis/data/", varname, "/", country, '_', varname, ".RData", sep="")
 	}	
 	
 	if (!file.exists(filename)) {
@@ -65,15 +65,15 @@ adm <- function(country="ABW", level=0, download=TRUE ) {
 	if (!file.exists(path)) {  dir.create(path, recursive=T)  }
 	path <- paste(path, "/", sep="")
 		
-	filename <- paste(path, varname, '_', country, level, ".RData", sep="")
+	filename <- paste(path, country, '_', varname, level, ".RData", sep="")
 	if (!file.exists(filename)) {
 		if (download) {
-			theurl <- paste("http://www.r-gis.org/rgis/data/adm/", varname, '_', country, level, ".RData", sep="")
+			theurl <- paste("http://www.r-gis.org/rgis/data/adm/", country, '_', varname, level, ".RData", sep="")
 			download.file(url=theurl, destfile=filename, method="auto", quiet = FALSE, mode = "wb", cacheOK = TRUE)
 			if (!file.exists(filename))
 				{ cat("\nCould not download file -- perhaps it does not exist\n\n") }
 		} else {
-			cat("\nFile not available locally. Use 'download = TRUE'\n")
+			cat("\n", filename, "not available. Use 'download = TRUE'\n")
 		}
 	}	
 	if (file.exists(filename)) {
