@@ -18,9 +18,8 @@
 	if (record["subvar1"] != "ISO") { stop( 'not a country dataset' ) }
 }
 
-
-countryData <- function(country="ABW", varname="adm", level=0, rasterformat="raster", download=TRUE) {
-	path <- paste(dataPath(), "/", varname, sep="")
+getshape <- function(country="ABW", varname="adm", level=0, precision='high', rasterformat="raster", download=TRUE) {
+	path <- paste(dataPath(), "/geodata", sep="")
 	if (!file.exists(path)) {  dir.create(path, recursive=T)  }
 	path <- paste(path, "/", sep="")
 	
@@ -61,17 +60,30 @@ countryData <- function(country="ABW", varname="adm", level=0, rasterformat="ras
 
 adm <- function(country="ABW", level=0, download=TRUE ) {
 	varname <- "adm"
-	path <- paste(dataPath(), "/", varname, sep="")
+	path <- paste(dataPath(), "/geodata", sep="")
 	if (!file.exists(path)) {  dir.create(path, recursive=T)  }
 	path <- paste(path, "/", sep="")
 		
 	filename <- paste(path, country, '_', varname, level, ".RData", sep="")
+	
+	if (file.exists(filename)) {
+		if (file.info(filename)$size < 1) {
+			file.remove(filename)
+		}
+	}
+
 	if (!file.exists(filename)) {
 		if (download) {
-			theurl <- paste("http://www.r-gis.org/rgis/data/adm/", country, '_', varname, level, ".RData", sep="")
+			theurl <- paste("http://www.r-gis.org/rgis/data/adm/", country, "_", varname, level, ".RData", sep="")
+			x <- url(theurl)
+			atry <- try(open(x), silent=TRUE)
+			if (class(atry) == "try-error") {
+				stop(paste('cannot download ', country, '_', varname, level, " Perhaps it does not exist.", sep="") )
+			}
+			close(x)
 			download.file(url=theurl, destfile=filename, method="auto", quiet = FALSE, mode = "wb", cacheOK = TRUE)
 			if (!file.exists(filename))
-				{ cat("\nCould not download file -- perhaps it does not exist\n\n") }
+				{ cat("Could not download file -- perhaps it does not exist\n\n") }
 		} else {
 			cat("\n", filename, "not available. Use 'download = TRUE'\n")
 		}
