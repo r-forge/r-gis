@@ -46,7 +46,7 @@ SRTM(x=106, y=-6, download=TRUE)
 	Admin boundary data, GADM: \url{http://biogeo.berkeley.edu/gadm/} 
 	SRTM elevation data: \url{http://srtm.csi.cgiar.org/} }
 
-\author{ \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} } }
+\author{Robert J. Hijmans}
 \examples{
 }
 \keyword{ spatial }

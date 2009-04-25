@@ -26,7 +26,7 @@ dataPathDefault()
 \value{
 }
 
-\author{ \author{ Robert J. Hijmans \email{r.hijmans@gmail.com} } }
+\author{Robert J. Hijmans}
 \examples{
 }
 \keyword{ spatial }
