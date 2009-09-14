@@ -32,7 +32,7 @@ FCC <- function(hwsd) {
 	colnames(fcc) <- c('g', 'd', 'e', 'a', 'h', 'i', 'x', 'v', 'k', 'b', 's', 'n', 'c', "'", '', '', '', '')
 	
 #   1) gley (g)
-	fcc[left == 'G' | left == 'W' | left=='O' | soil == 'Jt' | soil == 'Gt' | right == 'g' ), 1] <- TRUE
+	fcc[left == 'G' | left == 'W' | left=='O' | soil == 'Jt' | soil == 'Gt' | right == 'g' , 1] <- TRUE
 
 #   2) dry (d)	
 	fcc[left == 'X' | left == 'Y', 2] <- TRUE
@@ -44,7 +44,7 @@ FCC <- function(hwsd) {
 	fcc[hwsd$T_CEC_SOIL < 4] <- TRUE
 	
 #    4) aluminium toxicity (a)
-	fcc[soil == 'Gd' | soil == 'Bd' | soil == 'Wd' | soil == 'Fh' | soil == 'Ah'), 4] <- TRUE
+	fcc[soil == 'Gd' | soil == 'Bd' | soil == 'Wd' | soil == 'Fh' | soil == 'Ah', 4] <- TRUE
 	fcc[hwsd$T_PH_H2O < 5, 4] <- TRUE
 	
 #5) acid (h)
@@ -113,12 +113,11 @@ FCC <- function(hwsd) {
 }
 
 
-library(RODBC)
-db <- odbcConnectAccess('I:/Soil/HWSD/HWSD.mdb')
-query <- paste("SELECT * FROM HWSD_DATA")
-soil <- sqlQuery(db, query)
-odbcClose(db)
-
-f <- FCC(data)
+#library(RODBC)
+#db <- odbcConnectAccess('I:/Soil/HWSD/HWSD.mdb')
+#query <- paste("SELECT * FROM HWSD_DATA")
+#soil <- sqlQuery(db, query)
+#odbcClose(db)
+#f <- FCC(data)
 
 

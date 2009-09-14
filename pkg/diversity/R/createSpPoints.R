@@ -1,7 +1,10 @@
 
 
 db2SpPoints <- function(database, table, xfield='lat', yfield='lon', includeNULL=FALSE, projection="+proj=longlat +datum=WGS84") {
-	if  (tolower(fileExtension(database)) == '.mdb') {
+	if (!(require(RODBC))) {
+		stop('This functions requires the RODBC package; please install it')
+	}
+	if  (tolower(ext(database)) == '.mdb') {
 		db <- odbcConnectAccess(database)
 	} else { 
 		db <- odbcConnect(database) 

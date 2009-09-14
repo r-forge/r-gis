@@ -1,7 +1,11 @@
 
 vector.read <- function(filename) {
-	fn <- fileName(filename) 
-	fn <- setFileExtension(fn, '')
+	if (!(require(rgdal))) {
+		stop('This functions requires the rgdal package; please install it')
+	}
+
+	fn <- basename(filename) 
+	ext(fn) <- ''
 	vec <- readOGR(filename, fn) 
 	if (class(vec) == "SpatialPointsDataFrame") {
 		xy <- coordinates(vec)
@@ -14,6 +18,6 @@ vector.read <- function(filename) {
 	} else if (class(vec) == "SpatialPolygonsDataFrame") { 
 		result <- NA
 	} else { result <- NA }
-	return(result  )
+	return(result)
 }
 
