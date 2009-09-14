@@ -108,7 +108,6 @@ FCC <- function(hwsd) {
 
 #18) low moisture holding (S)	
 	fcc[hwsd$T_TEXTURE == 1, 18] <- TRUE
-	
 	return(fcc)
 }
 
