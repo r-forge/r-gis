@@ -4,7 +4,7 @@
 \alias{distVincenty}
 
 \title{
-Great circle distance, Vincenty method
+Great circle distance, 'Vincenty' method
 }
 
 \description{
@@ -19,28 +19,34 @@ distVincenty(p1, p2, a=6378137, b=6356752.3142, f=1/298.257223563)
 \arguments{
   \item{p1}{longitude/latitude of point(s) 1; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
   \item{p2}{as above. Should be of same length of p1, or a single point (or vice versa when p1 is a single point}
-  \item{a}{ellipsoid parameter}
-  \item{b}{ellipsoid parameter}
-  \item{f}{'flattening', ellipsoid parameter}
+  \item{a}{Equatorial axis of ellipsoid}
+  \item{b}{Polar axis of ellipsoid}
+  \item{f}{Inverse flattening of ellipsoid}
 }
 
 \details{
-Parameters for commonly uses ellipsoids
+
+WGS84 is the best available global ellipsoid, but for some areas other ellipsoids could be preferable. Here are parameters for some commonly used ellipsoids:
 
 \tabular{rllll}{
 \tab \code{ellipsoid}   \tab \code{a}      \tab \code{b}      \tab \code{f}        \cr
-\tab WGS-84	            \tab 6378137      \tab 6356752.3142   \tab 1/298.257223563 \cr
-\tab GRS-80	            \tab 6378137      \tab 6356752.3141   \tab 1/298.257222101 \cr
+\tab WGS84	            \tab 6378137      \tab 6356752.3142   \tab 1/298.257223563 \cr
+\tab GRS80	            \tab 6378137      \tab 6356752.3141   \tab 1/298.257222101 \cr
 \tab Airy (1830)        \tab 6377563.396  \tab 6356256.909    \tab 1/299.3249646   \cr
 \tab International 1924 \tab 6378388      \tab 6356911.946    \tab 1/297           \cr
 \tab Clarke (1880)      \tab 6378249.145  \tab 6356514.86955  \tab 1/293.465       \cr
+\tab Clarke (1866)      \tab 6378206.4    \tab 6356583.8      \tab 1/294.9786982   \cr
+\tab Bessel 1841        \tab 6377397.155  \tab 6356078.965    \tab 1/299.1528434   \cr
+\tab Krasovsky 1940     \tab 6378245      \tab 6356863        \tab 1/298.2997381   \cr
 \tab GRS-67             \tab 6378160      \tab 6356774.719    \tab 1/298.25        \cr
 }
 
+more info: \url{http://en.wikipedia.org/wiki/Reference_ellipsoid}
+				
 }
 
 \value{
-distance value in meters
+Distance value in meters 
 }
 
 

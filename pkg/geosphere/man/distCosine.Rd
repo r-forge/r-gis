@@ -4,7 +4,7 @@
 \alias{distCosine}
 
 \title{
-Great circle distance, cosine method
+Great circle distance, 'law of cosines' method
 }
 
 \description{

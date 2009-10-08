@@ -4,7 +4,7 @@
 \alias{distHaversine}
 
 \title{
-Great circle distance, haversine method
+Great circle distance, 'Haversine' method
 }
 
 \description{

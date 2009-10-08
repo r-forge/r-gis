@@ -27,7 +27,9 @@ Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 
 \references{
 \url{http://www.movable-type.co.uk/scripts/latlong.html}
+
 \url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
+
 \url{http://mathworld.wolfram.com/SphericalTrigonometry.html}
 }
 
