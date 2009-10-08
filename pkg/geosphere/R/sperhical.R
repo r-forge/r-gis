@@ -6,7 +6,6 @@
 
 # Port to R by Robert Hijmans
 
-
 bearing <- function(p1, p2) {
 #* calculate (initial) bearing between two points
 #*   see http:#//williams.best.vwh.net/avform.htm#Crs

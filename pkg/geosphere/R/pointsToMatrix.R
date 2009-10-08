@@ -38,9 +38,9 @@ pointsToMatrix <- function(p) {
 	}
 
 	if (min(p[,1]) < -360) { stop('longitude < -360') }
-	if (max(p[,1]) > 360) {  stop('longitude < 360')  }
+	if (max(p[,1]) > 360) {  stop('longitude > 360')  }
 	if (min(p[,2]) < -90) {  stop('latitude < -90')  }
-	if (max(p[,2]) > 90) {  stop('latitude < 90')  }
+	if (max(p[,2]) > 90) {  stop('latitude > 90')  }
 	
 	return(p)
 }
