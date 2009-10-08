@@ -4,12 +4,12 @@
 \alias{brngRhumb}
 
 \title{
-brngRhumb
+Rhumbline bearing
 }
 
 
 \description{
-Bearing along the rhumb line
+Bearing along a rhumb line
 }
 
 \usage{

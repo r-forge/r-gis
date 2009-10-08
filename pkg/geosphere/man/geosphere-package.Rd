@@ -2,13 +2,10 @@
 \alias{geosphere-package}
 \alias{geosphere}
 \docType{package}
-\title{
-What the package does (short line)
-Spherical Trigonometry
-}
+\title{Spherical Trigonometry}
 
 \description{
-Spherical Trigonometry for geographic applications. Including Great Circle distance, ...
+Spherical Trigonometry for geographic applications, such as great circle distance and distance along a rhumb line.
 }
 
 \details{
@@ -20,24 +17,22 @@ Date: \tab 2009-10-10\cr
 License: \tab GPL3\cr
 LazyLoad: \tab yes\cr
 }
-
-~~ An overview of how to use the package, including the most important functions ~~
-
 }
+
 \author{
-Chris Veness
+Chris Veness and Robert Hijmans
 
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 }
-\references{
 
+\references{
+\url{http://www.movable-type.co.uk/scripts/latlong.html}
+\url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
+\url{http://mathworld.wolfram.com/SphericalTrigonometry.html}
 }
+
+
 \keyword{ package }
 \keyword{ spatial }
 
-\seealso{
-~~ \code{\link[<pkg>:<pkg>-package]{<pkg>}} ~~
-}
 
-\examples{
-}
