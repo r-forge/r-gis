@@ -1,10 +1,10 @@
-\name{distVincenty}
+\name{distVincentyEllipsoid}
 \Rdversion{1.1}
 
-\alias{distVincenty}
+\alias{distVincentyEllipsoid}
 
 \title{
-Great circle distance, 'Vincenty' method
+Great circle distance, 'Vincenty' method using an ellipsoid
 }
 
 \description{
@@ -13,7 +13,7 @@ This method uses an ellipsoid and the results are accurate to witin 1 mm. The me
 }
 
 \usage{
-distVincenty(p1, p2, a=6378137, b=6356752.3142, f=1/298.257223563)
+distVincentyEllipsoid(p1, p2, a=6378137, b=6356752.3142, f=1/298.257223563)
 }
 
 \arguments{
@@ -52,22 +52,23 @@ Distance value in meters
 
 \references{
 Vincenty, T. 1975. Direct and inverse solutions of geodesics on the ellipsoid with applicaiton of nested equations. Survey Review Vol. 23, No. 176, pp88-93.
+
 \url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
 }
 
 \author{
-Chris Veness
+Chris Veness and Robert Hijmans
 }
 
 
 \seealso{
-\code{link[geosphere]{distHaversine}, link[geosphere]{distCosine}}
+\code{link[geosphere]{distVincentySphere}, link[geosphere]{distHaversine}, link[geosphere]{distCosine}}
 }
 
 \examples{
-distVincenty(c(0,0),c(90,90))
-# on Clarke 1880 ellipsoid
-distVincenty(c(0,0),c(90,90), a=6378249.145, b=6356514.86955, f=1/293.465)
+distVincentyEllipsoid(c(0,0),c(90,90))
+# on a Clarke 1880 ellipsoid
+distVincentyEllipsoid(c(0,0),c(90,90), a=6378249.145, b=6356514.86955, f=1/293.465)
 }
 
 \keyword{ spatial }
