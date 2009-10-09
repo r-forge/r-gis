@@ -8,7 +8,7 @@ Bearing
 }
 
 \description{
-Get the bearing between two points
+Get the bearing to go from point1 to point2
 }
 
 \usage{
@@ -20,26 +20,23 @@ bearing(p1, p2)
   \item{p2}{longitude/latitude of point(s) 2; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
 }
 
-\details{
-}
 
 \value{
+A bearing in degrees
 }
 
-
-\references{
-}
 
 \author{
 Chris Veness
 }
 
 
-
 \seealso{
+\code{ \link[geosphere]{brngRhumb}  }
 }
 
 \examples{
+bearing(c(0,0),c(90,90))
 }
 
 \keyword{ spatial }

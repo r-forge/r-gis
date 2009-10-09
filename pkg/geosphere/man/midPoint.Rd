@@ -25,7 +25,9 @@ Just as the initial bearing may vary from the final bearing, the midpoint may no
 
 
 \value{
+A pair of coordinates (longitude/latitude)
 }
+
 \references{
 \url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
 }
@@ -34,14 +36,8 @@ Just as the initial bearing may vary from the final bearing, the midpoint may no
 Chris Veness
 }
 
-\note{
-}
-
-
-\seealso{
-}
 \examples{
-  
+midPoint(c(0,0),c(90,90))  
 }
 
 \keyword{ spatial  }

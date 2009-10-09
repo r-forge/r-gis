@@ -27,7 +27,7 @@ If you maintain a constant bearing along a rhumb line, you will gradually spiral
 }
 
 \value{
- ...
+distance value in units of R (default=meters)
 }
 
 \references{
@@ -36,8 +36,6 @@ If you maintain a constant bearing along a rhumb line, you will gradually spiral
 
 \author{
 Chris Veness
-}
-\note{
 }
 
 \seealso{

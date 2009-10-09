@@ -21,10 +21,9 @@ destPoint(p, brng, d, R = 6378137)
   \item{R}{radius of the earth}
 }
 
-\details{
-}
 
 \value{
+A pair of coordinates (longitude/latitude)
 }
 
 \references{
@@ -35,12 +34,6 @@ destPoint(p, brng, d, R = 6378137)
 Chris Veness
 }
 
-\note{
-}
-
-
-\seealso{
-}
 
 \examples{
 destPoint(c(5,52),30,10000)

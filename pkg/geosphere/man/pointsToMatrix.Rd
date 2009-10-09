@@ -21,16 +21,12 @@ pointsToMatrix(p)
 
 
 \value{
- ...
+ a matrix with two columns representing longitude and latitude.
 }
 
-\references{
-}
 
 \author{
 Robert Hijmans and Jacob van Etten
-}
-\note{
 }
 
 

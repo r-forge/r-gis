@@ -11,8 +11,9 @@
 distRhumb <- function(p1, p2, R=6378137) {
 #* calculate distance, bearing, destination point on rhumb line
 #*   see http:#//williams.best.vwh.net/avform.htm#Rhumb
-	p1 <- pointsToMatrix(p1)
-	p2 <- pointsToMatrix(p2)
+	toRad <- pi / 180 
+	p1 <- pointsToMatrix(p1) * toRad
+	p2 <- pointsToMatrix(p2) * toRad
   
 	if(dim(p1)[1] != dim(p2)[1]) {
 		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
@@ -25,11 +26,10 @@ distRhumb <- function(p1, p2, R=6378137) {
 	lon2 <- p2[,1]
 	lat2 <- p2[,2]
 
-	toRad <- pi / 180 
-	dLat <- (lat2-lat1) * toRad
-	dLon <- abs(lon2-lon1) * toRad
-	dPhi <- log(tan(lat2 * toRad/2+pi/4)/tan(lat1 * toRad/2+pi/4))
-	q <- if(abs(dLat) > 1e-10) { dLat/dPhi } else { cos(lat1 * toRad) }
+	dLat <- (lat2-lat1) 
+	dLon <- abs(lon2-lon1)
+	dPhi <- log(tan(lat2/2 + pi/4)/tan(lat1/2 + pi/4))
+	q <- if(abs(dLat) > 1e-10) { dLat/dPhi } else { cos(lat1) }
   #// if dLon over 180° take shorter rhumb across 180° meridian:
 	if (dLon > pi) { dLon <- 2*pi - dLon  }
 	d <- sqrt(dLat*dLat + q*q*dLon*dLon) 
@@ -48,8 +48,9 @@ brngRhumb <- function(p1, p2) {
 # source http://www.movable-type.co.uk/scripts/latlong.html
 # (c) 2002-2009 Chris Veness
 
-	p1 <- pointsToMatrix(p1)
-	p2 <- pointsToMatrix(p2)
+	toRad <- pi / 180 
+	p1 <- pointsToMatrix(p1) * toRad
+	p2 <- pointsToMatrix(p2) * toRad
   	if(dim(p1)[1] != dim(p2)[1]) {
 		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
 			stop('p1 and p2 do not have the same number of points; and neither has only a single point')
@@ -61,9 +62,8 @@ brngRhumb <- function(p1, p2) {
 	lon2 <- p2[,1]
 	lat2 <- p2[,2]
 
-	toRad <- pi / 180 
-	dLon <- (lon2-lon1) * toRad
-	dPhi <- log(tan(lat2 * toRad/2+pi/4)/tan(lat1 * toRad/2+pi/4))
+	dLon <- (lon2-lon1)
+	dPhi <- log(tan(lat2/2 + pi/4)/tan(lat1/2+pi/4))
 	if (abs(dLon) > pi) {
 		if (dLon>0) {
 			dLon <- -(2*pi-dLon)
@@ -72,7 +72,9 @@ brngRhumb <- function(p1, p2) {
 		}
 	}
 	b <- atan2(dLon, dPhi)
+	b <- b / toRad
 	b <- (b+360) %% 360
+	names(b) <- ''
 	return(b)
 }
 

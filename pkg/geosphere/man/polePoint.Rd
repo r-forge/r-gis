@@ -20,26 +20,21 @@ polePoint(lat, brng)
   \item{brng}{bearing}
 }
 
-\details{
-}
 
 \value{
+A pair of coordinates (longitude/latitude)
 }
 
 \references{
 \url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
+
 \url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
 }
 
 \author{
 Chris Veness
 }
-\note{
-}
 
-
-\seealso{
-}
 
 \examples{
 polePoint(c(5,52),30)

@@ -17,7 +17,7 @@ distVincentySphere(p1, p2, R=6378137)
 
 \arguments{
   \item{p1}{longitude/latitude of point(s) 1; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
-  \item{p2}{as above. Should be of same length of p1, or a single point (or vice versa when p1 is a single point}
+  \item{p2}{as above. Should have same length as p1, or a single point (or vice versa when p1 is a single point}
   \item{R}{radius of the earth}
 }
 
@@ -37,7 +37,7 @@ Robert Hijmans
 
 
 \seealso{
-\code{link[geosphere]{distVincentySphere}, link[geosphere]{distHaversine}, link[geosphere]{distCosine}}
+\code{\link[geosphere]{distVincentySphere}, \link[geosphere]{distHaversine}, \link[geosphere]{distCosine}}
 }
 
 \examples{

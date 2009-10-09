@@ -17,7 +17,7 @@ The 'haversine' method assumes a spherical earth, ignoring ellipsoidal effects, 
 
 \arguments{
   \item{p1}{longitude/latitude of point(s) 1; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
-  \item{p2}{as above. Should be of same length of p1, or a single point (or vice versa when p1 is a single point}
+  \item{p2}{as above. Should have same length as p1, or a single point (or vice versa when p1 is a single point}
   \item{R}{radius of the earth}
 }
 
@@ -29,12 +29,13 @@ Since the earth is not quite a sphere, there are small errors in using spherical
 }
 
 \value{
-distance value in meters
+Distance value in the same unit as R (default is meters)
 }
 
 
 \references{
 Sinnott, R.W, 1984. Virtues of the Haversine. Sky and Telescope 68(2): 159
+
 \url{http://www.movable-type.co.uk/scripts/latlong.html}
 }
 
@@ -44,7 +45,7 @@ Chris Veness
 
 
 \seealso{
-\code{link[geosphere]{distCosine}, link[geosphere]{distVincenty}}
+\code{\link[geosphere]{distCosine}, \link[geosphere]{distVincentySphere}, \link[geosphere]{distVincentyEllipsoid}}
 }
 
 \examples{

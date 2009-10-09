@@ -7,7 +7,6 @@
 Rhumbline bearing
 }
 
-
 \description{
 Bearing along a rhumb line
 }
@@ -17,15 +16,13 @@ brngRhumb(p1, p2)
 }
 
 \arguments{
-  \item{p1}{longitude/latitude of point(s) 1; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
-  \item{p2}{as above. Should be of same length of p1, or a single point (or vice versa when p1 is a single point}
+  \item{p1}{longitude/latitude of point(s); can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
+  \item{p2}{as above. Should have same length as p1, or a single point (or vice versa when p1 is a single point}
 }
 
-\details{
-}
 
 \value{
-...
+A bearing in degrees
 }
 
 \references{
@@ -36,14 +33,13 @@ brngRhumb(p1, p2)
 Chris Veness
 }
 
-\note{
-}
-
 
 \seealso{
+\code{ \link[geosphere]{bearing}  }
 }
 
 \examples{
+brngRhumb(c(0,0),c(90,90))
 }
 
 \keyword{ spatial }
