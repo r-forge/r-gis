@@ -8,8 +8,6 @@
 # version 0.0
 
 
-
-
 distHaversine <- function(p1, p2, R=6378137) {
 #* Haversine formula to calculate distance between two points specified by 
 #* from: Haversine formula - R. W. Sinnott, "Virtues of the Haversine",
@@ -22,11 +20,7 @@ distHaversine <- function(p1, p2, R=6378137) {
 	p1 <- pointsToMatrix(p1) * toRad
 	p2 <- pointsToMatrix(p2) * toRad
 
-	if(dim(p1)[1] != dim(p2)[1]) {
-		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
-			stop('p1 and p2 do not have the same number of points and neither has only a single point')
-		}
-	}
+	compareDim(p1, p2)
 
 	lon1 <- p1[,1]
 	lat1 <- p1[,2]
@@ -50,11 +44,7 @@ distCosine <- function(p1, p2, R=6378137) {
 	toRad <- pi / 180 
 	p1 <- pointsToMatrix(p1) * toRad
 	p2 <- pointsToMatrix(p2) * toRad
-  	if(dim(p1)[1] != dim(p2)[1]) {
-		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
-			stop('p1 and p2 do not have the same number of points and neither has only a single point')
-		}
-	}
+	compareDim(p1, p2)
 
 	lon1 <- p1[,1]
 	lat1 <- p1[,2]
@@ -73,11 +63,8 @@ distVincentySphere <- function(p1, p2, R=6378137) {
 
 	p1 <- pointsToMatrix(p1) * toRad
 	p2 <- pointsToMatrix(p2) * toRad
-	if(dim(p1)[1] != dim(p2)[1]) {
-		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
-			stop('p1 and p2 do not have the same number of points and neither has only a single point')
-		}
-	}
+	compareDim(p1, p2)
+
 	lon1 <- p1[,1]
 	lat1 <- p1[,2]
 	lon2 <- p2[,1]
@@ -93,26 +80,22 @@ distVincentyEllipsoid <- function(p1, p2, a=6378137, b=6356752.3142, f=1/298.257
 #/*  Vincenty Inverse Solution of Geodesics on the Ellipsoid (c) Chris Veness 2002-2009           #*/
 #* Calculate geodesic distance (in m) between two points specified by latitude/longitude 
 #* (in numeric degrees) using Vincenty inverse formula for ellipsoids
-
 # source http://www.movable-type.co.uk/scripts/latlong.html
 # (c) 2002-2009 Chris Veness
+
 	toRad <- pi / 180 
 	p1 <- pointsToMatrix(p1) * toRad
 	p2 <- pointsToMatrix(p2) * toRad
 	
-	if(dim(p1)[1] != dim(p2)[1]) {
-		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
-			stop('p1 and p2 do not have the same number of points and neither has only a single point')
-		}	
-		maxdim <- max(dim(p1)[1], dim(p2)[1])
-		if (dim(p1)[1] == 1) {
-			p1 <- matrix(rep(p1, each=maxdim), ncol=2)
-		} else {
-			p2 <- matrix(rep(p2, each=maxdim), ncol=2)
-		}	
+	compareDim(p1, p2)
+	
+	maxdim <- max(dim(p1)[1], dim(p2)[1])
+	if (dim(p1)[1] == 1) {
+		p1 <- matrix(rep(p1, each=maxdim), ncol=2)
+	} else {
+		p2 <- matrix(rep(p2, each=maxdim), ncol=2)
 	}
-
-  
+	  
 	res <- vector(length=dim(p1)[1])
     for (i in 1:dim(p1)[1]) {
 

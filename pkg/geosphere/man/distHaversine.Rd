@@ -16,7 +16,7 @@ The 'haversine' method assumes a spherical earth, ignoring ellipsoidal effects, 
 }
 
 \arguments{
-  \item{p1}{longitude/latitude of point(s) 1; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
+  \item{p1}{longitude/latitude of point(s); can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
   \item{p2}{as above. Should have same length as p1, or a single point (or vice versa when p1 is a single point}
   \item{R}{radius of the earth}
 }
@@ -40,7 +40,7 @@ Sinnott, R.W, 1984. Virtues of the Haversine. Sky and Telescope 68(2): 159
 }
 
 \author{
-Chris Veness
+Chris Veness; ported to R by Robert Hijmans
 }
 
 

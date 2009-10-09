@@ -32,7 +32,7 @@ A pair of coordinates (longitude/latitude)
 }
 
 \author{
-Chris Veness
+Chris Veness; ported to R by Robert Hijmans
 }
 
 

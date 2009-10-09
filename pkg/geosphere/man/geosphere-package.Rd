@@ -30,6 +30,8 @@ Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 
 \url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
 
+\url{http://en.wikipedia.org/wiki/Great_circle_distance}
+
 \url{http://mathworld.wolfram.com/SphericalTrigonometry.html}
 }
 

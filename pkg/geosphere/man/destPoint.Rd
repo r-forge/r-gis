@@ -28,10 +28,12 @@ A pair of coordinates (longitude/latitude)
 
 \references{
 \url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
+
+\url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
 }
 
 \author{
-Chris Veness
+Chris Veness; ported to R by Robert Hijmans
 }
 
 

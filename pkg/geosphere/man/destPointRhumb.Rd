@@ -31,7 +31,7 @@ Coordinates (longitude/latitude) of a point
 }
 
 \author{
-Chris Veness
+Chris Veness; ported to R by Robert Hijmans
 }
 
 \note{

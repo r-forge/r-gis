@@ -32,7 +32,7 @@ Distance value in the same unit as R (default is meters)
 }
 
 \author{
-Chris Veness
+Chris Veness; ported to R by Robert Hijmans
 }
 
 

@@ -30,7 +30,7 @@ A bearing in degrees
 }
 
 \author{
-Chris Veness
+Chris Veness; ported to R by Robert Hijmans
 }
 
 

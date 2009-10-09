@@ -17,12 +17,7 @@ bearing <- function(p1, p2) {
 	p1 <- pointsToMatrix(p1)
 	p2 <- pointsToMatrix(p2)
   
-	if(dim(p1)[1] != dim(p2)[1]) {
-		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
-			stop('p1 and p2 do not have the same number of points; and neither has only a single point')
-		}
-	}
-  
+    compareDim(p1, p2)
   
 	lon1 <- p1[,1]
 	lat1 <- p1[,2]
