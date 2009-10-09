@@ -18,9 +18,9 @@ distHaversine <- function(p1, p2, R=6378137) {
 
 # source http://www.movable-type.co.uk/scripts/latlong.html
 # (c) 2002-2009 Chris Veness
-
-	p1 <- pointsToMatrix(p1)
-	p2 <- pointsToMatrix(p2)
+	toRad <- pi / 180 
+	p1 <- pointsToMatrix(p1) * toRad
+	p2 <- pointsToMatrix(p2) * toRad
 
 	if(dim(p1)[1] != dim(p2)[1]) {
 		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
@@ -28,18 +28,13 @@ distHaversine <- function(p1, p2, R=6378137) {
 		}
 	}
 
-
 	lon1 <- p1[,1]
 	lat1 <- p1[,2]
 	lon2 <- p2[,1]
 	lat2 <- p2[,2]
   
-	toRad <- pi / 180 
-	dLat <- (lat2-lat1) * toRad
-	dLon <- (lon2-lon1) * toRad
-	lat1 <- lat1 * toRad
-	lat2 <- lat2 * toRad
-
+	dLat <- (lat2-lat1)
+	dLon <- (lon2-lon1)
 	a <- sin(dLat/2) * sin(dLat/2) + cos(lat1) * cos(lat2) * sin(dLon/2) * sin(dLon/2)
 	c <- 2 * atan2(sqrt(a), sqrt(1-a))
 	d <- R * c
@@ -52,10 +47,10 @@ distCosine <- function(p1, p2, R=6378137) {
 
 # source http://www.movable-type.co.uk/scripts/latlong.html
 # (c) 2002-2009 Chris Veness
-	p1 <- pointsToMatrix(p1)
-	p2 <- pointsToMatrix(p2)
-  
-	if(dim(p1)[1] != dim(p2)[1]) {
+	toRad <- pi / 180 
+	p1 <- pointsToMatrix(p1) * toRad
+	p2 <- pointsToMatrix(p2) * toRad
+  	if(dim(p1)[1] != dim(p2)[1]) {
 		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
 			stop('p1 and p2 do not have the same number of points and neither has only a single point')
 		}
@@ -65,8 +60,7 @@ distCosine <- function(p1, p2, R=6378137) {
 	lat1 <- p1[,2]
 	lon2 <- p2[,1]
 	lat2 <- p2[,2]
-	toRad <- pi / 180 
-	d <- acos(sin(lat1 * toRad)*sin(lat2 * toRad) + cos(lat1 * toRad)*cos(lat2 * toRad)*cos((lon2-lon1) * toRad)) * R
+	d <- acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2)*cos((lon2-lon1))) * R
 	return(d)
 }
 
@@ -75,8 +69,10 @@ distVincentySphere <- function(p1, p2, R=6378137) {
 # Vincenty formula for a sphere
 # http://en.wikipedia.org/wiki/Great_circle_distance
 # author: Robert Hijmans
-	p1 <- pointsToMatrix(p1)
-	p2 <- pointsToMatrix(p2)
+	toRad <- pi / 180 
+
+	p1 <- pointsToMatrix(p1) * toRad
+	p2 <- pointsToMatrix(p2) * toRad
 	if(dim(p1)[1] != dim(p2)[1]) {
 		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
 			stop('p1 and p2 do not have the same number of points and neither has only a single point')
@@ -100,8 +96,9 @@ distVincentyEllipsoid <- function(p1, p2, a=6378137, b=6356752.3142, f=1/298.257
 
 # source http://www.movable-type.co.uk/scripts/latlong.html
 # (c) 2002-2009 Chris Veness
-	p1 <- pointsToMatrix(p1)
-	p2 <- pointsToMatrix(p2)
+	toRad <- pi / 180 
+	p1 <- pointsToMatrix(p1) * toRad
+	p2 <- pointsToMatrix(p2) * toRad
 	
 	if(dim(p1)[1] != dim(p2)[1]) {
 		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
@@ -114,10 +111,7 @@ distVincentyEllipsoid <- function(p1, p2, a=6378137, b=6356752.3142, f=1/298.257
 			p2 <- matrix(rep(p2, each=maxdim), ncol=2)
 		}	
 	}
-	toRad <- pi / 180 
-	toDeg <- 1 / toRad
-	
-  
+
   
 	res <- vector(length=dim(p1)[1])
     for (i in 1:dim(p1)[1]) {
@@ -130,9 +124,9 @@ distVincentyEllipsoid <- function(p1, p2, a=6378137, b=6356752.3142, f=1/298.257
 			lon2 <- p2[i,1]
 			lat2 <- p2[i,2]
 		
-			L <- (lon2-lon1) * toRad
-			U1 <- atan((1-f) * tan(lat1 * toRad))
-			U2 <- atan((1-f) * tan(lat2 * toRad))
+			L <- (lon2-lon1)
+			U1 <- atan((1-f) * tan(lat1))
+			U2 <- atan((1-f) * tan(lat2))
 			sinU1 <- sin(U1)
 			cosU1 <- cos(U1)
 			sinU2 <- sin(U2)
