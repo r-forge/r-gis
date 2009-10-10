@@ -8,7 +8,7 @@
 # version 0.0
 # license LGPL
 
-crossTrackDistance <- function(p1, p2, p3, R=6378137) {
+crossTrackDistance <- function(p1, p2, p3, r=6378137) {
 	toRad <- pi / 180 
 	p1 <- pointsToMatrix(p1) * toRad
 	p2 <- pointsToMatrix(p2) * toRad
@@ -19,12 +19,12 @@ crossTrackDistance <- function(p1, p2, p3, R=6378137) {
 	b13 <- bearing(p1, p3)
 	b12 <- bearing(p1, p2)
 	
-	dxt <- asin(sin(d13/R)*sin(b13-b12)) * R
+	dxt <- asin(sin(d13/r)*sin(b13-b12)) * r
 	return(dxt)
 }
 
 
-alongTrackDistance <- function(p1, p2, p3, R=6378137) {
+alongTrackDistance <- function(p1, p2, p3, r=6378137) {
 	toRad <- pi / 180 
 	p1 <- pointsToMatrix(p1) * toRad
 	p2 <- pointsToMatrix(p2) * toRad
@@ -32,9 +32,9 @@ alongTrackDistance <- function(p1, p2, p3, R=6378137) {
 	compareDim(p1, p2, p3)
 
     d13 <- distVincentySphere(p1, p3)
-	dxt <- crossTrackDistance(p1, p2, p3, R)
+	dxt <- crossTrackDistance(p1, p2, p3, r)
 	
-	dat <- acos(cos(d13/R)/cos(dxt/R)) * R
+	dat <- acos(cos(d13/r)/cos(dxt/r)) * r
 	return(dat)
 }
 

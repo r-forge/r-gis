@@ -4,26 +4,26 @@
 \alias{distVincentySphere}
 
 \title{
-Great circle distance, 'Vincenty' method using an sphere
+'Vincenty' (sphere) great circle distance
 }
 
 \description{
-This function calculates great-circle distances between the two points -- that is, the shortest distance over the earth's surface -- according to the 'Vincenty' method for a sphere (less accurate then the \code{distVicentyEllipsoid} method). 
+This function calculates great-circle distances between the two points (that is the shortest distance over the earth's surface, 'as the crow flies'), according to the 'Vincenty' method for a sphere (less accurate then the \code{distVicentyEllipsoid} method). 
 }
 
 \usage{
-distVincentySphere(p1, p2, R=6378137)
+distVincentySphere(p1, p2, r=6378137)
 }
 
 \arguments{
   \item{p1}{longitude/latitude of point(s) 1; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
   \item{p2}{as above. Should have same length as p1, or a single point (or vice versa when p1 is a single point}
-  \item{R}{radius of the earth}
+  \item{r}{radius of the earth}
 }
 
 
 \value{
-Distance value in the same unit as R (default is meters)
+Distance value in the same unit as \code{r} (default is meters)
 }
 
 

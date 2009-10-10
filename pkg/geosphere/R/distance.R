@@ -8,9 +8,9 @@
 # version 0.0
 
 
-distHaversine <- function(p1, p2, R=6378137) {
+distHaversine <- function(p1, p2, r=6378137) {
 #* Haversine formula to calculate distance between two points specified by 
-#* from: Haversine formula - R. W. Sinnott, "Virtues of the Haversine",
+#* from: Haversine formula - r. W. Sinnott, "Virtues of the Haversine",
 #*  Sky and Telescope, vol 68, no 2, 1984
 #*  http:#//www.census.gov/cgi-bin/geo/gisfaq?Q5.1
 
@@ -31,12 +31,12 @@ distHaversine <- function(p1, p2, R=6378137) {
 	dLon <- (lon2-lon1)
 	a <- sin(dLat/2) * sin(dLat/2) + cos(lat1) * cos(lat2) * sin(dLon/2) * sin(dLon/2)
 	c <- 2 * atan2(sqrt(a), sqrt(1-a))
-	d <- R * c
+	d <- r * c
 	return(d)
 }
 
 
-distCosine <- function(p1, p2, R=6378137) {
+distCosine <- function(p1, p2, r=6378137) {
 #* Use Law of Cosines to calculate distance between two points specified by latitude/longitude 
 
 # source http://www.movable-type.co.uk/scripts/latlong.html
@@ -50,12 +50,12 @@ distCosine <- function(p1, p2, R=6378137) {
 	lat1 <- p1[,2]
 	lon2 <- p2[,1]
 	lat2 <- p2[,2]
-	d <- acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2)*cos((lon2-lon1))) * R
+	d <- acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2)*cos((lon2-lon1))) * r
 	return(d)
 }
 
 
-distVincentySphere <- function(p1, p2, R=6378137) {
+distVincentySphere <- function(p1, p2, r=6378137) {
 # Vincenty formula for a sphere
 # http://en.wikipedia.org/wiki/Great_circle_distance
 # author: Robert Hijmans
@@ -72,7 +72,7 @@ distVincentySphere <- function(p1, p2, R=6378137) {
 
 	x <- sqrt((cos(lat2) * sin(lon1-lon2))^2 + (cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon1-lon2))^2)
 	y <- sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon1-lon2)
-	return ( R * atan2(x, y) )
+	return ( r * atan2(x, y) )
 }
 
 

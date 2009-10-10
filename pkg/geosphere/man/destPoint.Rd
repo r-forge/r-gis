@@ -7,18 +7,23 @@ Destination given bearing and distance, when following a great circle
 }
 
 \description{
-Given a start point, initial bearing, and distance, this will calculate the destination point and final bearing travelling along a (shortest distance) great circle arc.
+Calculate the destination point travelling along a (shortest distance) great circle arc, given a start point, initial bearing, and distance.
 }
 
 \usage{
-destPoint(p, brng, d, R = 6378137)
+destPoint(p, brng, d, r = 6378137)
 }
 
 \arguments{
   \item{p}{longitude/latitude of point(s); can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
   \item{brng}{bearing}
   \item{d}{distance}
-  \item{R}{radius of the earth}
+  \item{r}{radius of the earth}
+}
+
+
+\note{
+The bearing changes continuously when traveling along a great circle line. Therefore, thbe final bearing is not the same as the initial bearing. You can comute the final bearing with \code{finalBearing} (see examples, below)
 }
 
 
@@ -27,7 +32,7 @@ A pair of coordinates (longitude/latitude)
 }
 
 \references{
-\url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
+\url{http://www.movable-type.co.uk/scripts/latlong.html}
 
 \url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
 }
@@ -38,7 +43,12 @@ Chris Veness; ported to R by Robert Hijmans
 
 
 \examples{
-destPoint(c(5,52),30,10000)
+p <- c(5,52)
+d <- destPoint(p,30,10000)
+
+#final bearing, when arriving at endpoint: 
+finalBearing(d, p)
+
 }
 
 \keyword{ spatial  }

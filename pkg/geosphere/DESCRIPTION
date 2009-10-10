@@ -7,5 +7,5 @@ Suggests: sp
 Author: Chris Veness and Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 Description:  Spherical Trigonometry for geographic applications.
-License: GPL3
+License: LGPL
 LazyLoad: yes

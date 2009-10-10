@@ -1,18 +1,18 @@
-\name{brngRhumb}
+\name{finalBearing}
 \Rdversion{1.1}
 
-\alias{brngRhumb}
+\alias{finalBearing}
 
 \title{
-Rhumbline bearing
+final bearing
 }
 
 \description{
-Bearing (direction of travel) along a rhumb line. Unlike a great circle, a rhumb line is a line of constant bearing.
+Get the final bearing when arriving at point2 after starting from p1 and following the shortest path (a great circle).
 }
 
 \usage{
-brngRhumb(p1, p2)
+finalBearing(p1, p2)
 }
 
 \arguments{
@@ -25,22 +25,27 @@ brngRhumb(p1, p2)
 A bearing in degrees
 }
 
-\references{
-\url{http://www.movable-type.co.uk/scripts/latlong.html}
-}
 
 \author{
-Chris Veness; ported to R by Robert Hijmans
+Chris Veness; ported to R by Robert Hijmans;
 }
 
 
 \seealso{
-\code{ \link[geosphere]{bearing},  \link[geosphere]{distRhumb}  }
+\code{ \link[geosphere]{brngRhumb}  }
 }
 
 \examples{
-brngRhumb(c(0,0),c(90,90))
+bearing(c(0,0),c(90,90))
+finalBearing(c(0,0),c(90,90))
 }
+
+\references{
+\url{http://www.movable-type.co.uk/scripts/latlong.html}
+
+\url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
+}
+
 
 \keyword{ spatial }
 

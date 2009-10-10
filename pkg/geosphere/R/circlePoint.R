@@ -30,7 +30,7 @@ midPoint <- function(p1, p2) {
 	By <- cos(lat2) * sin(dLon)
 
 	lat3 <- atan2(sin(lat1)+sin(lat2), sqrt((cos(lat1)+Bx)*(cos(lat1)+Bx) + By*By ) )
-	lon3 <- lon1 * toRad + atan2(By, cos(lat1) + Bx)
+	lon3 <- lon1 + atan2(By, cos(lat1) + Bx)
 
 	if (is.nan(lat3) || is.nan(lon3)) return(NULL)
 	res <- cbind(lon3, lat3) / toRad
@@ -38,9 +38,7 @@ midPoint <- function(p1, p2) {
 	return(res)
 }
 
-
-
-destPoint <- function(p, brng, d, R=6378137) {
+destPoint <- function(p, brng, d, r=6378137) {
 #* calculate destination point given start point, initial bearing (deg) and distance (km)
 #*   see http:#//williams.best.vwh.net/avform.htm#LL
 # source http://www.movable-type.co.uk/scripts/latlong.html
@@ -53,8 +51,8 @@ destPoint <- function(p, brng, d, R=6378137) {
 
 	brng <- brng * toRad
 
-	lat2 <- asin( sin(lat1)*cos(d/R) + cos(lat1)*sin(d/R)*cos(brng) )
-	lon2 <- lon1 + atan2(sin(brng)*sin(d/R)*cos(lat1), cos(d/R)-sin(lat1)*sin(lat2))
+	lat2 <- asin( sin(lat1)*cos(d/r) + cos(lat1)*sin(d/r)*cos(brng) )
+	lon2 <- lon1 + atan2(sin(brng)*sin(d/r)*cos(lat1), cos(d/r)-sin(lat1)*sin(lat2))
 	lon2 <- (lon2+pi)%%(2*pi) - pi  #// normalise to -180...+180
 
 	if (is.nan(lat2) || is.nan(lon2)) return(NULL)

@@ -12,19 +12,19 @@ The cross track distance is the distance from the start point (p1) to the closes
 }
 
 \usage{
-alongTrackDistance(p1, p2, p3, R=6378137)
+alongTrackDistance(p1, p2, p3, r=6378137)
 }
 
 \arguments{
   \item{p1}{longitude/latitude of point(s); can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
   \item{p2}{as above. Should have same length as p1, or a single point (or vice versa when p1 is a single point}
   \item{p3}{as above}
-  \item{R}{radius of the earth; default = 6378137m}  
+  \item{r}{radius of the earth; default = 6378137m}  
 }
 
 
 \value{
-A distance in units of R (default is meters)
+A distance in units of r (default is meters)
 }
 
 \author{

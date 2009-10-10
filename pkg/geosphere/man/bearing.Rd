@@ -8,7 +8,7 @@ Bearing
 }
 
 \description{
-Get the bearing to go from point1 to point2
+Get the initial bearing (direction to travel in) to go from point1 to point2 following the shortest path (a great circle). Note that bearings change continuously while traveling along a great circle. A route with constant bearing is a rhumb line (see \code{\link[geosphere]{brngRhumb}}.
 }
 
 \usage{
@@ -38,6 +38,13 @@ Chris Veness; ported to R by Robert Hijmans;
 \examples{
 bearing(c(0,0),c(90,90))
 }
+
+\references{
+\url{http://www.movable-type.co.uk/scripts/latlong.html}
+
+\url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
+}
+
 
 \keyword{ spatial }
 

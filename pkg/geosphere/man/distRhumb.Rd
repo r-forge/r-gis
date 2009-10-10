@@ -12,13 +12,13 @@ A 'rhumb line' (or loxodrome) is a path of constant bearing, which crosses all m
 }
 
 \usage{
-distRhumb(p1, p2, R = 6378137)
+distRhumb(p1, p2, r=6378137)
 }
 
 \arguments{
   \item{p1}{longitude/latitude of point(s) 1; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
   \item{p2}{as above. Should be of same length of p1, or a single point (or vice versa when p1 is a single point}
-  \item{R}{radius of the earth; default = 6378137m}
+  \item{r}{radius of the earth; default = 6378137m}
 }
 
 \details{
@@ -27,11 +27,11 @@ If you maintain a constant bearing along a rhumb line, you will gradually spiral
 }
 
 \value{
-distance value in units of R (default=meters)
+distance value in units of r (default=meters)
 }
 
 \references{
-\url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
+\url{http://www.movable-type.co.uk/scripts/latlong.html}
 }
 
 \author{
@@ -39,7 +39,7 @@ Chris Veness; ported to R by Robert Hijmans
 }
 
 \seealso{
-\code{link[geosphere]{distCosine}, link[geosphere]{distVincenty}, [geosphere]{distHaversine}}
+\code{\link[geosphere]{distCosine}, \link[geosphere]{distVincenty}, \link[geosphere]{distHaversine}}
 }
 
 \examples{

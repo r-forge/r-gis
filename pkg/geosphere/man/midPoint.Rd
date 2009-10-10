@@ -29,7 +29,9 @@ A pair of coordinates (longitude/latitude)
 }
 
 \references{
-\url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
+\url{http://www.movable-type.co.uk/scripts/latlong.html}
+
+\url{http://en.wikipedia.org/wiki/Great_circle_distance}
 }
 
 \author{

@@ -5,10 +5,11 @@
 
 
 \title{
-Destination given bearing and distance, when following a great circle
+Highest latitude on a great circle
 }
+
 \description{
-Clairaut's formula. Given a latitude and its bearing, what is the polarmost point that will be reached following a great circle?
+Given a latitude and an initial bearing, what is the polar-most point that will be reached when following a great circle? Computed with Clairaut's formula. 
 }
 
 \usage{
@@ -28,7 +29,7 @@ A pair of coordinates (longitude/latitude)
 \references{
 \url{http://williams.best.vwh.net/ftp/avsig/avform.txt}
 
-\url{http://www.movable-type.co.uk/scripts/latlong-vincenty.html}
+\url{http://www.movable-type.co.uk/scripts/latlong.html}
 }
 
 \author{

@@ -8,7 +8,7 @@
 # version 0.0
 
 
-distRhumb <- function(p1, p2, R=6378137) {
+distRhumb <- function(p1, p2, r=6378137) {
 #* calculate distance, bearing, destination point on rhumb line
 #*   see http:#//williams.best.vwh.net/avform.htm#Rhumb
 	toRad <- pi / 180 
@@ -29,7 +29,7 @@ distRhumb <- function(p1, p2, R=6378137) {
   #// if dLon over 180° take shorter rhumb across 180° meridian:
 	if (dLon > pi) { dLon <- 2*pi - dLon  }
 	d <- sqrt(dLat*dLat + q*q*dLon*dLon) 
-	return(d * R)
+	return(d * r)
 }
 
 # You are welcome to re-use these scripts [under a LGPL license, without any warranty express or implied] 
@@ -75,7 +75,7 @@ brngRhumb <- function(p1, p2) {
 }
 
 
-destPointRhumb <- function(p, brng, dist, R=6378137) {
+destPointRhumb <- function(p, brng, dist, r=6378137) {
 # source http://www.movable-type.co.uk/scripts/latlong.html
 # (c) 2002-2009 Chris Veness
 
@@ -86,7 +86,7 @@ destPointRhumb <- function(p, brng, dist, R=6378137) {
 	toRad <- pi / 180 
 	toDeg <- 1 / toRad
 
-	d <- dist/R  #// d <- angular distance covered on earth's surface
+	d <- dist/r  #// d <- angular distance covered on earth's surface
 	lat1 <- lat * toRad
 	lon1 <- lon * toRad
 	brng <- brng * toRad

@@ -1,5 +1,6 @@
 # Author: Robert J. Hijmans and Jacob van Etten
-# Licence GPL v3
+# October 2009
+# Licence LGPL
 
 
 compareDim <- function(p1, p2, p3) {
@@ -28,7 +29,7 @@ pointsToMatrix <- function(p) {
 	if (class(p) == 'SpatialPoints' | class(p) == 'SpatialPointsDataFrame') {
 		require(sp)
 		if (is.projected(p)) {
-			stop('data points should not be projected...')  
+			stop('data points should not be projected. Either unproject or use Euclidean distances')  
 			# or rather transform them ....?
 		}
 		p <- coordinates(p)
