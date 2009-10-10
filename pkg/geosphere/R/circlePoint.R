@@ -32,7 +32,9 @@ midPoint <- function(p1, p2) {
 	lat3 <- atan2(sin(lat1)+sin(lat2), sqrt((cos(lat1)+Bx)*(cos(lat1)+Bx) + By*By ) )
 	lon3 <- lon1 + atan2(By, cos(lat1) + Bx)
 
-	if (is.nan(lat3) || is.nan(lon3)) return(NULL)
+	lon3[is.nan(lon3)] <- NA
+	lat3[is.nan(lat3)] <- NA
+	
 	res <- cbind(lon3, lat3) / toRad
 	colnames(res) <- c('lon', 'lat')
 	return(res)
@@ -54,8 +56,9 @@ destPoint <- function(p, brng, d, r=6378137) {
 	lat2 <- asin( sin(lat1)*cos(d/r) + cos(lat1)*sin(d/r)*cos(brng) )
 	lon2 <- lon1 + atan2(sin(brng)*sin(d/r)*cos(lat1), cos(d/r)-sin(lat1)*sin(lat2))
 	lon2 <- (lon2+pi)%%(2*pi) - pi  #// normalise to -180...+180
+	lon2[is.nan(lon2)] <- NA
+	lat2[is.nan(lat2)] <- NA
 
-	if (is.nan(lat2) || is.nan(lon2)) return(NULL)
 	res <- cbind(lon2, lat2) / toRad
 	colnames(res) <- c('lon', 'lat')
 	return(res)

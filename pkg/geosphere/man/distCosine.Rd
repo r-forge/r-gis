@@ -1,4 +1,4 @@
-\name{dist}
+\name{distCosine}
 \Rdversion{1.1}
 
 \alias{distCosine}

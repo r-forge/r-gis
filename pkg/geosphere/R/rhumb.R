@@ -25,9 +25,15 @@ distRhumb <- function(p1, p2, r=6378137) {
 	dLat <- (lat2-lat1) 
 	dLon <- abs(lon2-lon1)
 	dPhi <- log(tan(lat2/2 + pi/4)/tan(lat1/2 + pi/4))
-	q <- if(abs(dLat) > 1e-10) { dLat/dPhi } else { cos(lat1) }
+
+	q <- vector(length=length(dLat))
+	i <- abs(dLat) > 1e-10 
+	q[i] <- dLat/dPhi
+	q[-i]  <- cos(lat1) 
+	
   #// if dLon over 180° take shorter rhumb across 180° meridian:
-	if (dLon > pi) { dLon <- 2*pi - dLon  }
+	dLon[dLon > pi] <- 2*pi - dLon[dLon > pi]  
+
 	d <- sqrt(dLat*dLat + q*q*dLon*dLon) 
 	return(d * r)
 }
@@ -47,11 +53,7 @@ brngRhumb <- function(p1, p2) {
 	toRad <- pi / 180 
 	p1 <- pointsToMatrix(p1) * toRad
 	p2 <- pointsToMatrix(p2) * toRad
-  	if(dim(p1)[1] != dim(p2)[1]) {
-		if(dim(p1[1]) > 1 & dim(p2)[1] > 1) {
-			stop('p1 and p2 do not have the same number of points; and neither has only a single point')
-		}
-	}
+    compareDim(p1, p2)
   
 	lon1 <- p1[,1]
 	lat1 <- p1[,2]
@@ -60,17 +62,16 @@ brngRhumb <- function(p1, p2) {
 
 	dLon <- (lon2-lon1)
 	dPhi <- log(tan(lat2/2 + pi/4)/tan(lat1/2+pi/4))
-	if (abs(dLon) > pi) {
-		if (dLon>0) {
-			dLon <- -(2*pi-dLon)
-		} else {
-			dLon <- (2*pi+dLon)
-		}
-	}
+	i <- (abs(dLon) > pi)
+	j <- i && dLon > 0
+	dLon[j] <- -(2*pi-dLon[j])
+	j <- i && dLon <= 0
+	dLon[j] <- dLon[j] <- (2*pi+dLon[j])
+	
 	b <- atan2(dLon, dPhi)
 	b <- b / toRad
 	b <- (b+360) %% 360
-	names(b) <- ''
+	names(b) <- NULL
 	return(b)
 }
 
