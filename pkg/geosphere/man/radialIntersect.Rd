@@ -32,7 +32,7 @@ a point
 }
 
 \author{
-Robert Hijmans
+Robert Hijmans based on code by Ed Williams
 }
 
 

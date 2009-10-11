@@ -4,12 +4,8 @@
 # license LGPL
 
 greatCircle <- function(p1, p2, f=50, r=6378137) {
-
 #Intermediate points on a great circle
-# Here we find points (lat,lon) a given fraction of the distance (d) between them. Suppose the starting point is (lat1,lon1) 
-# and the final point (lat2,lon2) and we want the point a fraction f along the great circle route. f=0 is point 1. f=1 is point 2. 
-#The two points cannot be antipodal ( i.e. lat1+lat2=0 and abs(lon1-lon2)=pi) because then the route is undefined. The intermediate
-# latitude and longitude is then given by:
+# source: http://williams.best.vwh.net/avform.htm
 	toRad <- pi / 180 
 	d <- distCosine(p1, p2)
 	p1 <- pointsToMatrix(p1)
