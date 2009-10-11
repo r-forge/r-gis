@@ -1,12 +1,12 @@
 # author of original JavaScript code: Chris Vennes
 # (c) 2002-2009 Chris Veness
 # http://www.movable-type.co.uk/scripts/latlong.html
-# Liceence: LGPL, without any warranty express or implied
+# Licence: LGPL, without any warranty express or implied
 
 # Port to R by Robert Hijmans
 # October 2009
 # version 0.1
-# Liceence: LGPL
+# Licence: GPL3
 
 bearing <- function(p1, p2) {
 #calculate (initial) bearing between two points

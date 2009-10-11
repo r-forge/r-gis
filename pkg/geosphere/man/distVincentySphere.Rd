@@ -8,7 +8,8 @@
 }
 
 \description{
-This function calculates great-circle distances between the two points (that is the shortest distance over the earth's surface, 'as the crow flies'), according to the 'Vincenty' method for a sphere (less accurate then the \code{distVicentyEllipsoid} method). 
+The shortest distance between two points (i.e., the 'great-circle-distance' or 'as the crow flies'), according to the 'Vincenty (sphere)' method. 
+This method assumes a spherical earth, ignoring ellipsoidal effects and it is less accurate then the \code{distVicentyEllipsoid} method. 
 }
 
 \usage{

@@ -8,8 +8,8 @@
 }
 
 \description{
-This function calculates great-circle distances between the two points (that is the shortest distance over the earth's surface, 'as the crow flies'), according to the 'Vincenty' method. 
-This method uses an ellipsoid and the results are accurate to witin 1 mm. The method is computationally more intensive than the other methods in this package. 
+The shortest distance between two points (i.e., the 'great-circle-distance' or 'as the crow flies'), according to the 'Vincenty (ellipsoid)' method. 
+This method uses an ellipsoid and the results are very accurate. The method is computationally more intensive than the other great-circled methods in this package. 
 }
 
 \usage{

@@ -1,11 +1,11 @@
 Package: geosphere
 Type: Package
 Title: Spherical Trigonometry
-Version: 0.1.4
-Date: 2009-10-11
+Version: 0.1.5
+Date: 2009-10-12
 Suggests: sp
-Author: Chris Veness and Robert J. Hijmans
+Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 Description:  Spherical Trigonometry for geographic applications.
-License: LGPL
+License: GPL
 LazyLoad: yes

@@ -1,7 +1,7 @@
 # author Robert Hijmans
 # October 2009
-# version 0.0
-# license LGPL
+# version 0.1
+# license GPL3
 
 
 crossingParallels <- function(p1, p2, lat) {

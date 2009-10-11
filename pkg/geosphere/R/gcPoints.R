@@ -1,10 +1,10 @@
 # author Robert Hijmans
 # October 2009
-# version 0.0
-# license LGPL
+# version 0.1
+# license GPL
 
-greatCircle <- function(p1, p2, f=50, r=6378137) {
-#Intermediate points on a great circle
+gcPoints <- function(p1, p2, n=50, r=6378137) {
+# Intermediate points on a great circle
 # source: http://williams.best.vwh.net/avform.htm
 	toRad <- pi / 180 
 	d <- distCosine(p1, p2)
@@ -20,10 +20,11 @@ greatCircle <- function(p1, p2, f=50, r=6378137) {
 	lat2 <- p2[,2] * toRad
 
 	if (isTRUE(all.equal(lat1+lat2, 0)) & isTRUE(all.equal(abs(lon1-lon2), pi))) {
-		stop('antipodal points, infinite number of great circles available')
+		stop('you provided antipodal points; these have an infinite number of great circles')
 	}
 	
-	f <- 0:(f-1) / f
+	n <- max(round(n), 1)
+	f <- 1:n / (n+1)
 	
     A <- sin(1-f) / sin(d)
     B <- sin(f) / sin(d)
@@ -34,6 +35,7 @@ greatCircle <- function(p1, p2, f=50, r=6378137) {
 	lon <- atan2(y,x)
 	
 	gc <- cbind(lon,lat)/toRad
-	return( gc[order(gc[,1]),] )
+	return(gc)
+	#return( gc[order(gc[,1]),] )
 }
 

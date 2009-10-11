@@ -8,8 +8,8 @@
 }
 
 \description{
-This function calculates great-circle distances between two points (that is the shortest distance over the earth's surface, 'as the crow flies'), according to the 'haversine' method.
-The 'haversine' method assumes a spherical earth, ignoring ellipsoidal effects, which is accurate enough for most purposes, giving an 'as-the-crow-flies' distance between the two points (ignoring any hills!).
+The shortest distance between two points (i.e., the 'great-circle-distance' or 'as the crow flies'), according to the 'haversine method'.
+This method assumes a spherical earth, ignoring ellipsoidal effects.
 }
 
 \usage{distHaversine(p1, p2, r=6378137)
@@ -42,7 +42,7 @@ Sinnott, R.W, 1984. Virtues of the Haversine. Sky and Telescope 68(2): 159
 }
 
 \author{
-Chris Veness; ported to R by Robert Hijmans
+Chris Veness and Robert Hijmans
 }
 
 

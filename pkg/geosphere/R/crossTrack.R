@@ -1,12 +1,12 @@
 # author of original JavaScript code: Chris Vennes
 # (c) 2002-2009 Chris Veness
 # http://www.movable-type.co.uk/scripts/latlong.html
-# Liceence: LGPL, without any warranty express or implied
+# Licence: LGPL, without any warranty express or implied
 
 # Port to R by Robert Hijmans
 # October 2009
-# version 0.0
-# license LGPL
+# version 0.1
+# license GPL3
 
 crossTrackDistance <- function(p1, p2, p3, r=6378137) {
 	toRad <- pi / 180 

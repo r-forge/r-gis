@@ -1,7 +1,7 @@
 # author Robert Hijmans
 # October 2009
-# version 0.0
-# license LGPL
+# version 0.1
+# license GPL3
 
 radialIntersect <- function(p1, brng1, p2, brng2) {
 #crs13 true bearing from point 1 and the crs23 true bearing from point 2:

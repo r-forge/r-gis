@@ -1,79 +1,12 @@
 # author of original JavaScript code: Chris Vennes
 # (c) 2002-2009 Chris Veness
 # http://www.movable-type.co.uk/scripts/latlong.html
-# Liceence: LGPL, without any warranty express or implied
+# Licence: LGPL, without any warranty express or implied
 
 # Port to R by Robert Hijmans
 # October 2009
-# version 0.0
-
-
-distHaversine <- function(p1, p2, r=6378137) {
-#* Haversine formula to calculate distance between two points specified by 
-#* from: Haversine formula - r. W. Sinnott, "Virtues of the Haversine",
-#*  Sky and Telescope, vol 68, no 2, 1984
-#*  http:#//www.census.gov/cgi-bin/geo/gisfaq?Q5.1
-
-# source http://www.movable-type.co.uk/scripts/latlong.html
-# (c) 2002-2009 Chris Veness
-	toRad <- pi / 180 
-	p1 <- pointsToMatrix(p1) * toRad
-	p2 <- pointsToMatrix(p2) * toRad
-
-	compareDim(p1, p2)
-
-	lon1 <- p1[,1]
-	lat1 <- p1[,2]
-	lon2 <- p2[,1]
-	lat2 <- p2[,2]
-  
-	dLat <- (lat2-lat1)
-	dLon <- (lon2-lon1)
-	a <- sin(dLat/2) * sin(dLat/2) + cos(lat1) * cos(lat2) * sin(dLon/2) * sin(dLon/2)
-	c <- 2 * atan2(sqrt(a), sqrt(1-a))
-	d <- r * c
-	return(d)
-}
-
-
-distCosine <- function(p1, p2, r=6378137) {
-#* Use Law of Cosines to calculate distance between two points specified by latitude/longitude 
-
-# source http://www.movable-type.co.uk/scripts/latlong.html
-# (c) 2002-2009 Chris Veness
-	toRad <- pi / 180 
-	p1 <- pointsToMatrix(p1) * toRad
-	p2 <- pointsToMatrix(p2) * toRad
-	compareDim(p1, p2)
-
-	lon1 <- p1[,1]
-	lat1 <- p1[,2]
-	lon2 <- p2[,1]
-	lat2 <- p2[,2]
-	d <- acos(sin(lat1)*sin(lat2) + cos(lat1)*cos(lat2)*cos((lon2-lon1))) * r
-	return(d)
-}
-
-
-distVincentySphere <- function(p1, p2, r=6378137) {
-# Vincenty formula for a sphere
-# http://en.wikipedia.org/wiki/Great_circle_distance
-# author: Robert Hijmans
-	toRad <- pi / 180 
-
-	p1 <- pointsToMatrix(p1) * toRad
-	p2 <- pointsToMatrix(p2) * toRad
-	compareDim(p1, p2)
-
-	lon1 <- p1[,1]
-	lat1 <- p1[,2]
-	lon2 <- p2[,1]
-	lat2 <- p2[,2]
-
-	x <- sqrt((cos(lat2) * sin(lon1-lon2))^2 + (cos(lat1) * sin(lat2) - sin(lat1) * cos(lat2) * cos(lon1-lon2))^2)
-	y <- sin(lat1) * sin(lat2) + cos(lat1) * cos(lat2) * cos(lon1-lon2)
-	return ( r * atan2(x, y) )
-}
+# version 0.1
+# license GPL3
 
 
 distVincentyEllipsoid <- function(p1, p2, a=6378137, b=6356752.3142, f=1/298.257223563) {

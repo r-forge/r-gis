@@ -1,6 +1,7 @@
 # Author: Robert J. Hijmans and Jacob van Etten
 # October 2009
-# Licence LGPL
+# version 0.1
+# license GPL3
 
 
 compareDim <- function(p1, p2, p3) {
