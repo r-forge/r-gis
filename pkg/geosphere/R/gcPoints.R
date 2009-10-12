@@ -14,14 +14,15 @@ gcPoints <- function(p1, p2, n=50, r=6378137) {
 		stop('provide single points')
 	}
 
+	if (isAntipodal(p1, p2)) {
+		stop('you provided antipodal points; these have an infinite number of great circles')
+	}
+
 	lon1 <- p1[,1] * toRad
 	lat1 <- p1[,2] * toRad
 	lon2 <- p2[,1] * toRad
 	lat2 <- p2[,2] * toRad
 
-	if (isTRUE(all.equal(lat1+lat2, 0)) & isTRUE(all.equal(abs(lon1-lon2), pi))) {
-		stop('you provided antipodal points; these have an infinite number of great circles')
-	}
 	
 	n <- max(round(n), 1)
 	f <- 1:n / (n+1)

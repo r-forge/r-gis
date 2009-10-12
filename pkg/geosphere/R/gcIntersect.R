@@ -3,7 +3,11 @@
 # version 0.1
 # license GPL3
 
+# based on an alogrithm described by Ed Williams
+# http://williams.best.vwh.net/intersect.htm
 
+
+# Not used
 #gete <- function(lon, lat) {
 #	ex <- cos(lat)*cos(lon)
 #	ey <- -cos(lat)*sin(lon)
