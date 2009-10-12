@@ -4,7 +4,7 @@
 \alias{crossTrackDistance}
 
 \title{
-crossTrackDistance
+Cross Track Distance
 }
 
 \description{

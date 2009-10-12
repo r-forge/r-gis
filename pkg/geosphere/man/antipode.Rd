@@ -28,7 +28,7 @@ antipodal points or a logical value
 }
 
 \references{
-http://en.wikipedia.org/wiki/Antipodes
+\url{http://en.wikipedia.org/wiki/Antipodes}
 }
 
 \author{

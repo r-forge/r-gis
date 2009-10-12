@@ -4,7 +4,7 @@
 \alias{finalBearing}
 
 \title{
-final bearing
+Final bearing
 }
 
 \description{
@@ -27,12 +27,12 @@ A bearing in degrees
 
 
 \author{
-Chris Veness; ported to R by Robert Hijmans;
+Robert Hijmans
 }
 
 
 \seealso{
-\code{ \link[geosphere]{brngRhumb}  }
+\code{ \link[geosphere]{bearing}  }
 }
 
 \examples{

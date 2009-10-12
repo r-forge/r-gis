@@ -4,11 +4,12 @@
 \alias{alongTrackDistance}
 
 \title{
-alongTrackDistance
+Along Track Distance
 }
 
 \description{
-The cross track distance is the distance from the start point (p1) to the closest point on the path to the third point p2), following a great circle defined by points p1 and p2
+The along track distance is the distance from the start point (p1) to the closest point on the path to a third point (p3), 
+following a great circle path defined by points p1 and p2
 }
 
 \usage{

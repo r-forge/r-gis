@@ -20,7 +20,7 @@ LazyLoad: \tab yes\cr
 }
 
 \author{
-Chris Veness and Robert Hijmans
+Robert Hijmans, Chris Veness and Ed Williams
 
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 }
