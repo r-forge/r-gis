@@ -43,11 +43,10 @@ greatCircleIntersect <- function(p1, p2, p3, p4) {
 		return(sqrt(e[,1]^2 + e[,2]^2 + e[,3]^2))
 	}	
 
-	toRad <- pi / 180 
-	p1 <- pointsToMatrix(p1) * toRad
-	p2 <- pointsToMatrix(p2) * toRad
-	p3 <- pointsToMatrix(p3) * toRad
-	p4 <- pointsToMatrix(p4) * toRad
+	p1 <- pointsToMatrix(p1)
+	p2 <- pointsToMatrix(p2)
+	p3 <- pointsToMatrix(p3)
+	p4 <- pointsToMatrix(p4)
 
     compareDim(p1, p2)
     compareDim(p1, p3)
@@ -56,19 +55,30 @@ greatCircleIntersect <- function(p1, p2, p3, p4) {
     compareDim(p2, p4)
     compareDim(p3, p4)
 
+	anti <- isAntipodal(p1, p2)
+	if (! all(! anti)) { stop('p1 and p2 are antipodal -- cannot define a Great Circle') }
+	anti <- isAntipodal(p3, p4)
+	if (! all(! anti)) { stop('p3 and p4 are antipodal -- cannot define a Great Circle') }
+
+	toRad <- pi / 180 
+	p1 <- p1 * toRad
+	p2 <- p2 * toRad
+	p3 <- p3 * toRad
+	p4 <- p4 * toRad
+	
 	e1Xe2 <- eXe5(p1[,1], p1[,2], p2[,1], p2[,2])
 	e3Xe4 <- eXe5(p3[,1], p3[,2], p4[,1], p4[,2])
 
 	ea <- e1Xe2  / eSQRT(e1Xe2)
 	eb <- e3Xe4  / eSQRT(e3Xe4)
 	
-	eaXeb <- eXe3(ea,eb)
+	eaXeb <- eXe3(ea, eb)
 	
 	ll <- einv(eaXeb)
-	ll2 <- cbind(ll[,1]+pi, -ll[,2])
+	ll2 <- cbind(ll[,1] + pi, -ll[,2])
 	pts <- cbind(ll, ll2)
-	pts[,1] <- (pts[,1]+pi)%%(2*pi) - pi
-	pts[,3] <- (pts[,3]+pi)%%(2*pi) - pi
+	pts[,1] <- (pts[,1] + pi)%%(2*pi) - pi
+	pts[,3] <- (pts[,3] + pi)%%(2*pi) - pi
 	pts <- pts / toRad
 	
 	colnames(pts) <- c('lon1', 'lat1', 'lon2', 'lat2')

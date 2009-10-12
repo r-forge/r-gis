@@ -4,11 +4,11 @@
 \alias{greatCircleIntersect}
 
 \title{
-Intersecting radials
+Intersections of two great circles
 }
 
 \description{
-Get points on a great circle inbetween two specified points
+Get the two points where two great cricles cross each other. Great circles are defined by two points on it.
 }
 
 \usage{

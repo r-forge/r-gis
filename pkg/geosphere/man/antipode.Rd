@@ -9,7 +9,10 @@ Antipodes
 }
 
 \description{
-Compute an antipode, or check whether two points are antipodes. Antipodes are places on Earth that are diametrically opposite to one another; and could be connected by a straight line through the centre of the Earth.
+Compute an antipode, or check whether two points are antipodes. Antipodes are places on Earth that are diametrically opposite to one another; 
+and could be connected by a straight line through the centre of the Earth.
+
+Antipodal points are connected by an infinite number of great circles (e.g. the meridians connecting the poles), and can therefore not be used in some great circle based computations.
 }
 
 \usage{
