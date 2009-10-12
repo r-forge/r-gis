@@ -1,25 +1,24 @@
-\name{gcPoints}
+\name{greatCircle}
 \Rdversion{1.1}
 
-\alias{gcPoints}
+\alias{greatCircle}
 
 \title{
 Intersecting radials
 }
 
 \description{
-Get points on a great circle inbetween two specified points
+Get points on a great circle as defined by the shortest distance between two specified points
 }
 
 \usage{
-gcPoints(p1, p2, n=50, r=6378137) 
+greatCircle(p1, p2, n=360) 
 }
 
 \arguments{
   \item{p1}{Longitude/latitude of a single point; can be a vector of two numbers, a matrix of 2 columns (first one is longitude, second is latitude) or a spatialPoints* object}
   \item{p2}{As above}
   \item{n}{The requested number of points on the Great Circle}
-  \item{r}{radius of the earth; default = 6378137 m}  
 }
 
 
@@ -28,16 +27,16 @@ a matrix of points
 }
 
 \references{
-\url{http://williams.best.vwh.net/avform.htm#Intersection}
+\url{http://williams.best.vwh.net/avform.htm#Int}
 }
 
 \author{
-Robert Hijmans based on code by Ed Williams
+Robert Hijmans based on a formula by Ed Williams
 }
 
 
 \examples{
-gcPoints(c(5,52), c(-120,37), n=10)
+greatCircle(c(5,52), c(-120,37), n=36)
 }
 
 \keyword{ spatial }

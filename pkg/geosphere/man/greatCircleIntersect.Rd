@@ -1,7 +1,7 @@
-\name{gcIntersect}
+\name{greatCircleIntersect}
 \Rdversion{1.1}
 
-\alias{gcIntersect}
+\alias{greatCircleIntersect}
 
 \title{
 Intersecting radials
@@ -12,7 +12,7 @@ Get points on a great circle inbetween two specified points
 }
 
 \usage{
-gcIntersect(p1, p2, p3, p4) 
+greatCircleIntersect(p1, p2, p3, p4) 
 }
 
 \arguments{
@@ -38,7 +38,7 @@ Robert Hijmans, based on equations by Ed Williams (see reference)
 
 \examples{
 p1 <- c(5,52); p2 <- c(-120,37); p3 <- c(-60,0); p4 <- c(0,70)
-gcIntersect(p1,p2,p3,p4)
+greatCircleIntersect(p1,p2,p3,p4)
 }
 
 \keyword{ spatial }
