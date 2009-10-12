@@ -3,7 +3,7 @@
 # version 0.1
 # license GPL
 
-greatCircleInbetween <- function(p1, p2, n=50) {
+greatCircleIntermediate <- function(p1, p2, n=50) {
 # Intermediate points on a great circle
 # source: http://williams.best.vwh.net/avform.htm
 	toRad <- pi / 180 

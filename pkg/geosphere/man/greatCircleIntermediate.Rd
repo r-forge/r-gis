@@ -1,18 +1,18 @@
-\name{greatCircleInbetween}
+\name{greatCircleIntermediat}
 \Rdversion{1.1}
 
-\alias{greatCircleInbetween}
+\alias{greatCircleIntermediate}
 
 \title{
-Intersecting radials
+Intermediate points on a great circle
 }
 
 \description{
-Get points on a great circle inbetween the two points used to define the circle 
+Get intermediate points on a great circle inbetween the two points used to define the circle 
 }
 
 \usage{
-greatCircleInbetween(p1, p2, n=50) 
+greatCircleIntermediate(p1, p2, n=50) 
 }
 
 \arguments{
@@ -27,7 +27,7 @@ a matrix of points
 }
 
 \references{
-\url{http://williams.best.vwh.net/avform.htm#Intersection}
+\url{http://williams.best.vwh.net/avform.htm#Intermediate}
 }
 
 \author{
@@ -36,7 +36,7 @@ Robert Hijmans based on code by Ed Williams
 
 
 \examples{
-greatCircleInbetween(c(5,52), c(-120,37), n=10)
+greatCircleIntermediate(c(5,52), c(-120,37), n=10)
 }
 
 \keyword{ spatial }
