@@ -29,21 +29,26 @@ richness <- function(x) {
 
 presenceabsence <- function(x, species) {
 	x <- .checkdata(x)
-	if (is.numeric(species)) { species <- round(species)}
+	if (is.numeric(species)) { 
+		species <- round(species)
+	}
 	if (length(which(x==species)) > 0) { 
 		return(TRUE) 
-	} else {return(FALSE) }
+	} else {
+		return(FALSE) 
+	}
 }
 
 shannon <- function(x) {
 #   H(i) := sum((-P(i) * ln P(i))
 #   P(i) = the Proportion of objects in the i-th class
-	if (length(x) > 0) {
+	if (length(x) < 1) { return(NA) 
+	} else {
 		x <- .checkdata(x)
 		spp <- as.matrix(table(x)) / length(x)
 		H <- -1 * spp * log(spp) 	
 		return(sum(H))
-	} else { return(NA) } 	
+	} 
 }
 
 margalef <- function(x) {
