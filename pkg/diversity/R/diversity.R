@@ -1,5 +1,9 @@
+# Author: Robert J. Hijmans, r.hijmans@gmail.com
+# 2009
+# Version 0.1
+# Licence GPL3
 
-diversity.internal.checkdata <- function(x) {
+.checkdata <- function(x) {
 	if (length(x) > 0) {
 		if (!is.vector(x)) {
 			print(x)
@@ -13,62 +17,62 @@ diversity.internal.checkdata <- function(x) {
 }	
 
 
-diversity.index.nobservations <- function(x) {
-	x <- diversity.internal.checkdata(x)
+nobs <- function(x) {
+	x <- .checkdata(x)
 	return(length((x)))
 }	
 
-diversity.index.richness <- function(x) {
-	x <- diversity.internal.checkdata(x)
+richness <- function(x) {
+	x <- .checkdata(x)
 	return(length(unique(x))) 
 }
 
-diversity.index.presenceabsence <- function(x, species) {
-	x <- diversity.internal.checkdata(x)
+presenceabsence <- function(x, species) {
+	x <- .checkdata(x)
 	if (is.numeric(species)) { species <- round(species)}
 	if (length(which(x==species)) > 0) { 
 		return(TRUE) 
 	} else {return(FALSE) }
 }
 
-diversity.index.shannon <- function(x) {
+shannon <- function(x) {
 #   H(i) := sum((-P(i) * ln P(i))
 #   P(i) = the Proportion of objects in the i-th class
 	if (length(x) > 0) {
-		x <- diversity.internal.checkdata(x)
+		x <- .checkdata(x)
 		spp <- as.matrix(table(x)) / length(x)
 		H <- -1 * spp * log(spp) 	
 		return(sum(H))
 	} else { return(NA) } 	
 }
 
-diversity.index.margalef <- function(x) {
+margalef <- function(x) {
 #    //Margalef. S: Number of species. N: Number of individuals in the S species.
-	x <- diversity.internal.checkdata(x)
+	x <- .checkdata(x)
 	S <- length(unique(x))
 	N <- length(x)
 	return((S-1)/log(N))
 }
 
-diversity.index.menhinick <- function(x) {
-	x <- diversity.internal.checkdata(x)
+menhinick <- function(x) {
+	x <- .checkdata(x)
 	S <- length(unique(x))
 	N <- length(x)
 	return((S)/sqrt(N))
 }
 
 
-diversity.index.simpson <- function(x) {
-	x <- diversity.internal.checkdata(x)
+simpson <- function(x) {
+	x <- .checkdata(x)
 	spp <- as.matrix(table(x)) / length(x)
 	return(sum(spp^2))
 }
 
-diversity.index.simpson2 <- function(x) {
+simpson2 <- function(x) {
 #Simpson's index, D = sum( n(i)*(n(i)-1) / N*(N-1) )
 #n(i) = number of objects in i-th class (species)
 #N = total number of objects}
-	x <- diversity.internal.checkdata(x)
+	x <- .checkdata(x)
 	spp <- as.matrix(table(x)) 
 	obs <- length(x)
 	n <- spp * (spp - 1)
@@ -76,8 +80,8 @@ diversity.index.simpson2 <- function(x) {
 	return(sum(n/N))
 }
 
-diversity.index.brillouin <- function(x) {
-	x <- diversity.internal.checkdata(x)
+brillouin <- function(x) {
+	x <- .checkdata(x)
 	spp <- as.matrix(table(x)) / length(x)
 	obs <- length(x)
 	small <- which(spp < 150) 
@@ -93,8 +97,8 @@ diversity.index.brillouin <- function(x) {
 }	
 	
 
-diversity.index.renyi <- function(x, alpha) {
-	x <- diversity.internal.checkdata(x)
+renyi <- function(x, alpha) {
+	x <- .checkdata(x)
 	spp <- as.vector(table(x)) / length(x)
 	spp <- spp^alpha
 	reyni <- (1 / (1-alpha) ) * log(sum(spp))
@@ -102,38 +106,3 @@ diversity.index.renyi <- function(x, alpha) {
 }
 	
 
-   
-diversity.estimator.chao <- function(x) {
-	x <- diversity.internal.checkdata(x)
-	spp <- as.vector(table(x))
-	Sobs <- length(spp)
-	singles <- length(spp[spp==1])
-	doubles <- length(spp[spp==2])
-	chao <- Sobs + singles^2/(2*doubles)
-	return(chao)
-}
-
-
-diversity.reserve.rebelo <- function(xy) {
-	xy[is.na(xy)] <- 0
-	xy <- round(xy)
-	xy[xy<0] <- 0
-	xy[xy>0] <- 1
-	nspecies <- length(xy[,1])
-	nsites <- length(xy[1,])
-	res <- matrix(ncol=2, nrow=nsites)
-	for (i in 1:nsites) {
-		sitesppcount <- colSums(xy)
-		nsp <- max(sitesppcount)
-		if (nsp == 0) {break}
-		selsite <- which(sitesppcount == nsp)[1]
-		res[i,1] <- selsite
-		res[i,2] <- nsp
-		delspp <- as.vector(which(xy[,selsite]==1))
-		xy[delspp,] <- 0
-	}
-	colnames(res) <- c("Site", "nSpecies")
-	return(res[1:(i-1),])
-}
-
-	
