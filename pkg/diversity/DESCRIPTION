@@ -8,5 +8,5 @@ Suggests: RODBC, rgdal
 Author: Robert Hijmans
 Maintainer: <r.hijmans@gmail.com>
 Description: Biodiversity and niche modeling functions
-License: GPLv3
+License: GPL (>=3)
 LazyLoad: yes
