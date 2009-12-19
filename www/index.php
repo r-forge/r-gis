@@ -45,15 +45,9 @@ echo $contents; } ?>
 
 <br>
 <p>
-The R-forge project contains a number of related packages. It is an incubator for package ideas, that might eventually grow-up and move out to their own repository. This has happend for <a href="http://r-forge.r-project.org/projects/raster/">raster</a>, <a href="http://r-forge.r-project.org/projects/gdistance/">gdistance</a>, and the packages in <a href="http://r-forge.r-project.org/projects/gdistance/">cropsim</a>.</p>
+The R-forge project contained a number of packages that have now moved out to their own repository, including <a href="http://r-forge.r-project.org/projects/raster/">raster</a>, <a href="http://r-forge.r-project.org/projects/gdistance/">gdistance</a>, 
+<a href="http://r-forge.r-project.org/projects/remotesensing/">remotesensing</a>, and the packages in <a href="http://r-forge.r-project.org/projects/cropsim/">cropsim</a> and in <a href="http://r-forge.r-project.org/projects/dismo/">dismo</a>.</p>
 <br>
-<p>Most of these packages depend on the <a href="http://r-forge.r-project.org/projects/raster/">raster</a> package that provides basic classes and methods for raster (grid) data manipulation. So you will need to install that package first if you want to use the others (install.packages("raster", repos="http://R-Forge.R-project.org"). The raster package itsels depends on sp and rgdal. </p>
-<br>
-<p>'geodata' is for easy access to on-line spatial data. We are currently working on links to GADM boundaries, SRTM, worlclim, and DCW data. </p>
-<br>
-<p>'RemoteSensing' contains remote sensing functions (right now mainly a set of vegetation indices). </p>
-<br>
-<p>'diversity' contains functions for the analysis of biodiversity data (not much there right now, and have a look at adehabitat instead if this is what you are looking for.), and will focus macroecology and niche modeling
 <br>
 </p>
 
