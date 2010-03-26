@@ -1,0 +1,3 @@
+exportMethods(extent)
+exportPattern("^[^\\.]")
+
