@@ -82,7 +82,7 @@ setAs('SpatialPointsDataFrame', 'GeoPoints',
 	colnames(holes) = c('id', 'part')
 	last = 0
 	for (i in 1:n) {
-		parts = length(p[[i]])
+		parts = length(p[[i]]@Polygons
 		for (j in 1:parts) {
 			crd = p[[i]]@Polygons[[j]]@coords
 			nr = dim(crd)[1]
@@ -112,7 +112,7 @@ setAs('SpatialPointsDataFrame', 'GeoPoints',
 	colnames(xy) = c('x', 'y')
 	last = 0
 	for (i in 1:n) {
-		parts = length(p[[i]])
+		parts = length(p[[i]]@Lines
 		for (j in 1:parts) {
 			crd = p[[i]]@Lines[[j]]@coords
 			nr = dim(crd)[1]
