@@ -1,0 +1,12 @@
+Package: spBabel
+Type: Package
+Title: Coercion between spatial objects
+Version: 0.0-1
+Date: 2010-08-25
+Depends: methods, sp
+Suggests: spatstat
+Author: Barry Rowlingson, Robert Hijmans
+Maintainer: Robert Hijmans <r.hijmans@gmail.com>
+Description: Coercion between spatial objects. Really.
+License: GPL (>=3)
+LazyLoad: yes
