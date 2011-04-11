@@ -7,7 +7,7 @@ Tier 1 N emission
 }
 
 \description{
-This function computes Tier 1 N emission
+This function computes IPCC Tier 1 N emission
 }
 
 \usage{
