@@ -1,0 +1,16 @@
+land_use_or_practice,term_name,area_ha,amount_kg,EF_name,EF,EF_L,EF_H
+synthetic N inputs (non-rice),Fsn,NA,5,EF1,0.01,0.003,0.03
+organic N inputs (non-rice),Fon,NA,5,EF1,0.01,0.003,0.03
+N in crop residues (non-rice),Fcr,NA,5,EF1,0.01,0.003,0.03
+N mineralised (non-rice),Fsom,NA,5,EF1,0.01,0.003,0.03
+synthetic N inputs (rice),Fsn,NA,5,EF1FR  ,0.003,0,0.006
+organic N inputs (rice),Fon,NA,5,EF1FR  ,0.003,0,0.006
+N in crop residues (rice),Fcr,NA,5,EF1FR  ,0.003,0,0.006
+N mineralised (rice),Fsom,NA,5,EF1FR  ,0.003,0,0.006
+temperate cropland/grassland,FosCGtemp,5,,EF2CGtemp,8,2,24
+tropical cropland/grassland: tropical,FosCGtrop,5,,EF2CGtrop,16,5,48
+nutrient rich temperate forest,FosFNRtemp,5,,EF2FtempNR,0.6,0.16,2.4
+nutrient poor temperate forest,FosFNPtemp,5,,EF2FtempNP,0.1,0.02,0.3
+tropical forest,FosFtrop,5,,EF2Ftrop,8,0,24
+urine and dung deposition from cattle/poultry/pigs,NA,NA,5,EF3PRPCPP,0.02,0.007,0.06
+urine and dung deposition from sheep/other animals,NA,NA,5,EF3PRPSO,0.01,0.003,0.03

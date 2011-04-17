@@ -6,8 +6,15 @@ N2O_tier1 <- function(Fsn, Fon, Fcr, Fsom, FosCG, FosFNR, FosFNP, Fprp, EF, rice
 	#However,  it doesn't recognize the EF.RData file when I call the function without EF (maybe something I don't yet understand abt. environments)??
 	
 	 if(missing(EF)){
-		 thisenvir = new.env()
-		 EF <- get(data("EF"), thisenvir, thisenvir)
+		 #EF = read.table("EF.RData")
+		 
+		 EF = read.csv("table_11.1.csv")
+		 
+		 #EF = data("table_11.1.csv", package = NULL)
+		 
+		 #thisenvir = new.env()
+		 #EF <- get(data("table_11.1.csv", package = "emissions", envir = thisenvir))
+		 #EF <- data.frame(EF)
 	 }
 	
 	
