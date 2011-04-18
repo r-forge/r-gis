@@ -59,3 +59,7 @@ Joshua Perlman
 \seealso{
 \code{\link{N2O_tier1}}
 }
+
+\examples{
+d <- read.csv(system.file("N2O_tier1_ex.csv", package="emissions"))
+}
