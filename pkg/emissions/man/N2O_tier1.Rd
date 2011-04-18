@@ -21,8 +21,11 @@ N2O_tier1(T1_data)
 \details{
 In order to prepare data for use (as a data frame) in this function, users should: 
 	1) Make a copy of the file "N2O_tier1_ex.csv" provided with this package
+	
 	2) Adjust the data in columns "area_ha" and "amount_kg" to reflect the data for your region of interest (note that data cells to be adjusted by the user are given a default value of 5)
+	
 	3) You may adjust the emissions factors in column "EF" if you wish, but realize that the ones provided are those used by the IPCC for Tier1 N2O emissions estimation
+	
 	4) Save the file with any name, and then read it into R as a data frame using read.csv("file.csv", header = TRUE)
 }
 
@@ -37,18 +40,15 @@ IPCC 2006
 
 
 \author{
-Robert Hijmans and Joshua Perlman
+Joshua Perlman and Robert Hijmans
 }
 
-\note{
-No further notes
-}
 
 \seealso{
 \code{\link{N2O_tier2}}
 }
 
 \examples{
-
+# to be done
 }
 

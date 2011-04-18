@@ -1,7 +1,8 @@
+\name{emissions-package}
 
-\name{emission-package}
-\alias{emission-package}
-\alias{emission}
+\alias{emissions-package}
+
+\alias{emissions}
 \docType{package}
 
 \title{
@@ -13,12 +14,10 @@ package title
 
 Provide an overview of how to use the package, including the most important ~~
 
-
-
 }
 
 \author{
-Who wrote it
+Joshua Perlman
 Maintainer: Who to complain to <yourfault@somewhere.net>
 }
 

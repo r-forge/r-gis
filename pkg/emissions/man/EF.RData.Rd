@@ -1,37 +1,34 @@
-\name{EF.RData (table_11.1)}
+\name{EF}
 
-\alias{EF.RData (table_11.1)}
+\alias{EF}
 
 \title{
-EF.RData (table_11.1)
+Emission factors for N2O, tier 1
 }
 
 \description{
-This table contains emission factors for N2O to be used as default emission factors with the function N2O_tier1()
+Default emission factors for the function N2O_tier1(). This is table_11.1 in IPCC (2006)
 }
 
 \usage{
-.RData file used to supply default emissions factors
-}
-
-\table items{
-  \item{EF1}{N2O emission factor for N-inputs: additions from mineral fertilisers, organic amendments and crop residues, and N mineralised from mineral soil as a result of loss of soil carbon [kg N2O–N (kgN)-1]}
-  \item{EF1FR}{N2O emission factor for N-inputs to flooded rice fields [kg N2O–N (kg N)-1]}
-  \item{EF2CGtemp}{N2O emission factor from drained/managed organic soils for temperate organic crop and grassland soils (kg N2O–N ha-1)}
-  \item{EF2CGtrop}{N2O emission factor from drained/managed organic soils for tropical organic crop and grassland soils (kg N2O–N ha-1)}
-  \item{EF2FtempR}{N2O emission factor from drained/managed organic soils for temperate and boreal organic nutrient rich forest soils (kg N2O–N ha-1)}
-  \item{EF2FtempP}{N2O emission factor from drained/managed organic soils for temperate and boreal organic nutrient poor forest soils (kg N2O–N ha-1)}
-  \item{EF2Ftrop}{N2O emission from drained/managed organic soils for tropical organic forest soils (kg N2O–N ha-1)}
-  \item{EF3PRPCPP}{N2O emission factor from urine and dung N deposited on pasture, range and paddock for cattle (dairy, non-dairy and buffalo), poultry and pigs}
-  \item{EF3PRPSO}{N2O emission factor from urine and dung N deposited on pasture, range and paddock for sheep and ‘other animals’ [kg N2O–N (kg N)-1]}
+data(EF)
 }
 
 \details{
-necessary details than the description above
+\itemize{
+  \item{EF1}{N2O emission factor for N-inputs: additions from mineral fertilisers, organic amendments and crop residues, and N mineralised from mineral soil as a result of loss of soil carbon [kg N2O-N (kgN)-1]}
+  \item{EF1FR}{N2O emission factor for N-inputs to flooded rice fields [kg N2O-N (kg N)-1]}
+  \item{EF2CGtemp}{N2O emission factor from drained/managed organic soils for temperate organic crop and grassland soils (kg N2O-N ha-1)}
+  \item{EF2CGtrop}{N2O emission factor from drained/managed organic soils for tropical organic crop and grassland soils (kg N2O-N ha-1)}
+  \item{EF2FtempR}{N2O emission factor from drained/managed organic soils for temperate and boreal organic nutrient rich forest soils (kg N2O-N ha-1)}
+  \item{EF2FtempP}{N2O emission factor from drained/managed organic soils for temperate and boreal organic nutrient poor forest soils (kg N2O-N ha-1)}
+  \item{EF2Ftrop}{N2O emission from drained/managed organic soils for tropical organic forest soils (kg N2O-N ha-1)}
+  \item{EF3PRPCPP}{N2O emission factor from urine and dung N deposited on pasture, range and paddock for cattle (dairy, non-dairy and buffalo), poultry and pigs}
+  \item{EF3PRPSO}{N2O emission factor from urine and dung N deposited on pasture, range and paddock for sheep and 'other animals' [kg N2O-N (kg N)-1]}
 }
-
+}
 \value{
-numeric value
+N2O emmission (unit ??)
 }
 
 \references{
@@ -41,12 +38,9 @@ IPCC 2006
 
 
 \author{
-Robert Hijmans and Joshua Perlman
+Joshua Perlman
 }
 
-\note{
-No further notes
-}
 
 \seealso{
 \code{\link{N2O_tier1}}
