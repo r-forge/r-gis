@@ -1,9 +1,9 @@
-\name{NMMS_ex.csv.}
+\name{NMMS_ex.csv}
 
-\alias{NMMS_ex.csv.}
+\alias{NMMS_ex.csv}
 
 \title{
-NMMS_ex.csv.
+NMMS_ex.csv
 }
 
 \description{
