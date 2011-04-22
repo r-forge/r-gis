@@ -1,10 +1,18 @@
 land_use_or_practice,term_name,area_ha,amount_kg,EF_name,EF,EF_L,EF_H
-synthetic N inputs (non-rice),Fsn,NA,5,EF1,0.01,0.003,0.03
-organic N inputs (non-rice),Fon,NA,5,EF1,0.01,0.003,0.03
+synthetic N inputs (non-rice),Fsn,NA,5,EF1i,5,5,5
+,Fsn,NA,5,EF1i,5,5,5
+,Fsn,NA,5,EF1i,5,5,5
+organic N inputs (non-rice),Fon,NA,5,EF1i,5,5,5
+,Fon,NA,5,EF1i,5,5,5
+,Fon,NA,5,EF1i,5,5,5
 N in crop residues (non-rice),Fcr,NA,5,EF1,0.01,0.003,0.03
 N mineralised (non-rice),Fsom,NA,5,EF1,0.01,0.003,0.03
-synthetic N inputs (rice),Fsn,NA,5,EF1FR,0.003,0,0.006
-organic N inputs (rice),Fon,NA,5,EF1FR,0.003,0,0.006
+synthetic N inputs (rice),Fsn,NA,5,EF1FRi,5,5,5
+,Fsn,NA,5,EF1FRi,5,5,5
+,Fsn,NA,5,EF1FRi,5,5,5
+organic N inputs (rice),Fon,NA,5,EF1FRi,5,5,5
+,Fon,NA,5,EF1FRi,5,5,5
+,Fon,NA,5,EF1FRi,5,5,5
 N in crop residues (rice),Fcr,NA,5,EF1FR,0.003,0,0.006
 N mineralised (rice),Fsom,NA,5,EF1FR,0.003,0,0.006
 temperate cropland/grassland,FosCGtemp,5,NA,EF2CGtemp,8,2,24

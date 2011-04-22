@@ -1,0 +1,20 @@
+animal_category,MM_system,FRAClossms_pct,FRAClossms_pct__L,FRAClossms_pct_H,Nt,NEXt_kg,MSts,Nbeddingms_kg
+Swine,Anaerobic lagoon,78,55,90,5,5,0.5,5
+Swine,Pit storage,25,15,30,5,5,0.5,5
+Swine,Deep bedding,50,10,60,5,5,0.5,5
+Swine,Liquid/Slurry,48,15,60,5,5,0.5,5
+Swine,Solid storage,50,20,70,5,5,0.5,5
+Dairy Cow,Anaerobic lagoon,77,55,99,5,5,0.5,5
+Dairy Cow,Liquid/Slurry,40,15,45,5,5,0.5,5
+Dairy Cow,Pit storage,28,10,40,5,5,0.5,5
+Dairy Cow,Dry lot,30,10,35,5,5,0.5,5
+Dairy Cow,Solid storage,40,10,65,5,5,0.5,5
+Dairy Cow,Daily spread,22,15,60,5,5,0.5,5
+Poultry,Poultry without litter,55,40,70,5,5,0.5,5
+Poultry,Anaerobic lagoon,77,50,90,5,5,0.5,5
+Poultry,Poultry with litter,50,20,80,5,5,0.5,5
+Other Cattle,Dry lot,40,20,50,5,5,0.5,5
+Other Cattle,Solid storage,50,20,70,5,5,0.5,5
+Other Cattle,Deep bedding,40,10,50,5,5,0.5,5
+Other,Deep bedding,35,15,40,5,5,0.5,5
+Other,Solid storage,15,5,20,5,5,0.5,5

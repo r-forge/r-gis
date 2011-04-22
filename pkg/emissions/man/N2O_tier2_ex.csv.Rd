@@ -26,8 +26,10 @@ This table contains emission factors for N2O to be used as default emission fact
 	\item{area_ha}{gives the area of land in each land use, where applicable}
 	\item{amount_kg}{gives the amount in kg of the N-input source, where applicable}
 	\item{EF_name}{gives name of the emission factor associated with each N-source, as specified by IPCC table 11.1
-			EF1: N2O emission factor for N-inputs: additions from mineral fertilisers, organic amendments and crop residues, and N mineralised from mineral soil as a result of loss of soil carbon [kg N2O-N (kgN)-1]
-			EF1FR: additions from mineral fertilisers, organic amendments and crop residues, and N mineralised from mineral soil for flooder rice fields [kg N2O-N (kgN)-1]
+			EF1i: N2O emission factor for N-inputs: additions from mineral fertilisers and organic amendments under condition i[kg N2O-N (kgN)-1] 
+			EF1: N2O emission factor for N-inputs: crop residues and N mineralised from mineral soil as a result of loss of soil carbon [kg N2O-N (kgN)-1]
+			EF1FRi: N2O emission factor for synthetic and organic N-inputs to flooded rice fields under condition i [kg N2O-N (kg N)-1]
+			EF1FR: N2O emission factor for crop residues and N mineralised from mineral soil for flooded rice fields [kg N2O-N (kg N)-1]
 			EF2CGtemp: N2O emission factor from drained/managed organic soils for temperate organic crop and grassland soils (kg N2O-N ha-1)
 			EF2CGtrop: N2O emission factor from drained/managed organic soils for tropical organic crop and grassland soils (kg N2O-N ha-1)
 			EF2FtempR: N2O emission factor from drained/managed organic soils for temperate and boreal organic nutrient rich forest soils (kg N2O-N ha-1)
@@ -35,6 +37,8 @@ This table contains emission factors for N2O to be used as default emission fact
 			EF2Ftrop: N2O emission from drained/managed organic soils for tropical organic forest soils (kg N2O-N ha-1)
 			EF3PRPCPP: N2O emission factor from urine and dung N deposited on pasture, range and paddock for cattle (dairy, non-dairy and buffalo), poultry and pigs
 			EF3PRPSO: N2O emission factor from urine and dung N deposited on pasture, range and paddock for sheep and 'other animals' [kg N2O-N (kg N)-1]
+			
+			NOTE: any of the above emission factors could be dissagreggated to reflect i different conditions if such information is available.  In this example, only N inputs are disaggregated by condition (i = 3 conditions here)
 		}
 	\item{EF}{gives the value of each emission factor above, as specified by IPCC table 11.1}
 	\item{EF_L}{gives the lower bound of uncertainty associated with the emission factor, as specified by IPCC table 11.1}
@@ -57,7 +61,7 @@ Joshua Perlman and Robert Hijmans
 
 
 \seealso{
-\code{\link{N2O_tier1}}
+\code{\link{N2O_tier2}}
 }
 
 \examples{
