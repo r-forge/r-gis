@@ -54,5 +54,6 @@ No further notes
 }
 
 \examples{
+ef <- data.frame(Fsn=1, Fon=2, Fsom=3, Fcr=5, EF1=0.01, EF1FR = 0.003, EF2CGtemp=8, EF2CGtrop=16, EF2FtempR=0.6, EF2FtempP=0.1, EF2Ftrop=8, EF3PRPCRP=0.02, EF3PRPSO=0.01)
+N2O_tier2(ef)
 }
-

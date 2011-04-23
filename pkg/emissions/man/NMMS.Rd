@@ -58,5 +58,6 @@ Joshua Perlman and Robert Hijmans
 }
 
 \examples{
+# to be done
 }
 
