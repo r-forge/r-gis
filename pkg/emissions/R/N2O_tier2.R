@@ -1,5 +1,5 @@
 
-N2O_tier2 <- function(x){
+tier2a <- function(x){
 	
 	index <- 1
 	 for (EF in x$EF){
@@ -10,21 +10,24 @@ N2O_tier2 <- function(x){
 	 }
 		
 	
-	index <- 1
-	N2O_total_direct <- 0
-	for (EF in x$EF_name){
-		if (is.na(x$amount_kg[index]) == FALSE){
-			N2O_total_direct <- N2O_total_direct + (x$amount_kg[index] * x$EF[index])
-			index <- index + 1
-		}
-		else{
-			N2O_total_direct <- N2O_total_direct + (x$area_ha[index] * x$EF[index])
-			index <- index + 1
-		}
-		
-	}
-		
-	return(N2O_total_direct)
+	sum(x$amount_kg * x$EF, na.rm=TRUE) + sum(x$area_ha * x$EF, na.rm=TRUE)
+	
 }
+
+	
+
+tier2b <- function(v, p){
+# v is a vector, matrix, or data.frame
+# p is a data.frame or list
+
+	if (is.vector(v)) {
+		v <- t(as.matrix(v))
+	}
+	stopifnot(all(colnames(v) %in% names(p)))
+	varnames <- colnames(v)
+	pp <- p[varnames]
+	apply(v, 1, function(x, ...)sum(x*pp), na.rm=TRUE)
+}
+
 
 	
