@@ -65,5 +65,5 @@ Joshua Perlman and Robert Hijmans
 }
 
 \examples{
-d <- read.csv(system.file("N2O_tier1_ex.csv", package="emissions"))
+d <- read.csv(system.file("N2O_tier2_ex.csv", package="emissions"))
 }

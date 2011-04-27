@@ -7,7 +7,7 @@ N2O_tier1_ex.csv
 }
 
 \description{
-This table contains emission factors for N2O to be used as default emission factors with the function N2O_tier1()
+This table contains emission factors for N2O and other necessary data to be used as default emission factors with the function N2O_tier1()
 }
 
 
