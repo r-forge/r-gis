@@ -1,0 +1,27 @@
+gen_vegtype	spec_vegtype	Cf_mean	Cf_sd
+Shrublands	Shrubland  (general)	0.95	NA
+Shrublands	Calluna heath	0.71	0.3
+Shrublands	Fynbos	0.61	0.16
+Shrublands	all Shrublands	0.72	0.25
+Savanna woodlands: early dry season burns	Savanna woodland	0.22	NA
+Savanna woodlands: early dry season burns	Savanna parkland	0.73	NA
+Savanna woodlands: early dry season burns	Other savanna woodlands	0.37	0.19
+Savanna woodlands: early dry season burns	all Savanna woodlands: early dry season burns	0.4	0.22
+Savanna woodlands: mid or late dry season burns	Savanna woodland	0.72	NA
+Savanna woodlands: mid or late dry season burns	Savanna parkland	0.82	0.07
+Savanna woodlands: mid or late dry season burns	Tropical savanna	0.73	0.04
+Savanna woodlands: mid or late dry season burns	Other savanna woodlands	0.68	0.19
+Savanna woodlands: mid or late dry season burns	all Savanna woodlands: mid or late dry season burns	0.74	0.14
+Savanna Grasslands and Pastures: early dry season burns	Tropical/sub-tropical grassland	0.74	NA
+Savanna Grasslands and Pastures: early dry season burns	Grassland	NA	NA
+Savanna Grasslands and Pastures: early dry season burns	all savanna grasslands: early dry season burns	0.74	NA
+Savanna Grasslands and Pastures: mid or late dry season burns	Tropical/sub-tropical grassland	0.92	0.11
+Savanna Grasslands and Pastures: mid or late dry season burns	Tropical pasture	0.35	0.21
+Savanna Grasslands and Pastures: mid or late dry season burns	Savanna	0.86	0.12
+Savanna Grasslands and Pastures: mid or late dry season burns	all Savanna grasslands (mid/late dry season burns)	0.77	0.26
+Other vegetation types	Peatland	0.5	NA
+Other vegetation types	Tropical Wetlands	0.7	NA
+Agricultural residues: Post harvest field burning	Wheat residues	0.9	NA
+Agricultural residues: Post harvest field burning	Maize residues	0.8	NA
+Agricultural residues: Post harvest field burning	Rice residues	0.8	NA
+Agricultural residues: Post harvest field burning	Sugarcane	0.8	NA
