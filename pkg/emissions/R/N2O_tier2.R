@@ -1,5 +1,5 @@
 
-tier2a <- function(x){
+.tier2 <- function(x){
 	
 	index <- 1
 	 for (EF in x$EF){
@@ -16,7 +16,7 @@ tier2a <- function(x){
 
 	
 
-tier2b <- function(v, p){
+tier2 <- function(v, p){
 # v is a vector, matrix, or data.frame
 # p is a data.frame or list
 	if (missing(p)) {
