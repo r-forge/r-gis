@@ -14,11 +14,26 @@ tier2a <- function(x){
 	
 }
 
+
+test2 <- function() {
+	test()
+}
+
+test <- function() {
+	data('a')
+}
+
 	
 
 tier2b <- function(v, p){
 # v is a vector, matrix, or data.frame
 # p is a data.frame or list
+	if (missing(p)) {
+		thisenvir <- new.env()
+		path <- system.file("data", package="emissions")
+		d <- paste(path, '/EF.RData', sep='')
+		p <- get(load(d, thisenvir), thisenvir)
+	}
 
 	if (is.vector(v)) {
 		v <- t(as.matrix(v))
