@@ -14,15 +14,6 @@ tier2a <- function(x){
 	
 }
 
-
-test2 <- function() {
-	test()
-}
-
-test <- function() {
-	data('a')
-}
-
 	
 
 tier2b <- function(v, p){
