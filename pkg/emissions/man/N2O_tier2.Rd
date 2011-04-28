@@ -11,11 +11,12 @@ This function computes N2O emissions according to the Tier 2 IPCC methodology
 }
 
 \usage{
-N2O_tier2(x)
+N2O_tier2(v, p)
 }
 
 \arguments{
-  \item{x}{a data frame containing the input data necessary to calculate N2O direct emissions based on the IPCC Tier 1 methodology (see details)}
+  \item{v}{a data.frame containing the input data necessary to calculate N2O direct emissions based on the IPCC Tier 1 methodology (see details)}
+  \item{p}{a data.frame or list ....}
 }
 
 \details{

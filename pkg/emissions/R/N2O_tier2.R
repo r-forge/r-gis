@@ -1,5 +1,5 @@
 
-.tier2 <- function(x){
+.N2O_tier2 <- function(x){
 	
 	index <- 1
 	 for (EF in x$EF){
@@ -16,7 +16,7 @@
 
 	
 
-tier2 <- function(v, p){
+N2O_tier2 <- function(v, p){
 # v is a vector, matrix, or data.frame
 # p is a data.frame or list
 	if (missing(p)) {
