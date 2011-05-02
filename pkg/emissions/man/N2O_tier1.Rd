@@ -7,39 +7,25 @@ Tier 1 N2O emissions
 }
 
 \description{
-This function computes IPCC Tier 1 N emission given a data frame (table) of input data
+This function computes IPCC Tier 1 N2O emissions given two data frames: one for variables (areas and quantities) and one for emission factors.  It also gives upper and lower bound emission estimates.
 }
 
 \usage{
-N2O_tier1(x)
+N2O_tier1(v, p)
 }
 
 \arguments{
-  \item{x}{a data frame containing the input data necessary to calculate N2O direct emissions based on the IPCC Tier 1 methodology (see details)}
+  \item{v}{a data frame containing the the variables, in this case land areas and quantities of emitting substances (e.g. manure), see help file for vars_N2Otier1}
+  \item{p}{a data frame containing the emission factors (and their high and low values) corresponding to the emission sources in v, see help file for vars_N2Otier1}
 }
 
 \details{
-In order to prepare data for use (as a data frame) in this function, users should: 
-
-	1) Make a copy of the file "N2O_tier1_ex.csv" provided with this package
-	
-	2) Adjust the data in columns "area_ha" and "amount_kg" to reflect the data for your region of interest (note that data cells to be adjusted by the user are given a default value of 5)
-	
-	3) You may adjust the emissions factors in column "EF" if you wish, but realize that the ones provided are those used by the IPCC for Tier1 N2O emissions estimation
-	
-	4) Save the file as a .csv file with any name, and then read it into R as a data frame using read.csv("filename.csv", header = TRUE)
-	
-Alternatively, users may simply load "N2O_tier1_ex.csv" as a data frame object and manipulate the data frame (i.e. change areas and amounts) within R.
-
-Note that in tier 1 methodology, each emission factor corresponds to one or more emission source types (land use/practice), refelecting the highly generalized nature of the methodology.  In other words, each emission source type
-has one and only one corresponding emission factor. Users should not attempt to disaggregate emissions sources with different emission factors using this function ( N2O_tier1() ); users should follow the data formatting/manipulation conventions specified above (i.e. do not change the dimensions or headernames of the table).  If users wish to further disaggregate emissions sources using more specific emissions factors, they should use the function for the tier 2 methodology ( N2O_tier2() ).
-
-Please also see the help file for "N2O_tier1_ex.csv".
+Example data frames for v and p are provided with this package as vars_N2Otier1.RData and vars_N2Otier1.RData respectively.  Note that the only formatting rule for passing these data frames to the function is that the for any column header in v, there is an indentical (matching) column header in v.  Please see the additional help files referenced above for instructions on populating v and p.
 
 }
 
 \value{
-data frame
+numeric
 }
 
 \references{
@@ -54,10 +40,13 @@ Joshua Perlman and Robert Hijmans
 
 
 \seealso{
-\code{\link{N2O_tier2}}
+\code{\link{vars_N2Otier1}}
+\code{\link{EF_N2Otier1}}
 }
 
 \examples{
-# to be done
+data("vars_N2Otier1")
+data("EF_N2Otier1")
+N2O_tier1(vars_N2Otier1, EF_N2Otier1)
 }
 

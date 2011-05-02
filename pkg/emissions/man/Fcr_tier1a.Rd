@@ -53,6 +53,4 @@ No further notes
 }
 
 \examples{
-d <- read.csv(system.file("Fcr_tier1_ex.csv", package="emissions"))
-N2O_tier2(d)
 }

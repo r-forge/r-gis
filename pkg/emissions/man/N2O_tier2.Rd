@@ -7,7 +7,7 @@ Tier 2 N2O emissions
 }
 
 \description{
-This function computes N2O emissions according to the Tier 2 IPCC methodology
+This function computes IPCC Tier 2 N2O emissions given two data frames: one for variables (areas and quantities) and one for emission factors. If upper and lower bound estimates of emission factors are provided, upper and lower bound estimates of emissions will be calculated
 }
 
 \usage{
@@ -15,25 +15,18 @@ N2O_tier2(v, p)
 }
 
 \arguments{
-  \item{v}{a data.frame containing the input data necessary to calculate N2O direct emissions based on the IPCC Tier 1 methodology (see details)}
-  \item{p}{a data.frame or list ....}
+  \item{v}{a data.frame containing the the variables, in this case land areas and quantities of emitting substances (e.g. manure), see help file for vars_N2Otier2}
+  \item{p}{a data frame containing the emission factors (and their high and low values) corresponding to the emission sources in v, see help file for vars_N2Otier2}
 }
 
 \details{
-The tier 2 IPCC methodology for calculating N2O emissions is simply an extension of the tier 1 methodology.  In the tier 1 methodology, each emission source type had one and only one emission factor.  Tier 2 methodology allows for
-arbitrary levels of disaggregation for each source type.  In other words, any given source type may be split into pieces (i.e. different conditions under which emissions occur) and each peice may be assigned a unique emission factor.  This is exemplified in the example table "N2O_tier2_ex.csv".  Note that in this example, the emission sources "synthetic N inputs" and "organic N inputs" (for non-rice and rice crops) are disaggregated, leaving room for three different emission factors for each of these sources under different conditions (in the column "EF_name", you will see that "i" is used to denote different emission factors corresponding to condition "i").  Although in this example, only two source types are disaggregated, any sources may be disaggregated to any degree if more precise information regarding emission factors under different conditions is available.
-
-As such, the function N2O_tier2() is designed to handle an arbitrary number of records for a given data frame, x.  The only formatting restrictions for the data frame are:
-	1) The column headers must be the same as those in "N2O_tier2_ex.csv".
-	2) For records where "area_ha" or "amount_kg" are not relevant quantities (ex: area for synthetic N-inputs or amount for tropical forest), data cells must be filled with the value NA.
-	3) All non-NA cells in the columns "area_ha" and "amount_kg" must be of numeric class (i.e. not character/text)
-	
-Please also see the help files for "N2O_tier2_ex.csv" and the N2O_tier1().
-
+The tier 2 IPCC methodology for calculating N2O emissions is simply an extension of the tier 1 methodology.  In the tier 1 methodology, each emission source type has one and only one emission factor.  Tier 2 methodology assumes 
+arbitrary levels of disaggregation for each source type.  For example, if temperate cropland/grassland is a major emission source for a country and spans a large area, this land use type may be dissagregated into different geographic regions, with a corresponding emission factors for each region.   As such, it is expected that users of this function will have multiple emission source sub-categories (and corresponding emission factors), as opposed to users of the tier 1 methodology, where source types are highly aggregated, and essentially fixed.  This is reflected in the example data frames vars_N2Otier1 and EF_N2Otier1.  Please see the help files for each of these example data frames.
 }
 
+
 \value{
-numeric value
+numeric 
 }
 
 \references{
@@ -51,10 +44,15 @@ No further notes
 }
 
 \seealso{
+\code{\link{vars_N2Otier2}}
+\code{\link{EF_N2Otier2}}
 \code{\link{N2O_tier1}}
+\code{\link{vars_N2Otier1}}
+\code{\link{EF_N2Otier1}}
 }
 
 \examples{
-d <- read.csv(system.file("N2O_tier2_ex.csv", package="emissions"))
-N2O_tier2(d)
+data("vars_N2Otier2")
+data("EF_N2Otier2")
+N2O_tier2(vars_N2Otier2, EF_N2Otier2)
 }
