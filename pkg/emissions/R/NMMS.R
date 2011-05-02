@@ -10,3 +10,20 @@ NMMS <- function(x){
 	return(NMMS)
 
 }
+
+
+# NMMS <- function(v, p){
+	
+	# if (is.vector(v)) {
+		# v <- t(as.matrix(v))
+	# }
+	
+	# stopifnot(all(rownames(p) %in% rownames(v)))  
+	# varnames <- rownames(v)  
+	# pp <- p[varnames]										##problem with this line (says: "Error in `[.data.frame`(p, varnames) : undefined columns selected")
+	# apply(v, 1, function(x, ...)sum(x*pp), na.rm=TRUE)    ##need to apply formula in line 6 in this line
+# }
+ 
+ 
+ 
+ 
