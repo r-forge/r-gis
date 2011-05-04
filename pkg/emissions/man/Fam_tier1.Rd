@@ -1,4 +1,4 @@
- \name{Fam_tier1}
+\name{Fam_tier1}
 
 \alias{Fam_tier1}
 
@@ -11,18 +11,19 @@ This function computes the amount of total animal manure allocated to soil appli
 }
 
 \usage{
-Fam_tier1(x, FracFEED, FracFUEL, FracCNST)
+Fam_tier1(v, p, FracFEED, FracFUEL, FracCNST)
 }
 
 \arguments{
- \item{x}{a data frame, formatted according to "NMMS_ex.csv", containing the activity data necessary to compute total available manure.  See help for "NMMS()" and "NMMS_ex.csv"}
+ \item{v}{a matrix similar to vars_NMMS, see help for "vars_NMMS"}
+ \item{p}{p matrix similar to pars_NMMS, see help for "pars_NMMS"}
  \item{FracFEED}{fraction of managed manure used for feed}
  \item{FracFUEL}{fraction of managed manure used for fuel}
  \item{FracCNST}{fraction of managed manure used for construction}
 }
 
 \details{
-This function takes the data frame x, uses another built-in function, NMMS(), to compute total available manure using x, and then uses the other input parameters (fractions) to allocated manure to the different uses.
+This function simply executes another built-in function NMMS using arguments v and p (see help for "NMMS") and adds the values of the other three arguments to result returned by NMMS.  Please also see help for "NMMS", "vars_NMMS", and "pars_NMMS"
 }
 
 \value{
@@ -42,11 +43,13 @@ Joshua Perlman and Robert Hijmans
 
 \seealso{
 \code{\link{NMMS}}
-\code{\link{NMMS_ex.csv}}
+\code{\link{vars_NMMS}}
+\code{\link{pars_NMMS}}
 }
 
 \examples{
-data <- read.csv(system.file("NMMS_ex.csv", package = "emissions"))
-Fam_tier1(x = data, FracFEED = .12, FracFUEL = .20, FracCNST = .07)
+data("vars_NMMS")
+data("pars_NMMS")
+Fam_tier1(v = vars_NMMS, p = pars_NMMS, FracFEED = .12, FracFUEL = .20, FracCNST = .07)
 }
 

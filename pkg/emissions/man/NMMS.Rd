@@ -7,39 +7,25 @@ Managed manure N
 }
 
 \description{
-This function computes managed manure N available for application to managed soils, feed, fuel, or construction uses, given a table of input data.
+This function computes managed manure N available for application to managed soils, feed, fuel, or construction uses.
 }
 
 \usage{
-NMMS(x)
+NMMS(v, p, na.rm = FALSE)
 }
 
 \arguments{
-  \item{x}{a data frame containing the input data necessary to calculate total managed manure N available for the applications above (see details)}
+  \item{v}{a matrix or data frame with the variable, in this case, the number of animals in each manure management system (see help for "vars_NMMS" for example and further documentation}
+  \item{p}{a data frame with the parameters associate with each manure management system (see help for "pars_NMMS" for example and further documentation}
+  \item{na.rm}{FALSE by defualt.  If TRUE, NA values are ignored}
 }
 
 \details{
-In order to prepare data for use (as a data frame) in this function, users should: 
-
-	1) Make a copy of the file "NMMS_ex.csv" provided with this package
-	
-	2) Adjust the data in columns "Nt", "NEXt_kg", "MSts", and "Nbeddingms_kg" to reflect the data in your region of interest (note the default values in the cells to be adjusted are 5, except for "MSts", where the are .5 to indicate that the data in this field should be a fraction.
-	
-	3) Save the file as a .csv file with any name, and then read it into R as a data frame using read.csv("filename.csv", header = TRUE)
-	
-Alternatively, users may simply load "NMMS_ex.csv" as a data frame object and manipulate the data frame (i.e. values in columns specified above) within R.
-
-This function is written to handle an arbitrary number of records in the given data frame, x.  Therefore, the user may add or further specify management systems using "NMMS_ex.csv" as a template.   The only formatting rules are:
-	1) The names of column headers must match those in "NMMS_ex.csv"
-	2) Columns "FRAClossms_pct", "FRAClossms_pct__L", "FRAClossms_pct_H", "Nt, "NEXt_kg", MSts", "Nbeddingms_kg" must all contain numeric data (no characters/strings).  
-	3) If a given manure management system is not present or applicable in the region of interest, simply put 0 in the corresponding data columns ("Nt, "NEXt_kg", MSts", "Nbeddingms_kg")
-
-Please also see the help file for "NMMS_ex.csv".
-
+Users may use the example input data structures (vars_NMMS and pars_NMMS) to enter input data for their region of interest.  The only formatting rule with regard to the input data (required for the function to work) is that for any manure management system specifed in the matrix of variables, there must be a corresponding management system (with exactly the same name) in the data frame of parameters.  In other words, users should take care to make sure the column names in v match the row names in p in terms of number and name (although the order in which column/row names occurr in v and p does not matter.
 }
 
 \value{
-returns data of numeric type
+numeric
 }
 
 \references{
@@ -54,10 +40,13 @@ Joshua Perlman and Robert Hijmans
 
 
 \seealso{
-\code{\link{NMMS}}
+\code{\link{vars_NMMS}}
+\code{\link{pars_NMMS}}
 }
 
 \examples{
-# to be done
+data("vars_NMMS")
+data("pars_NMMS")
+NMMS(vars_NMMS, pars_NMMS)
 }
 
