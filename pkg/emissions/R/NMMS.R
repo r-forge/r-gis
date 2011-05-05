@@ -36,21 +36,32 @@ NMMS <- function(p, ...){
 	if (length(x) > 0) {
 		stop('unknown variable(s) found: ', vars[x])
 	}
-	if (length(vars)==0 & missing(p)) {
-		stop('no data supplied')
-	}
-	
-	if (! missing(p) & length(vars) > 0) {
-		allnames <- unique(colnames(p), vars)
-		a <- allnames %in% params
-		if (! all(a)) {
-			stop('variables or parameters missing: ', paste(allnames[a], collapse=', '))
-		}		
+	if (length(vars)==0) {
+		if (missing(p)) {
+			stop('no data supplied')
+		} else {
+			if (any(! params %in% colnames(p))) {
+				stop('prameters missing')
+			}
+		} 
+	} else {
+		if (missing(p)) {
+			if (any(! params %in% vars)) {
+				stop('variables missing: ', params[! params %in% vars])
+			}		
+		} else {
+			allnames <- unique(colnames(p), vars)
+			a <- allnames %in% params
+			if (! all(a)) {
+				stop('variables or parameters missing: ', paste(allnames[a], collapse=', '))
+			}		
+		}
 	}
 
+	
+	
 
 	if (length(vars) > 0) {
-	
 		v1 <- vars[1]
 		if (is.vector(dots[[v1]])) {
 			dots[[v1]] <- t(as.matrix(dots[[v1]]))
