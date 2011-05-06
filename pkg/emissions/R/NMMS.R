@@ -72,6 +72,9 @@ NMMS <- function(p, ...){
 			if (! all(cnames %in% rownames(p))) {
 				stop('manure systems in parameters do not match those of : ', v1)
 			}
+			if (dim(dots[[v1]])[2] != dim(p)[1] ) {
+				stop('dimension of variable: ',v1 ,' does not match number of rows of p')
+			}
 		}
 		
 		assign(v1, t(dots[[v1]]))
