@@ -41,7 +41,7 @@ NMMS <- function(p, ...){
 			stop('no data supplied')
 		} else {
 			if (any(! params %in% colnames(p))) {
-				stop('prameters missing')
+				stop('parameters missing')
 			}
 		} 
 	} else {
@@ -57,9 +57,6 @@ NMMS <- function(p, ...){
 			}		
 		}
 	}
-
-	
-	
 
 	if (length(vars) > 0) {
 		v1 <- vars[1]
