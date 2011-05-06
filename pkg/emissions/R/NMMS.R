@@ -107,6 +107,6 @@ NMMS <- function(p, ...){
 	return(res)
 }
  
- NMMS(p, Nt=v)
+ #NMMS(p, Nt=v)
 
  
