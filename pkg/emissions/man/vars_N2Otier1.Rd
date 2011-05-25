@@ -8,6 +8,7 @@ vars_N2Otier1
 
 \description{
 This data frame requires the user to input data on land area and/or amounts of emitting substances.  In other words, this data frame contains quantities of emission sources.  
+
 }
 
 
@@ -38,7 +39,8 @@ data frame
 }
 
 \references{
-IPCC, 2006:  \url{http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html}
+2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4 Agriculture, Forestry and Other Land Use
+\url{http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html}
 }
 
 

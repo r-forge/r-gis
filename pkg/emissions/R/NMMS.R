@@ -27,15 +27,21 @@ NMMS <- function(p, ...){
 	
 	params <- c('Nt', 'NEXt_kg', 'FRAClossms_pct', 'MSts', 'Nbeddingms_kg')
 	
+	#checks that each variable is only entered once
 	dots <- list(...)
 	vars <- names(dots)
 	if (length(vars) != length(unique(vars))) {
 		stop('duplicate variables')
 	}
+	
+	#finds variables that are not in the list of possible variables (params) and warns of these unknown variables
 	x <- which(! vars %in% params)
 	if (length(x) > 0) {
 		stop('unknown variable(s) found: ', vars[x])
 	}
+	
+	#if the user doesn't enter any variables and if there are no parameters given, the user is told that no data was supplied
+	#otherwise, if not all the parameters in params are found in the colnames of data frame p, user is told that parameters are missing
 	if (length(vars)==0) {
 		if (missing(p)) {
 			stop('no data supplied')
@@ -44,7 +50,11 @@ NMMS <- function(p, ...){
 				stop('parameters missing')
 			}
 		} 
-	} else {
+	} 
+	
+	#if there is no parameters data frame and if not all parameters in params are found in vars entered by user, warn that variables are missing
+	#otherwise, find all unique names between p and vars, check whether it's true that each name in this set is found in params, and if not, warn the user which vars/params are missing
+	else {
 		if (missing(p)) {
 			if (any(! params %in% vars)) {
 				stop('variables missing: ', params[! params %in% vars])
@@ -57,14 +67,15 @@ NMMS <- function(p, ...){
 			}		
 		}
 	}
-
+	
+	#if variables are entered by the user
 	if (length(vars) > 0) {
 		v1 <- vars[1]
 		if (is.vector(dots[[v1]])) {
 			dots[[v1]] <- t(as.matrix(dots[[v1]]))
 		}
-		cnames <- colnames(dots[[v1]])
 		
+		cnames <- colnames(dots[[v1]])
 		if (! missing(p)) {
 			if (! all(cnames %in% rownames(p))) {
 				stop('manure systems in parameters do not match those of : ', v1)
@@ -87,7 +98,6 @@ NMMS <- function(p, ...){
 		}
 		rm(dots)
 	}
-		
 	
 	pnames <- params[(!params %in% vars)]
 	if (! missing(p)) {

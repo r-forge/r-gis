@@ -12,7 +12,7 @@ This data frame contains the parameters for each manure management system necess
 
 
 \details{
-Users may use this example data frame to enter the given parameters for each system.  Where IPPC default values are available, they are provided in this example data frame.  Where values require input from the user, 0 is provided as the default.  The most important formatting rule for this data frame is that the row names match the column names of the corresponding matrix of variables in terms of number of rows/columns and their names; order doesn't matter (also see help for "NMMS and "vars_NMMS").
+You may use this example data frame to enter the given parameters for each system.  Where IPPC default values are available, they are provided in this example data frame.  Where values require input, 0 is provided as the default.  
 }
 
 \arguments{
@@ -28,7 +28,7 @@ numeric value
 }
 
 \references{
-IPCC, 2006:  
+2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4 Agriculture, Forestry and Other Land Use  
 \url{http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html}
 }
 

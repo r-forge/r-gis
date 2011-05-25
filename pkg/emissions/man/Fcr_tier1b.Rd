@@ -1,18 +1,18 @@
-\name{Fcr_tier1a}
+\name{Fcr_tier1b}
 
-\alias{Fcr_tier1a}
+\alias{Fcr_tier1b}
 
 \title{
 N From Crop Residues and Forage/Pasture Renewal (Tier 1)
 }
 
 \description{
-This function computes N from crop residues and pasture renewals.  This function is very similar to the function Fcr_tier1b(); the input data is the same, the equation is slightly different.
-IPCC equation 11.6
+This function computes N from crop residues and pasture renewals.  This function is very similar to the function Fcr_tier1a(); the input data is the same, the equation is slightly different.
+IPCC equation 11.7
 }
 
 \usage{
-Fcr_tier1a(p, ...)
+Fcr_tier1b(p, ...)
 }
 
 \arguments{
@@ -47,11 +47,10 @@ No further notes
 \seealso{
 \code{\link{vars_Fcr}}
 \code{\link{pars_Fcr}}
-\code{\link{Fcr_tier1b}}
+\code{\link{Fcr_tier1a}}
 }
 
 \examples{
-
 data("vars_Fcr")
 data("pars_Fcr")
 
@@ -64,4 +63,5 @@ Fcr_tier1a(pars_Fcr, crop_kg_per_ha = vars_Fcr["crop_kg_per_ha",], TOTarea_ha = 
 
 #Case with additional variables passed as vectors from the matrix vars_NMMS, which are substituted for the constant parameters in the calculation
 Fcr_tier1a(pars_Fcr, crop_kg_per_ha = vars_Fcr["crop_kg_per_ha",], TOTarea_ha = vars_Fcr["TOTarea_ha",], frac_ren = vars_Fcr["frac_ren",], frac_remv = vars_Fcr["frac_remv",])
+
 }

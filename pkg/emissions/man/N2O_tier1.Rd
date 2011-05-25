@@ -8,6 +8,7 @@ Tier 1 N2O emissions
 
 \description{
 This function computes IPCC Tier 1 N2O emissions given two data frames: one for variables (areas and quantities) and one for emission factors.  It also gives upper and lower bound emission estimates.
+IPCC equation 11.1
 }
 
 \usage{
@@ -29,7 +30,7 @@ numeric
 }
 
 \references{
-IPCC 2006
+2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4 Agriculture, Forestry and Other Land Use
 \url{http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html}
 }
 

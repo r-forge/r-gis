@@ -1,19 +1,19 @@
-crop_name,crop_kg_per_ha,TOTarea_ha
-Grains,10,10
-Beans and pulses,10,10
-Tubers,10,10
-"Root crops, others",10,10
-N fixing forages,10,10
-Non N fixing forages,10,10
-Perennial grasses,10,10
-Grass clover mixtures,10,10
-Maize,10,10
-Wheat,10,10
-Winter wheat,10,10
-Spring wheat,10,10
-Rice ,10,10
-Barley,10,10
-Oats,10,10
-Millet,10,10
-Sorghum,10,10
-Rye,10,10
+crop_name,crop_kg_per_ha,TOTarea_ha,dry_frac,slope,intercept,Cf,frac_ren,Nag_kg,frac_remv,Rbg,Rbg_error_pct,Nbg_kg,frac_burnt
+Grains,0,0,0,0,0,0,0,0,0,0,0,0,0
+Beans and pulses,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tubers,0,0,0,0,0,0,0,0,0,0,0,0,0
+"Root crops, others",0,0,0,0,0,0,0,0,0,0,0,0,0
+N fixing forages,0,0,0,0,0,0,0,0,0,0,0,0,0
+Non N fixing forages,0,0,0,0,0,0,0,0,0,0,0,0,0
+Perennial grasses,0,0,0,0,0,0,0,0,0,0,0,0,0
+Grass clover mixtures,0,0,0,0,0,0,0,0,0,0,0,0,0
+Maize,0,0,0,0,0,0,0,0,0,0,0,0,0
+Wheat,0,0,0,0,0,0,0,0,0,0,0,0,0
+Winter wheat,0,0,0,0,0,0,0,0,0,0,0,0,0
+Spring wheat,0,0,0,0,0,0,0,0,0,0,0,0,0
+Rice ,0,0,0,0,0,0,0,0,0,0,0,0,0
+Barley,0,0,0,0,0,0,0,0,0,0,0,0,0
+Oats,0,0,0,0,0,0,0,0,0,0,0,0,0
+Millet,0,0,0,0,0,0,0,0,0,0,0,0,0
+Sorghum,0,0,0,0,0,0,0,0,0,0,0,0,0
+Rye,0,0,0,0,0,0,0,0,0,0,0,0,0

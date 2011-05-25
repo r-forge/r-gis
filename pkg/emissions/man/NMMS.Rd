@@ -8,24 +8,22 @@ Managed manure N
 
 \description{
 This function computes managed manure N available for application to managed soils, feed, fuel, or construction uses.
-IPPC function xxx
+IPPC equation 10.34
 }
 
 \usage{
-NMMS(Nt, p, na.rm = FALSE)
+NMMS(p, ...)
 }
 
 \arguments{
-  \item{Nt}{matrix or data.frame with the number of animals in each manure management system. (see \code{\link{vars_NMMS}} for an example and further documentation}
   \item{p}{data.frame with the parameters associated with each manure management system (see \code{link{pars_NMMS}} for an example and further documentation}
-  \item{na.rm}{FALSE by default.  If TRUE, NA values are ignored}
   \item{...}{Additional variables (see Details)}  
 }
 
 \details{
-You can use the example input data structures (vars_NMMS and pars_NMMS) to enter input data for their region of interest.  The only formatting rule with regard to the input data (required for the function to work) is that for any manure management system specifed in the matrix of variables, there must be a corresponding management system (with exactly the same name) in the data frame of parameters.  In other words, users should take care to make sure the column names in v match the row names in p in terms of number and name (although the order in which column/row names occurr in Nt and p does not matter.
+You can use the example input data structures (vars_NMMS and pars_NMMS) to enter input data for your region of interest.  Although the intial assumption of this function is that most input data will be relatively stable (and therefore contained as "constants"/parameters in p, with the exception of the number of livestock, Nt, which is set as a variable by definition), you have the option to pass variable values to overwrite constant parameters through the (...) argument.  For example, if you have site or region-specifc data on the percentage of N lost in each animal-management system (FRAClossms_pct), you can set these data up as a vector (or matrix, such as vars_NMMS, if you have multiple variables that you need to reference) and pass it as an argument after p, which will overwrite the parameter data in p and use your variable data instead.  This approach of clearly distinguishing variables and parameters through the use of a parameters data.frame and a variables vector (which can substitute variables for parameters) allows for a high degree of scalability in the use of this function while minimizing the amount of data needed to perform the calcluations.  For example, suppose you want to estimate available manure N for all 50 US states and assume that only livestock population (Nt) varies by state.  With this function, you can hold all other quantities constant in the data.frame p, and then have a vector of length 50 with livestock population values for each state.  This avoids the problem of duplicating parameter values for each variable record, and is particularly important for spatial data applications (i.e. avoiding the need to create spatial data for parameters that don't vary spatially).
 
-Explain that parameters can be passes as variable in the dots argument
+Note that variable names must be referenced according to their given names in the vars_NMMS and/or pars_NMMS examples when they are used in a call of NMMS().  For example, the number of animals, must always be referenced as "Nt", the average annual N excretion per head must always be referenced as "NEXt_kg", and so on (see examples below).
 }
 
 \value{
@@ -33,7 +31,7 @@ numeric
 }
 
 \references{
-IPCC, 2006
+2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4 Agriculture, Forestry and Other Land Use
 \url{http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html}
 }
 
@@ -51,8 +49,12 @@ Joshua Perlman and Robert Hijmans
 \examples{
 data("vars_NMMS")
 data("pars_NMMS")
-NMMS(vars_NMMS, pars_NMMS)
 
-# changing a parameter to a variable
+#Base case (only Nt varies):
+NMMS(pars_NMMS, Nt = vars_NMMS["Nt",])
+
+#Case with additional variables passed as vectors from the matrix vars_NMMS, which are substituted for the constant parameters in the calculation
+NMMS(pars_NMMS, Nt = vars_NMMS["Nt",], NEXt_kg = vars_NMMS["NEXt_kg",], FRAClossms_pct = vars_NMMS["FRAClossms_pct",]) 
+
 }
 

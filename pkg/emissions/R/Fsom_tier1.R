@@ -1,32 +1,20 @@
-.Fcr_tier1a_old <- function(x){
-	
-	index <- 1
-	Fcr <- 0
-	for (crop in x$crop_name){
-	
-		cropT <- x$crop_kg_per_ha[index] * x$dry_frac[index]
-		AGdm <- cropT * x$slope[index] + x$intercept[index]
-		Rag <- AGdm * 1000/cropT
-		
-		if ( is.na(x$Rbg[index]) || is.na(x$Nbg_kg[index]) ){
-			Fcr <- Fcr + ( cropT * (x$TOTarea_ha[index] - x$BURNTarea_ha[index]) * x$frac_ren[index] * ( Rag * x$Nag_kg[index] * (1 - x$frac_remv[index]) ) )
-			index <- index + 1
-		}
-		
-		else{
-			Fcr <- Fcr + ( cropT * (x$TOTarea_ha[index] - x$BURNTarea_ha[index]) * x$frac_ren[index] * ( Rag * x$Nag_kg[index] * (1 - x$frac_remv[index]) + x$Rbg[index] * x$Nbg_kg[index] ) )
-			index  <- index + 1
-		}
-		
+Fsom_tier1 <- function(Cmin, R){
+
+	if (is.vector(Cmin)) {
+		Cmin <- t(as.matrix(Cmin))
 	}
 	
-	return(Fcr)
+	stopifnot(all(colnames(Cmin) %in% names(R)))
+	varnames <- colnames(R)
+	pp <- Cmin[varnames]  
+	apply(R, 1, function(x, ...)sum(pp*1/x*1000), na.rm=TRUE)
 }
 
 
-Fcr_tier1a <- function(p, ...){
+
+.Fsom_tier1 <- function(p, ...){
 	
-	params <- c('crop_kg_per_ha', 'TOTarea_ha', 'dry_frac', 'slope', 'intercept', 'Cf', 'frac_ren', 'Nag_kg', 'frac_remv', 'Rbg', 'Nbg_kg', 'frac_burnt')
+	params <- c('deltaC', 'R')
 	
 	dots <- list(...)
 	vars <- names(dots)
@@ -68,7 +56,7 @@ Fcr_tier1a <- function(p, ...){
 		
 		if (! missing(p)) {
 			if (! all(cnames %in% rownames(p))) {
-				stop('cropping systems in parameters do not match those of : ', v1)
+				stop('land use changes in parameters do not match those of : ', v1)
 			}
 			if (dim(dots[[v1]])[2] != dim(p)[1] ) {
 				stop('dimension of variable: ',v1 ,' does not match number of rows of p')
@@ -99,7 +87,7 @@ Fcr_tier1a <- function(p, ...){
 		}
 	}
 		
-	res <- (crop_kg_per_ha * dry_frac) * (TOTarea_ha - frac_burnt * TOTarea_ha * Cf) * frac_ren * (  (crop_kg_per_ha * dry_frac * slope + intercept)*1000/(crop_kg_per_ha * dry_frac) * Nag_kg * (1 - frac_remv) + Rbg * ( (crop_kg_per_ha * dry_frac * slope + intercept) * 1000 + (crop_kg_per_ha * dry_frac) ) /(crop_kg_per_ha * dry_frac) * Nbg_kg )
+	res <- deltaC * 1/R * 1000
 	if (!is.matrix(res)) {
 		res <- matrix(res)
 	}

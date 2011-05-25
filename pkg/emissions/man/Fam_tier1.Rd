@@ -8,22 +8,22 @@ N From Animal Manure Applied to Soils
 
 \description{
 This function computes the amount of total animal manure allocated to soil application (kg N yr -1) 
+IPCC equation 11.4
 }
 
 \usage{
-Fam_tier1(v, p, FracFEED, FracFUEL, FracCNST)
+Fam_tier1(nmms, FracFEED, FracFUEL, FracCNST)
 }
 
 \arguments{
- \item{v}{a matrix similar to vars_NMMS, see help for "vars_NMMS"}
- \item{p}{p matrix similar to pars_NMMS, see help for "pars_NMMS"}
+ \item{nmms}{amount of managed manure N available for soil application, feed, fuel, or construction (kg N yr-1).  This quantity can be computed using the function NMMS().}
  \item{FracFEED}{fraction of managed manure used for feed}
  \item{FracFUEL}{fraction of managed manure used for fuel}
  \item{FracCNST}{fraction of managed manure used for construction}
 }
 
 \details{
-This function simply executes another built-in function NMMS using arguments v and p (see help for "NMMS") and adds the values of the other three arguments to result returned by NMMS.  Please also see help for "NMMS", "vars_NMMS", and "pars_NMMS"
+This function simply is simply takes the total available manure (nmms) and calculates the amount applied to soils by based on the levels of the other competing uses (feed, fuel, and construction.
 }
 
 \value{
@@ -31,7 +31,7 @@ numeric
 }
 
 \references{
-IPCC 2006
+2006 IPCC Guidelines for National Greenhouse Gas Inventories, Volume 4 Agriculture, Forestry and Other Land Use
 \url{http://www.ipcc-nggip.iges.or.jp/public/2006gl/index.html}
 }
 
@@ -48,8 +48,6 @@ Joshua Perlman and Robert Hijmans
 }
 
 \examples{
-data("vars_NMMS")
-data("pars_NMMS")
-Fam_tier1(v = vars_NMMS, p = pars_NMMS, FracFEED = .12, FracFUEL = .20, FracCNST = .07)
+Fam_tier1(nmms = 100, FracFEED = .12, FracFUEL = .20, FracCNST = .07)
 }
 
