@@ -25,6 +25,7 @@
 
 NMMS <- function(p, ...){
 	
+	Nt = NEXt_kg = FRAClossms_pct = MSts = Nbeddingms_kg = NULL
 	params <- c('Nt', 'NEXt_kg', 'FRAClossms_pct', 'MSts', 'Nbeddingms_kg')
 	
 	#checks that each variable is only entered once

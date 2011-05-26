@@ -14,6 +14,8 @@ Fsom_tier1 <- function(Cmin, R){
 
 .Fsom_tier1 <- function(p, ...){
 	
+# to avoid a 'note' in R CMD check
+	deltaC = R = NULL
 	params <- c('deltaC', 'R')
 	
 	dots <- list(...)

@@ -25,6 +25,10 @@
 
 
 Fcr_tier1a <- function(p, ...){
+
+# to avoid a 'note' in R CMD check
+	crop_kg_per_ha = TOTarea_ha = dry_frac = slope = intercept = Cf = frac_ren = Nag_kg = frac_remv = Rbg = Nbg_kg = frac_burnt = NULL
+
 	
 	params <- c('crop_kg_per_ha', 'TOTarea_ha', 'dry_frac', 'slope', 'intercept', 'Cf', 'frac_ren', 'Nag_kg', 'frac_remv', 'Rbg', 'Nbg_kg', 'frac_burnt')
 	

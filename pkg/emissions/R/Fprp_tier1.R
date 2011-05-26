@@ -24,6 +24,9 @@
 }
 
 Fprp_tier1 <- function(p, ...){
+
+# to avoid a 'note' in R CMD check	
+	Nt = NEXt_kg = MStprp = NULL
 	
 	params <- c('Nt', 'NEXt_kg', 'MStprp')
 	
