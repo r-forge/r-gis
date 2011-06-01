@@ -1,0 +1,11 @@
+Package: dirt
+Type: Package
+Title: soil science related functions
+Version: 0.1
+Date: 2008-10-17
+Suggests: raster, sp, RODBC, rgdal
+Author: Robert J. Hijmans
+Maintainer: <r.hijmans@gmail.com>
+Description: does not do anything yet
+License: GPL (>=3)
+LazyLoad: yes

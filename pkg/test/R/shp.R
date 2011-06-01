@@ -174,11 +174,13 @@ setMethod ('show' , 'ShapeFile',
 	rawb <- readBin(f, "raw", n=n)
 	records <- list(length=nrec)
 	a <- 1
-	for (i in start:end) {
+	i <- 1
+	for (j in start:end) {
 		b <- a + shp@dbf@record.length - 1
 		recb <- rawb[a:b]
 		records[[i]] = readBin(recb, "character", 1)
 		a <- b + 1
+		i <- i + 1
 	}
 	z <- matrix(ncol=shp@dbf@nfields, nrow=nrec)
 	colnames(z) <- shp@dbf@fields$NAME
@@ -190,6 +192,8 @@ setMethod ('show' , 'ShapeFile',
 		for (i in 2:length(x)) {
 			from[i] <- from[i-1] + x[i-1]
 		}
+		# from = cumsum(x) - 1  ??
+		
 		to <- from+x-1
 		for (i in 1:length(records)) {
 			a <- records[[i]]
