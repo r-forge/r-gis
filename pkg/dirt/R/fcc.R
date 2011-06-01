@@ -5,22 +5,22 @@
 # Licence GPL v3
 
 
-# Based on basic program that accompanied the FAO Soil Map of the World. 
+# Based on a BASIC program that accompanied the FAO Soil Map of the World. 
 # This functions was adapted for the Homogenized World Soil Database, HWSD
 
-FCCagg <- function(hwsd) {
-	fcc <- FCC(hwsd)
+.FCCagg <- function(hwsd) {
+	fcc <- .FCC(hwsd)
 	fcc <- hwsd$SHARE * fcc
 	fccagg <- vector()
-	for (i in 1:ndim(fcc)[2]) {
-		j <- tapply( fcc[,i], INDEX=hwsd$MU_GLOBAL, FUN=SUM )
+	for (i in 1:dim(fcc)[2]) {
+		j <- tapply( fcc[,i], INDEX=hwsd$MU_GLOBAL, FUN=sum )
 		fccagg <- cbind(fccagg, j)
 	}
 	return(fccagg)
 }
 
 
-FCC <- function(hwsd) {
+.FCC <- function(hwsd) {
 # Fertility Capability Classification
 	hwsd$PHASE <- as.integer(hwsd$PHASE)
 	hwsd$T_TEXTURE <- as.integer(hwsd$T_TEXTURE)
