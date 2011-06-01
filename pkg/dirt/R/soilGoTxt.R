@@ -23,10 +23,15 @@ c('comppct_l', 'comppct_r', 'comppct_h', 'compname', 'compkind', 'majcompflag', 
 	chof <- paste(tab, '/chorizon.txt', sep="")
 
 	vers <- readLines(verf)
-	vers <- 2
+	
+	if (vers[1] == "SSURGOV2.1") {
+		vers <- vers[1]
+	} else {
+		stop(vers[1])
+	}
 	
 	horiz <- read.table(chof, sep='|')
-	colnames(horiz) <- .getChon(vers)
+	colnames(horiz) <- dirt:::.getChon(vers)
 
 #	mapf <- paste(tab, '/mapunit.txt', sep="")
 #	map <- read.table(mapf, sep='|')
@@ -34,14 +39,13 @@ c('comppct_l', 'comppct_r', 'comppct_h', 'compname', 'compkind', 'majcompflag', 
 #	map <- map[, c('mukey', 'cokey')]
 
 	comp <- read.table(cmpf, sep='|')
-	colnames(comp) <- .getComn(vers)
+	colnames(comp) <- dirt:::.getComn(vers)
 	comp <- comp[,c('cokey', 'mukey', 'comppct_r')]
 
     props <- unique(c('cokey', props, c("hzdept_r", "hzdepb_r")))
 	horiz <- horiz[, props]	
 	
-	d <- merge(horiz, comp, by='cokey')
-	d
+	merge(horiz, comp, by='cokey')
 }
 	
 	

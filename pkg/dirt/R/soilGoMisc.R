@@ -48,15 +48,17 @@
     n <- substr(n, 1, 10)
 
        # duplicate names
-    nn  = as.matrix(table(n))
-    i = which(nn > 1)
+    nn  <- as.matrix(table(n))
+    i <- which(nn > 1)
     if (! is.null(i)) {
-        names = rownames(nn)[i]
+        names <- rownames(nn)[i]
         n[n %in% names] <- substr(n[n %in% names], 1, 9)
         n <- make.unique(n, sep = "")
     }
-    if (! all(x == n)) {
-        x = rbind(x, n)
+	i <- x == n
+    if (! all(i)) {
+		x <- rbind(x, n)
+		x <- x[, !i]
         rownames(x) = c('original name', 'adjusted name')
         print(x)
     }
