@@ -4,7 +4,6 @@
 # Licence GPL v3
 
 
-
 .mergeSoilRaster <- function(r, d, props, filename='', ...) {
 	stopifnot(require(raster))
     if (is.character(r)) {
@@ -19,6 +18,7 @@
 
 	if (filename != '') {
 		# should first enforce the .shp extension
+		extension(filename) <- '.shp'
 		if (!overwrite & file.exists(filename)) {
 			warning('file exists and "overwrite=FALSE". returning data.frame')
 			return(d)
@@ -42,44 +42,14 @@
     if (length(i)==0) { stop('polygon attributes do not have a MUKEY field') }
 	spd <- merge(spd, d, by.x=i[1], by.y=1, all.x=TRUE)
 	spd <- spd[order(spd[,2]), -2]
-	colnames(spd) <- .fixNames(colnames(spd), verbose=verbose)
+	colnames(spd) <- raster:::.fixNames(colnames(spd), verbose=verbose)
 	sp@data <- spd
 	if (filename != '') {
 		writeOGR(sp, filename, "soil", "ESRI Shapefile")
+		return(invisible(sp))
 	} else {
 		return(sp)
 	}
 }
 
-
-
-.fixNames <- function(x, verbose=TRUE) {
-    n <- gsub('^[[:space:]]+', '',  gsub('[[:space:]]+$', '', x) )
-    nn <- n
-    n <- gsub('[^[:alnum:]]', '_', n)
-    n[nchar(n) > 10] <- gsub('_', '', n[nchar(n) > 10])
-    n[n==''] <- 'field'
-    n <- gsub('^[^[:alpha:]]', 'X', n)
-    n <- substr(n, 1, 10)
-
-       # duplicate names
-    nn  <- as.matrix(table(n))
-    i <- which(nn > 1)
-    if (! is.null(i)) {
-        names <- rownames(nn)[i]
-        n[n %in% names] <- substr(n[n %in% names], 1, 9)
-        n <- make.unique(n, sep = "")
-    }
-	if (verbose) {
-		i <- x == n
-		if (! all(i)) {
-			x <- rbind(x, n)
-			colnames(x) <- paste('col_', 1:ncol(x), sep="")
-			x <- x[, !i, drop=FALSE]
-			rownames(x) = c('original name', 'adjusted name')
-			print(x)
-		}
-    }
-    return(n)
-}
 
