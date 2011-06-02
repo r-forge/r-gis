@@ -1,3 +1,9 @@
+# Author: Robert J. Hijmans
+# May 2011
+# Version 1.0
+# Licence GPL v3
+
+
 
 .mergeSoilRaster <- function(r, d, props, filename='', ...) {
 	stopifnot(require(raster))
@@ -9,14 +15,23 @@
 }
 
 
-.mergeSoilPol <- function(sp, d, filename='') {
+.mergeSoilPol <- function(sp, d, filename='', overwrite=FALSE, verbose=TRUE) {
+
+	if (filename != '') {
+		# should first enforce the .shp extension
+		if (!overwrite & file.exists(filename)) {
+			warning('file exists and "overwrite=FALSE". returning data.frame')
+			return(d)
+		}
+	}
+
     if (is.character(sp)) {
 		if (!(require(rgdal))) {
 			stop("To read a shapefile you need the rgdal package; please install it")  
 		}
 		fn <- basename(sp)
         fn <- substr(fn, 1, nchar(fn)-4)
-        sp <- readOGR(dirname(sp), fn)
+        sp <- readOGR(dirname(sp), fn, verbose=verbose)
 	}
     if (! inherits(sp, 'SpatialPolygonsDataFrame')) {
         warning('not a good sp object (should be a SpatialPolygonsDataFrame), returning data.frame')
@@ -27,7 +42,7 @@
     if (length(i)==0) { stop('polygon attributes do not have a MUKEY field') }
 	spd <- merge(spd, d, by.x=i[1], by.y=1, all.x=TRUE)
 	spd <- spd[order(spd[,2]), -2]
-	colnames(spd) <- .fixNames(colnames(spd))
+	colnames(spd) <- .fixNames(colnames(spd), verbose=verbose)
 	sp@data <- spd
 	if (filename != '') {
 		writeOGR(sp, filename, "soil", "ESRI Shapefile")
@@ -38,7 +53,7 @@
 
 
 
-.fixNames <- function(x) {
+.fixNames <- function(x, verbose=TRUE) {
     n <- gsub('^[[:space:]]+', '',  gsub('[[:space:]]+$', '', x) )
     nn <- n
     n <- gsub('[^[:alnum:]]', '_', n)
@@ -55,12 +70,15 @@
         n[n %in% names] <- substr(n[n %in% names], 1, 9)
         n <- make.unique(n, sep = "")
     }
-	i <- x == n
-    if (! all(i)) {
-		x <- rbind(x, n)
-		x <- x[, !i]
-        rownames(x) = c('original name', 'adjusted name')
-        print(x)
+	if (verbose) {
+		i <- x == n
+		if (! all(i)) {
+			x <- rbind(x, n)
+			colnames(x) <- paste('col_', 1:ncol(x), sep="")
+			x <- x[, !i, drop=FALSE]
+			rownames(x) = c('original name', 'adjusted name')
+			print(x)
+		}
     }
     return(n)
 }

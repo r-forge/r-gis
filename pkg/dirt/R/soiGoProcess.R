@@ -1,3 +1,8 @@
+# Author: Robert J. Hijmans
+# May 2011
+# Version 1.0
+# Licence GPL v3
+
 
 .processGo <- function(d, depth, vars, type='mean') {
 

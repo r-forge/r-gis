@@ -1,7 +1,9 @@
+# Author: Robert J. Hijmans
+# May 2011
+# Version 1.0
+# Licence GPL v3
 
-# "ph1to1h2o_h", "ph1to1h2o_l"
-
-.getSoilGoAccess <- function(mdb, depth, props) {
+.getSoilGoAccess <- function(mdb, props) {
     props <- unique(c(props, c("hzdept_r", "hzdepb_r")))
     props <- paste("chorizon.", props, sep="")
     props <- paste(props, collapse = ", ")
@@ -14,8 +16,7 @@
         }
         stop('cannot connect to database')
     }
-    sql <- paste('SELECT mapunit.mukey, component.cokey, component.comppct_r,',  props, 'FROM (mapunit INNER JOIN component
-	ON mapunit.mukey = component.mukey) INNER JOIN chorizon ON component.cokey = chorizon.cokey;')
+    sql <- paste('SELECT mapunit.mukey, component.cokey, component.comppct_r,',  props, 'FROM (mapunit INNER JOIN component ON mapunit.mukey = component.mukey) INNER JOIN chorizon ON component.cokey = chorizon.cokey;')
     d <- sqlQuery(con, sql)
     close(con)
 	d
