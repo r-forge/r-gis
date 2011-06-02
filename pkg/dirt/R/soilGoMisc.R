@@ -16,15 +16,6 @@
 
 .mergeSoilPol <- function(sp, d, filename='', overwrite=FALSE, verbose=TRUE) {
 
-	if (filename != '') {
-		# should first enforce the .shp extension
-		extension(filename) <- '.shp'
-		if (!overwrite & file.exists(filename)) {
-			warning('file exists and "overwrite=FALSE". returning data.frame')
-			return(d)
-		}
-	}
-
     if (is.character(sp)) {
 		if (!(require(rgdal))) {
 			stop("To read a shapefile you need the rgdal package; please install it")  
@@ -42,10 +33,24 @@
     if (length(i)==0) { stop('polygon attributes do not have a MUKEY field') }
 	spd <- merge(spd, d, by.x=i[1], by.y=1, all.x=TRUE)
 	spd <- spd[order(spd[,2]), -2]
-	colnames(spd) <- raster:::.fixNames(colnames(spd), verbose=verbose)
+	colnames(spd) <- raster:::.fixDBFNames(colnames(spd), verbose=verbose)
 	sp@data <- spd
+	
 	if (filename != '') {
+		extension(filename) <- '.shp'
+		if (file.exists(filename)) {
+			if (overwrite) {
+				file.remove(filename)
+				file.remove(extension(filename, '.dbf'))
+				file.remove(extension(filename, '.shx'))
+				
+			} else {
+				warning('file exists and "overwrite=FALSE". returning data.frame')
+				return(d)
+			} 
+		}
 		writeOGR(sp, filename, "soil", "ESRI Shapefile")
+		extension(filename) <- '.dbf'
 		return(invisible(sp))
 	} else {
 		return(sp)

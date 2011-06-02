@@ -21,6 +21,10 @@
 
 	# aggregate horizons by soil type
 	dd1 = aggregate(d[, vars], list(d$cokey), mysum)
+	if (ncol(dd1)==2) {
+		# single variable...
+		colnames(dd1)[2] = vars
+	}
 	colnames(dd1)[1] = 'cokey'
 
 	if (type=='mean') {
@@ -38,6 +42,10 @@
 
 	# aggregate soil type by map unit
 		ddd = aggregate(md[,vars], list(md$mukey), mysum)
+		if (ncol(ddd)==2) {
+			# single variable...
+			colnames(ddd)[2] = vars
+		}
 		colnames(ddd)[1] = 'mukey'
 
 	# assure that contributions add up to 100%

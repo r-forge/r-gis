@@ -36,7 +36,7 @@ c('comppct_l', 'comppct_r', 'comppct_h', 'compname', 'compkind', 'majcompflag', 
 	}
 	
 	horiz <- read.table(chof, sep='|')
-	colnames(horiz) <- dirt:::.getChon(vers)
+	colnames(horiz) <- .getChon(vers)
 
 #	mapf <- paste(tab, '/mapunit.txt', sep="")
 #	map <- read.table(mapf, sep='|')
@@ -44,7 +44,7 @@ c('comppct_l', 'comppct_r', 'comppct_h', 'compname', 'compkind', 'majcompflag', 
 #	map <- map[, c('mukey', 'cokey')]
 
 	comp <- read.table(cmpf, sep='|')
-	colnames(comp) <- dirt:::.getComn(vers)
+	colnames(comp) <- .getComn(vers)
 	comp <- comp[,c('cokey', 'mukey', 'comppct_r')]
 
     props <- unique(c('cokey', props, c("hzdept_r", "hzdepb_r")))
