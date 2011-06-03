@@ -14,7 +14,7 @@
 }
 
 
-.mergeSoilPol <- function(sp, d, filename='', overwrite=FALSE, verbose=TRUE) {
+.mergeSoilPol <- function(sp, d, filename='', overwrite=FALSE, verbose=TRUE, naValue=-9999) {
 
     if (is.character(sp)) {
 		if (!(require(rgdal))) {
@@ -48,6 +48,9 @@
 				warning('file exists and "overwrite=FALSE". returning data.frame')
 				return(d)
 			} 
+		}
+		if (!is.na(naValue)) {
+			sp@data[is.na(sp@data)] <- naValue
 		}
 		writeOGR(sp, filename, "soil", "ESRI Shapefile")
 		extension(filename) <- '.dbf'

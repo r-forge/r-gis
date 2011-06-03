@@ -1,5 +1,18 @@
 
 
+setClass('VectorLayer',
+	representation (
+		filename = 'character',
+		hdr = '.ShpHdr',
+		dbf = '.DBF',
+		nrecords = 'integer',
+		index = 'matrix',
+		crs = 'CRS'		
+	)
+)
+
+
+
 setClass('.ShpHdr',
 	representation (
 		code = 'integer',
@@ -31,17 +44,6 @@ setClass('.DBF',
 )
 
 
-setClass('ShapeFile',
-	representation (
-		filename = 'character',
-		hdr = '.ShpHdr',
-		dbf = '.DBF',
-		nrecords = 'integer',
-		index = 'matrix'
-	)
-)
-
-
 
 .shptype <- function(x) {
 	if (x==0) r <- "Null Shape"
@@ -62,20 +64,29 @@ setClass('ShapeFile',
 	return(r)
 }
 
-setMethod ('show' , 'ShapeFile', 
+setMethod ('show' , 'VectorLayer', 
 	function(object) {
 		cat('class       :' , class(object), '\n')
 		cat('filename    :' , object@filename, '\n')
 		cat('type        :' , .shptype(object@hdr@type), '\n')
 		cat('nrecords    :' , object@nrecords, '\n')
 		cat('nfields     :' , object@dbf@nfields, '\n')
+		cat('coord. ref. :' , projection(object, TRUE), '\n')
 	}
 )	
+
+
+setMethod('dimnames', signature(x='VectorLayer'), 
+function(x) { 
+		return(list(NULL, x@dbf@fields$NAME)) 
+	} 
+)
+
 
 .shxHeader <- function(fn) {
 # based on read.shx by Ben Stabler
 # in shapefiles pacakge
-	ext(fn) <- '.shx'
+	extension(fn) <- '.shx'
     f <- file(fn, "rb")
     on.exit(close(f))
 	hdr <- new('.ShpHdr')
@@ -101,7 +112,7 @@ setMethod ('show' , 'ShapeFile',
 # based on read.shx by Ben Stabler
 # in shapefiles pacakge
 	fn <- shp@filename
-	ext(fn) <- '.shx'
+	extension(fn) <- '.shx'
 	f <- file(fn, "rb")
     on.exit(close(f))
 	seek(f, 100)
@@ -115,7 +126,7 @@ setMethod ('show' , 'ShapeFile',
 .dbfHeader <- function(fn) {
 # based on read.dbf by Ben Stabler
 # in shapefiles pacakge
-    ext(fn) <- '.dbf'
+    extension(fn) <- '.dbf'
 	f <- file(fn, "rb")
 	on.exit(close(f))
 	dbf <- new('.DBF')
@@ -123,7 +134,7 @@ setMethod ('show' , 'ShapeFile',
     year <- readBin(f, integer(), 1, size = 1, endian = "little")
     month <- readBin(f, integer(), 1, size = 1, endian = "little")
     day <- readBin(f, integer(), 1, size = 1, endian = "little")
-	dbf@file.date <- gsub(" ", "-", paste(2000+year, month, day))
+	dbf@file.date <- paste(year, "-", month, "-", day, sep="")
     dbf@nrecords <- readBin(f, integer(), 1, size = 4, endian = "little")
     dbf@header.length <- readBin(f, integer(), 1, size = 2, endian = "little")
     dbf@record.length <- readBin(f, integer(), 1, size = 2, endian = "little")
@@ -146,7 +157,7 @@ setMethod ('show' , 'ShapeFile',
         field.decimal <- c(field.decimal, readBin(f, integer(), 1, 1, endian = "little"))
         file.temp <- readBin(f, integer(), 14, 1, endian = "little")
     }
-    fields <- data.frame(NAME = field.name, TYPE = field.type, LENGTH = field.length, DECIMAL = field.decimal)
+    fields <- data.frame(NAME = field.name, TYPE = field.type, LENGTH = field.length, DECIMAL = field.decimal, stringsAsFactors=FALSE)
     fields$LENGTH[fields$LENGTH < 0] <- (256 + fields$LENGTH[fields$LENGTH < 0])
     file.temp <- readBin(f, integer(), 1, 1, endian = "little")
     fields$LENGTH[1] <- fields$LENGTH[1] + 1
@@ -166,7 +177,7 @@ setMethod ('show' , 'ShapeFile',
 	nrec <- end - start + 1
 
 	fn <- shp@filename
-	ext(fn) <- '.dbf'
+	extension(fn) <- '.dbf'
 	f <- file(fn, "rb")
     on.exit(close(f))
 	seek(f, shp@dbf@header.length)
@@ -182,18 +193,13 @@ setMethod ('show' , 'ShapeFile',
 		a <- b + 1
 		i <- i + 1
 	}
+	rm(recb)
 	z <- matrix(ncol=shp@dbf@nfields, nrow=nrec)
 	colnames(z) <- shp@dbf@fields$NAME
 	
 	if (ncol(z) > 1) {
 		x <- shp@dbf@fields$LENGTH
-		from <- x
-		from[1] <- 1
-		for (i in 2:length(x)) {
-			from[i] <- from[i-1] + x[i-1]
-		}
-		# from = cumsum(x) - 1  ??
-		
+		from <- cumsum(c(1,x[-length(x)]))
 		to <- from+x-1
 		for (i in 1:length(records)) {
 			a <- records[[i]]
@@ -206,7 +212,8 @@ setMethod ('show' , 'ShapeFile',
 			z[,1] <- unlist(records)
 		}
 	}
-	
+
+	z[z=="************************"] <- NA
 	z <- data.frame(z, stringsAsFactors=FALSE)
 	for (i in 1:nrow(shp@dbf@fields)) {
 		if (shp@dbf@fields[i,2]=='N') {
@@ -214,7 +221,8 @@ setMethod ('show' , 'ShapeFile',
 		} else if (shp@dbf@fields[i,2]=='F') {
 			z[,i] <- as.numeric(z[,i])
 		} else if (shp@dbf@fields[i,2]=='C') {
-			z[,i] <- trim(z[,i])
+			x <- trim(z[,i])
+			z[z[,i]=="", i] <- NA
 		} else if (shp@dbf@fields[i,2]=='D') {		
 			z[,i] <- as.Date(z[,i], format = "%Y%m%d")
 		}
@@ -238,7 +246,7 @@ setMethod ('show' , 'ShapeFile',
 	stopifnot(end >= start)
 	
 	fn <- shp@filename
-	ext(fn) <- '.shp'
+	extension(fn) <- '.shp'
 	f <- file(fn, "rb")
     on.exit(close(f))
 	seek(f, shp@index[start,1])
@@ -332,10 +340,10 @@ getShapes <- function(shp, start, end, sp=TRUE) {
 }
 
  
-shapefile <- function(fn) {
+shape <- function(fn) {
 	require(raster)
-	x <- new('ShapeFile')
-	ext(fn) <- 'shp'
+	x <- new('VectorLayer')
+	extension(fn) <- 'shp'
 	x@filename <- fn
 	x@hdr <- .shxHeader(fn)
 	x <- .shxIndex(x)
