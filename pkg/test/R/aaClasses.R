@@ -21,7 +21,7 @@ setClass('GeoVectorFile',
 		
 
 
-setClass ('GeoVector', 
+setClass ('VectorLayer', 
 	contains = 'VIRTUAL', 
 	representation (
 		file = 'GeoVectorFile',

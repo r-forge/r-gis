@@ -12,7 +12,6 @@ setClass('VectorLayer',
 )
 
 
-
 setClass('.ShpHdr',
 	representation (
 		code = 'integer',
@@ -42,7 +41,6 @@ setClass('.DBF',
 		fields = 'data.frame'
 	)
 )
-
 
 
 .shptype <- function(x) {
@@ -79,6 +77,13 @@ setMethod ('show' , 'VectorLayer',
 setMethod('dimnames', signature(x='VectorLayer'), 
 function(x) { 
 		return(list(NULL, x@dbf@fields$NAME)) 
+	} 
+)
+
+
+setMethod('dimnames', signature(x='SpatialPolygonsDataFrame'), 
+function(x) { 
+		dimnames(x@data)
 	} 
 )
 
@@ -326,16 +331,66 @@ function(x) {
 }
 
 
+
+
 getShapes <- function(shp, start, end, sp=TRUE) {
 	geo <- .shpRecords(shp, start, end)
 	rec <- .dbfRecords(shp, start, end)
 	if (sp) {
+	
 		if (shp@hdr@type==1) {
+		
 			geo <- SpatialPointsDataFrame(geo, data=rec)
 			return(geo)
+			
+		} else if (shp@hdr@type==5) {
+
+			npol <- length(geo)
+			pols <- list()
+			for (i in 1:npol) {
+				subp <- list()
+				npart <- geo[[i]]$num.parts
+				idx <- c(geo[[i]]$parts, geo[[i]]$num.points)
+				for (j in 1:npart) {
+					p <- geo[[i]]$points[(idx[i]+1):idx[i+1], ]
+					subp <- c(subp, Polygon( p ))
+				}
+				pols <- c(pols, Polygons( subp, as.character(i)) )
+			}
+			# to do: hole detection
+			pols <- SpatialPolygons( pols )
+			pols <- SpatialPolygonsDataFrame(pols, rec)	
+			return(pols)
+			
+		} else if (shp@hdr@type==3) {
+
+			nlns <- length(geo)
+			lns <- list()
+			for (i in 1:nlns) {
+				subp <- list()
+				npart <- geo[[i]]$num.parts
+				idx <- c(geo[[i]]$parts, geo[[i]]$num.points)
+				for (j in 1:npart) {
+					p <- geo[[i]]$points[(idx[i]+1):idx[i+1], ]
+					subp <- c(subp, Line( p ))
+				}
+				lns <- c(lns, Lines( subp, as.character(i)) )
+			}
+			# to do: hole detection
+			pols <- SpatialLines( lns )
+			pols <- SpatialLinesDataFrame(lns, rec)	
+			return(lns)
+			
+
+		} else {
+			warning('type not implemented')
+			return(list(geo, rec))
 		}
+		
 	} else {
+	
 		return(list(geo, rec))
+		
 	}
 }
 
@@ -352,8 +407,9 @@ shape <- function(fn) {
 }
 
 
-#fn <- "AFG_adm1.shp"
-#x <- shapefile(fn)
-#d <- getShapes(x, 1, 3)
-#str(x)
+#fn <- "MEX_adm1.shp"
+#x <- shape(fn)
+#d <- getShapes(x, 5, 13)
+#plot(d)
+
 
