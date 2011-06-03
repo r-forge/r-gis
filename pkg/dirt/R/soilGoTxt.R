@@ -31,11 +31,19 @@ c('comppct_l', 'comppct_r', 'comppct_h', 'compname', 'compkind', 'majcompflag', 
 		vers <- vers[1]
 	} else {
 		if (!ignoreVersion) {
-			stop('unknown version: ', vers[1])
+			stop('unknown version: ', vers[1], '\n Please report this.\n You can try to use this file anyway, at your own risk, using argument "ignoreVersion=TRUE"')
 		}
 	}
 	
-	horiz <- read.table(chof, sep='|')
+	horiz <- try(read.table(chof, sep='|'), silent=TRUE)
+	if (class(horiz) == 'try-error') {
+		warning('table chorizon has no records. Assuming there are no soils in this area')
+		cn <- unique(c('cokey', props, "hzdept_r", "hzdepb_r", 'cokey', 'mukey', 'comppct_r'))
+		d <- data.frame(matrix(nrow=0, ncol=length(cn)))
+		colnames(d) <- cn
+		return(d)
+	}
+	
 	colnames(horiz) <- .getChon(vers)
 
 #	mapf <- paste(tab, '/mapunit.txt', sep="")

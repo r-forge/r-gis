@@ -1,8 +1,8 @@
-\name{Dirt-package}
+\name{dirt-package}
 
-\alias{Dirt-package}
+\alias{dirt-package}
 
-\alias{Dirt}
+\alias{dirt}
 \docType{package}
 
 \title{

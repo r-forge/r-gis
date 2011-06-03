@@ -4,54 +4,10 @@
 # Licence GPL v3
 
 
+soilGo <- function(dat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=TRUE, raster=FALSE, filename='', overwrite=FALSE,  verbose=TRUE, ... ) {
 
-soilGoMZ <- function(zipdat, depth=10, props=c("om_r", "claytotal_h"), tofile=TRUE, sp = NULL, verbose=TRUE, ... ) {
-	files <- as.character(unzip(zipdat, list = TRUE)$Name)
-	files <- files[tolower(extension(files)) == '.zip']
-	stopifnot(length(files) > 0)
+	stopifnot(dpto > dpfrom)
 	
-	if (tofile) {
-		out <- extension(zipdat, '')
-		dir.create(out, showWarnings=FALSE)
-	} else {
-		lst <- list()
-		i <- 1
-	}
-	pfiles <- paste(tempdir(), "/", files, sep = "")
-
-	for (i in 1:length(files)) {
-		f <- files[i]
-		if (verbose) {
-			cat(f, '\n'); flush.console()
-		}
-
-		unzip(zipdat, f, exdir=tempdir())
-		if (tofile) {
-			if (isTRUE(sp)) {
-				filename  <- extension(f, '.shp')
-			} else {
-				filename  <- extension(f, '.txt')			
-			}
-			filename <- paste(out, '/', filename, sep='')
-			try( x  <- soilGo(pfiles[i], props=props, depth=depth, sp=sp, filename=filename, overwrite=TRUE, verbose=FALSE, ...) )
-		} else {
-			try( lst[[i]]  <- soilGo(pfiles[i], props=props, depth=depth, sp=sp, overwrite=TRUE, verbose=FALSE, ...) )		
-			i <- i + 1
-		}
-		file.remove(pfiles[i])
-	}
-	if (!tofile) {
-		return(lst)
-	} else {
-		return(NULL)
-	}
-}
-
-
-
-
-soilGo <- function(dat, depth=10, props=c("om_r", "claytotal_h"), filename='', overwrite=FALSE, sp = NULL, raster=NULL, verbose=TRUE, ... ) {
-
     ext <- tolower(extension(dat))
 	if (!ext %in% c('.zip', '.mdb')) {
 		stop('"dat" should be a .zip file or an access (.mdb) file')
@@ -64,6 +20,21 @@ soilGo <- function(dat, depth=10, props=c("om_r", "claytotal_h"), filename='', o
 	} else if (ext == '.zip') {
 		wdir <- paste(tempdir(), "/R_dirt_ssurgo_tmp", sep = "")
 		x <- unzip(dat, exdir=wdir)
+		
+		path <- strsplit(as.character(x[1,1]), '/')[[1]][1]
+		hasTabular <- length(which(x[,1] == paste(path, '/tabular/', sep='')))
+		if (!hasTabular) {
+			stop('zip file has no tabular data')
+		}
+		hasSpatial <- length(which(x[,1] == paste(path, '/spatial/', sep='')))
+		if (!hasSpatial) {
+			if (isTRUE(sp)) {
+				warning('zip file has no spatial data')
+				sp <- FALSE
+				filename <- ''
+			}
+		}
+		
 		dat <- extension(basename(dat), '')
 		dat <- paste(wdir, '/', dat, '/tabular', sep="")
 		if (!file.exists(dat)) {
@@ -73,7 +44,7 @@ soilGo <- function(dat, depth=10, props=c("om_r", "claytotal_h"), filename='', o
 		on.exit( unlink( wdir , recursive=TRUE) )
 	} 
 	
-	d <- .processGo(d, depth, props)
+	d <- .processGo(d, dpfrom, dpto, props)
 	
     if (!is.null(raster)) {
 	
