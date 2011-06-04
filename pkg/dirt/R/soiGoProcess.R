@@ -6,20 +6,22 @@
 
 .processGo <- function(d, dpfrom, dpto, vars, type='mean') {
 
-	depth <- dpto- dpfrom 
-
 	if (nrow(d) > 0) {
 #	d$contr <- (pmin(depth, d$hzdepb_r) - pmin(depth, d$hzdept_r)) / depth
-		d$contr <- pmax(pmin(dpto, d$hzdepb_r) - pmax(dpfrom, d$hzdept_r), 0) / depth
+		maxdp <- aggregate(d$hzdepb_r, list(d$cokey), max)
+		colnames(maxdp) <- c('cokey', 'depth')
+		d$contr <- pmax(pmin(dpto, d$hzdepb_r) - pmax(dpfrom, d$hzdept_r), 0) / (dpto - dpfrom)
 		d <- subset(d, d$contr > 0)
 	}
 	
 	if (nrow(d) == 0) {
-		d <- data.frame((matrix(nrow=0, ncol=length(vars)+3)))
-		colnames(d) <- c('mukey', vars, 'pctSoil', 'depth')
+		d <- data.frame((matrix(nrow=0, ncol=length(vars)+4)))
+		colnames(d) <- c('mukey', vars, 'pctSoil', 'depth', 'sample')
 		return(d)
 	}
-	
+
+	d <- merge(d, maxdp, by='cokey')
+	vars <- c(vars, 'depth')
 	d[, vars] <- d[, vars] * d$contr
 
     mysum <- function(x) {
@@ -65,10 +67,9 @@
 		stopifnot( all(ddd[,1] == ddd2[,1]) )  # should not be necessary to check, it seems
 		ddd$pctSoil <- ddd2[,2]
 		ddd[,vars] <- ddd[,vars] / ddd$pctSoil
-		ddd[,vars] <- ddd[,vars] / ddd$pctSoil
-		ddd$depth <- paste(dpfrom, '-', dpto, sep='')		
+		ddd$sample <- paste(dpfrom, '-', dpto, sep='')		
 	} else {
-		stop()
+		stop('not implemented')
 	}
 	ddd
 }
