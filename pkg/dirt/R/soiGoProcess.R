@@ -15,8 +15,8 @@
 	}
 	
 	if (nrow(d) == 0) {
-		d <- data.frame((matrix(nrow=0, ncol=length(vars)+4)))
-		colnames(d) <- c('mukey', vars, 'pctSoil', 'fromto')
+		d <- data.frame((matrix(nrow=0, ncol=length(vars)+3)))
+		colnames(d) <- c('mukey', vars, 'pctSoil', 'depth')
 		return(d)
 	}
 	
@@ -66,7 +66,7 @@
 		ddd$pctSoil <- ddd2[,2]
 		ddd[,vars] <- ddd[,vars] / ddd$pctSoil
 		ddd[,vars] <- ddd[,vars] / ddd$pctSoil
-		ddd$fromto <- paste(dpfrom, '-', dpto, sep='')		
+		ddd$depth <- paste(dpfrom, '-', dpto, sep='')		
 	} else {
 		stop()
 	}
