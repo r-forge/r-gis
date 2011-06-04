@@ -9,7 +9,7 @@ STATSGO and SSURGO are soil survey database for the Unites States
 }
 
 \usage{
-soilGoMZ(zipdat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=FALSE, tofile=TRUE, overwrite=FALSE, verbose=TRUE, ... ) 
+soilGoMZ(zipdat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=FALSE, tofile=TRUE, overwrite=FALSE, unzip='internal', verbose=TRUE, ... ) 
 
 }
 \arguments{
@@ -20,6 +20,7 @@ soilGoMZ(zipdat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=FALSE, to
   \item{sp}{ Logical. Should values be returned as a SpatialPolygonsDataFrame (and should a shapefile be written, if a filename is supplied)}
   \item{tofile}{ save results to a file? }  
   \item{overwrite}{ Logical }
+  \item{unzip}{ unzip method to be used. See \code{\link{unzip}}. On windows, the default value needs to be changed for very large files}
   \item{verbose}{ verbose feedback }  
   \item{...}{ nada }
 }

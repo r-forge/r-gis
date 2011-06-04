@@ -3,8 +3,9 @@
 # Version 1.0
 # Licence GPL v3
 
-soilGoMZ <- function(zipdat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=FALSE, tofile=TRUE, overwrite=FALSE, verbose=TRUE, ... ) {
-	files <- as.character(unzip(zipdat, list = TRUE)$Name)
+soilGoMZ <- function(zipdat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=FALSE, tofile=TRUE, overwrite=FALSE, unzip="internal", verbose=TRUE, ... ) {
+
+	files <- as.character(unzip(zipdat, list=TRUE, unzip=unzip)$Name)
 	files <- files[tolower(extension(files)) == '.zip']
 	stopifnot(length(files) > 0)
 	
@@ -24,7 +25,7 @@ soilGoMZ <- function(zipdat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), 
 			cat(f, '\n'); flush.console()
 		}
 
-		unzip(zipdat, f, exdir=tempdir())
+		unzip(zipdat, f, exdir=tempdir(), unzip=unzip)
 		if (tofile) {
 			if (isTRUE(sp)) {
 				filename  <- extension(f, '.shp')
