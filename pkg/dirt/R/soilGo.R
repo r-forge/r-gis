@@ -19,14 +19,16 @@ soilGo <- function(dat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=TR
 		
 	} else if (ext == '.zip') {
 		wdir <- paste(tempdir(), "/R_dirt_ssurgo_tmp", sep = "")
+		wdir <- gsub('\\\\', '/', wdir)
+		on.exit( unlink( wdir , recursive=TRUE) )
 		x <- unzip(dat, exdir=wdir)
-		
-		path <- strsplit(as.character(x[1,1]), '/')[[1]][1]
-		hasTabular <- length(which(x[,1] == paste(path, '/tabular/', sep='')))
+		x <- gsub(paste(wdir, '/', sep=''), '', x)
+		x <- strsplit(x, '/')
+		hasTabular <- sum(sapply(x, function(y)y[2] == 'tabular')) > 10
 		if (!hasTabular) {
 			stop('zip file has no tabular data')
 		}
-		hasSpatial <- length(which(x[,1] == paste(path, '/spatial/', sep='')))
+		hasSpatial <- sum(sapply(x, function(y)y[2] == 'spatial')) > 2
 		if (!hasSpatial) {
 			if (isTRUE(sp)) {
 				warning('zip file has no spatial data')
@@ -41,28 +43,24 @@ soilGo <- function(dat, dpfrom=0, dpto=15, props=c("om_r", "claytotal_h"), sp=TR
 			stop('contents of zip file do not seem to be SSURGO or STATSGO data')
 		}
 		d <- .getSoilGoTxt(dat, props, ...)
-		on.exit( unlink( wdir , recursive=TRUE) )
 	} 
 	
 	d <- .processGo(d, dpfrom, dpto, props)
 	
-    if (!is.null(raster)) {
+    if (isTRUE(sp)) {
+	
+		dat <- gsub('\\\\', '/', dat)
+		# remove 'tabular'
+		shp <- substr(dat, 1, nchar(dat)-7)			
+		sp <- unlist(strsplit(dat, '/'))
+		sp <- sp[length(sp)-1]
+		sp <- unlist(strsplit(sp, '_'))
+		sp <- paste(shp, 'spatial/', sp[1], 'mu_a_', sp[2], '.shp', sep='')
+		return(.mergeSoilPol(sp, d, filename, overwrite=overwrite, verbose=verbose))
+		
+    } else if (isTRUE(raster)) {
 	
 		return(.mergeSoilRaster(raster, d, props, filename, overwrite=overwrite))
-		
-    } else if (!is.null(sp)) {
-	
-		if (isTRUE(sp)) {
-			dat <- gsub('\\\\', '/', dat)
-			# remove 'tabular'
-			shp <- substr(dat, 1, nchar(dat)-7)			
-			sp <- unlist(strsplit(dat, '/'))
-			sp <- sp[length(sp)-1]
-			sp <- unlist(strsplit(sp, '_'))
-			sp <- paste(shp, 'spatial/', sp[1], 'mu_a_', sp[2], '.shp', sep='')
-			
-		}
-		return(.mergeSoilPol(sp, d, filename, overwrite=overwrite, verbose=verbose))
 		
 	} else if (filename!= '') {
 		if (!overwrite & file.exists(filename)) {

@@ -19,7 +19,7 @@ c('comppct_l', 'comppct_r', 'comppct_h', 'compname', 'compkind', 'majcompflag', 
 
 
 
-.getSoilGoTxt <- function(tab, props, ignoreVersion=FALSE) {
+.getSoilGoTxt <- function(tab, props, ignoreVersion=FALSE, ...) {
 
 	verf <- paste(tab, '/version.txt', sep="")
 	cmpf <- paste(tab, '/comp.txt', sep="")

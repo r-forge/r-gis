@@ -7,11 +7,12 @@
 .processGo <- function(d, dpfrom, dpto, vars, type='mean') {
 
 	depth <- dpto- dpfrom 
-#	d$contr <- (pmin(depth, d$hzdepb_r) - pmin(depth, d$hzdept_r)) / depth
 
-	d$contr <- pmax(pmin(dpto, d$hzdepb_r) - pmax(dpfrom, d$hzdept_r), 0) / depth
-		
-	d <- subset(d, d$contr > 0)
+	if (nrow(d) > 0) {
+#	d$contr <- (pmin(depth, d$hzdepb_r) - pmin(depth, d$hzdept_r)) / depth
+		d$contr <- pmax(pmin(dpto, d$hzdepb_r) - pmax(dpfrom, d$hzdept_r), 0) / depth
+		d <- subset(d, d$contr > 0)
+	}
 	
 	if (nrow(d) == 0) {
 		d <- data.frame((matrix(nrow=0, ncol=length(vars)+4)))
