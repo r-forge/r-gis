@@ -53,7 +53,6 @@
 			sp@data[is.na(sp@data)] <- naValue
 		}
 		writeOGR(sp, filename, "soil", "ESRI Shapefile")
-		extension(filename) <- '.dbf'
 		return(invisible(sp))
 	} else {
 		return(sp)

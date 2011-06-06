@@ -6,6 +6,8 @@
 
 .processGo <- function(d, dpfrom, dpto, vars, type='mean') {
 
+	stopifnot(type %in% c('mean')) #, 'min', 'max'))
+	
 	if (nrow(d) > 0) {
 #	d$contr <- (pmin(depth, d$hzdepb_r) - pmin(depth, d$hzdept_r)) / depth
 		maxdp <- aggregate(d$hzdepb_r, list(d$cokey), max)
@@ -40,36 +42,34 @@
 		colnames(dd1)[2] = vars
 	}
 	colnames(dd1)[1] = 'cokey'
-
-	if (type=='mean') {
-
-	# assure that contributions add up to 100%
-		dd2 = aggregate(d$contr, list(d$cokey), mysum)
-		colnames(dd2) = c('cokey', 'contr')
-		stopifnot(all(dd1[,1] == dd2[,1]))
-		dd1[,vars] = dd1[,vars] / dd2[,2]
+	# adjust if the contributions do not add up to 100%
+	dd2 = aggregate(d$contr, list(d$cokey), mysum)
+	colnames(dd2) = c('cokey', 'contr')
+	stopifnot(all(dd1[,1] == dd2[,1]))
+	dd1[,vars] = dd1[,vars] / dd2[,2]
 
 	#dd3 = merge(dd1, dd2, 'cokey')
-		m = unique(d[,c('mukey', 'cokey', 'comppct_r')])
-		md = merge(m, dd1, by='cokey')
-		md[,vars] = md[,vars] * md$comppct_r
-
+	m = unique(d[,c('mukey', 'cokey', 'comppct_r')])
+	md = merge(m, dd1, by='cokey')
+	
+	# only for means...
+	md[,vars] = md[,vars] * md$comppct_r
+	
 	# aggregate soil type by map unit
-		ddd = aggregate(md[,vars], list(md$mukey), mysum)
-		if (ncol(ddd)==2) {
-			# single variable...
-			colnames(ddd)[2] = vars
-		}
-		colnames(ddd)[1] = 'mukey'
+	ddd = aggregate(md[,vars], list(md$mukey), mysum)
+	if (ncol(ddd)==2) {
+		# single variable...
+		colnames(ddd)[2] = vars
+	}
+	colnames(ddd)[1] = 'mukey'
 
 	# assure that contributions add up to 100%
-		ddd2 = aggregate(md$comppct_r, list(md$mukey), mysum)
-		stopifnot( all(ddd[,1] == ddd2[,1]) )  # should not be necessary to check, it seems
-		ddd$pctSoil <- ddd2[,2]
-		ddd[,vars] <- ddd[,vars] / ddd$pctSoil
-		ddd$sample <- paste(dpfrom, '-', dpto, sep='')		
-	} else {
-		stop('not implemented')
-	}
+	ddd2 = aggregate(md$comppct_r, list(md$mukey), mysum)
+
+
+	stopifnot( all(ddd[,1] == ddd2[,1]) )  # should not be necessary to check, it seems
+	ddd$pctSoil <- ddd2[,2]
+	ddd[,vars] <- ddd[,vars] / ddd$pctSoil
+	ddd$sample <- paste(dpfrom, '-', dpto, sep='')
 	ddd
 }
