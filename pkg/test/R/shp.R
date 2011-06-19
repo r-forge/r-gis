@@ -171,14 +171,35 @@
 
 
 
-.getShapes <- function(shp, start, end, sp=TRUE) {
-	geo <- .shpRecords(shp, start, end)
-	rec <- .dbfRecords(shp, start, end)
+.getShapes <- function(shp, start, end, vec=TRUE, att=TRUE, sp=TRUE) {
+	
+	if (!vec) { 
+		if (!att) {
+			stop('nothing to do if vec=F & att=F')
+		}
+		return( .dbfRecords(shp, start, end) )
+	} else {
+		geo <- .shpRecords(shp, start, end)
+		if (att) {
+			rec <- .dbfRecords(shp, start, end) 
+			if (!sp) {
+				return(list(geo, rec))
+			}
+		} else {
+			if (!sp) {
+				return(geo)
+			}
+		}
+	}
+	
 	if (sp) {
 	
 		if (shp@vec@type==1) {
-		
-			geo <- SpatialPointsDataFrame(geo, data=rec)
+			if (att) {
+				geo <- SpatialPointsDataFrame(geo, data=rec)
+			} else {
+				geo <- SpatialPoints(geo)
+			}
 			return(geo)
 			
 		} else if (shp@vec@type==5) {
@@ -193,39 +214,34 @@
 
 			npol <- length(geo)
 			pols <- SpatialPolygons( sapply(1:npol, function(x) getPols(x))	)
-			pols <- SpatialPolygonsDataFrame(pols, rec)	
+			if (att) {
+				pols <- SpatialPolygonsDataFrame(pols, rec)	
+			}
 			return(pols)
 			
 		} else if (shp@vec@type==3) {
 
-			nlns <- length(geo)
-			lns <- list()
-			for (i in 1:nlns) {
-				subp <- list()
+			getLines <- function(i) {
 				npart <- geo[[i]]$num.parts
 				idx <- c(geo[[i]]$parts, geo[[i]]$num.points)
-				for (j in 1:npart) {
-					p <- geo[[i]]$points[(idx[i]+1):idx[i+1], ]
-					subp <- c(subp, Line( p ))
-				}
-				lns <- c(lns, Lines( subp, as.character(i)) )
-			}
+				subl <- lapply(1:npart, function(j) Line(geo[[i]]$points[(idx[j]+1):idx[j+1], ]))
 			# to do: hole detection
-			pols <- SpatialLines( lns )
-			pols <- SpatialLinesDataFrame(lns, rec)	
-			return(lns)
-			
+				list(Lines( subl, as.character(i))) 
+			}
 
+			nlns <- length(geo)
+			lns <- SpatialLines( sapply(1:nlns, function(x) getLines(x))	)
+			if (att) {
+				lns <- SpatialLinesDataFrame(lns, rec)	
+			}
+			return(lns)
+		
+	
 		} else {
 			warning('type not implemented')
 			return(list(geo, rec))
 		}
-		
-	} else {
-	
-		return(list(geo, rec))
-		
-	}
+	} 
 }
 
 
@@ -261,7 +277,7 @@ layer <- function(filename) {
 	if (x@att@nrecords != x@nrecords) {
 		warning('number of attribute records does not much number of index file records. Shapfile might be invalid.')
 	}
-	prj <- extension(f, '.prj')
+	prj <- extension(filename, '.prj')
 	if (file.exists(prj)) {
 		prj <- unlist(readLines(prj, warn=FALSE))
 		# now what?
@@ -270,12 +286,12 @@ layer <- function(filename) {
 	x
 }
 
-getVector <- function(layer, start=1, end, sp=TRUE) {
+getVector <- function(layer, start=1, end, vec=TRUE, att=TRUE, sp=TRUE) {
 	start <- min( max(1, start), layer@nrecords )
 	if (missing(end)) { end <- layer@nrecords }
 	if (end < start) { end <- start }
 	if (layer@driver == 'shape') {
-		return(.getShapes(layer, start, end, sp=sp))
+		return(.getShapes(layer, start, end, vec=vec, att=att, sp=sp))
 	}	
 }
 

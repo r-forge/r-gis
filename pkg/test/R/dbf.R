@@ -71,12 +71,12 @@
 		from <- reclng * (i-1) + 1
 		to <- from + reclng
 		recbin <- rawbin[from:to]
-		records[[i]] = readBin(recbin, "character", 1)
+		readBin(recbin, "character", 1)
 	}
 
 	records <- lapply(1:nrec, function(x) getRec(x))
+	rm(rawbin)
 	
-	rm(recb)
 	z <- matrix(ncol=shp@att@nfields, nrow=nrec)
 	colnames(z) <- shp@att@fields$NAME
 	

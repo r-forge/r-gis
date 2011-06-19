@@ -33,6 +33,6 @@ Maintainer: <r.hijmans@gmail.com>
 \keyword{ spatial }
 
 \seealso{
-\code{\link[<sp>:<sp>-package]{<sp>}} ~~
+\code{\link[<sp>:<sp>-package]{<sp>}}
 }
 
