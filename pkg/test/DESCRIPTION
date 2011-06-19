@@ -3,7 +3,7 @@ Type: Package
 Title: test
 Version: 0.0-1
 Date: 5-March-2010
-Depends: methods, sp, R (>= 2.8.0)
+Depends: methods, sp, raster, XML, R (>= 2.8.0)
 Suggests: rgdal (>= 0.5-33), deldir
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 

@@ -1,10 +1,8 @@
 #Author/copyright: Bjarke Christensen	
 #License: ?
 
-#  require(XML)
-#    require(sp)
 	
-split.SpatialPointsDataFrame <- function(x, f, drop=F) {
+.split.SpatialPointsDataFrame <- function(x, f, drop=F) {
     stopifnot(class(x)=="SpatialPointsDataFrame")
     stopifnot(length(f) == nrow(x))
     if (!is.factor(f)) f <- factor(f)
@@ -13,7 +11,7 @@ split.SpatialPointsDataFrame <- function(x, f, drop=F) {
     res
 }
 
-split.SpatialPolygonsDataFrame <- function(x, f, drop=F) {
+.split.SpatialPolygonsDataFrame <- function(x, f, drop=F) {
     stopifnot(class(x)=="SpatialPolygonsDataFrame")
     stopifnot(length(f) == nrow(x))
     if (!is.factor(f)) f <- factor(f)
@@ -22,7 +20,7 @@ split.SpatialPolygonsDataFrame <- function(x, f, drop=F) {
     res
 }
 
-split.SpatialLinesDataFrame <- function(x, f, drop=F) {
+.split.SpatialLinesDataFrame <- function(x, f, drop=F) {
     stopifnot(class(x)=="SpatialLinesDataFrame")
     stopifnot(length(f) == nrow(x))
     if (!is.factor(f)) f <- factor(f)
@@ -33,7 +31,7 @@ split.SpatialLinesDataFrame <- function(x, f, drop=F) {
 
 
 
-KMLstyle <- function(tree, id, href="http://maps.google.com/mapfiles/kml/shapes/placemark_square.png", scale="0.5", color="FF0000FF") {
+.KMLstyle <- function(tree, id, href="http://maps.google.com/mapfiles/kml/shapes/placemark_square.png", scale="0.5", color="FF0000FF") {
       tree$addNode("Style", attrs=c(id=id), close=F)
       tree$addNode("IconStyle", close=F)
       tree$addNode("color", color)
@@ -53,7 +51,7 @@ KMLstyle <- function(tree, id, href="http://maps.google.com/mapfiles/kml/shapes/
     }
 
 	
-KMLpolygons <- function(tree, object, style, foldername, altitude="0", ...) {
+.KMLpolygons <- function(tree, object, style, foldername, altitude="0", ...) {
       dataframe <- ("data" %in% slotNames(object))
       colnm <- switch(dataframe,
                         T = paste("<b>", names(slot(object, 'data')), ":</b>", sep=""),
@@ -106,7 +104,7 @@ KMLpolygons <- function(tree, object, style, foldername, altitude="0", ...) {
 
 
 	
-KMLlines <- function(tree, object, style, foldername, altitude="0", ...) {
+.KMLlines <- function(tree, object, style, foldername, altitude="0", ...) {
       colnm <- paste("<b>", names(slot(object, 'data')), ":</b>", sep="")
       lines <- coordinates(object)
       if (length(altitude)==length(lines)) {
@@ -149,7 +147,7 @@ KMLlines <- function(tree, object, style, foldername, altitude="0", ...) {
     }
 
 
-KMLpoints <- function(tree, object, style, foldername, ...) {
+.KMLpoints <- function(tree, object, style, foldername, ...) {
       colnm <- paste("<b>", names(slot(object, 'data')), ":</b>", sep="")
       tree$addNode("Folder", close=F)
         tree$addNode("name", foldername)
@@ -169,47 +167,46 @@ KMLpoints <- function(tree, object, style, foldername, ...) {
       return(tree)
     }
 
-KMLcolor <- function(colors, alpha="ff", ...) {
+.KMLcolor <- function(colors, alpha="ff", ...) {
       padhex <- function(x) ifelse(x<16, paste("0", as.character(as.hexmode(x)), sep=""), as.character(as.hexmode(x)))
         rgbcolor <- col2rgb(colors)
         apply(rgbcolor, 2, function(x) paste(alpha, padhex(x[3]), padhex(x[2]), padhex(x[1]), sep=""))
     }
 
-KMLreproject <- function(object) {
-          require(rgdal)
-          return(spTransform(object, CRS("+proj=longlat")))
-      return(ret)
-    }
+.KMLreproject <- function(object) {
+	require(rgdal)
+	return(spTransform(object, CRS("+proj=longlat")))
+}
 
 	
 KML <- function(object, name=substitute(object), colors=palette(), file, altitude="0", ...) {
-       colors <- KMLcolor(colors, ...)
+       colors <- .KMLcolor(colors, ...)
        tr <- xmlTree("kml",
                       namespaces=c("http://www.opengis.net/kml/2.2", gx="http://www.google.com/kml/ext/2.2", kml="http://www.opengis.net/kml/2.2", atom="http://www.w3.org/2005/Atom"))
        tr$addNode("Document", close=F)
          tr$addNode("name", name)
          if (class(object) %in% c('SpatialPointsDataFrame', 'SpatialPolygonsDataFrame', 'SpatialLinesDataFrame', 'SpatialPoints', 'SpatialPolygons', 'SpatialLines')) {
-            object <- KMLreproject(object)
-            tr <- KMLstyle(tr, 'style1', color=colors[1])
+            object <- .KMLreproject(object)
+            tr <- .KMLstyle(tr, 'style1', color=colors[1])
             tr <- switch(class(object),
-              'SpatialPointsDataFrame' = KMLpoints(tr, object, style='#style1', foldername=name, ...),
-              'SpatialPolygonsDataFrame' = KMLpolygons(tr, object, style='#style1', foldername=name, altitude=altitude, ...),
-              'SpatialLinesDataFrame' = KMLlines(tr, object, style='#style1', foldername=name, altitude=altitude, ...),
-              'SpatialPoints' = KMLpoints(tr, object, style='#style1', foldername=name, ...),
-              'SpatialPolygons' = KMLpolygons(tr, object, style='#style1', foldername=name, altitude=altitude, ...),
-              'SpatialLines' = KMLlines(tr, object, style='#style1', foldername=name, altitude=altitude, ...)
+              'SpatialPointsDataFrame' = .KMLpoints(tr, object, style='#style1', foldername=name, ...),
+              'SpatialPolygonsDataFrame' = .KMLpolygons(tr, object, style='#style1', foldername=name, altitude=altitude, ...),
+              'SpatialLinesDataFrame' = .KMLlines(tr, object, style='#style1', foldername=name, altitude=altitude, ...),
+              'SpatialPoints' = .KMLpoints(tr, object, style='#style1', foldername=name, ...),
+              'SpatialPolygons' = .KMLpolygons(tr, object, style='#style1', foldername=name, altitude=altitude, ...),
+              'SpatialLines' = .KMLlines(tr, object, style='#style1', foldername=name, altitude=altitude, ...)
               )
          } else {
-            object <- lapply(object, KMLreproject)
-            for (i in 1:length(object)) tr <- KMLstyle(tr, paste('style', i, sep=""), color=colors[i])
+            object <- lapply(object, .KMLreproject)
+            for (i in 1:length(object)) tr <- .KMLstyle(tr, paste('style', i, sep=""), color=colors[i])
             for (i in 1:length(object)) {
               tr <- switch(class(object[[i]]),
-                'SpatialPointsDataFrame' = KMLpoints(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], ...),
-                'SpatialPolygonsDataFrame' = KMLpolygons(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...),
-                'SpatialLinesDataFrame' = KMLlines(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...),
-                'SpatialPoints' = KMLpoints(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], ...),
-                'SpatialPolygons' = KMLpolygons(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...),
-                'SpatialLines' = KMLlines(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...)
+                'SpatialPointsDataFrame' = .KMLpoints(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], ...),
+                'SpatialPolygonsDataFrame' = .KMLpolygons(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...),
+                'SpatialLinesDataFrame' = .KMLlines(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...),
+                'SpatialPoints' = .KMLpoints(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], ...),
+                'SpatialPolygons' = .KMLpolygons(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...),
+                'SpatialLines' = .KMLlines(tr, object[[i]], style=paste('#style', i, sep=""), foldername=names(object)[[i]], altitude=altitude[i], ...)
                 )
             }
          }

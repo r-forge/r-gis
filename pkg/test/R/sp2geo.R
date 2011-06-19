@@ -9,11 +9,11 @@
 setAs('Spatial', 'GeoVector', 
 	function(from) { 
 		if (inherits(from, 'SpatialPolygons')) {
-			return( setAs(from, 'GeoPolygons') )
+			return( setAs(from, 'VectorLayerPolygons') )
 		} else if (inherits(from, 'SpatialLines')) {
-			return( setAs(from, 'GeoLines') )	
+			return( setAs(from, 'VectorLayerLines') )	
 		} else if (inherits(from, 'SpatialPoints')) {
-			return( setAs(from, 'GeoPoints') )		
+			return( setAs(from, 'VectorLayerPoints') )		
 		} else {
 			stop('What kind of object is this?')
 		}
@@ -21,7 +21,7 @@ setAs('Spatial', 'GeoVector',
 )
 
 
-setAs('SpatialPolygons', 'GeoPolygons', 
+setAs('SpatialPolygons', 'VectorLayerPolygons', 
 	function(from) { 
 		geo <- .fromSpPolygons(from)
 		geo@data = data.frame(id=1:nrow(geo@xy))
@@ -29,7 +29,7 @@ setAs('SpatialPolygons', 'GeoPolygons',
 	}
 )
 
-setAs('SpatialPolygonsDataFrame', 'GeoPolygons', 
+setAs('SpatialPolygonsDataFrame', 'VectorLayerPolygons', 
 	function(from) { 
 		geo <- .fromSpPolygons(from)
 		geo@data <- from@data
@@ -37,7 +37,7 @@ setAs('SpatialPolygonsDataFrame', 'GeoPolygons',
 	}
 )
 
-setAs('SpatialLines', 'GeoLines', 
+setAs('SpatialLines', 'VectorLayerLines', 
 	function(from) { 
 		geo <- .fromSpLines(from)
 		geo@data = data.frame(id=1:nrow(geo@xy))
@@ -45,7 +45,7 @@ setAs('SpatialLines', 'GeoLines',
 	}
 )
 
-setAs('SpatialLinesDataFrame', 'GeoLines', 
+setAs('SpatialLinesDataFrame', 'VectorLayerLines', 
 	function(from) { 
 		geo <- .fromSpLines(from)
 		geo@data <- from@data
@@ -54,7 +54,7 @@ setAs('SpatialLinesDataFrame', 'GeoLines',
 )
 
 
-setAs('SpatialPoints', 'GeoPoints', 
+setAs('SpatialPoints', 'VectorLayerPoints', 
 	function(from) { 
 		geo <- .fromSpPoints(from)
 		geo@data = data.frame(id=1:nrow(geo@xy))
@@ -62,7 +62,7 @@ setAs('SpatialPoints', 'GeoPoints',
 	}
 )
 
-setAs('SpatialPointsDataFrame', 'GeoPoints', 
+setAs('SpatialPointsDataFrame', 'VectorLayerPoints', 
 	function(from) { 
 		geo <- .fromSpPoints(from)
 		geo@data <- from@data
@@ -82,7 +82,7 @@ setAs('SpatialPointsDataFrame', 'GeoPoints',
 	colnames(holes) = c('id', 'part')
 	last = 0
 	for (i in 1:n) {
-		parts = length(p[[i]]@Polygons
+		parts = length(p[[i]]@Polygons)
 		for (j in 1:parts) {
 			crd = p[[i]]@Polygons[[j]]@coords
 			nr = dim(crd)[1]
@@ -112,7 +112,7 @@ setAs('SpatialPointsDataFrame', 'GeoPoints',
 	colnames(xy) = c('x', 'y')
 	last = 0
 	for (i in 1:n) {
-		parts = length(p[[i]]@Lines
+		parts = length(p[[i]]@Lines)
 		for (j in 1:parts) {
 			crd = p[[i]]@Lines[[j]]@coords
 			nr = dim(crd)[1]
