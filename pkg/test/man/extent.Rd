@@ -3,7 +3,7 @@
 \Rdversion{1.1}
 
 \alias{extent}
-\alias{extent,GeoVector-method}
+\alias{extent,VectorLayer-method}
 
 \title{
 Exent

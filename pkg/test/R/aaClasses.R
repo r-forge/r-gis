@@ -57,8 +57,13 @@ setClass('.GeoAttributesDBF',
 )
 
 		
+setClass ('.GeoData', 
+	representation (
+		xy  = 'matrix'
+	)
+)
 		
-
+		
 setClass ('VectorLayer', 
 	contains = 'VIRTUAL', 
 	representation (
@@ -66,10 +71,9 @@ setClass ('VectorLayer',
 		driver = 'character',
 		vec = '.GeoSpatial',
 		att = '.GeoAttributes',
+		data = '.GeoData',
 		nrecords = 'integer',
-		crs = 'CRS',
-		data = 'data.frame',
-		xy  = 'matrix'
+		crs = 'CRS'
 	),
 	prototype (	
 		file = '',

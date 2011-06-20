@@ -6,7 +6,7 @@
 
 
 
-setMethod('length', signature(x='GeoVector'), 
+setMethod('length', signature(x='VectorLayer'), 
 function(x) {
 	return(length(unique(x@id[,1])))
 }

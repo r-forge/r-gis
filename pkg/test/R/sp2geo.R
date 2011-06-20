@@ -6,7 +6,7 @@
 
 
 
-setAs('Spatial', 'GeoVector', 
+setAs('Spatial', 'VectorLayer', 
 	function(from) { 
 		if (inherits(from, 'SpatialPolygons')) {
 			return( setAs(from, 'VectorLayerPolygons') )
@@ -94,7 +94,7 @@ setAs('SpatialPointsDataFrame', 'VectorLayerPoints',
 			}
 		}
 	}
-	geo = new('GeoPolygons')
+	geo = new('VectorLayerPolygons')
 	geo@xy= xy
 	geo@id = id
 	geo@holes = holes
@@ -121,7 +121,7 @@ setAs('SpatialPointsDataFrame', 'VectorLayerPoints',
 			xy=rbind(xy, crd)
 		}
 	}
-	geo = new('GeoLines')
+	geo = new('VectorLayerLines')
 	geo@xy= xy
 	geo@id = id
 	return(geo)
@@ -136,7 +136,7 @@ setAs('SpatialPointsDataFrame', 'VectorLayerPoints',
 	colnames(id) = c('id', 'part', 'first', 'last')
 	id[,c(1,3,4)] <- 1:nrow(id)
 	id[,2] <- 1
-	geo = new('GeoPoints')
+	geo = new('VectorLayerPoints')
 	geo@xy= xy
 	geo@id = id
 	return(geo)

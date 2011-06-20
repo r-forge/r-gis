@@ -16,7 +16,7 @@ if (!isGeneric('piece')) {
 }  
 
 
-setMethod('piece', signature(x='GeoVector', i='numeric', j='numeric'), 
+setMethod('piece', signature(x='VectorLayer', i='numeric', j='numeric'), 
 function(x, i, j) {
 	x <- getpiece(x, i[1])
 	np = nrow(x@id)
@@ -34,8 +34,7 @@ function(x, i, j) {
 }
 )
 
-
-setMethod('piece', signature(x='GeoPolygons', i='numeric', j='numeric'), 
+setMethod('piece', signature(x='VectorLayerPolygons', i='numeric', j='numeric'), 
 function(x, i, j) {
 	x <- getpiece(x, i[1])
 	np = nrow(x@id)

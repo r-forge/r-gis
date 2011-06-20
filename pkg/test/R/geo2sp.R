@@ -5,13 +5,13 @@
 # Licence GPL v3
 
 
-setAs('GeoVector', 'Spatial', 
+setAs('VectorLayer', 'Spatial', 
 	function(from) { 
-		if (class(from) == 'GeoPolygons') {
+		if (class(from) == 'VectorLayerPolygons') {
 			return( setAs(from, 'SpatialPolygonsDataFrame') ) 
-		} else if (class(from) == 'GeoLines') {
+		} else if (class(from) == 'VectorLayerLines') {
 			return( setAs(from, 'SpatialLinesDataFrame') ) 		
-		} else if (class(from) == 'GeoPoints') {
+		} else if (class(from) == 'VectorLayerPoints') {
 			return( setAs(from, 'SpatialPointsDataFrame') ) 		
 		} else {
 			stop('What kind of object is this?')
@@ -20,38 +20,38 @@ setAs('GeoVector', 'Spatial',
 )
 
 
-setAs('GeoPolygons', 'SpatialPolygons', 
+setAs('VectorLayerPolygons', 'SpatialPolygons', 
 	function(from) { 
 		return( .spFromGeoPolygons(from) )
 	}
 )
 
-setAs('GeoPolygons', 'SpatialPolygonsDataFrame', 
+setAs('VectorLayerPolygons', 'SpatialPolygonsDataFrame', 
 	function(from) { 
 		return( SpatialPolygonsDataFrame( .spFromGeoPolygons(from), from@data ) )
 	}
 )
 
-setAs('GeoLines', 'SpatialLines', 
+setAs('VectorLayerLines', 'SpatialLines', 
 	function(from) { 
 		return( .spFromGeoLines(from) )
 	}
 )
 
-setAs('GeoLines', 'SpatialLinesDataFrame', 
+setAs('VectorLayerLines', 'SpatialLinesDataFrame', 
 	function(from) { 
 		return( SpatialLinesDataFrame( .spFromGeoLines(from), from@data ) )
 	}
 )
 
 
-setAs('GeoPoints', 'SpatialPoints', 
+setAs('VectorLayerPoints', 'SpatialPoints', 
 	function(from) { 
 		return( SpatialPoints(from@xy) )
 	}
 )
 
-setAs('GeoPoints', 'SpatialPointsDataFrame', 
+setAs('VectorLayerPoints', 'SpatialPointsDataFrame', 
 	function(from) { 
 		sp <-  SpatialPoints(from@xy) 
 		if (nrow(from@id) == max(from@id[,2])) {

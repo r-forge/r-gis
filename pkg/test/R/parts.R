@@ -15,7 +15,7 @@ if (!isGeneric('part')) {
 }  
 
 
-setMethod('part', signature(x='GeoVector', i='numeric'), 
+setMethod('part', signature(x='VectorLayer', i='numeric'), 
 function(x, i) {
 	np = length(x)
 	i = unique(pmin(pmax(1, i), np))
@@ -34,7 +34,7 @@ function(x, i) {
 )
 
 
-setMethod('part', signature(x='GeoPolygons', i='numeric'), 
+setMethod('part', signature(x='VectorLayerPolygons', i='numeric'), 
 function(x, i) {
 	np = length(x)
 	i = unique(pmin(pmax(1, i), np))

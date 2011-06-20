@@ -9,9 +9,9 @@ if (!isGeneric("extent")) {
 		standardGeneric("extent"))
 }	
 
-setMethod('extent', signature(x='GeoVector'), 
-	function(x) {
-		extent(as.vector(range(x@xy)))
+setMethod('extent', signature(x='VectorLayer'), 
+	function(x, ...) {
+		extent(as.vector(range(x@data@xy)))
 	}
 )
 
