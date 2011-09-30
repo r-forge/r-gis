@@ -1,5 +1,5 @@
 
-.getFilename <- function(x, covertogdal=TRUE) {
+.getFilename <- function(x, converttogdal=TRUE, nl=Inf) {
 	if (is.character(x)) {
 		stopifnot(file.exists(x))
 	} else {
@@ -7,7 +7,9 @@
 			x <- as(x, 'RasterBrick')
 		}
 		if (inherits(x, 'Raster')) {
-			stopifnot(nlayers(x) == 1)
+			if (nlayers(x) > nl) {
+				stop('number of layers is greater than:', nl)
+			}
 			if (! fromDisk(x)) {
 				fn <- extension(rasterTmpFile(), '.tif')
 				x <- writeRaster(x, filename=fn)

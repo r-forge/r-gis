@@ -1,7 +1,7 @@
 
-fwTranslate <- function(x, filename, format, options=NULL, ...) {
+fwTranslate <- function(x, filename, format, options=NULL) {
 
-	fwp <- paste(FWpath(), 'gdal_translate', sep='')
+	fwp <- paste(fwPath(), 'gdal_translate', sep='')
 	
 	x <- .getFilename(x)
 	if (trim(filename) == "") {

@@ -1,6 +1,6 @@
 
 fwInfo <- function(x, options=NULL) {
-	fwp <- paste(FWpath(), 'gdalinfo', sep='')
+	fwp <- paste(fwPath(), 'gdalinfo', sep='')
 	x <- .getFilename(x)
 	outfile <- extension(rasterTmpFile(), '.txt')
 	fullcall <- paste(fwp, options, x)
