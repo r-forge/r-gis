@@ -11,7 +11,7 @@ fwTranslate <- function(x, filename, format, options=NULL) {
 	} else if (missing(format)) {
 		format <- 'GTiff'	
 	}
-	fullcall <- paste(fwp, options, x, filename, "-of", format)
+	fullcall <- paste(fwp, options, x, shQuote(filename), "-of", format)
 	system(fullcall)
 	raster(filename)
 }

@@ -13,7 +13,8 @@ fwDEM <- function(dem, type='slope', filename="", options=NULL, format='GTiff') 
 		extension(filename) <- 'tif'
 	}
 	
-	fullcall <- paste(fwp, type, dem, filename, "-of", format, options)
+	
+	fullcall <- paste(fwp, type, shQuote(dem), shQuote(filename), "-of", format, options)
 	system(fullcall)
 	raster(filename)
 }

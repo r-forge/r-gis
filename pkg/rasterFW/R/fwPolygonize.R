@@ -5,7 +5,7 @@ fwPolygonize <- function(x, options=NULL) {
 	x <- .getFilename(x)
 	format='ESRI Shapefile'
 	out <- extension(rasterTmpFile, '.shp')
-	fullcall <- paste(fwp, x, '-f', format, out, options)
+	fullcall <- paste(fwp, shQuote(x), '-f', format, shQuote(out), options)
 	system(fullcall)
 	fn <- extension(basename(out), "")
     vec <- readOGR(dirname(out), fn)

@@ -4,9 +4,13 @@
 fwPath <- function(x=NULL, save=TRUE) {
 	if (!is.null(x)) {
 		x <- trim(x)
-		lastchar <- substr(x, nchar(x), nchar(x))
-		if (lastchar != "/" & lastchar != '\\') {
-			x <- paste(x, .Platform$file.sep, sep="")
+		x <- gsub('\\', '/', x)
+		if (substr(x, nchar(x), nchar(x)) != '/') {
+			x <- paste(x, '/', sep="")
+		}
+		bin <- tolower(substr(x, nchar(x)-3, nchar(x)-1))
+		if (bin != 'bin') {
+			stop('this is not the right "bin" folder' )
 		}
 		x <- normalizePath(x)
 		if (x != '') {
