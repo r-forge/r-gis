@@ -4,19 +4,16 @@
 fwPath <- function(x=NULL, save=TRUE) {
 	if (!is.null(x)) {
 		x <- trim(x)
-		x <- gsub('\\', '/', x)
-		if (substr(x, nchar(x), nchar(x)) != '/') {
-			x <- paste(x, '/', sep="")
-		}
-		bin <- tolower(substr(x, nchar(x)-3, nchar(x)-1))
-		if (bin != 'bin') {
-			stop('this is not the right "bin" folder' )
-		}
-		x <- normalizePath(x)
 		if (x != '') {
-			if (!file.exists(substr(x, 1, (nchar(x)-1)))) {
-				stop('path does not exist')
+			x <- gsub('\\', '/', x)
+			if (substr(x, nchar(x), nchar(x)) != '/') {
+				x <- paste(x, '/', sep="")
 			}
+			bin <- tolower(substr(x, nchar(x)-3, nchar(x)-1))
+			if (bin != 'bin') {
+				stop('this is not the right "bin" folder' )
+			}
+			x <- normalizePath(x, winslash='/', mustWork=TRUE)
 		}
 		options(rasterfwPath = x)
 		if (save) {
