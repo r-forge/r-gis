@@ -22,9 +22,9 @@ fwPath <- function(x=NULL, save=TRUE) {
 	} else {
 		x <- getOption('rasterfwPath')
 		if (is.null(x)) {
-			stop('First use "fwPath" to set the path to the FWtools "bin" folder, or set it to "" of this folder is in your "path"')
+			stop('Use "fwPath(x)" to set the path to the FWtools "bin" folder,\n or set it to "" if this folder is in your path')
 		}
-		x
+		return(x)
 	}
 }
 
@@ -39,7 +39,9 @@ fwPath <- function(x=NULL, save=TRUE) {
 		} else {
 			if (p[length(p)] != "") { p <- c(p, "") }
 			i <- which(substr(p, 1, 20) == "options(rasterfwPath")
-			p <- p[-i]
+			if (length(i) > 0) {
+				p <- p[-i]
+			}
 		}
 	} else {
 		p <- ""
