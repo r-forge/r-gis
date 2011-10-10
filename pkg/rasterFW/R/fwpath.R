@@ -5,7 +5,7 @@ fwPath <- function(x=NULL, save=TRUE) {
 	if (!is.null(x)) {
 		x <- trim(x)
 		if (x != '') {
-			x <- gsub('\\', '/', x)
+			x <- gsub('\\\\', '/', x)
 			if (substr(x, nchar(x), nchar(x)) != '/') {
 				x <- paste(x, '/', sep="")
 			}
