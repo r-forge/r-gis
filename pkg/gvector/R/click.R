@@ -22,7 +22,7 @@ setMethod('click', signature(x='SpatialPolygons'),
 		xyCoords@proj4string <- x@proj4string
 		i <- which(!is.na(over(x, xyCoords)))
 		if (length(i) > 0) {
-			if (hasSlot(x, 'data')) {
+			if (.hasSlot(x, 'data')) {
 				x <- x@data[i,]
 			} else {
 				x <- row.names(x)[i]
@@ -32,9 +32,9 @@ setMethod('click', signature(x='SpatialPolygons'),
 		}
 		
 		if (xy) {
-			res <- cbind(xyCoords, x)
+			x <- cbind(xyCoords, x)
 		}
-		return(res)
+		return(x)
 	}
 )
 
@@ -45,7 +45,7 @@ setMethod('click', signature(x='SpatialLines'),
 		e@proj4string <- x@proj4string
 		i <- which(!is.na(over(x, e)))
 		if (length(i) > 0) {
-			if (hasSlot(x, 'data')) {
+			if (.hasSlot(x, 'data')) {
 				x <- x@data[i,]
 			} else {
 				x <- row.names(x)[i]
@@ -63,7 +63,7 @@ setMethod('click', signature(x='SpatialPoints'),
 		e@proj4string <- x@proj4string
 		i <- which(!is.na(over(x, e)))
 		if (length(i) > 0) {
-			if (hasSlot(x, 'data')) {
+			if (.hasSlot(x, 'data')) {
 				x <- x@data[i,]
 			} else {
 				x <- row.names(x)[i]
