@@ -18,7 +18,9 @@ setMethod('click', signature(x='SpatialPolygons'),
 			text(xyCoords, labels=1:n)
 		}
 
-		i <- which(!is.na(over(x, SpatialPoints(xyCoords))))
+		xyCoords <- SpatialPoints(xyCoords)
+		xyCoords@proj4string <- x@proj4string
+		i <- which(!is.na(over(x, xyCoords)))
 		if (length(i) > 0) {
 			if (hasSlot(x, 'data')) {
 				x <- x@data[i,]
