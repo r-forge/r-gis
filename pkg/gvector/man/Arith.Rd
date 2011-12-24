@@ -36,10 +36,8 @@ Comparison of terminology for polygon manipulation methods used in ArcGIS and in
 \tabular{rll}{
   \tab \bold{ArcGIS}    \tab  \bold{raster} \cr
   \tab Erase     \tab  erase or "-" \cr
-  \tab Identity  \tab  identity \cr
+  \tab Identity  \tab  ident \cr
   \tab Intersect \tab  intersect \cr
-  \tab Spatial Join \tab  (to be done) \cr  
-  \tab Symmetrical Difference \tab  "^" (to be done) \cr 
   \tab Union     \tab  union or "+" \cr
   \tab Update    \tab  update \cr
   \tab Append    \tab  combine \cr
@@ -49,9 +47,13 @@ Comparison of terminology for polygon manipulation methods used in ArcGIS and in
   \tab Clip      \tab  crop or "*" \cr
   \tab Select    \tab  select \cr
   \tab "i"       \tab  click \cr
+
+  \tab Spatial Join \tab  (to be done) \cr  
+  \tab Symmetrical Difference \tab  "^" (to be done) \cr 
+  
 }
 
-For spatial-join and other spatial queries, see sp functions 'over' and 'overlay' (or raster function extract when using Raster objects)
+For spatial-join and other spatial queries, see sp \link[sp]{over}
 }
 
 \author{Robert J. Hijmans}

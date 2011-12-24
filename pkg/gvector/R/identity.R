@@ -4,24 +4,28 @@
 # Licence GPL v3
 
 
-setMethod('update', signature(object='SpatialPolygonsDataFrame'), 
-function(object, ...) {
+	
+if (!isGeneric("ident")) {
+	setGeneric("ident", function(x, y, ...)
+		standardGeneric("ident"))
+}	
 
-	require(rgeos)
+
+setMethod('ident', signature(x='SpatialPolygons', y='SpatialPolygons'), 
+function(x, y, ...) {
 
 	yy <- list(...)
 	if (is.null(yy)) {
 		return(object)
 	}
 
-	i <- which(sapply(yy, function(x) inherits(x, 'SpatialPolygonsDataFrame')))
+	i <- which(sapply(yy, function(x) inherits(x, 'SpatialPolygons')))
 	if (length(i)==0) {
-		stop('additional arguments should be of class SpatialPolygonsDataFrame')
+		stop('additional arguments should be of class SpatialPolygons')
 	} else if (length(i) < length(yy)) {
-		warning('additional arguments that are not of class SpatialPolygonsDataFrame are ignored')
+		warning('additional arguments that are not of class SpatialPolygons are ignored')
 		yy <- yy[i]
-	} 
-	
+	}	
 
 	haswarned <- FALSE
 	for (y in yy) {
@@ -87,6 +91,3 @@ function(object, ...) {
 	x
 } 
 )
-
-
-

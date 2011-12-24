@@ -4,24 +4,21 @@
 # Licence GPL v3
 
 
-setMethod('update', signature(object='SpatialPolygonsDataFrame'), 
+setMethod('update', signature(object='SpatialPolygons'), 
 function(object, ...) {
-
 
 	yy <- list(...)
 	if (is.null(yy)) {
 		return(object)
 	}
 
-	i <- which(sapply(yy, function(x) inherits(x, 'SpatialPolygonsDataFrame')))
+	i <- which(sapply(yy, function(x) inherits(x, 'SpatialPolygons')))
 	if (length(i)==0) {
-		stop('additional arguments should be of class SpatialPolygonsDataFrame')
+		stop('additional arguments should be of class SpatialPolygons')
 	} else if (length(i) < length(yy)) {
-		warning('additional arguments that are not of class SpatialPolygonsDataFrame are ignored')
+		warning('additional arguments that are not of class SpatialPolygons are ignored')
 		yy <- yy[i]
 	} 
-	
-	require(rgeos)
 
 	haswarned <- FALSE
 	for (y in yy) {
@@ -32,34 +29,13 @@ function(object, ...) {
 			}
 			y@proj4string <- x@proj4string
 		}	
-		
-		i <- gIntersects(x, y)
-		if (!i) {
-			next
-		}
-	
-		x <- spChFIDs(x, as.character(1:length(row.names(x))))
-		y <- spChFIDs(y, as.character(1:length(row.names(y))))
-
-		xnames <- colnames(x@data)
-		ynames <- colnames(y@data)
-		yinx <- which(ynames %in% xnames)
-		doAtt <- TRUE
-		if (length(yinx) == 0) {
-			doAtt <- FALSE
-		}
-		
 		subs <- gIntersects(x, y, byid=TRUE)
-
-		subsx <- apply(subs, 2, any)
-		subsy <- apply(subs, 1, any)
-		
-		x <- x - int
-		if (is.null(x)) {
-			x <- int
+		if (!any(subs)) {
+			next
 		} else {
-			int <- y - x
-			x <- append(x, int)			
+			int <- crop(y, x)
+			x <- erase(x, int)
+			x <- combine(x, int)
 		}
 	}
 	x

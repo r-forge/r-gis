@@ -52,7 +52,7 @@ function(x, y) {
 	ydata <- .hasSlot(y, 'data')
 	dat <- NULL
 	if (xdata & ydata) {
-		nms <- .goodNames(c(colnames(x@data), colnames(y@data)))
+		nms <- raster:::.goodNames(c(colnames(x@data), colnames(y@data)))
 		colnames(x@data) <- xnames <- nms[1:ncol(x@data)]
 		colnames(y@data) <- ynames <- nms[(ncol(x@data)+1):length(nms)]
 		dat <- cbind(x@data[NULL, ,drop=FALSE], y@data[NULL, ,drop=FALSE])

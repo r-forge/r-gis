@@ -4,13 +4,8 @@
 # Licence GPL v3
 
 
-setMethod('crop', signature(x='Spatial', y='ANY'), 
-
-function(x, y, ...) {
-
-	if (inherits(x, 'SpatialPolygons')) {
-	
-		require(rgeos)
+setMethod('crop', signature(x='SpatialPolygons', y='ANY'), 
+	function(x, y, ...) {
 
 		if (! inherits(y, 'SpatialPolygons')) {
 			if (inherits(y, 'Extent')) {
@@ -66,11 +61,13 @@ function(x, y, ...) {
 			}
 			return(y)
 		}
-		
-	} else if (inherits(x, 'SpatialLines')) {
-	
-		require(rgeos)
+	}
+)
 
+
+setMethod('crop', signature(x='SpatialLines', y='ANY'),
+	function(x, y, ...) {
+	
 		if (! inherits(y, 'SpatialPolygons')) {
 			if (inherits(y, 'Extent')) {
 				y <- as(y, 'SpatialPolygons')
@@ -105,48 +102,29 @@ function(x, y, ...) {
 				y <- y@lineyobj
 			}
 			return(y)
-			
 		}
-		
-	} else if (inherits(x, 'SpatialGrid')) {
-	
-		y <- extent(y)
-		r <- raster(x)
-		
-		if (.hasSlot(x, 'data')) {
-			i <- cellsFromExtent(r, y)
-			r <- crop(r, y)
-			r <- as(r, 'SpatialGridDataFrame')
-			r@data <- x@data[i,,drop=FALSE]
-			return(r)
-			
-		} else {
-			return( as( crop(raster(x), y), 'SpatialGrid' ) )
-		}
-		
-	} else if (inherits(x, 'SpatialPixels')) {
-
-		y <- extent(y)
-		i <- x@coords[,1] >= y@xmin &  x@coords[,1] <= y@xmax & x@coords[,2] >= y@ymin &  x@coords[,2] <= y@ymax
-		
-		r <- raster(x)
-		i <- cellsFromExtent(r, y)
-		r <- crop(r, y)
-		if (.hasSlot(x, 'data')) {
-			r <- as(r, 'SpatialPixelsDataFrame')
-		} else {
-			r <- as(r, 'SpatialPixels')
-		} 
-		return( r[i,] )
-
-	} else if (inherits( x, 'SpatialPoints')) { 
-
-		y <- extent(y)
-		i <- x@coords[,1] >= y@xmin &  x@coords[,1] <= y@xmax & x@coords[,2] >= y@ymin &  x@coords[,2] <= y@ymax
-		x[i,]
-		
 	}
-}
 )
 
+
+setMethod('crop', signature(x='SpatialPoints', y='ANY'),
+	function(x, y, ...) {
+		if (! inherits(y, 'SpatialPolygons')) {
+			if (inherits(y, 'Extent')) {
+				y <- as(y, 'SpatialPolygons')
+			} else { 
+				y <- as(extent(y), 'SpatialPolygons')
+			}
+			y@proj4string <- x@proj4string		
+		}
+
+		i <- which(!is.na(over(x, y)))
+		if (length(i) > 0) {
+			x <- x[i,]
+		} else {
+			x <- NULL
+		}
+		x
+	}
+)
 

@@ -4,56 +4,6 @@
 # Licence GPL v3
 
 
-# friendly rbind
-.frbind <- function(x, ...) {
-
-	if (! inherits(x, 'data.frame') ) {
-		x <- data.frame(x)
-	}
-
-	d <- list(...)
-	if (length(d) == 0) { return(x) }
-	
-	for (i in 1:length(d)) {
-		
-		dd <- d[[i]]
-		if (! inherits(dd, 'data.frame')) {
-			dd <- data.frame(dd)
-		}
-		
-		cnx <- colnames(x)
-		cnd <- colnames(dd)
-		
-		e <- cnx[(cnx %in% cnd)]	
-		for (j in e) {
-			if (class(x[,j]) != class(dd[,j])) {
-				x[,j] <- as.character(x[,j])
-				dd[,j] <- as.character(dd[,j])
-			}
-		}
-		
-		a <- which(!cnd %in% cnx)
-		if (length(a) > 0) {
-			zz <- dd[NULL, a, drop=FALSE]
-			zz[1:nrow(x),] <- NA
-			x <- cbind(x, zz)
-		}
-
-		b <- which(!cnx %in% cnd)
-		if (length(b) > 0) {
-			zz <- x[NULL, b, drop=FALSE]
-			zz[1:nrow(dd),] <- NA
-			dd <- cbind(dd, zz)
-		}
-		
-		x <- rbind(x, dd)		
-	}
-	x
-}
-
-#setMethod('c', signature(x='SpatialPolygons'), 
-
-
 if (!isGeneric("combine")) {
 	setGeneric("combine", function(x, y, ...)
 		standardGeneric("combine"))
@@ -62,16 +12,21 @@ if (!isGeneric("combine")) {
 
 setMethod('combine', signature(x='SpatialPolygons', y='SpatialPolygons'), 
 function(x, y, ..., keepnames=FALSE) {
-	.appendPolygons(x, y, ..., keepnames=keepnames) 
-} )
 
+		x <- list(x, y, ...)
 
-
-.appendPolygons <- function (x, ..., keepnames=FALSE) {
-		
-		x <- list(x, ...)
-		
 		rwn <- lapply(x, row.names)
+		i <- sapply(rwn, length) > 0
+		if (!all(i)) {
+			if (!any(i)) {
+				return(x[[1]])
+			}
+			x <- x[i]
+			if (length(x) == 1) {
+				return( x[[1]] )
+			}
+		}
+
 		ln <- sapply(rwn, length)
 		rnu <- raster:::.uniqueNames(unlist(rwn))
 		end <- cumsum(ln)
@@ -154,5 +109,6 @@ function(x, y, ..., keepnames=FALSE) {
 		x <- do.call(rbind, x)
 		SpatialPolygonsDataFrame(x, dat)
 }
+)
 
 
