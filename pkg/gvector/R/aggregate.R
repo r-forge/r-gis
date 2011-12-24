@@ -6,7 +6,6 @@
 
 setMethod('aggregate', signature(x='SpatialPolygons'), 
 function(x, vars=NULL, sums=NULL, ...) {
-	require(rgeos)
 	
 	if (! .hasSlot(x, 'data') ) {
 		hd <- FALSE

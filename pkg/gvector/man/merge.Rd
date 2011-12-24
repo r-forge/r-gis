@@ -35,10 +35,7 @@ Spatial*
 \author{Robert J. Hijmans}
 
 \seealso{
-The \code{\link{merge,SpatialPolygons,SpatialPolygons-method}} for appending and perhaps spatially intersecting polygons
-
-The \code{\link{merge,Raster,Raster-method}} for merging Raster objects
-
+The \code{\link[base]{merge}}
 }
 
 
