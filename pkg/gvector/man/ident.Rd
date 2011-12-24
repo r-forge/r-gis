@@ -28,8 +28,6 @@ Identity
 SpatialPolygons
 }
 
-\author{Robert J. Hijmans}
-
 \seealso{
 \code{\link{update}, \link{union}}
 }

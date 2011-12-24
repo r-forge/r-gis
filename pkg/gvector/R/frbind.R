@@ -5,6 +5,7 @@
 
 
 # friendly rbind
+# rbinds data.frames with different column names
 .frbind <- function(x, ...) {
 
 	if (! inherits(x, 'data.frame') ) {

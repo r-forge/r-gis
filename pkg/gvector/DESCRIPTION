@@ -4,6 +4,7 @@ Title: gvector
 Version: 0.0-1
 Date: 22-December-2011
 Depends: methods, sp, raster, rgeos (>= 0.1-15), R (>= 2.11.0)
+Suggests: deldir
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
 Description: geographic vector data manipulation

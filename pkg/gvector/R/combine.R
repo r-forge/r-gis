@@ -64,32 +64,7 @@ function(x, y, ..., keepnames=FALSE) {
 				if (is.null(dat)) {
 					dat <- x[[i]]@data
 				} else {
-					d <- x[[i]]@data
-					cndat <- colnames(dat)
-					cnd <- colnames(d)
-					p <- cndat[cndat %in% cnd]
-					z <- which(!cndat %in% cnd)
-					if (length(z) > 1) {
-						dd <- dat[NULL, z]
-						dd[1:nrow(d),] <- NA
-						d <- cbind(d, dd)
-					}
-					z <- which(!cnd %in% cndat)
-					if (length(z) > 1) {
-						dd <- d[NULL, z]
-						dd[1:nrow(dat),] <- NA
-						dat <- cbind(dat, dd)
-					}
-					
-					for (j in p) {
-						if (class(dat[,j]) != class(d[,j])) {
-							dat[,j] <- as.character(dat[,j])
-							d[,j] <- as.character(d[,j])
-						}
-					}
-
-					
-					dat <- rbind(dat, d)
+					dat <- .frbind(dat, x[[i]]@data)
 				}
 			} else {
 				if ( is.null(dat)) {
@@ -97,10 +72,7 @@ function(x, y, ..., keepnames=FALSE) {
 					dat[1:length(x[[i]]@polygons),] <- NA
 					rownames(dat) <- row.names(x[[i]])
 				} else {
-					dd <- dat[NULL, ]
-					dd[1:length(x[[i]]@polygons),] <- NA
-					rownames(dd) <- row.names(x[[i]])
-					dat <- rbind(dat, dd)
+					dat[(nrow(dat)+1):(nrow(dat)+nrow(x[[i]]@coords)),] <- NA
 				}	
 			}
 		}
@@ -108,6 +80,155 @@ function(x, y, ..., keepnames=FALSE) {
 		x <- sapply(x, function(x) as(x, 'SpatialPolygons'))
 		x <- do.call(rbind, x)
 		SpatialPolygonsDataFrame(x, dat)
+}
+)
+
+
+
+
+setMethod('combine', signature(x='SpatialLines', y='SpatialLines'), 
+	function(x, y, ..., keepnames=FALSE) {
+
+		x <- list(x, y, ...)
+
+		rwn <- lapply(x, row.names)
+		i <- sapply(rwn, length) > 0
+		if (!all(i)) {
+			if (!any(i)) {
+				return(x[[1]])
+			}
+			x <- x[i]
+			if (length(x) == 1) {
+				return( x[[1]] )
+			}
+		}
+
+		ln <- sapply(rwn, length)
+		rnu <- raster:::.uniqueNames(unlist(rwn))
+		end <- cumsum(ln)
+		start <- c(0, end[-length(end)]) + 1
+		for (i in 1:length(x)) {
+			if (keepnames) {
+				if (! all(rnu[start[i]:end[i]] == rwn[[i]]) ) {
+					row.names(x[[i]]) <- rnu[start[i]:end[i]]
+				}
+			} else {
+				row.names(x[[i]]) <- as.character(start[i]:end[i])
+			}	
+		}
+
+		cls <- sapply(x, class)
+		if (all(cls == 'SpatialLines')) {
+			return( do.call( rbind, x))
+		}
+
+		if (all(cls == 'SpatialLinesDataFrame')) {
+			dat <- lapply( x, function(x) { slot(x, 'data') } )
+			dat <- do.call(.frbind, dat)
+			x <- sapply(x, function(y) as(y, 'SpatialLines'))
+			x <- do.call( rbind, x)
+			rownames(dat) <- row.names(x)
+			return( SpatialLinesDataFrame(x, dat) )
+		}
+
+		
+		dat <- NULL
+#		dataFound <- FALSE
+		for (i in 1:length(x)) {
+			if (.hasSlot(x[[i]], 'data')) {
+#				dataFound <- TRUE
+				if (is.null(dat)) {
+					dat <- x[[i]]@data
+				} else {
+					dat <- .frbind(dat, x[[i]]@data)
+				}
+			} else {
+				if ( is.null(dat)) {
+					dat <- data.frame()
+					dat[1:length(x[[i]]@lines),] <- NA
+					rownames(dat) <- row.names(x[[i]])
+				} else {
+					dat[(nrow(dat)+1):(nrow(dat)+nrow(x[[i]]@coords)),] <- NA
+				}	
+			}
+		}
+#		if (! dataFound ) { return( do.call(rbind, x) ) }
+		x <- sapply(x, function(x) as(x, 'SpatialLines'))
+		x <- do.call(rbind, x)
+		SpatialLinesDataFrame(x, dat)
+}
+)
+
+
+
+
+setMethod('combine', signature(x='SpatialPoints', y='SpatialPoints'),
+	function(x, y, ..., keepnames=FALSE) {
+
+		x <- list(x, y, ...)
+
+		rwn <- lapply(x, row.names)
+		i <- sapply(rwn, length) > 0
+		if (!all(i)) {
+			if (!any(i)) {
+				return(x[[1]])
+			}
+			x <- x[i]
+			if (length(x) == 1) {
+				return( x[[1]] )
+			}
+		}
+
+		ln <- sapply(rwn, length)
+		rnu <- raster:::.uniqueNames(unlist(rwn))
+		end <- cumsum(ln)
+		start <- c(0, end[-length(end)]) + 1
+		for (i in 1:length(x)) {
+			if (keepnames) {
+				if (! all(rnu[start[i]:end[i]] == rwn[[i]]) ) {
+					row.names(x[[i]]) <- rnu[start[i]:end[i]]
+				}
+			} else {
+				row.names(x[[i]]) <- as.character(start[i]:end[i])
+			}	
+		}
+
+		cls <- sapply(x, class)
+		if (all(cls == 'SpatialPoints')) {
+			return( do.call( rbind, x))
+		}
+
+		if (all(cls == 'SpatialPointsDataFrame')) {
+			dat <- lapply( x, function(x) { slot(x, 'data') } )
+			dat <- do.call(.frbind, dat)
+			x <- sapply(x, function(y) as(y, 'SpatialPoints'))
+			x <- do.call( rbind, x)
+			rownames(dat) <- row.names(x)
+			return( SpatialPointsDataFrame(x, dat) )
+		}
+		
+		dat <- NULL
+		for (i in 1:length(x)) {
+			if (.hasSlot(x[[i]], 'data')) {
+				if (is.null(dat)) {
+					dat <- x[[i]]@data
+				} else {
+					dat <- .frbind(dat, x[[i]]@data)
+				}
+			} else {
+				if ( is.null(dat)) {
+					dat <- data.frame()
+					dat[1:nrow(x[[i]]@coords),] <- NA
+					rownames(dat) <- row.names(x[[i]])
+				} else {
+					dat[(nrow(dat)+1):(nrow(dat)+nrow(x[[i]]@coords)),] <- NA
+				}	
+			}
+		}
+#		if (! dataFound ) { return( do.call(rbind, x) ) }
+		x <- sapply(x, function(x) as(x, 'SpatialPoints'))
+		x <- do.call(rbind, x)
+		SpatialPoinsDataFrame(x, dat)
 }
 )
 
