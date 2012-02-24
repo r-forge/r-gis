@@ -14,7 +14,7 @@
       goto 1
       endif
       h=xa(khi)-xa(klo)
-      if (h.eq.0.) pause 'bad xa input.'
+C      if (h.eq.0.) pause 'bad xa input.'
       a=(xa(khi)-x)/h
       b=(x-xa(klo))/h
       y=a*ya(klo)+b*ya(khi)+

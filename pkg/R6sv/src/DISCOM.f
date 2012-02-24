@@ -13,7 +13,7 @@ c - to vary the number of quadratures
       common /sixs_polar/ pha(nqmax_p),qha(nqmax_p),uha(nqmax_p),
      &alphal(0:nqmax_p),betal(0:nqmax_p),gammal(0:nqmax_p),
      &zetal(0:nqmax_p)
-      real nbmu 
+      integer nbmu 
 c - to vary the number of quadratures
 
 

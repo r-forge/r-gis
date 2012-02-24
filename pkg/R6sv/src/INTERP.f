@@ -175,24 +175,26 @@ C	   rolut(i,j)=roluts(linf,i,j)
 C     &      +(roluts(lsup,i,j)-roluts(linf,i,j))*coefl
 C	endif
 	
-	if ((rolutsq(lsup,i,j).gt.0.001).and.(rolutsq(linf,i,j).gt.0.001)) then
-           alphac=alog(rolutsq(lsup,i,j)/rolutsq(linf,i,j))/coef
-           betac=rolutsq(linf,i,j)/(wlinf**(alphac))
-	   rolutq(i,j)=betac*(wl**alphac)
-	   else
-	   rolutq(i,j)=rolutsq(linf,i,j)
-     &      +(rolutsq(lsup,i,j)-rolutsq(linf,i,j))*coefl
-	endif
+	      if ((rolutsq(lsup,i,j).gt.0.001).and.
+     &	      (rolutsq(linf,i,j).gt.0.001)) then 
+                 alphac=alog(rolutsq(lsup,i,j)/rolutsq(linf,i,j))/coef
+                 betac=rolutsq(linf,i,j)/(wlinf**(alphac))
+	             rolutq(i,j)=betac*(wl**alphac)
+	      else
+	        rolutq(i,j)=rolutsq(linf,i,j)
+     &        +(rolutsq(lsup,i,j)-rolutsq(linf,i,j))*coefl
+          endif
 
 
-	if ((rolutsu(lsup,i,j).gt.0.001).and.(rolutsu(linf,i,j).gt.0.001)) then
-           alphac=alog(rolutsu(lsup,i,j)/rolutsu(linf,i,j))/coef
+      if ((rolutsu(lsup,i,j).gt.0.001).and.
+     &  (rolutsu(linf,i,j).gt.0.001)) then
+	       alphac=alog(rolutsu(lsup,i,j)/rolutsu(linf,i,j))/coef
            betac=rolutsu(linf,i,j)/(wlinf**(alphac))
-	   rolutu(i,j)=betac*(wl**alphac)
-	   else
-	   rolutu(i,j)=rolutsu(linf,i,j)
+	    rolutu(i,j)=betac*(wl**alphac)
+      else
+	     rolutu(i,j)=rolutsu(linf,i,j)
      &      +(rolutsu(lsup,i,j)-rolutsu(linf,i,j))*coefl
-	endif
+      endif
 
 	enddo
 	enddo
