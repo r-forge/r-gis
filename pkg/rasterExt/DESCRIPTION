@@ -1,10 +1,10 @@
-Package: rasterFW
+Package: rasterExt
 Type: Package
-Title: raster and FWtools
-Version: 0.0-0
+Title: raster and external programs (FWtools, ArcGIS)
+Version: 0.0-1
 Date: 29-September-2011
-Depends: raster, rgdal, R (>= 2.11.0)
-Author: Robert J. Hijmans and Lyndon Estes
+Depends: raster, rgdal, R (>= 2.13.0)
+Author: Robert J. Hijmans [cre, aut] & Lyndon Estes [ctb]
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
 Description: raster and FWtools
 License: GPL (>=3)
