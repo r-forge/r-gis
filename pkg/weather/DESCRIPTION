@@ -3,7 +3,7 @@ Type: Package
 Title: Weather data manipulation
 Version: 0.3-1
 Date: 23-August-2012
-Depends: methods, spacetime, raster
+Depends: methods, spacetime (>= 0.7-1), raster
 Suggests: RODBC
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>

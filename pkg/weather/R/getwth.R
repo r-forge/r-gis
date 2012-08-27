@@ -2,11 +2,11 @@
 # License GPL3
 # Version 0.2  August 2012
 
+
 getWthFile <- function(filename, type='NASA') {
 	if (type=='NASA') {
 		return(.getWthFileNASA(filename))
 	}
-	.getWthFileNASA(filename)
 }
 
 getWthXY <- function(lon, lat, start="1983-1-1", end="2012-12-31", overwrite=FALSE) {
@@ -48,16 +48,6 @@ getWthXY <- function(lon, lat, start="1983-1-1", end="2012-12-31", overwrite=FAL
 
 
 .ICASAstyle <- function(lns) {
-	h1 <- lns[7]
-#@ INSI   WTHLAT   WTHLONG  WELEV   TAV   AMP  REFHT  WNDHT
-#  NASA   59.500  -167.500      5                        10
-	
-	y <- as.numeric(substr(h1, 9, 15))
-	x <- as.numeric(substr(h1, 18, 25))
-	alt <- as.numeric(substr(h1, 27, 32))
-	h2 <- lns[9]
-#@ WEYR WEDAY  SRAD   TMAX   TMIN   RAIN   WIND   TDEW    T2M   RH2M
-	h2 <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", h2))  , " ")
 
 	lns <- lns[10:(length(lns)-1)]
 	lns <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", lns))  , " ")
@@ -82,13 +72,44 @@ getWthXY <- function(lon, lat, start="1983-1-1", end="2012-12-31", overwrite=FAL
 }
 
 .getWthFileNASA <- function(filename) {
+
 	lns <- readLines(filename)
-	
-	if (substr(lns[6],1,1) == '@') {
-		return(.ICASAstyle(lns))
-	}
-	
 	hdr <- lns[1:30]
+	end <- which(hdr=="@ WEYR WEDAY  SRAD   TMAX   TMIN   RAIN   WIND   TDEW    T2M   RH2M")
+
+	if (length(end) > 0) {
+		h <- which(hdr == "@ INSI   WTHLAT   WTHLONG  WELEV   TAV   AMP  REFHT  WNDHT") + 1
+		h1 <- hdr[h]
+		y <- as.numeric(substr(h1, 9, 15))
+		x <- as.numeric(substr(h1, 18, 25))
+		alt <- as.numeric(substr(h1, 27, 32))
+
+		h2 <- lns[end]
+		h2 <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", h2))  , " ")
+		end2 <- which(lns=="</PRE></BODY></HTML>") - 1
+		
+		lns <- trim( lns[ c((end+1):end2) ] )
+	
+		lns <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", lns))  , " ")
+		v <- unlist(lns)
+		
+		v <- as.numeric(v)
+		v[v == -99] <- NA
+		v <- data.frame(matrix(v, ncol=length(lns[[1]]), byrow=T))
+
+		colnames(v) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tavg", "relh")
+	
+		date <- dateFromDoy(v[,'doy'], v[,'year'])
+		#lns <- cbind(as.data.frame(date), lns)
+		v <- v[,-c(1:2)]
+
+		r <- raster()
+		cell <- cellFromXY(r, c(x, y))
+	
+		return( makeWeather(cell, x, y, alt, date, v) )
+
+	}
+
 	end <- which(hdr=="-END HEADER-")
 	if (end != 18) { warning('strange file') }
 	
