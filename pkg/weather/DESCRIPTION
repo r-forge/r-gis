@@ -1,0 +1,12 @@
+Package: weather
+Type: Package
+Title: Weather data manipulation
+Version: 0.3-1
+Date: 23-August-2012
+Depends: methods, spacetime, raster
+Suggests: RODBC
+Author: Robert J. Hijmans
+Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
+Description: coming soon
+License: GPL-3
+LazyLoad: yes
