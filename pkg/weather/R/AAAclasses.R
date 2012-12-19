@@ -4,8 +4,26 @@
 # Licence GPL v3
 
 
-setClass('WeatherStations', 
-	contains = 'STFDF',
+setClass('Weather', 
+	representation (
+	    locations = 'data.frame',
+		values = 'data.frame'
+	),
+	prototype (	
+		locations = data.frame(ID=1, longitude=NA, latitude=NA, elevation=NA, name=NA)[-1,],
+		values = data.frame(ID=1, date=NA)[-1,]
+	),
+	validity = function(object) {
+		return(TRUE)
+	}	
+)
+
+
+
+
+
+setClass('WeatherSpatial', 
+	contains = 'STFDF', 
 	representation (
 	),
 	prototype (	
@@ -18,7 +36,7 @@ setClass('WeatherStations',
 
 
 
-setMethod ('show' , 'WeatherStations', 
+setMethod ('show' , 'WeatherSpatial', 
 	function(object) {
 		cat('class       :' , class(object), '\n')
 
@@ -48,7 +66,7 @@ setMethod ('show' , 'WeatherStations',
 	
 
 
-setMethod ('plot' , signature(x='WeatherStations', y='ANY'), 
+setMethod ('plot' , signature(x='WeatherSpatial', y='ANY'), 
 	function(x, y, cex=0.2, type='l', ...) {
 		ns <- length(x@sp)
 		time <- index(x@time)
@@ -67,7 +85,7 @@ setMethod ('plot' , signature(x='WeatherStations', y='ANY'),
 )
 
 
-setMethod ('plot' , signature(x='WeatherStations', y='missing'), 
+setMethod ('plot' , signature(x='WeatherSpatial', y='missing'), 
 	function(x, ...) {
 		y <- colnames(x@data)[1]
 		plot(x, y, ...)
