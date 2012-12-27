@@ -20,8 +20,6 @@ setClass('Weather',
 
 
 
-
-
 setClass('WeatherSpatial', 
 	contains = 'STFDF', 
 	representation (

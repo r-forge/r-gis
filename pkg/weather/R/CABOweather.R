@@ -1,29 +1,21 @@
-# Author: Robert J. Hijmans, r.hijmans@gmail.com
+# Author: Robert J. Hijmans
 # License GPL3
-# Version 0.1  January 2009
 
 
-writeCABOwth <- function(w, country='AAA', station=1, wind=2.5,  path=getwd(), print=TRUE, boundlat=TRUE, rainfact=1, tempfact=0) {
+writeFSE <- function(w, country='AAA', station=1, wind=2.5,  path=getwd(), ... ) {
 	
-	w@data$srad <- w@data$srad * 1000
-	w@data$tmin <- w@data$tmin + tempfact
-	w@data$tmax <- w@data$tmax + tempfact
-	w@data$prec <- w@data$prec * rainfact
-
-	year <- yearFromDate(index(w@time))
-
-	xy <- coordinates(w)
-	lon <- xy[1,1]
-	lat <- xy[1,2]
-	alt <- w@sp$elevation[1]
+#	w@values$srad <- w@values$srad * 1000
+#	w@values$tmin <- w@values$tmin + tempfact
+#	w@values$tmax <- w@values$tmax + tempfact
+#	w@values$prec <- w@values$prec * rainfact
+	year <- yearFromDate(w@values$date)
+	lon <- w@locations$longitude
+	lat <- w@locations$latitude
+	alt <- w@locations$elevation
 	
 	years <- unique(year)
 	for (yr in years) {
 		fname <- paste(path, '/', country, station, '.', substr(yr, 2, 4), sep="")
-		if (print) {
-			cat(fname, '\n')
-			flush.console()
-		}
 		thefile <- file(fname, "w")
 		
 		cat("*-----------------------------------------------------------", "\n", file = thefile)
@@ -45,7 +37,7 @@ writeCABOwth <- function(w, country='AAA', station=1, wind=2.5,  path=getwd(), p
 		cat("** WCCYEARNR=", yr, "\n", file = thefile)
 		cat("*-----------------------------------------------------------", "\n", file = thefile)
 
-		if (boundlat) {
+		if (isTRUE(list(...)$dotsboundlat)) {
 			if ( lat > 60) { lat <- 59 }
 			if ( lat < -60 ) { lat <- -59 }
 		}
@@ -59,5 +51,5 @@ writeCABOwth <- function(w, country='AAA', station=1, wind=2.5,  path=getwd(), p
 		}
 		close(thefile)
     }
-	return(invisible(TRUE))
+	return(invisible(fname))
 }		

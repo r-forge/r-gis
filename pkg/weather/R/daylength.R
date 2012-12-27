@@ -1,6 +1,5 @@
-# Author: Robert J. Hijmans, r.hijmans@gmail.com
+# Author: Robert J. Hijmans
 # License GPL3
-# Version 0.1  January 2009
 
 
 daylength <- function(lat, doy) {
@@ -8,14 +7,8 @@ daylength <- function(lat, doy) {
 		doy <- doyFromDate(doy) 
 	}
 	lat[lat > 90 | lat < -90] <- NA 
-
-	doy[doy==366] <- 365
-	doy[doy < 1] <- 365 + doy[doy < 1]
-	doy[doy > 365] <- doy[doy > 365] - 365 
-	if (isTRUE(any(doy<1))  | isTRUE(any(doy>365))) {
-		stop('cannot understand value for doy') 
-	}
-
+	doy <- doy %% 365
+	
 #Ecological Modeling_, volume 80 (1995) pp. 87-95, called "A Model
 #Comparison for Daylength as a Function of Latitude and Day of the Year."
 	P <- asin(0.39795 * cos(0.2163108 + 2 * atan(0.9671396 * tan(0.00860*(doy-186)))))
@@ -26,7 +19,7 @@ daylength <- function(lat, doy) {
 }
 
 
-daylength2 <- function(lat, doy) {
+.daylength2 <- function(lat, doy) {
 	if (class(doy) == 'Date' | class(doy) == 'character') { 
 		doy <- doyFromDate(doy) 
 	}

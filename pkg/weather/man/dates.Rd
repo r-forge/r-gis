@@ -8,12 +8,11 @@
 \alias{isLeapYear}
 \alias{daysInYear}
 \alias{daysOfYear}
-\alias{daylength}
-\alias{daylength2}
 
 \title{ date routines }
+
 \description{
-  Conversion between day of year number to date and back, and extraction of parts of a date.
+Simple helper functions for conversion between day of year number to date and back, and extraction of parts of a date.
 }
 
 \usage{
@@ -24,8 +23,6 @@ monthFromDate(date)
 yearFromDate(date)
 isLeapYear(year)
 daysInYear(year)
-daylength(lat, doy)
-daylength2(lat, doy)
 }
 
 \arguments{
@@ -39,7 +36,6 @@ daylength2(lat, doy)
   Day of the year or Date
 }
 
-\author{ Robert J. Hijmans }
 \examples{
 doy <- 88
 year <- 1970
@@ -51,4 +47,3 @@ isLeapYear(2000)
 daysInYear(2000)
 daysInYear(1999)
 }
-\keyword{ spatial }
