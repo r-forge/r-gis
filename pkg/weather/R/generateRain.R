@@ -32,13 +32,13 @@ generateRain <- function(rain, raind, markov=0.75, reps=1) {
     ALFA <- rnpwd / BETA
 
 	nd <- c(31,28,31,30,31,30,31,31,30,31,30,31)
-    PWD = markov * raind / nd
-	PWW = PWD + 1 - markov
+    PWD <- markov * raind / nd
+	PWW <- PWD + 1 - markov
 
-	i <- (RNPWD < mlimit) & (RNPWD > 0)
+	i <- (rnpwd < mlimit) & (rnpwd > 0)
     ALFA[i] <- 0.999
-    BETA[i] <- RNPWD[i] / 0.999
-	i <- RNPWD == 0
+    BETA[i] <- rnpwd[i] / 0.999
+	i <- rnpwd == 0
     PWD[i] <- 0  # no rain
     PWW[i] <- 0  
 	

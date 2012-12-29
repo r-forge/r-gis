@@ -12,30 +12,30 @@ PET <- function(w, lat=0, type="Thorntwaite", Pereira=FALSE) {
 	#Thornthwaite, C.W., 1948.
 		# L <- avgMonthDaylength(lat)
 		L <- rep(12, 12)
-		tavg <- w$tavg
-		tavg[tavg < 0] <- 0
-		I <- sum((tavg/5)^1.514)
+		tmp <- w$tmp
+		tmp[tmp < 0] <- 0
+		I <- sum((tmp/5)^1.514)
 		alpha <- 6.75e-07 * I^3 - 7.71e-05 * I^2 + 1.79e-02 * I + 0.492
-		PET <- 16 * L/12 * (10*tavg / I)^alpha
+		PET <- 16 * L/12 * (10*tmp / I)^alpha
 
 		# Willmott for > 26C
-		i <- tavg > 26
-		PET[i] <- -415.85 + 32.24*tavg[i] - 0.43*tavg[i]^2
-		PET[tavg == 0] <- 0
+		i <- tmp > 26
+		PET[i] <- -415.85 + 32.24*tmp[i] - 0.43*tmp[i]^2
+		PET[tmp == 0] <- 0
 		return(PET / 30)
 	} else if (type == 'ThornWill') {
 		# L <- avgMonthDaylength(lat)
 		L <- rep(12, 12)
-		tavg <- w$tavg
-		tavg[tavg < 0] <- 0
-		I <- sum((tavg/5)^1.514)
+		tmp <- w$tmp
+		tmp[tmp < 0] <- 0
+		I <- sum((tmp/5)^1.514)
 		alpha <- 6.75e-07 * I^3 - 7.71e-05 * I^2 + 1.79e-02 * I + 0.492
-		PET <- 16 * L/12 * (10*tavg / I)^alpha
+		PET <- 16 * L/12 * (10*tmp / I)^alpha
 
 		# Willmott for > 26C
-		i <- tavg > 26
-		PET[i] <- -415.85 + 32.24*tavg[i] - 0.43*tavg[i]^2
-		PET[tavg == 0] <- 0
+		i <- tmp > 26
+		PET[i] <- -415.85 + 32.24*tmp[i] - 0.43*tmp[i]^2
+		PET[tmp == 0] <- 0
 		return(PET / 30)
 	} else if (type == 'ThornWillCam') {
 		# L <- avgMonthDaylength(lat)

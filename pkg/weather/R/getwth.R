@@ -1,6 +1,6 @@
 # Author: Robert J. Hijmans
 # License GPL3
-# Version 0.2  December 2012
+# Version 1.0  December 2012
 
 
 .getWthFile <- function(filename, type='NASA') {
@@ -9,71 +9,81 @@
 	}
 }
 
-getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), source='Power', cacheOK=TRUE, quiet, ...) {
+getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), quiet, ...) {
 	r <- raster()
 	cell <- cellFromXY(r, c(lon, lat))
 	if (is.na(cell)) {	stop("invalid coordinates") }
 	
-	if (tile) {
-		i <- cellFromXY(aggregate(raster(), 30), c(lon, lat))
-		theurl <- paste("http://biogeo.ucdavis.edu/data/climate/power/tile", i, ".zip" , sep='')
-		filename <- paste(folder, "/tile_", i, ".zip", sep="")
-		if (!file.exists(filename)) {
-			if (missing(quiet)) { quiet <- FALSE }
-			download.file(url=theurl, destfile=filename, method="auto", quiet=quiet, mode = "wb", cacheOK=cacheOK)
-		}
-		unzip(filename, exdir=folder)
-	}
-
-	if (missing(quiet)) { quiet <- TRUE }
+	folder <- paste(folder, '/power', sep='')
+	dir.create(folder, FALSE, TRUE)
 	
+	dots <- list(...)
+	source <- dots@source
+	if (is.null(source)) { source <- 'davis' }
 	source <- tolower(source)
 	filename <- paste(folder, "/power_", cell, ".wth", sep="")
-	vars <- c("swv_dwn", "T2M", "T2MN", "T2MX", "RH2M", "RAIN")
 	xy <- xyFromCell(r, cell)
 	lon <- xy[1]
 	lat <- xy[2]
 	
 	if (!file.exists(filename) | overwrite) {
+
+		if (tile) {
+			i <- cellFromXY(aggregate(raster(), 30), c(lon, lat))
+			theurl <- paste("http://biogeo.ucdavis.edu/data/climate/power/tile", i, ".zip" , sep='')
+			filename <- paste(folder, "/tile_", i, ".zip", sep="")
+			if (! file.exists(filename)) {
+				if (missing(quiet)) { quiet <- FALSE }
+				download.file(url=theurl, destfile=filename, method="auto", quiet=quiet, mode = "wb")
+			}
+			unzip(filename, exdir=folder)
+		}
+
+		if (missing(quiet)) { quiet <- TRUE }
+	
 		if (source == 'davis') {
 			theurl <- paste("http://biogeo.ucdavis.edu/data/climate/power/pow", cell, ".txt" , sep='')
-			download.file(url=theurl, destfile=filename, method="auto", quiet=quiet, mode = "wb", cacheOK=cacheOK)
+			download.file(url=theurl, destfile=filename, method="auto", quiet=quiet, mode="wb", cacheOK=TRUE)
 		} else {
+			vars <- c("swv_dwn", "T2M", "T2MN", "T2MX", "RH2M", "RAIN")
 			d <- as.Date(Sys.time())
 			eday <- dayFromDate(d)
 			emon <- monthFromDate(d)
 			eyr <- yearFromDate(d)
 			part1 <- "http://earth-www.larc.nasa.gov/cgi-bin/cgiwrap/solar/agro.cgi?email=agroclim%40larc.nasa.gov&step=1&lat="
 			part2 <- paste(lat, "&lon=", lon, "&sitelev=&ms=1&ds=1&ys=1983&me=", emon, "&de=", eday, "&ye=", eyr, sep="")
-			part3 <- ''
-			for (i in 1:length(vars)) {
-				part3 <- paste(part3, "&p=", vars[i], sep="")
-			}
+			part3 <- paste("&p=", vars, sep='', collapse='')
 			part3 <- paste(part3, "&submit=Submit", sep="")
 			theurl <- paste(part1, part2, part3, sep="")
 			f <- tempfile()
-			download.file(url=theurl, destfile=f, method="auto", quiet=quiet, mode = "wb", cacheOK=cacheOK)
+			download.file(url=theurl, destfile=f, method="auto", quiet=quiet, mode="wb", cacheOK=TRUE)
 			v <- .getWthFileNASA(f)
 			file.remove(f)
-			v@locations$longitude=lon
-			v@locations$latitude=lat
 			save(v, file=filename)
 		 }
 	}
+	
 	if (file.exists(filename)) {
         env <- new.env()
         d <- get(load(filename, env), env)
-		if (is.null(d@values$rhmin)) {
-			rhnx <- rhMinMax(d@values) 
-			vapr <- d@values$relh * SVP(d@values$tavg) / 1000     # 100 for % and 10 to go from hPa to kPa
-			rh <- cbind(d@values$relh, rhnx, vapr)
-			colnames(rh) <- c("rhavg", "rhmin", "rhmax", "vapr")
-			i <- which(colnames(d@values) == 'relh')
-			d@values <- cbind(d@values[, -i], rh)
+		if (is.null(d$rhmin)) {
+			rhnx <- rhMinMax(d) 
+			vapr <- d$relh * .SVP(d$tmp) / 1000     # 100 for % and 10 to go from hPa to kPa
+			rh <- cbind(d$relh, rhnx, vapr)
+			colnames(rh) <- c("rh", "rhmin", "rhmax", "vapr")
+			i <- which(colnames(d) == 'relh')
+			d <- cbind(d[, -i], rh)
 		}
-		
-		
-        return(d)
+		alt <- attr(d, 'alt')
+		attr(d, 'alt') <- NULL
+		elevation <- NA
+		if (!is.null(alt)) {
+			try(elevation <- as.numeric(alt), silent=TRUE)
+		}
+		w <- new('Weather')
+		w@values <- d
+		w@locations <- data.frame(longitude=lon, latitude=lat, elevation=elevation, name='Power', stringsAsFactors=FALSE)
+        return(w)
     } else {
 		stop('could not do it')
 	}
@@ -89,21 +99,15 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), s
 	lns <- data.frame(matrix(as.numeric(unlist(lns)), ncol=length(lns[[1]]), byrow=T))
 	#colnames(lns) <- h2[[1]]
 	lns <- lns[,-1]
-	colnames(lns) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tavg", "relh")
+	colnames(lns) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tmp", "relh")
 
-	#rhnx <- rhMinMax(lns[,'relh'], lns[,'tmin'], lns[,'tmax'], lns[,'tavg']) 
-	#vapr <- lns[,'relh'] * SVP(lns[,'tavg']) / 1000     # 100 for % and 10 to go from hPa to kPa
+	#rhnx <- rhMinMax(lns[,'relh'], lns[,'tmin'], lns[,'tmax'], lns[,'tmp']) 
+	#vapr <- lns[,'relh'] * .SVP(lns[,'tmp']) / 1000     # 100 for % and 10 to go from hPa to kPa
 	#lns <- cbind(lns, rhnx, vapr)
 	
 	date <- dateFromDoy(lns[,'doy'], lns[,'year'])
 	#lns <- cbind(as.data.frame(date), lns)
-	lns <- lns[,-c(1:2)]
-
-	r <- raster()
-	cell <- cellFromXY(r, c(x, y))
-	
-	makeWeather(cell, x, y, alt, date, lns)
-	#@ WEYR WEDAY  SRAD   TMAX   TMIN   RAIN   WIND   TDEW    T2M   RH2M
+	lns[,-c(1:2)]
 }
 
 .getWthFileNASA <- function(filename) {
@@ -132,7 +136,7 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), s
 		v[v == -99] <- NA
 		v <- data.frame(matrix(v, ncol=length(lns[[1]]), byrow=T))
 
-		colnames(v) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tavg", "relh")	
+		colnames(v) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tmp", "relh")	
 		
 	} else {
 
@@ -155,21 +159,17 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), s
 		v[v=="-"] <- NA
 		v <- data.frame(matrix(as.numeric(v), ncol=length(lns[[1]]), byrow=T))
 
-		nicevars <- c("year", "doy", "srad", "tavg", "tmin", "tmax", "relh", "prec")
+		nicevars <- c("year", "doy", "srad", "tmp", "tmin", "tmax", "relh", "prec")
 		colnames(v) <- nicevars
 	}
 	
 	rhnx <- rhMinMax(v) 
-	vapr <- v$relh * SVP(v$tavg) / 1000     # 100 for % and 10 to go from hPa to kPa
+	vapr <- v$relh * .SVP(v$tmp) / 1000     # 100 for % and 10 to go from hPa to kPa
 	rh <- cbind(v$relh, rhnx, vapr)
-	colnames(rh) <- c("rhavg", "rhmin", "rhmax", "vapr")
+	colnames(rh) <- c("rh", "rhmin", "rhmax", "vapr")
 	i <- which(colnames(v) == 'relh')
 	v <- cbind(v[, -i], rh)
-	w <- new('Weather')
-	w@values <- v
-	w@locations <- data.frame(longitude=NA, latitude=NA, elevation=alt, name='Power', stringsAsFactors=FALSE)
-	return(w)
-
+	return(v)
 	
 #date <- dateFromDoy(v[,'doy'], v[,'year'])
 

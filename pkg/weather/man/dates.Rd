@@ -1,4 +1,4 @@
-\name{date}
+\name{dates}
 
 \alias{dateFromDoy}
 \alias{doyFromDate}
@@ -29,7 +29,6 @@ daysInYear(year)
   \item{doy}{Day of the year (1..365) or (1:366) for leap years }
   \item{year}{year, e.g. 1982 }
   \item{date}{date (Date or character class) as 'yyyy-mm-dd', e.g. '1982-11-23' }  
-  \item{lat}{latitude, in degrees. I.e. between -90.0 and 90.0 }
 }
 
 \value{
