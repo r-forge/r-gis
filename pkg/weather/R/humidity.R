@@ -54,6 +54,32 @@ rhMinMax <- function(w) {
 }	
 
 
+rhMinMax2 <- function(w) {
+	#rh, tmin, tmax, tmp=(tmin+tmax)/2
+	if (is.null(w$tmin)) { stop('"w" does not have "tmin" values') }
+	if (is.null(w$tmax)) { stop('"w" does not have "tmax" values') }
+	if (is.null(w$rh)) { stop('"w" does not have "rh" (relative humidity) values') }
+
+	tmin <- pmax(w$tmin, -5)
+	tmax <- pmax(w$tmax, -5)
+	if (is.null(w$tmp)) { 
+		w$tmp <- (w$tmin + w$tmax) / 2
+	}
+	tmp <- pmax(w$tmp, -5)
+	
+	es <- saturatedVaporPressure(tmp)
+	vp <- w$rh / 100 * es
+	
+	es <- saturatedVaporPressure(tmax)
+	rhmin <- 100 * vp / es;
+	rhmin <- pmax(0, pmin(100, rhmin))
+	
+	es <- saturatedVaporPressure(tmin)
+	rhmax <- 100*vp/es;
+	rhmax <- pmax(0, pmin(100, rhmax))
+	cbind(rhmin, rhmax)
+}	
+
 diurnalRH <- function(w) {
 	if (is.null(w@values$rhmin)) {
 		if (is.null(w@values$rh)) {

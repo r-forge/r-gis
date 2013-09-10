@@ -163,7 +163,7 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), q
 		colnames(v) <- nicevars
 	}
 	
-	rhnx <- rhMinMax(v) 
+	rhnx <- rhMinMax2(v) 
 	vapr <- v$relh * .SVP(v$tmp) / 1000     # 100 for % and 10 to go from hPa to kPa
 	rh <- cbind(v$relh, rhnx, vapr)
 	colnames(rh) <- c("rh", "rhmin", "rhmax", "vapr")
