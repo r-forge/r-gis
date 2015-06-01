@@ -1,0 +1,12 @@
+Package: Rproj4
+Type: Package
+Title: Rproj4
+Version: 0.0-1
+Date: 31-May-2015
+LinkingTo: Rcpp
+Imports: Rcpp
+Author: Robert J. Hijmans
+Maintainer: Robert J. Hijmans <r.hijmans@gmail.com> 
+Description: Direct use of PROJ.4 library
+License: GPL (>=3)
+URL: http://raster.r-forge.r-project.org/
