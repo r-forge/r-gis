@@ -1,9 +1,9 @@
-\name{test-package}
+\name{Rproj4-package}
 \Rdversion{1.1}
 
-\alias{test-package}
+\alias{Rproj4-package}
 
-\alias{test}
+\alias{Rproj4}
 
 \docType{package}
 \title{What the package does (short line)}
