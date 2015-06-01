@@ -2,7 +2,7 @@ Package: Rproj4
 Type: Package
 Title: Transformation of geospatial coordinate systems
 Version: 0.0-1
-Date: 31-May-2015
+Date: 2015-05-31
 LinkingTo: Rcpp
 Imports: Rcpp
 Author: Robert J. Hijmans
