@@ -5,6 +5,17 @@
 
 using namespace Rcpp;
 
+// pjcheckcrs
+bool pjcheckcrs(String crs);
+RcppExport SEXP Rproj4_pjcheckcrs(SEXP crsSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject __result;
+    Rcpp::RNGScope __rngScope;
+    Rcpp::traits::input_parameter< String >::type crs(crsSEXP);
+    __result = Rcpp::wrap(pjcheckcrs(crs));
+    return __result;
+END_RCPP
+}
 // pjtransform3
 NumericMatrix pjtransform3(NumericVector x, NumericVector y, String pj_in, String pj_out);
 RcppExport SEXP Rproj4_pjtransform3(SEXP xSEXP, SEXP ySEXP, SEXP pj_inSEXP, SEXP pj_outSEXP) {

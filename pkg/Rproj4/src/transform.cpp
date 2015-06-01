@@ -6,6 +6,15 @@ using namespace Rcpp;
 
 const char* toConstChar(std::string s){ return s.c_str(); }
 
+// [[Rcpp::export(name = "checkCRS")]]
+bool pjcheckcrs(String crs) {
+	if (pj_init_plus(toConstChar(crs))) {
+		return true;
+	} else {
+		return false;	
+	}
+}
+
 // [[Rcpp::export(name = ".pjtransform")]]
 NumericMatrix pjtransform3(NumericVector x, NumericVector y, String pj_in, String pj_out) {
     projPJ pj_input, pj_output;
