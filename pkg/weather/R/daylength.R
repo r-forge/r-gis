@@ -18,7 +18,6 @@ daylength <- function(lat, doy) {
 	return(DL)
 }
 
-
 .daylength2 <- function(lat, doy) {
 	if (class(doy) == 'Date' | class(doy) == 'character') { 
 		doy <- doyFromDate(doy) 

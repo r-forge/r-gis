@@ -3,8 +3,8 @@
 # Version 0.1  January 2009
 
 yearFromDate <- function(date) {
-# to avoid date shifts because of your local time zone if date is a POSIX. ..
 # date is a string like "2007-7-10"    YYYY-M-D
+# to avoid date shifts because of your local time zone if date is a POSIX. 
 	date <- as.character(date)
 	as.numeric(format(as.Date(date), "%Y"))
 }
@@ -42,7 +42,6 @@ daysOfYear <- function(year) {
 	d <- seq(firstday, to=lastday, by=1)
 	return(d)
 }	
-
 
 dateFromDoy <- function(doy, year) {
 	year <- round(year)

@@ -21,6 +21,11 @@ daylength(lat, doy)
 double  
 }
 
+\references{
+William C. Forsythe, Edward J. Rykiel Jr., Randal S. Stahl, Hsin-i Wu, Robert M. Schoolfield, 1995. A model comparison for daylength as a function of latitude and day of the year. Ecological Modeling 80: 87-95.
+}
+
+
 \examples{
 daylength(52, 50)
 daylength(5, 50)

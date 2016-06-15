@@ -2,19 +2,39 @@
 # License GPL3
 
 
-writeFSE <- function(w, country='AAA', station=1, wind=2.5,  path=getwd(), ... ) {
+readFSEwth <- function(f) {
+  d <- trim(readLines(f))
+  i <- substr(d, 1, 1) == '*'
+  d <- d[!i ]
+  h <- d[1]
+  h <- unlist(strsplit(h, ' '))
+  h <- as.numeric(h[h != ""])
+  location <- h[1:3]
+  d <- d[-1]
+  x <- sapply(d, function(i)strsplit(i, ' '), USE.NAMES = FALSE)
+  x <- lapply(x, function(y) as.numeric(y[y!=''] ))
+  x <- do.call(rbind, x)
+  date <- dateFromDoy(x[,3], x[,2])
+  df <- data.frame(date, x[,4:9])
+  colnames(df) <- c("date", "srad", "tmin", "tmax", "vapr", "wind", "prec")
+  attr(df, 'location') <- location
+  df 
+}
+
+
+
+
+writeFSEwth <- function(w, country='AAA', station=1, lon=0, lat=0, elev=0,  path=getwd(), ... ) {
 	
-#	w@values$srad <- w@values$srad * 1000
-#	w@values$tmin <- w@values$tmin + tempfact
-#	w@values$tmax <- w@values$tmax + tempfact
-#	w@values$prec <- w@values$prec * rainfact
-	year <- yearFromDate(w@values$date)
-	lon <- w@locations$longitude
-	lat <- w@locations$latitude
-	alt <- w@locations$elevation
+	if (isTRUE(list(...)$dotsboundlat)) {
+	  if ( lat > 60) { lat <- 59 }
+	  if ( lat < -60 ) { lat <- -59 }
+	}
 	
-	years <- unique(year)
-	for (yr in years) {
+  w$year <- yearFromDate(w$date)
+  years <- unique(w$year)
+
+  for (yr in years) {
 		fname <- paste(path, '/', country, station, '.', substr(yr, 2, 4), sep="")
 		thefile <- file(fname, "w")
 		
@@ -37,19 +57,19 @@ writeFSE <- function(w, country='AAA', station=1, wind=2.5,  path=getwd(), ... )
 		cat("** WCCYEARNR=", yr, "\n", file = thefile)
 		cat("*-----------------------------------------------------------", "\n", file = thefile)
 
-		if (isTRUE(list(...)$dotsboundlat)) {
-			if ( lat > 60) { lat <- 59 }
-			if ( lat < -60 ) { lat <- -59 }
-		}
-		cat(lon, lat, alt, '  0.00  0.00 \n', file = thefile)
+		cat(lon, lat, elev, '  0.00  0.00 \n', file = thefile)
 
-		yw <- w[ ,year==yr]
+		yw <- w[w$year==yr, ]
 		
 		yw[is.na(yw)] <- -9999
-		for (d in 1:length(yw[,1])) {
-			cat("1  ", sprintf("%6.0f", yr), sprintf("%5.0f", d), sprintf("%10.0f", yw$srad[d]), sprintf("%8.1f", yw$tmin[d]), sprintf("%8.1f", yw$tmax[d]), sprintf("%8.1f", yw$vapr[d]), sprintf("%8.1f", wind), sprintf("%8.1f", yw$prec[d]), "\n", file=thefile)
+		for (d in 1:nrow(yw)) {
+			cat("1  ", sprintf("%6.0f", yr), sprintf("%5.0f", d), sprintf("%10.0f", yw$srad[d]), sprintf("%8.1f", yw$tmin[d]), sprintf("%8.1f", yw$tmax[d]), sprintf("%8.1f", yw$vapr[d]), sprintf("%8.1f", yw$wind[d]), sprintf("%8.1f", yw$prec[d]), "\n", file=thefile)
 		}
 		close(thefile)
     }
 	return(invisible(fname))
 }		
+#wth$srad = wth$srad * 1000
+#writeFSEwth(wth, 'NLD', 3, 5.67,51.97, 7 )
+
+

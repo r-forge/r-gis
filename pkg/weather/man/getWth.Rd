@@ -1,7 +1,7 @@
 
-\name{getWthPower}
+\name{wthPower}
 
-\alias{getWthPower}
+\alias{wthPower}
 
 
 \title{ Get weather data }
@@ -11,32 +11,36 @@ Get weather data from the NASA Power database. The function returns data for (ti
 }
 
 \usage{
-getWthPower(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), quiet, ...) 
+wthPower(lon, lat, folder=file.path(getwd(), 'power'), overwrite=FALSE, tile=FALSE, source='Davis', ...) 
 }
 
 \arguments{
 \item{lon}{numeric between -180 and 180 (degrees latitude)}
 \item{lat}{numeric between -90 and 90 (degrees longitude)}
+\item{folder}{character. Where (directory, path) should the downloaded records be saved?} 
 \item{overwrite}{ logical. If \code{TRUE} previously downloaded files are overwritten }
 \item{tile}{logical. If \code{TRUE} a 10 by 10 degrees tile (100 records) is downloaded for faster processing of adjacent locations}
-\item{folder}{character. Where (directory, path) should the downloaded records be saved?} 
-\item{quiet}{logical. If \code{TRUE} suppress status messages (if any), and the progress bar. See \code{\link{download.file}}} 
-\item{...}{Additional arguments} 
+\item{source}{character. From "Davis" or from the orginal source ("NASA")} 
+\item{...}{additional arguments. None implemented} 
 }
 
 
 
 \value{
-An object of class 'Weather'
+data.frame with weather data between 1983 and 2016.
 }
 
-\details{
-To be done
+\references{
+http://power.larc.nasa.gov/common/php/Agro_ExSummary.php
+
+Paul W. Stackhouse, Jr, David Westberg, James M. Hoell, William S. Chandler, Taiping Zhang. Prediction Of Worldwide Energy Resource (POWER) --- Agroclimatology Methodology ---
+(1 Latitude by 1 Longitude Spatial Resolution) (Version 1.0.2 June 4, 2015). NASA Langley Research Center and SSAI/NASA Langley Research Center.
+http://power.larc.nasa.gov/documents/Agroclimatology_Methodology.pdf
 }
 
 \examples{
 \dontrun{
-d <- getWthPower(6,56, overwrite=T)
+d <- wthPower(6, 56)
 }
 }
 

@@ -1,11 +1,11 @@
 Package: weather
 Type: Package
 Title: Weather data manipulation
-Version: 0.4
-Date: 23-August-2012
-Depends: methods, spacetime (>= 0.7-1), raster
+Version: 0.5
+Date: 16-April-2016
 Author: Robert J. Hijmans
+Depends: raster
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
-Description: weather data manipulation
+Description: A set of functions for weather data manipulation.
 License: GPL-3
 LazyLoad: yes

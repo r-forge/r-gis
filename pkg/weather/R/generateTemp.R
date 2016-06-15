@@ -36,7 +36,7 @@
 }
 
 
-generateTmp <- function(tmin, tmax, reps=1, std=.1, autocor=5) {
+genTmp <- function(tmin, tmax, reps=1, std=.1, autocor=5) {
 	stopifnot(length(tmin) == length(tmax))
 	n <- length(tmin)
 	nyrs <- n / 12
@@ -55,7 +55,6 @@ generateTmp <- function(tmin, tmax, reps=1, std=.1, autocor=5) {
 	
 	res <- list()
 	for (r in 1:reps) {
-	
 		x <- filter(rnorm(m, sd=std[1]), filter=rep(1,autocor), circular=TRUE)
 		y <- filter(runif(m, -0.5*std[1], 0.5*std[1]), filter=rep(1,autocor), circular=TRUE)
 		tn <- c(tmin[length(tmin)], tmin, tmin[1])

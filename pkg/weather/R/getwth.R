@@ -3,106 +3,141 @@
 # Version 1.0  December 2012
 
 
-.getWthFile <- function(filename, type='NASA') {
-	if (type=='NASA') {
-		return(.getWthFileNASA(filename))
-	}
+.downloadNASAPower <- function(lon, lat) {
+	filename <- tempfile()
+	vars <- c("toa_dwn", "swv_dwn", "lwv_dwn", "T2M", "T2MN", "T2MX", "RH2M", "DFP2M", "RAIN", "WS10M")
+	d <- as.Date(Sys.time())
+	eday <- dayFromDate(d)
+	emon <- monthFromDate(d)
+	eyr <- yearFromDate(d)
+	part1 <- "http://earth-www.larc.nasa.gov/cgi-bin/cgiwrap/solar/agro.cgi?email=&step=1&lat="
+	part2 <- paste(lat, "&lon=", lon, "&sitelev=&ms=1&ds=1&ys=1983&me=", emon, "&de=", eday, "&ye=", eyr, sep="")
+	part3 <- paste("&p=", vars, sep='', collapse='')
+	part3 <- paste(part3, "&submit=Submit", sep="")
+	theurl <- paste(part1, part2, part3, sep="")
+	download.file(url=theurl, destfile=filename, method="auto", quiet=TRUE, mode="wb", cacheOK=TRUE)
+	return(filename)
 }
 
-getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), quiet, ...) {
-	r <- raster()
-	cell <- cellFromXY(r, c(lon, lat))
-	if (is.na(cell)) {	stop("invalid coordinates") }
-	
-	folder <- paste(folder, '/power', sep='')
-	dir.create(folder, FALSE, TRUE)
-	
-	dots <- list(...)
-	source <- dots@source
-	if (is.null(source)) { source <- 'davis' }
-	source <- tolower(source)
-	filename <- paste(folder, "/power_", cell, ".wth", sep="")
-	xy <- xyFromCell(r, cell)
-	lon <- xy[1]
-	lat <- xy[2]
-	
-	if (!file.exists(filename) | overwrite) {
+.processPower <- function(inf, outf) {
 
-		if (tile) {
-			i <- cellFromXY(aggregate(raster(), 30), c(lon, lat))
-			theurl <- paste("http://biogeo.ucdavis.edu/data/climate/power/tile", i, ".zip" , sep='')
-			filename <- paste(folder, "/tile_", i, ".zip", sep="")
-			if (! file.exists(filename)) {
-				if (missing(quiet)) { quiet <- FALSE }
-				download.file(url=theurl, destfile=filename, method="auto", quiet=quiet, mode = "wb")
-			}
-			unzip(filename, exdir=folder)
-		}
-
-		if (missing(quiet)) { quiet <- TRUE }
-	
-		if (source == 'davis') {
-			theurl <- paste("http://biogeo.ucdavis.edu/data/climate/power/pow", cell, ".txt" , sep='')
-			download.file(url=theurl, destfile=filename, method="auto", quiet=quiet, mode="wb", cacheOK=TRUE)
-		} else {
-			vars <- c("swv_dwn", "T2M", "T2MN", "T2MX", "RH2M", "RAIN")
-			d <- as.Date(Sys.time())
-			eday <- dayFromDate(d)
-			emon <- monthFromDate(d)
-			eyr <- yearFromDate(d)
-			part1 <- "http://earth-www.larc.nasa.gov/cgi-bin/cgiwrap/solar/agro.cgi?email=agroclim%40larc.nasa.gov&step=1&lat="
-			part2 <- paste(lat, "&lon=", lon, "&sitelev=&ms=1&ds=1&ys=1983&me=", emon, "&de=", eday, "&ye=", eyr, sep="")
-			part3 <- paste("&p=", vars, sep='', collapse='')
-			part3 <- paste(part3, "&submit=Submit", sep="")
-			theurl <- paste(part1, part2, part3, sep="")
-			f <- tempfile()
-			download.file(url=theurl, destfile=f, method="auto", quiet=quiet, mode="wb", cacheOK=TRUE)
-			v <- .getWthFileNASA(f)
-			file.remove(f)
-			save(v, file=filename)
-		 }
+	lns <- readLines(inf)
+	hdr <- lns[1:30]
+	end <- which(hdr=="-END HEADER-")
+	if (length(end) < 1) {
+		stop('file not good')
 	}
 	
-	if (file.exists(filename)) {
-        env <- new.env()
-        d <- get(load(filename, env), env)
-		if (is.null(d$rhmin)) {
-			rhnx <- rhMinMax(d) 
-			vapr <- d$relh * .SVP(d$tmp) / 1000     # 100 for % and 10 to go from hPa to kPa
-			rh <- cbind(d$relh, rhnx, vapr)
-			colnames(rh) <- c("rh", "rhmin", "rhmax", "vapr")
-			i <- which(colnames(d) == 'relh')
-			d <- cbind(d[, -i], rh)
-		}
-		alt <- attr(d, 'alt')
-		attr(d, 'alt') <- NULL
-		elevation <- NA
-		if (!is.null(alt)) {
-			try(elevation <- as.numeric(alt), silent=TRUE)
-		}
-		w <- new('Weather')
-		w@values <- d
-		w@locations <- data.frame(longitude=lon, latitude=lat, elevation=elevation, name='Power', stringsAsFactors=FALSE)
-        return(w)
+	lonlat <- strsplit(hdr[4], ' ')[[1]][c(7,3)]
+	elevation <- strsplit(hdr[6], '= ')[[1]][2]
+	d <- lns[(end-1):length(lns)]
+	d <- d[-2]
+	
+	d <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", d))  , " ")
+	v <- do.call(rbind, d)
+	v[v == '-'] <- NA
+	cn <- v[1,]
+	v <- v[-1,]
+	d <- matrix(as.numeric(v), ncol=ncol(v))
+
+	cns <- c('YEAR', 'DOY', 'toa_dwn', 'swv_dwn', 'lwv_dwn', 'T2M', 'T2MN', 'T2MX', 'RH2M', 'DFP2M', 'RAIN', 'WS10M')
+	stopifnot(all(cn == cns))
+	#colnames(d) <- cn
+	colnames(d) <- c("year", "doy", "erad", "srad", "lwav", "tavg", "tmin", "tmax", "rhum", "tdew", "prec", "wind")	
+	d <- data.frame(d)
+	rhnx <- rhMinMax2(d)
+	d <- cbind(d, rhnx)
+	
+	d$date <- as.Date(d$doy, origin=paste(d$year-1, "-12-31", sep=''))
+	d$vapr <- d$rhum * .SVP(d$tavg) / 1000
+	
+	d <- d[, c("date", "srad", "lwav", "tavg", "tmin", "tmax", "tdew", "vapr", "rhum", "rhmn", "rhmx", "prec", "wind")]
+	attr(d, 'location') <- as.numeric(c(lonlat, elevation))
+	saveRDS(d, file=outf)
+}
+
+
+
+wthPower <- function(lon, lat, folder=file.path(getwd(), 'power'), ...) {
+	r <- raster::raster()
+	cell <- raster::cellFromXY(r, cbind(lon, lat))
+	if (is.na(cell)) {	stop("invalid coordinates") }
+	xy <- raster::xyFromCell(r, cell)
+	lon <- xy[1]
+	lat <- xy[2]
+	a <- aggregate(r, 30)
+	tile <- cellFromXY(a, xy)
+	
+	folder <- file.path(folder, paste0("tile_", tile))
+	if (!file.exists(folder)) {
+		dir.create(folder, recursive=TRUE, showWarn=FALSE)
+	}
+	fname <- file.path(folder, paste0(cell, ".rds"))
+	if (! (file.exists(fname)) ) {
+			theurl <- paste0("http://biogeo.ucdavis.edu/data/climate/daily/nasatiles/", tile, ".zip")
+			tfilename <- paste0(folder, "/tile_", tile, ".zip", sep="")
+			#if (! file.exists(tfilename)) {
+			message(paste('downloading to', folder))
+			download.file(url=theurl, destfile=tfilename, method="auto", quiet=TRUE, mode = "wb")
+			#}
+			unzip(tfilename, exdir=folder)
+	}
+	if (file.exists(fname)) {
+        readRDS(fname)
     } else {
 		stop('could not do it')
 	}
-
 }
 
 
 
-.ICASAstyle <- function(lns) {
+.wthPowerOne <- function(lon, lat, folder=file.path(getwd(), 'power'), overwrite=FALSE, source='Davis', ...) {
+	r <- raster::raster()
+	cell <- raster::cellFromXY(r, cbind(lon, lat))
+	if (is.na(cell)) {	stop("invalid coordinates") }
+	xy <- raster::xyFromCell(r, cell)
+	lon <- xy[1]
+	lat <- xy[2]
+	
+	fname <- file.path(folder, paste0("nasa-power_", cell, ".rds"))
+	
+	if (! (file.exists(fname) | overwrite ) ) {
+		dir.create(folder, FALSE, TRUE)
+	
+		source <- tolower(source)
+		if (source == 'davis') {
+			theurl <- paste0("http://biogeo.ucdavis.edu/data/climate/daily/nasapower/", cell, ".rds")
+			download.file(url=theurl, destfile=fname, method="auto", quiet=TRUE, mode="wb", cacheOK=TRUE)
+		} else {
+			tmpfile <- NULL
+			tmpfile <- .downloadNASAPower(lon, lat)
+			if (is.null(tmpfile)) {
+				stop('it did not work out')
+			}
+			.processPower(tmpfile, fname)
+		}
+	}
+	
+	if (file.exists(fname)) {
+        readRDS(fname)
+    } else {
+		stop('could not do it')
+	}
+}
+
+
+
+..ICASAstyle <- function(lns) {
 
 	lns <- lns[10:(length(lns)-1)]
 	lns <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", lns))  , " ")
 	lns <- data.frame(matrix(as.numeric(unlist(lns)), ncol=length(lns[[1]]), byrow=T))
 	#colnames(lns) <- h2[[1]]
 	lns <- lns[,-1]
-	colnames(lns) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tmp", "relh")
+	colnames(lns) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tmp", "rhum")
 
-	#rhnx <- rhMinMax(lns[,'relh'], lns[,'tmin'], lns[,'tmax'], lns[,'tmp']) 
-	#vapr <- lns[,'relh'] * .SVP(lns[,'tmp']) / 1000     # 100 for % and 10 to go from hPa to kPa
+	#rhnx <- rhMinMax(lns[,'rhum'], lns[,'tmin'], lns[,'tmax'], lns[,'tmp']) 
+	#vapr <- lns[,'rhum'] * .SVP(lns[,'tmp']) / 1000     # 100 for % and 10 to go from hPa to kPa
 	#lns <- cbind(lns, rhnx, vapr)
 	
 	date <- dateFromDoy(lns[,'doy'], lns[,'year'])
@@ -110,7 +145,7 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), q
 	lns[,-c(1:2)]
 }
 
-.getWthFileNASA <- function(filename) {
+..getWthFileNASA <- function(filename) {
 
 	lns <- readLines(filename)
 	hdr <- lns[1:30]
@@ -127,7 +162,7 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), q
 		h2 <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", h2))  , " ")
 		end2 <- which(lns=="</PRE></BODY></HTML>") - 1
 		
-		lns <- trim( lns[ c((end+1):end2) ] )
+		lns <- raster::trim( lns[ c((end+1):end2) ] )
 	
 		lns <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", lns))  , " ")
 		v <- unlist(lns)
@@ -136,7 +171,7 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), q
 		v[v == -99] <- NA
 		v <- data.frame(matrix(v, ncol=length(lns[[1]]), byrow=T))
 
-		colnames(v) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tmp", "relh")	
+		colnames(v) <- c("year", "doy", "srad", "tmax", "tmin", "prec", "wind", "tdew", "tmp", "rhum")	
 		
 	} else {
 
@@ -159,15 +194,15 @@ getWthPower <- function(lon, lat, overwrite=FALSE, tile=FALSE, folder=getwd(), q
 		v[v=="-"] <- NA
 		v <- data.frame(matrix(as.numeric(v), ncol=length(lns[[1]]), byrow=T))
 
-		nicevars <- c("year", "doy", "srad", "tmp", "tmin", "tmax", "relh", "prec")
+		nicevars <- c("year", "doy", "srad", "tmp", "tmin", "tmax", "rhum", "prec")
 		colnames(v) <- nicevars
 	}
 	
 	rhnx <- rhMinMax2(v) 
-	vapr <- v$relh * .SVP(v$tmp) / 1000     # 100 for % and 10 to go from hPa to kPa
-	rh <- cbind(v$relh, rhnx, vapr)
+	vapr <- v$rhum * .SVP(v$tmp) / 1000     # 100 for % and 10 to go from hPa to kPa
+	rh <- cbind(v$rhum, rhnx, vapr)
 	colnames(rh) <- c("rh", "rhmin", "rhmax", "vapr")
-	i <- which(colnames(v) == 'relh')
+	i <- which(colnames(v) == 'rhum')
 	v <- cbind(v[, -i], rh)
 	return(v)
 	
