@@ -3,6 +3,8 @@
 # Version 1.0  December 2012
 
 
+.trim <- function(x) { gsub("^\\s+|\\s+$", "", x) }
+
 .downloadNASAPower <- function(lon, lat) {
 	filename <- tempfile()
 	vars <- c("toa_dwn", "swv_dwn", "lwv_dwn", "T2M", "T2MN", "T2MX", "RH2M", "DFP2M", "RAIN", "WS10M")
@@ -57,20 +59,49 @@
 }
 
 
+.cellFromLL <- function(lon, lat, res=1) {
+	res <- 1 / res
+	nrows <- 180 * res
+    ncols <- 360 * res
+	
+	row <- floor((90 - lat) * res) 
+	row[row < 0] <- 0
+	row[row > (nrows-1)] <- nrows - 1
+
+	col <- floor((lon + 180) * res)
+	col[col < 0] <- 0
+	col[col > (ncols-1)] <- ncols - 1
+
+	(row) * ncols + col + 1
+}
+
+.llFromCell <- function(cell, res=1) {
+	nrows <- 180 / res
+    ncols <- 360 / res
+	cell <- cell -1
+	
+    col = cell %% ncols
+    row = trunc(cell / ncols);
+
+    lon <- (col + 0.5) * res - 180
+    lat <- 90 - (row + 0.5) * res
+	
+	cbind(lon, lat)
+}
+
+
 
 wthPower <- function(lon, lat, folder=file.path(getwd(), 'power'), ...) {
-	r <- raster::raster()
-	cell <- raster::cellFromXY(r, cbind(lon, lat))
+	cell <- .cellFromLL(lon, lat)
 	if (is.na(cell)) {	stop("invalid coordinates") }
-	xy <- raster::xyFromCell(r, cell)
+	xy <- .llFromCell(cell)
 	lon <- xy[1]
 	lat <- xy[2]
-	a <- aggregate(r, 30)
-	tile <- cellFromXY(a, xy)
+	tile <- .cellFromLL(lon, lat, 30)
 	
 	folder <- file.path(folder, paste0("tile_", tile))
 	if (!file.exists(folder)) {
-		dir.create(folder, recursive=TRUE, showWarn=FALSE)
+		dir.create(folder, recursive=TRUE, showWarnings=FALSE)
 	}
 	fname <- file.path(folder, paste0(cell, ".rds"))
 	if (! (file.exists(fname)) ) {
@@ -92,10 +123,9 @@ wthPower <- function(lon, lat, folder=file.path(getwd(), 'power'), ...) {
 
 
 .wthPowerOne <- function(lon, lat, folder=file.path(getwd(), 'power'), overwrite=FALSE, source='Davis', ...) {
-	r <- raster::raster()
-	cell <- raster::cellFromXY(r, cbind(lon, lat))
+	cell <- .cellFromLL(lon, lat)
 	if (is.na(cell)) {	stop("invalid coordinates") }
-	xy <- raster::xyFromCell(r, cell)
+	xy <- .llFromCell(cell)
 	lon <- xy[1]
 	lat <- xy[2]
 	
@@ -162,7 +192,7 @@ wthPower <- function(lon, lat, folder=file.path(getwd(), 'power'), ...) {
 		h2 <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", h2))  , " ")
 		end2 <- which(lns=="</PRE></BODY></HTML>") - 1
 		
-		lns <- raster::trim( lns[ c((end+1):end2) ] )
+		lns <- .trim( lns[ c((end+1):end2) ] )
 	
 		lns <- strsplit ( gsub("[[:space:]]+", " ", gsub("[[:space:]]+$", "", lns))  , " ")
 		v <- unlist(lns)

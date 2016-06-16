@@ -1,1 +1,3 @@
 exportPattern("^[^\\.]")
+importFrom("stats", "aggregate", "filter", "rgamma", "rnorm", "runif", "spline")
+importFrom("utils", "download.file", "unzip")

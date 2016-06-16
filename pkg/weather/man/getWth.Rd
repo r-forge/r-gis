@@ -11,17 +11,14 @@ Get weather data from the NASA Power database. The function returns data for (ti
 }
 
 \usage{
-wthPower(lon, lat, folder=file.path(getwd(), 'power'), overwrite=FALSE, tile=FALSE, source='Davis', ...) 
+wthPower(lon, lat, folder=file.path(getwd(), 'power'), ...) 
 }
 
 \arguments{
 \item{lon}{numeric between -180 and 180 (degrees latitude)}
 \item{lat}{numeric between -90 and 90 (degrees longitude)}
 \item{folder}{character. Where (directory, path) should the downloaded records be saved?} 
-\item{overwrite}{ logical. If \code{TRUE} previously downloaded files are overwritten }
-\item{tile}{logical. If \code{TRUE} a 10 by 10 degrees tile (100 records) is downloaded for faster processing of adjacent locations}
-\item{source}{character. From "Davis" or from the orginal source ("NASA")} 
-\item{...}{additional arguments. None implemented} 
+\item{...}{additional arguments} 
 }
 
 

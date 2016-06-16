@@ -3,7 +3,7 @@
 
 
 readFSEwth <- function(f) {
-  d <- trim(readLines(f))
+  d <- .trim(readLines(f))
   i <- substr(d, 1, 1) == '*'
   d <- d[!i ]
   h <- d[1]

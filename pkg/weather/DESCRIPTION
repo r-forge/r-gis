@@ -4,8 +4,7 @@ Title: Weather data manipulation
 Version: 0.5
 Date: 16-April-2016
 Author: Robert J. Hijmans
-Depends: raster
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
-Description: A set of functions for weather data manipulation.
+Description: A set of functions for weather and climate data manipulation.
 License: GPL-3
 LazyLoad: yes
