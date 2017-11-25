@@ -1,0 +1,14 @@
+Package: geo
+Type: Package
+Title: raster data 
+Version: 0.0-0
+Date: 2017-6-13
+Depends: methods
+LinkingTo: Rcpp
+Imports: Rcpp
+SystemRequirements: C++11
+Author: Robert J. Hijmans
+Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
+Description: Classes and basic methods for geographic data. 
+License: GPL (>=3)
+LazyLoad: yes
