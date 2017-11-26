@@ -28,7 +28,7 @@ bool GeoRaster::createFromFile(std::string fname) {
 			double ymax = atof(ini.GetValue("georeference", "ymax"));	
 			GeoExtent e(xmin, xmax, ymin, ymax);
 			if (nlyr() == 0) {
-				setExtent(e);
+				setExtent(e, false);
 				ncol = ncols;
 				nrow = nrows;
 				

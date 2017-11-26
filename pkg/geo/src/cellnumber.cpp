@@ -7,17 +7,14 @@ using namespace std;
 
 std::vector<double> GeoRaster::cellFromXY (std::vector<double> x, std::vector<double> y) {
 
-// length of x and y should be the same
-
-	size_t len = x.size();
-	std::vector<double> cells(len);
-	
+// size of x and y should be the same
+	size_t size = x.size();
+	std::vector<double> cells(size);
 	
 	double yres_inv = nrow / (extent.ymax - extent.ymin);
 	double xres_inv = ncol / (extent.xmax - extent.xmin);
-	
   
-	for (size_t i = 0; i < len; i++) {
+	for (size_t i = 0; i < size; i++) {
 		// cannot use trunc here because trunc(-0.1) == 0
 		double row = std::floor((extent.ymax - y[i]) * yres_inv);
 		// points in between rows go to the row below

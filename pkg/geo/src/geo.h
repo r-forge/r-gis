@@ -30,6 +30,7 @@ class GeoExtent {
 
 };
 
+
 class RasterSource {
 	public:
 		std::vector<bool> memory;
@@ -41,6 +42,15 @@ class RasterSource {
 		std::vector<double> NAflag;
 		
 };
+
+
+class BlockSize {
+	public:
+		std::vector<unsigned> row;
+		std::vector<unsigned> nrows;
+		unsigned n;
+};
+
 
 class GeoRaster {
 	
@@ -78,7 +88,7 @@ class GeoRaster {
 		GeoExtent getExtent() { return extent; }
 		void setExtent(GeoExtent e) { extent = e ; }
 
-		void setExtent(GeoExtent ext, bool keepRes, bool doSnap=false);
+		void setExtent(GeoExtent ext, bool keepRes=false, std::string snap="");
 
 		
 		string getCRS()	{ return(crs); }
@@ -183,8 +193,17 @@ class GeoRaster {
 		}
 
 		GeoExtent align(GeoExtent e, string snap="near");
+		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
 		
 		//GeoRaster crop(GeoExtent e, string filename);
+
+		BlockSize getBlockSize() {
+			BlockSize bs;
+			bs.row = {1, unsigned(ceil(nrow/2))};
+			bs.nrows = {bs.row[1] - 1, nrow-bs.row[1] + 1};
+			bs.n = 2;
+			return bs;
+		}
 		
 };
 
