@@ -4,47 +4,27 @@
 # Licence GPL v3
 
 
-if (!isGeneric("extent")) {
-	setGeneric("extent", function(x, ...)
-		standardGeneric("extent"))
+if (!isGeneric("ext")) {
+	setGeneric("ext", function(x, ...)
+		standardGeneric("ext"))
 }	
 
-if (!isGeneric("extent<-")) {
-	setGeneric("extent<-", function(x, value)
-		standardGeneric("extent<-"))
+if (!isGeneric("ext<-")) {
+	setGeneric("ext<-", function(x, value)
+		standardGeneric("ext<-"))
 }	
 
-
-if (!isGeneric("xmin")) {
-	setGeneric("xmin", function(x)
-		standardGeneric("xmin"))
-}
-
-if (!isGeneric("xmax")) {
-	setGeneric("xmax", function(x)
-		standardGeneric("xmax"))
-}
-
-if (!isGeneric("ymin")) {
-	setGeneric("ymin", function(x)
-		standardGeneric("ymin"))
-}
-
-if (!isGeneric("ymax")) {
-	setGeneric("ymax", function(x)
-		standardGeneric("ymax"))
-}
 
 	
 
-setMethod('extent', signature(x='missing'), 
+setMethod('ext', signature(x='missing'), 
 	function(x, ...){ 
 		e <- methods::new('GeoExtent')
 		return(e)
 	}
 )	
 	
-setMethod('extent', signature(x='numeric'), 
+setMethod('ext', signature(x='numeric'), 
 	function(x, ...){ 
 		dots <- unlist(list(...))
 		x <- c(x, dots)
@@ -65,13 +45,13 @@ setMethod('extent', signature(x='numeric'),
 )
 
 
-setMethod('extent', signature(x='GeoRaster'), 
+setMethod('ext', signature(x='GeoRaster'), 
 	function(x, ...){ 
-		extent(x@ptr$extent)
+		ext(x@ptr$extent)
 	}
 )	
 
-setMethod("extent<-", signature('GeoRaster', 'GeoExtent'), 
+setMethod("ext<-", signature('GeoRaster', 'GeoExtent'), 
 	function(x, value) {
 	    stop()
 		# requires a deep copy
@@ -80,47 +60,4 @@ setMethod("extent<-", signature('GeoRaster', 'GeoExtent'),
 		#return(y)
 	}
 )
-
-
-
-setMethod('xmin', signature(x='GeoRaster'), 
-function(x) {
-	return(xmin(extent(x)))
-})
-
-setMethod('xmax', signature(x='GeoRaster'), 
-function(x) {
-	return(xmax(extent(x)))
-})
-
-setMethod('ymin', signature(x='GeoRaster'), 
-function(x) {
-	return(ymin(extent(x)))
-})
-
-setMethod('ymax', signature(x='GeoRaster'), 
-function(x) {
-	return(ymax(extent(x)))
-})
-
-setMethod('xmin', signature(x='GeoExtent'), 
-function(x) {
-	return(x@xmin)
-})
-
-setMethod('xmax', signature(x='GeoExtent'), 
-function(x) {
-	return(x@xmax)
-})
-
-setMethod('ymin', signature(x='GeoExtent'), 
-function(x) {
-	return(x@ymin)
-})
-
-setMethod('ymax', signature(x='GeoExtent'), 
-function(x) {
-	return(x@ymax)
-})
-
 

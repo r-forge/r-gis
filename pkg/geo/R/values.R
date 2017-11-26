@@ -9,7 +9,7 @@ if (!isGeneric("values")) {
 }	
 
 if (!isGeneric("values<-")) {
-	setGeneric("values<-", function(x, value, ...)
+	setGeneric("values<-", function(x, ..., value)
 		standardGeneric("values<-"))
 }	
 
@@ -24,7 +24,7 @@ function(x, ...) {
 
 
 setMethod('values<-', signature(x='GeoRaster', 'numeric'), 
-	function(x, value, ...) {
+	function(x, ..., value) {
 
 	if (is.matrix(value)) { 
 		if (nlayer(value) == ncol(x) & ncell(value) == nrow(x)) {
@@ -75,12 +75,12 @@ setMethod('range', signature(x='GeoRaster'),
 )
 
 if (!isGeneric("setRange")) {
-	setGeneric("setRange", function(x, ...)
+	setGeneric("setRange", function(x)
 		standardGeneric("setRange"))
 }	
 
 setMethod('setRange', signature(x='GeoRaster'), 
-	function(x, ...) {
+	function(x) {
 		if (!.hasRange(x)) {
 			x@ptr$setRange
 		}

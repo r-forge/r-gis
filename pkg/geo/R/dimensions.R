@@ -85,49 +85,13 @@ setMethod('nlayer', signature(x='GeoRaster'),
 }	
 
 
-'xmin<-' <- function(x, value) {
-	if (inherits(x, 'Extent')) {
-		x@ptr$xmin <- value
-	} else {
-		x@extent@ptr$xmin <- value
-	}
-	return(x)
-}
-
-'xmax<-' <- function(x, value) {
-	if (inherits(x, 'Extent')) {
-		x@ptr$xmax <- value
-	} else {
-		x@extent@ptr$xmax <- value
-	}
-	return(x)
-}
-
-'ymin<-' <- function(x, value) {
-	if (inherits(x, 'Extent')) {
-		x@ptr$ymin <- value
-	} else {
-		x@extent@ptr$ymin <- value
-	}
-	return(x)
-}
-
-'ymax<-' <- function(x, value) {
-	if (inherits(x, 'Extent')) {
-		x@ptr$ymax <- value
-	} else {
-		x@extent@ptr$ymax <- value
-	}
-	return(x)
-}
-
-
 
 
 if (!isGeneric("res")) {
 	setGeneric("res", function(x)
 		standardGeneric("res"))
 }
+
 if (!isGeneric("xres")) {
 	setGeneric("xres", function(x)
 		standardGeneric("xres"))
@@ -145,12 +109,13 @@ function(x) {
 
 setMethod('xres', signature(x='GeoRaster'), 
 function(x) {
-		res[1]
+		res(x)[1]
 	}
 )
 
 setMethod('yres', signature(x='GeoRaster'), 
 function(x) {
-		res[2]
+		res(x)[2]
 	}
 )
+

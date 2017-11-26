@@ -37,10 +37,12 @@ Same as \code{x}.
 
 \examples{
 r <- georaster(ncol=18,nrow=18)
-r[39:49] <- 1
-r[113:155] <- 2
-r[200] <- 6
-s <- trim(r) 
+v <- rep(NA, ncell(r))
+v[39:49] <- 1
+v[113:155] <- 2
+v[200] <- 6
+values(r) <- v
+#s <- trim(r) 
 
 
 trim("    hi folks    !   ")

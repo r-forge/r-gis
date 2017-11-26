@@ -4,9 +4,8 @@
 # Licence GPL v3
 
 
-
 if (!isGeneric("crs")) {
-	setGeneric("crs", function(x, ...)
+	setGeneric("crs", function(x)
 		standardGeneric("crs"))
 }	
 
@@ -17,12 +16,12 @@ setMethod("crs", signature('GeoRaster'),
 )
 
 if (!isGeneric("crs<-")) {
-	setGeneric("crs<-", function(x, value, ...)
+	setGeneric("crs<-", function(x, ..., value)
 		standardGeneric("crs<-"))
 }	
 
 setMethod("crs<-", signature('GeoRaster', 'character'), 
-	function(x, value, ...) {
+	function(x, ..., value) {
 	# requires deep copy
 	#	x@ptr$crs <- value
 	#	return(x)

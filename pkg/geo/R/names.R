@@ -44,13 +44,6 @@ validNames <- function(x, prefix='lyr') {
 
 
 
-
-setMethod('labels', signature(object='GeoRaster'), 
-	function(object) { 
-		names(object)
-	}
-)
-
 	
 setMethod('names', signature(x='GeoRaster'), 
 	function(x) { 

@@ -11,7 +11,7 @@ RCPP_MODULE(GeoRaster){
 
     class_<GeoRaster>("GeoRaster")
 		.constructor()
-//	    .constructor<std::string>()
+	    .constructor<std::string>()
 		.constructor<std::vector<unsigned>, std::vector<double>, std::string>()
 	
 		.method("cellFromXY", ( std::vector<double> (GeoRaster::*)(std::vector<double>,std::vector<double>) )( &GeoRaster::cellFromXY ))

@@ -3,7 +3,7 @@
 \alias{crs}
 \alias{crs<-}
 \alias{crs,GeoRaster-method}
-\alias{crs<-,GeoRaster-method}
+\alias{crs<-,GeoRaster,character-method}
 
 
 \title{ Get or set a coordinate reference system (projection) }
@@ -13,9 +13,9 @@ Get or set the coordinate reference system (CRS) of a GeoRaster object.
 }
 
 \usage{
-\S4method{crs}{ANY}(x, ...)
+\S4method{crs}{GeoRaster}(x)
 
-crs(x) <- value
+crs(x, ...) <- value
 }
 
 \arguments{

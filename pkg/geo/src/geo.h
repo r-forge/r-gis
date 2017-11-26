@@ -67,6 +67,7 @@ class GeoRaster {
 			source.layers[0][1] = 1;
 			source.datatype.push_back("");
 			range.resize(2);
+			names.push_back("lyr.1");
 		}
 		
 //		GeoRaster(unsigned _nrow=10, unsigned _ncol=10, unsigned nlayers=1, double xmin=-180, double xmax=180, double ymin=-90, double ymax=90, std::string _crs="+proj=longlat +datum=WGS84") {
@@ -87,6 +88,7 @@ class GeoRaster {
 			source.datatype.push_back("");
 			range.resize(2);
 			crs=_crs;
+			for (unsigned i=0; i<rcl[2]; i++) {	names.push_back("lyr." + std::to_string(i)) ; }
 		}
 		
 		

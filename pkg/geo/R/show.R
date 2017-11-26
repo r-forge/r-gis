@@ -7,11 +7,12 @@
 
 setMethod ('show' , 'GeoExtent', 
 	function(object) {
+		e <- as.vector(object)
 		cat('class       :' , class(object), '\n')
-		cat('xmin        :' , xmin(object), '\n')
-		cat('xmax        :' , xmax(object), '\n')
-		cat('ymin        :' , ymin(object), '\n')
-		cat('ymax        :' , ymax(object), '\n')
+		cat('xmin        :' , e[1], '\n')
+		cat('xmax        :' , e[2], '\n')
+		cat('ymin        :' , e[3], '\n')
+		cat('ymax        :' , e[4], '\n')
 	}
 )	
 	
@@ -28,8 +29,8 @@ setMethod ('show' , 'GeoRaster',
 		xyres <- res(object)
 		cat('resolution  : ' , xyres[1], ', ', xyres[2], '  (x, y)\n', sep="")
 
-		e <- extent(object)
-		cat('extent      : ' , e@xmin, ', ', e@xmax, ', ', e@ymin, ', ', e@ymax, '  (xmin, xmax, ymin, ymax)\n', sep="")
+		e <- as.vector(ext(object))
+		cat('extent      : ' , e[1], ', ', e[2], ', ', e[3], ', ', e[4], '  (xmin, xmax, ymin, ymax)\n', sep="")
 
 		crs <- crs(object)
 		cat('coord. ref. :' , crs(object), '\n')
