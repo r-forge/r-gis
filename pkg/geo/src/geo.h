@@ -8,12 +8,26 @@ using namespace std;
 class GeoExtent {
 	public:
 		double xmin, xmax, ymin, ymax;
-		GeoExtent() {
-			xmin = -180;
-			xmax = 180;
-			ymin = -90;
-			ymax = 90;
+		GeoExtent() {xmin = -180; xmax = 180; ymin = -90; ymax = 90;}
+		GeoExtent(double _xmin, double _xmax, double _ymin, double _ymax) {xmin = _xmin; xmax = _xmax; ymin = _ymin; ymax = _ymax;}
+		
+		void intersect(GeoExtent e) { 
+			xmin = std::max(xmin, e.xmin);
+			xmax = std::min(xmax, e.xmax);
+			ymin = std::max(ymin, e.ymin);
+			ymax = std::min(ymax, e.ymax);
 		}
+
+		std::vector<double> asVector() { 
+			std::vector<double> e(4);
+			e[0] = xmin; e[1] = xmax; e[2] = ymin; e[3] = ymax; 
+			return(e);
+		}
+			
+		bool valid() {
+			return ((xmax > xmin) && (ymax > ymin));
+		}
+
 };
 
 class RasterSource {
@@ -40,7 +54,7 @@ class GeoRaster {
 		
 	public:
 		//double NA = std::numeric_limits<double>::quiet_NaN();
-
+	
 		unsigned nrow, ncol;
 		// values
 		bool hasValues;
@@ -49,63 +63,24 @@ class GeoRaster {
 		std::vector< std::vector<double> > range;
 		std::vector<string> names;
 		std::vector<bool> inMemory() { return source.memory; }
-		
-		GeoRaster(std::string fname) {
-			range.resize(2);
-			createFromFile(fname);
-		}
-		
-		GeoRaster() {
-			nrow=10; ncol=10; 
-			hasValues = false; 
-			hasRange.push_back(false);
-			source.memory.push_back(true);
-			source.filename.push_back("");
-			source.driver.push_back("");
-			source.nlayers.push_back(1);
-			source.layers.resize(1, vector<int>(1));
-			source.layers[0][1] = 1;
-			source.datatype.push_back("");
-			range.resize(2);
-			names.push_back("lyr.1");
-		}
-		
-//		GeoRaster(unsigned _nrow=10, unsigned _ncol=10, unsigned nlayers=1, double xmin=-180, double xmax=180, double ymin=-90, double ymax=90, std::string _crs="+proj=longlat +datum=WGS84") {
-		GeoRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::string _crs) {
-			nrow=rcl[0]; ncol=rcl[1];
-			extent.xmin = ext[0];
-			extent.xmax = ext[1];
-			extent.ymin = ext[2];
-			extent.ymax = ext[3];
-			hasValues = false; 
-			hasRange.push_back(false);
-			source.memory.push_back(true);
-			source.filename.push_back("");
-			source.driver.push_back("");
-			source.nlayers.push_back(rcl[2]);
-			source.layers.resize(1, vector<int>(1));
-			source.layers[0][1] = 1;
-			source.datatype.push_back("");
-			range.resize(2);
-			crs=_crs;
-			for (unsigned i=0; i<rcl[2]; i++) {	names.push_back("lyr." + std::to_string(i)) ; }
-		}
-		
+
+		// consructors
+		GeoRaster(std::string fname);
+		GeoRaster();
+		GeoRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::string _crs);
 		
 		double ncell() { return nrow * ncol; }
-		std::vector<double> getExtent() { 
-			std::vector<double> e(4);
-			e[0] = extent.xmin; e[1] = extent.xmax; e[2] = extent.ymin; e[3] = extent.ymax; 
-			return(e);
-		}
-		void setExtent(std::vector<double> e) {
+
+/*	void setExtent(std::vector<double> e) {
 			extent.xmin = e[0]; extent.xmax = e[1]; extent.ymin = e[2]; extent.ymax = e[3]; 
 		}
-//		void setExtent(double xmin, double xmax, double ymin, double ymax) {
-//			extent[0] = xmin; extent[1] = xmax; extent[2] = ymin; extent[3] = ymax;
-//		}
+*/
+		GeoExtent getExtent() { return extent; }
+		void setExtent(GeoExtent e) { extent = e ; }
 
-	
+		void setExtent(GeoExtent ext, bool keepRes, bool doSnap=false);
+
+		
 		string getCRS()	{ return(crs); }
 		void setCRS(string _crs) { crs = _crs; }
 		std::vector<string> getNames()	{ return(names); }
@@ -118,6 +93,21 @@ class GeoRaster {
 			return out;
 		}
 
+		std::vector<double> origin() {
+			std::vector<double> r = resolution();
+			double x = extent.xmin - r[0] * (round(extent.xmin / r[0]));
+			double y = extent.ymax - r[1] * (round(extent.ymax / r[1]));
+	
+	/*		if (isTRUE(all.equal((r[1] + x), abs(x)))) {
+				x = abs(x)}
+			if (isTRUE(all.equal((r[2] + y), abs(y)))) {
+				y = abs(y)}
+	*/		
+			std::vector<double> out {x, y};
+			return out;
+		}
+	
+		
 		int nlyr() { 
 			int lyrs = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
 			return(lyrs);
@@ -181,16 +171,7 @@ class GeoRaster {
 		std::vector<double> valuesRow(int);	
 		std::vector<std::vector<double>> valuesAll();	
 
-			
 		bool writeValues(string filename, std::vector<double>  values);
-		
-
-		GeoRaster SQRT() {
-			GeoRaster r = *this;
-			std::transform(r.values.begin(), r.values.end(), r.values.begin(), (double(*)(double)) sqrt);
-			return r;
-		}
-		
 		void setRange() {
 			auto result = std::minmax_element (values.begin(), values.end());
 			std::vector< std::vector<double> > v(2, vector<double>(1));
@@ -200,16 +181,27 @@ class GeoRaster {
 			std::vector<bool> b {true};
 			hasRange = b;
 		}
+
+		GeoExtent align(GeoExtent e, string snap="near");
 		
+		//GeoRaster crop(GeoExtent e, string filename);
 		
 };
 
 
-
-/*GeoRaster SQRTfree(GeoRaster* g) {
+/*
+		GeoRaster SQRT() {
+			GeoRaster r = *this;
+			std::transform(r.values.begin(), r.values.end(), r.values.begin(), (double(*)(double)) sqrt);
+			return r;
+		}
+*/		
+/*
+GeoRaster SQRTfree(GeoRaster* g) {
 	GeoRaster r = *g;
 	std::transform(r.values.begin(), r.values.end(), r.values.begin(), (double(*)(double)) sqrt);
 	return r;
-}*/
+}
+*/
 
 

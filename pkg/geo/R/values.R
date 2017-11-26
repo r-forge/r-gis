@@ -45,7 +45,7 @@ setMethod('values<-', signature(x='GeoRaster', 'numeric'),
 	}
 
 	# new pointer
-	y <- georaster(x)
+	y <- rst(x)
 	y@ptr$values <- value
 	y
 }

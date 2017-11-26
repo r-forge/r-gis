@@ -6,8 +6,16 @@ using namespace Rcpp;
 RCPP_EXPOSED_CLASS(GeoRaster)
 RCPP_EXPOSED_CLASS(GeoExtent)
 
+	
 RCPP_MODULE(GeoRaster){
-    using namespace Rcpp ;
+    using namespace Rcpp;
+
+    class_<GeoExtent>("GeoExtent")
+		.constructor()
+		.constructor<double, double, double, double>()
+		.property("vector", &GeoExtent::asVector)		
+		.property("valid", &GeoExtent::valid)		
+	;	
 
     class_<GeoRaster>("GeoRaster")
 		.constructor()
@@ -22,6 +30,7 @@ RCPP_MODULE(GeoRaster){
 		.method("rowFromY", ( std::vector<unsigned> (GeoRaster::*)(std::vector<double>) )( &GeoRaster::rowFromY ))
 		.method("xyFromCell", ( std::vector< std::vector<double> > (GeoRaster::*)(std::vector<double>) )( &GeoRaster::xyFromCell ))
 		.method("rowColFromCell", ( std::vector< std::vector<unsigned> > (GeoRaster::*)(std::vector<double>) )( &GeoRaster::rowColFromCell ))
+		.method("setRange", &GeoRaster::setRange, "setRange")
 		
 	
 		.property("values", &GeoRaster::getValues, &GeoRaster::setValues )
@@ -41,11 +50,8 @@ RCPP_MODULE(GeoRaster){
 		.field_readonly( "hasRange", &GeoRaster::hasRange )
 		.field_readonly( "range", &GeoRaster::range )
 
-		.method("setRange", &GeoRaster::setRange, "setRange")
 		
-		.method("sqrt1", &GeoRaster::SQRT, "sqrt")
-
+//		.method("sqrt1", &GeoRaster::SQRT, "sqrt")
 //		.method("sqrt2", &SQRTfree, "sqrt")
-	;
-	
+	;	
 }

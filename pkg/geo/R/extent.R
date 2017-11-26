@@ -14,12 +14,12 @@ if (!isGeneric("ext<-")) {
 		standardGeneric("ext<-"))
 }	
 
-
 	
 
 setMethod('ext', signature(x='missing'), 
 	function(x, ...){ 
 		e <- methods::new('GeoExtent')
+		e@ptr <- GeoExtent$new()
 		return(e)
 	}
 )	
@@ -36,10 +36,7 @@ setMethod('ext', signature(x='numeric'),
 		}
 		names(x) <- NULL
 		e <- methods::new('GeoExtent')
-		e@xmin <- x[1]
-		e@xmax <- x[2]
-		e@ymin <- x[3]
-		e@ymax <- x[4]
+		e@ptr <- GeoExtent$new(x[1], x[2], x[3], x[4])
 		if (validObject(e)) return(e)
 	}	
 )
@@ -47,7 +44,9 @@ setMethod('ext', signature(x='numeric'),
 
 setMethod('ext', signature(x='GeoRaster'), 
 	function(x, ...){ 
-		ext(x@ptr$extent)
+		e <- methods::new('GeoExtent')
+		e@ptr <- x@ptr$extent
+		return(e)
 	}
 )	
 

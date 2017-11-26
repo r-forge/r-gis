@@ -36,7 +36,7 @@ GeoExtent object or numeric coordinate
 
 
 \examples{
-r <- georaster()
+r <- rst()
 ext(r)
 ext(c(0, 20, 0, 20))
 

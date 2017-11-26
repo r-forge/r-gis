@@ -31,7 +31,7 @@ character or modified GeoRaster
 
 
 \examples{ 
-r <- georaster()
+r <- rst()
 crs(r)
 #crs(r) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
 #crs(r)
