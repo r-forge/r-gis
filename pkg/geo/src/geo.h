@@ -69,6 +69,27 @@ class GeoRaster {
 			range.resize(2);
 		}
 		
+//		GeoRaster(unsigned _nrow=10, unsigned _ncol=10, unsigned nlayers=1, double xmin=-180, double xmax=180, double ymin=-90, double ymax=90, std::string _crs="+proj=longlat +datum=WGS84") {
+		GeoRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::string _crs) {
+			nrow=rcl[0]; ncol=rcl[1];
+			extent.xmin = ext[0];
+			extent.xmax = ext[1];
+			extent.ymin = ext[2];
+			extent.ymax = ext[3];
+			hasValues = false; 
+			hasRange.push_back(false);
+			source.memory.push_back(true);
+			source.filename.push_back("");
+			source.driver.push_back("");
+			source.nlayers.push_back(rcl[2]);
+			source.layers.resize(1, vector<int>(1));
+			source.layers[0][1] = 1;
+			source.datatype.push_back("");
+			range.resize(2);
+			crs=_crs;
+		}
+		
+		
 		double ncell() { return nrow * ncol; }
 		std::vector<double> getExtent() { 
 			std::vector<double> e(4);
@@ -169,7 +190,6 @@ class GeoRaster {
 		}
 		
 		void setRange() {
-			
 			auto result = std::minmax_element (values.begin(), values.end());
 			std::vector< std::vector<double> > v(2, vector<double>(1));
 			v[0][0] = *result.first;

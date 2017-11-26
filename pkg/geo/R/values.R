@@ -23,7 +23,7 @@ function(x, ...) {
 )
 
 
-setMethod('values<-', signature(x='GeoRaster'), 
+setMethod('values<-', signature(x='GeoRaster', 'numeric'), 
 	function(x, value, ...) {
 
 	if (is.matrix(value)) { 
@@ -44,8 +44,10 @@ setMethod('values<-', signature(x='GeoRaster'),
 		value <- rep(value, ncell(x))
 	}
 
-	x@ptr$values <- value
-	x
+	# new pointer
+	y <- georaster(x)
+	y@ptr$values <- value
+	y
 }
 )
 	
@@ -66,11 +68,22 @@ setMethod('values<-', signature(x='GeoRaster'),
 	x@ptr$hasRange
 }
 
-
-
 setMethod('range', signature(x='GeoRaster'), 
-	function(x, ..., na.rm=FALSE) {
+	function(x, ..., na.rm=TRUE) {
 		x@ptr$range
+	}
+)
+
+if (!isGeneric("setRange")) {
+	setGeneric("setRange", function(x, ...)
+		standardGeneric("setRange"))
+}	
+
+setMethod('setRange', signature(x='GeoRaster'), 
+	function(x, ...) {
+		if (!.hasRange(x)) {
+			x@ptr$setRange
+		}
 	}
 )
 

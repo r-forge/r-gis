@@ -1,8 +1,9 @@
 \name{crs}
 
 \alias{crs}
-\alias{crs,GeoRaster-method}
 \alias{crs<-}
+\alias{crs,GeoRaster-method}
+\alias{crs<-,GeoRaster-method}
 
 
 \title{ Get or set a coordinate reference system (projection) }
@@ -30,7 +31,7 @@ character or modified GeoRaster
 
 
 \examples{ 
-r <- raster()
+r <- georaster()
 crs(r)
 #crs(r) <- "+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +ellps=WGS84"
 #crs(r)

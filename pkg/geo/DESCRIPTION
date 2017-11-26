@@ -1,8 +1,8 @@
 Package: geo
 Type: Package
-Title: raster data 
-Version: 0.0-0
-Date: 2017-6-13
+Title: raster data
+Version: 0.0-1
+Date: 2017-11-25
 Depends: methods
 LinkingTo: Rcpp
 Imports: Rcpp

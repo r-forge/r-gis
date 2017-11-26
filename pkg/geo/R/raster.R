@@ -10,39 +10,29 @@ if ( !isGeneric("georaster") ) {
 }
 
 setMethod('georaster', signature(x='missing'), 
-	function(nrows=180, ncols=360, xmn=-180, xmx=180, ymn=-90, ymx=90, crs, ext, resolution, vals=NULL) {
+	function(nrow=180, ncol=360, nlayer=1, xmin=-180, xmax=180, ymin=-90, ymax=90, crs, ext, resolution, ...) {
 
-		r <- methods::new('GeoRaster')
-		r@ptr <- GeoRaster$new()
-		return(r)
-		
-		if (missing(ext)) {
-			ext <- extent(xmn, xmx, ymn, ymx)
-		}
+		if (missing(ext)) {	ext <- extent(xmin, xmax, ymin, ymax) }
 	
 		if (missing(crs)) {
-			if (ext@ptr$xmin > -360.01 & ext@ptr$xmax < 360.01 & ext@ptr$ymin > -90.01 & ext@ptr$ymax < 90.01) { 
+			if (ext@xmin > -360.01 & ext@xmax < 360.01 & ext@ymin > -90.01 & ext@ymax < 90.01) { 
 				crs <- "+proj=longlat +datum=WGS84"
 			} else {
-				# if sp >= 1.2.1  crs <- CRS(as.character(NA), doCheckCRSArgs=FALSE)
 				crs <- as.character(NA)
 			}
 		} else {
 			crs <- as.character(crs)
 		}
-		if (missing(resolution)) {
-			nrows <- as.integer(max(1, round(nrows)))
-			ncols <- as.integer(max(1, round(ncols)))
-			# r <- methods::new('RasterLayer', extent=ext, nrows=nrows, ncols=ncols, crs=crs)
-		} else {
-			#r <- methods::new('RasterLayer', extent=ext, crs=crs)
-			#res(r) <- resolution
+		
+
+		r <- methods::new('GeoRaster')
+		r@ptr <- GeoRaster$new(c(nrow, ncol, nlayer), as.vector(ext), crs)
+		
+		if (!missing(resolution)) {
+			res(r) <- resolution
 		}
-#		if (!is.null(vals)) {
-#			return( setValues(r, vals) )
-#		} else {
-			return( r )
-#		}
+
+		return(r)
 	}
 )
 
@@ -68,4 +58,12 @@ setMethod('georaster', signature(x='character'),
 )
 
 
+setMethod('georaster', signature(x='GeoRaster'), 
+	function(x, ...) {
+		r <- methods::new('GeoRaster')
+		r@ptr <- GeoRaster$new(dim(r), as.vector(extent(r)), crs(r))
+		# also need the keep the names ?
+		return(r)
+	}
+)
 

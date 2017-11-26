@@ -1,7 +1,7 @@
 \name{trim}
 
 \alias{trim}
-\alias{trim,Raster-method}
+\alias{trim,GeoRaster-method}
 \alias{trim,character-method}
 \alias{trim,matrix-method}
 \alias{trim,data.frame-method}
@@ -36,7 +36,7 @@ Same as \code{x}.
 \author{Robert J. Hijmans and Jacob van Etten}
 
 \examples{
-r <- raster(ncol=18,nrow=18)
+r <- georaster(ncol=18,nrow=18)
 r[39:49] <- 1
 r[113:155] <- 2
 r[200] <- 6

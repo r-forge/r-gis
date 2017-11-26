@@ -3,6 +3,9 @@
 \alias{extent}
 \alias{extent,GeoExtent-method}
 \alias{extent,GeoRaster-method}
+\alias{extent<-,GeoRaster,GeoExtent-method}
+\alias{extent,numeric-method}
+\alias{extent,missing-method}
 
 \alias{xmin}
 \alias{xmax}
@@ -32,6 +35,8 @@ Get a GeoExtent object of a GeoRaster object, or coordinates from such an object
 \usage{
 extent(x, ...)
 
+extent(x) <- value
+
 xmin(x)
 xmax(x)
 ymin(x)
@@ -45,7 +50,7 @@ ymax(x) <- value
 
 \arguments{
   \item{x}{GeoRaster or a GeoExtent object or a vector of four numbers}
-  \item{value}{number. x or y coordinate}  
+  \item{value}{If \code{x} is a GeoRaster, \code{value} should be a GeoExtent. In other cases it shoudl be a number (x or y coordinate)}  
   \item{...}{Additional arguments. None implemented }
 }
  

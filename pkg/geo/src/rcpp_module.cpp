@@ -11,8 +11,9 @@ RCPP_MODULE(GeoRaster){
 
     class_<GeoRaster>("GeoRaster")
 		.constructor()
-	    .constructor<std::string>()
-
+//	    .constructor<std::string>()
+		.constructor<std::vector<unsigned>, std::vector<double>, std::string>()
+	
 		.method("cellFromXY", ( std::vector<double> (GeoRaster::*)(std::vector<double>,std::vector<double>) )( &GeoRaster::cellFromXY ))
 		.method("cellFromRowCol", ( std::vector<double> (GeoRaster::*)(std::vector<unsigned>,std::vector<unsigned>) )( &GeoRaster::cellFromRowCol ))
 		.method("yFromRow", ( std::vector<double> (GeoRaster::*)(std::vector<unsigned>) )( &GeoRaster::yFromRow ))
@@ -39,6 +40,8 @@ RCPP_MODULE(GeoRaster){
 		.field_readonly( "hasValues", &GeoRaster::hasValues )
 		.field_readonly( "hasRange", &GeoRaster::hasRange )
 		.field_readonly( "range", &GeoRaster::range )
+
+		.method("setRange", &GeoRaster::setRange, "setRange")
 		
 		.method("sqrt1", &GeoRaster::SQRT, "sqrt")
 

@@ -18,17 +18,27 @@
 }
 
 
-.goodNames <- function(ln, prefix='layer') {
-	validNames(ln, prefix)
+
+.uniqueNames <- function(x, sep='.') {
+	y <- as.matrix(table(x))
+	y <- y[y[,1] > 1, ,drop=F]
+	if (nrow(y) > 0) {
+		y <- rownames(y)
+		for (i in 1:length(y)) {
+			j <- which(x==y[i])
+			x[j] <- paste(x[j], sep, 1:length(j), sep='')
+		}
+	}
+	x
 }
 
-validNames <- function(x, prefix='layer') {
+validNames <- function(x, prefix='lyr') {
 	x <- trim(as.character(x))
 	x[is.na(x)] <- ""
-	if (.standardnames()) {
+#	if (.standardnames()) {
 		x[x==''] <- prefix
 		x <- make.names(x, unique=FALSE)
-	}
+#	}
 	.uniqueNames(x)
 }
 

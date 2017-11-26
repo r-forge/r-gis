@@ -9,6 +9,11 @@ if (!isGeneric("extent")) {
 		standardGeneric("extent"))
 }	
 
+if (!isGeneric("extent<-")) {
+	setGeneric("extent<-", function(x, value)
+		standardGeneric("extent<-"))
+}	
+
 
 if (!isGeneric("xmin")) {
 	setGeneric("xmin", function(x)
@@ -65,6 +70,17 @@ setMethod('extent', signature(x='GeoRaster'),
 		extent(x@ptr$extent)
 	}
 )	
+
+setMethod("extent<-", signature('GeoRaster', 'GeoExtent'), 
+	function(x, value) {
+	    stop()
+		# requires a deep copy
+		# y <- deepcopy(x)
+		#y@ptr$extent <- as.vector(value)
+		#return(y)
+	}
+)
+
 
 
 setMethod('xmin', signature(x='GeoRaster'), 

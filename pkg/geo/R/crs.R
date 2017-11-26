@@ -21,9 +21,11 @@ if (!isGeneric("crs<-")) {
 		standardGeneric("crs<-"))
 }	
 
-setMethod("crs<-", signature('GeoRaster'), 
+setMethod("crs<-", signature('GeoRaster', 'character'), 
 	function(x, value, ...) {
-		x@ptr$crs <- value
+	# requires deep copy
+	#	x@ptr$crs <- value
+	#	return(x)
 	}
 )
 

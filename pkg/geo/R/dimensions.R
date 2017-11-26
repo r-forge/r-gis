@@ -27,18 +27,9 @@ setMethod('dim<-', signature(x='GeoRaster'),
 		} else if (length(value) > 3) {
 			warning('value should have length 1, 2, or 3. Additional values ignored')
 			value <- value[1:3]
-		}
-		
+		}		
 		value <- as.integer(pmax(round(value), c(1,1,1)))
-		
-		if (value[1] != nrow(x) | value[2] != ncol(x) | value[3] != nlayer(x)) {
-			x <- clearValues(x)
-			x <- .clearFile(x)
-			x@ptr$nrow <- value[1]
-			x@ptr$ncol <- value[2]
-			x@ptr$nlyr <- value[3]
-		}
-		return(x)	
+		georaster(value, as.vector(extent(x)), crs(x))
 	}
 )
 
@@ -137,6 +128,14 @@ if (!isGeneric("res")) {
 	setGeneric("res", function(x)
 		standardGeneric("res"))
 }
+if (!isGeneric("xres")) {
+	setGeneric("xres", function(x)
+		standardGeneric("xres"))
+}
+if (!isGeneric("yres")) {
+	setGeneric("yres", function(x)
+		standardGeneric("yres"))
+}
 
 setMethod('res', signature(x='GeoRaster'), 
 function(x) {
@@ -144,3 +143,14 @@ function(x) {
 	}
 )
 
+setMethod('xres', signature(x='GeoRaster'), 
+function(x) {
+		res[1]
+	}
+)
+
+setMethod('yres', signature(x='GeoRaster'), 
+function(x) {
+		res[2]
+	}
+)
