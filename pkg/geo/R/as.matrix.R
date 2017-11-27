@@ -4,6 +4,7 @@
 # Licence GPL v3
 
 
+
 # mode argument is ignored as mode=mode gave an error on R-devel
 setMethod('as.vector', signature(x='GeoExtent'), 
 function(x, mode='any') {

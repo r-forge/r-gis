@@ -9,6 +9,8 @@ using namespace std;
 GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
 
 	GeoRaster out = *this;
+	out.values.resize(0);
+	
 	e.intersect(out.getExtent());
 	
 	if ( !e.valid() ) {
@@ -34,16 +36,15 @@ GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
 		// return deep copy of input 
 	}
 
-	unsigned nc = out.ncol;
+	unsigned ncols = out.ncol;
 
-
-	BlockSize bs = getBlockSize(filename);
+	BlockSize bs = out.getBlockSize(filename);
  	out.writeStart(filename);
 	readStart();
 
 	std::vector<double> v;
 	for (size_t i = 0; i < bs.n; i++) {
-		v = readValues(bs.row[i]+row1-1, bs.nrows[i], col1, nc);	
+		v = readValues(row1+bs.row[i]-1, bs.nrows[i], col1, ncols);	
 		out.writeValues(v, bs.row[i]);
 	} 
 	out.writeStop();

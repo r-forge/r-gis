@@ -31,13 +31,16 @@ RCPP_MODULE(GeoRaster){
 		.method("xyFromCell", ( std::vector< std::vector<double> > (GeoRaster::*)(std::vector<double>) )( &GeoRaster::xyFromCell ))
 		.method("rowColFromCell", ( std::vector< std::vector<unsigned> > (GeoRaster::*)(std::vector<double>) )( &GeoRaster::rowColFromCell ))
 		.method("setRange", &GeoRaster::setRange, "setRange")
+		.method("writeRaster", &GeoRaster::writeRaster, "writeRaster")
 		
-	
+		.method("readValues", &GeoRaster::readValues, "readValues")	
 		.property("values", &GeoRaster::getValues, &GeoRaster::setValues )
+
 		.property("crs", &GeoRaster::getCRS, &GeoRaster::setCRS )
 		.property("extent", &GeoRaster::getExtent, &GeoRaster::setExtent )
 		.property("names", &GeoRaster::getNames, &GeoRaster::setNames )
 		.property("res", &GeoRaster::resolution)
+		.property("origin", &GeoRaster::origin)
 
 		.property("inMemory", &GeoRaster::inMemory )
 		.property("nlyr", &GeoRaster::nlyr )

@@ -33,6 +33,17 @@ BlockSize GeoRaster::getBlockSize(std::string filename) {
 }
 
 
+GeoRaster GeoRaster::writeRaster(std::string filename) {
+//	if ((filename == "") { stop}
+//	if ((!hasValues) {stop }
+	
+	writeStart(filename);
+	writeValues(getValues(), 1);
+	writeStop();
+	return GeoRaster(filename);
+}
+
+
 void GeoRaster::writeStart(std::string filename){
 	if (filename != "") {
 		source.filename[0] = filename;
@@ -50,31 +61,71 @@ void GeoRaster::writeStop(){
 	}
 }
 
-void GeoRaster::writeValues(std::vector<double> values, unsigned row){
+void GeoRaster::writeValues(std::vector<double> vals, unsigned row){
 	if (source.filename[0] != "") {
 		// write
 	} else {
-		setValues(values);
+		setValues(vals);
 	}
 }
 
 
 void GeoRaster::setValues(std::vector<double> _values) {
-			//bool result = false;
-	if (_values.size() == (ncol * nrow * nlyr())) {
+	//bool result = false;
+	//if (_values.size() == (ncol * nrow * nlyr())) {
 		values = _values;
+		
 		std::vector<bool> mem {true};
 		source.memory = mem;
-				// todo clear source...
+		// todo clear source...
 		setRange();
 		hasValues = true;
 		std::vector<string> n {"layer"};
 		names = n;
 				
 		//result = true;
-	} 
+	//} 
 	//return (result);
 }
 
 
+void vector_minmax(std::vector<double> v, double &min, int &imin, double &max, int &imax) {
+    std::vector<double>::size_type p=0;
+    imax = -1; imin=-1;
+    min = std::numeric_limits<double>::max();
+    max = std::numeric_limits<double>::lowest();
+    for (auto &val : v) {
+		if (!std::isnan(val)) {
+			if (val>max) {
+				imax = p;
+				max = val;
+			}
+			if (val<min) {
+				imin = p;
+				min = val;
+			}
+		}
+        p++;
+    }
+}
+
+
+void GeoRaster::setRange() {
+// this does not work when the first element is NAN
+	double vmin, vmax;
+	int imin, imax;
+	vector_minmax(values, vmin, imin, vmax, imax); 
+
+	std::vector< std::vector<double> > v(2, vector<double>(1));
+	v[0][0] = vmin;
+	v[1][0] = vmax;
+	
+/*	auto result = std::minmax_element (values.begin(), values.end());
+	v[0][0] = *result.first;
+	v[1][0] = *result.second;
+*/	
+
+	range = v;
+	hasRange = std::vector<bool> {true};
+}
 

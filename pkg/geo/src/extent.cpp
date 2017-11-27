@@ -64,3 +64,18 @@ GeoExtent GeoRaster::align(GeoExtent e, string snap) {
 	return GeoExtent(xmn, xmx, ymn, ymx);
 }
 
+
+std::vector<double> GeoRaster::origin() {
+	std::vector<double> r = resolution();
+	double x = extent.xmin - r[0] * (round(extent.xmin / r[0]));
+	double y = extent.ymax - r[1] * (round(extent.ymax / r[1]));
+	if (is_equal((r[0] + x), abs(x))) {
+		x = fabs(x);
+	}
+	if (is_equal((r[1] + y), abs(y))) {
+		y = fabs(y);
+	}
+	std::vector<double> out {x, y};
+	return out;
+}
+
