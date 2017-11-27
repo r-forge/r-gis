@@ -12,7 +12,7 @@ Plot (that is, make a map of) the values of a GeoRaster object
 }
 
 \usage{
-\S4method{plot}{Raster,ANY}(x, y, maxpixels=500000, ...)
+\S4method{plot}{GeoRaster,ANY}(x, y, maxpixels=500000, ...)
 }
 
 
@@ -20,6 +20,7 @@ Plot (that is, make a map of) the values of a GeoRaster object
   \item{x}{Raster* object}
   \item{y}{missing}
   \item{maxpixels}{integer > 0. Maximum number of cells to use for the plot}
+  \item{...}{dot dot dot}  
 }
 
 
