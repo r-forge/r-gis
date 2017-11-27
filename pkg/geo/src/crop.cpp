@@ -35,26 +35,19 @@ GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
 	}
 
 	unsigned nc = out.ncol;
-	unsigned nr = row2 - row1 + 1;
 
-	BlockSize bs = getBlockSize();
-	
- 
-//	out.writeStart(out, filename=filename, ... )
-	// only actually write if trim(filename) != ""
-	// if multiple steps in iter then create filename 
-	// R session should always send a temp folder to static var when pkg is loaded?
 
-//	readStart();
+	BlockSize bs = getBlockSize(filename);
+ 	out.writeStart(filename);
+	readStart();
+
+	std::vector<double> v;
 	for (size_t i = 0; i < bs.n; i++) {
-//		vv = getValuesBlock(row=itr.row[i]+row1-1, nrows=itr.nrows[i], col1, nc);
-		
-//      writeValues is setValues if no filename
-//		out.writeValues(vv, itr.row[i]);
+		v = readValues(bs.row[i]+row1-1, bs.nrows[i], col1, nc);	
+		out.writeValues(v, bs.row[i]);
 	} 
-//	out = writeStop(out);
-//	readStop();
-
+	out.writeStop();
+	readStop();
 	
 	return(out);
 }

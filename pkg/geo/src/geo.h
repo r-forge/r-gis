@@ -49,6 +49,7 @@ class BlockSize {
 		std::vector<unsigned> row;
 		std::vector<unsigned> nrows;
 		unsigned n;
+		std::string filename;
 };
 
 
@@ -59,7 +60,7 @@ class GeoRaster {
 		
 	protected:
 		GeoExtent extent;
-		string crs ="+proj=longlat +datum=WGS84";
+		std::string crs ="+proj=longlat +datum=WGS84";
 		RasterSource source;
 		
 	public:
@@ -91,8 +92,8 @@ class GeoRaster {
 		void setExtent(GeoExtent ext, bool keepRes=false, std::string snap="");
 
 		
-		string getCRS()	{ return(crs); }
-		void setCRS(string _crs) { crs = _crs; }
+		std::string getCRS()	{ return(crs); }
+		void setCRS(std::string _crs) { crs = _crs; }
 		std::vector<string> getNames()	{ return(names); }
 		void setNames(std::vector<string> _names) { names = _names; }
 				
@@ -123,9 +124,7 @@ class GeoRaster {
 			return(lyrs);
 		}
 		std::vector<string> filenames() { return source.filename; }
-		
-		std::vector<double> getValues() { return values; }
-	
+
 		
 		bool compare(unsigned nrows, unsigned ncols, GeoExtent e ) {
 			double limit = 0.0001;
@@ -139,22 +138,9 @@ class GeoRaster {
 			return ((nrow == nrows) && (ncol == ncols) && eOK);
 		}
 	
-		void setValues(std::vector<double> _values) {
-			//bool result = false;
-			if (_values.size() == (ncol * nrow * nlyr())) {
-				values = _values;
-				std::vector<bool> mem {true};
-				source.memory = mem;
-				// todo clear source...
-				setRange();
-				hasValues = true;
-				std::vector<string> n {"layer"};
-				names = n;
-				
-				//result = true;
-			} 
-			//return (result);
-		}
+		std::vector<double> getValues() { return values; }
+		void setValues(std::vector<double> _values);
+
 
 		bool createFromFile(std::string fname);
 
@@ -181,7 +167,6 @@ class GeoRaster {
 		std::vector<double> valuesRow(int);	
 		std::vector<std::vector<double>> valuesAll();	
 
-		bool writeValues(string filename, std::vector<double>  values);
 		void setRange() {
 			auto result = std::minmax_element (values.begin(), values.end());
 			std::vector< std::vector<double> > v(2, vector<double>(1));
@@ -195,15 +180,16 @@ class GeoRaster {
 		GeoExtent align(GeoExtent e, string snap="near");
 		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
 		
-		//GeoRaster crop(GeoExtent e, string filename);
-
-		BlockSize getBlockSize() {
-			BlockSize bs;
-			bs.row = {1, unsigned(ceil(nrow/2))};
-			bs.nrows = {bs.row[1] - 1, nrow-bs.row[1] + 1};
-			bs.n = 2;
-			return bs;
-		}
+		BlockSize getBlockSize(std::string filename="");
+		
+		void readStart();
+		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
+		std::vector<double> readValues(unsigned row, unsigned nrows);
+		void readStop();
+		
+		void writeStart(std::string filename);
+		void writeValues(std::vector<double> values, unsigned row);
+		void writeStop();
 		
 };
 
