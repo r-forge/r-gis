@@ -15,7 +15,6 @@ Plot (that is, make a map of) the values of a GeoRaster object
 \S4method{plot}{GeoRaster,ANY}(x, y, maxpixels=500000, ...)
 }
 
-
 \arguments{
   \item{x}{Raster* object}
   \item{y}{missing}

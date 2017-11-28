@@ -1,6 +1,7 @@
 using namespace std;
 #include "geo.h"
 //#include "boost/multi_array.hpp"
+#include "rst_read.h"
 
 
 void GeoRaster::readStart(){
@@ -33,6 +34,7 @@ std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned
 	std::vector<double> out(nrows*ncols, NAN);
 	
 	if (source.memory[0]) {
+
 		size_t k = 0;
 		size_t ij;
 		for (size_t i = (row-1); i < (row+nrows-1); i++) {
@@ -44,8 +46,24 @@ std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned
 		}
 	} else {
 		// read from file
+		string file = source.filename[0];
+		out = readFLT4(file, 0, ncell());
 	}
 	return(out);	
+}
+
+
+
+std::vector<double>  GeoRaster::getValues() { 
+
+
+	if (source.memory[0]) {
+
+		return values; 
+	} else {
+
+		return readValues(1, nrow, 1, ncol);
+	}
 }
 
 

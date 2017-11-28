@@ -22,7 +22,7 @@ BlockSize GeoRaster::getBlockSize(std::string filename) {
 	// in memory
 		bs.row = {1};
 		bs.nrows = {nrow};
-		bs.n = 1;	
+		bs.n = 1;
 	} else {
 	// to be improved, see raster::blockSize
 		bs.row = {1, unsigned(ceil(nrow/2))};

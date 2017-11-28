@@ -82,10 +82,7 @@ class GeoRaster {
 		
 		double ncell() { return nrow * ncol; }
 
-/*	void setExtent(std::vector<double> e) {
-			extent.xmin = e[0]; extent.xmax = e[1]; extent.ymin = e[2]; extent.ymax = e[3]; 
-		}
-*/
+//	void setExtent(std::vector<double> e) {	extent.xmin = e[0]; extent.xmax = e[1]; extent.ymin = e[2]; extent.ymax = e[3]; }
 		GeoExtent getExtent() { return extent; }
 		void setExtent(GeoExtent e) { extent = e ; }
 
@@ -112,7 +109,7 @@ class GeoRaster {
 		
 		bool compare(unsigned nrows, unsigned ncols, GeoExtent e );
 	
-		std::vector<double> getValues() { return values; }
+		std::vector<double> getValues();
 		void setValues(std::vector<double> _values);
 
 

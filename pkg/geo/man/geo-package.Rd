@@ -24,6 +24,12 @@ This package has single main class, "GeoRaster", as opposed to the three classes
 
 A new design rule each algorithm is implemented only once... In the raster package many algos are implemented twice, once for in memory, once for chunk wise to disk computations for large files. 
 
+Open questions:
+
+It is very unnatural to use R's 1-based index at the C++ level. But if using 0 based, there should perhaps be a "R flag" that adds/substracts one from each cell/row/ncol/layer number. Easy to go wrong
+
+Best way to represent multidimenisonal raster data. Either a std::vector (one dimension, and then always compute from there) or boost multi_array?
+
 }
 
 
