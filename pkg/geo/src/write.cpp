@@ -129,3 +129,39 @@ void GeoRaster::setRange() {
 	hasRange = std::vector<bool> {true};
 }
 
+
+
+
+/*
+bool GeoRaster::writeHDR() { 
+
+	CSimpleIniA ini;	
+	ini.SetValue("section", "key", "newvalue");
+		
+	ini.SetValue("version", NULL, NULL);
+	ini.SetValue("version", version, "2");
+	
+	ini.SetValue("georeference", NULL, NULL);
+	ini.SetValue("georeference", "xmin", xmin);
+	ini.SetValue("georeference", "xmax", xmax);
+	ini.SetValue("georeference", "ymin", ymin);
+	ini.SetValue("georeference", "ymax", ymax);
+	ini.SetValue("georeference", "projection", crs);
+
+	ini.SetValue("dimensions", "nrows", nrow);
+	ini.SetValue("dimensions", "ncols", ncol);
+	ini.SetValue("dimensions", "nlyrs", nlyr);
+	ini.SetValue("dimensions", "lyrnms", names);		
+
+	ini.SetValue("data", NULL, NULL);
+	ini.SetValue("data", "datatype", datatype);
+	ini.SetValue("data", "nodata", NAvalue);
+
+	std::vector<double> smin = double2str(vmin);
+	std::vector<double> smax = double2str(vmax);
+	smin = concatenate(smin, ":|:");
+	smax = concatenate(smax, ":|:");
+	ini.SetValue("data", "minvalue", smin);
+	ini.SetValue("data", "maxvalue", smax);
+}
+*/

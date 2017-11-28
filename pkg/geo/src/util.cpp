@@ -4,6 +4,16 @@ using namespace std;
 #include <locale>
 #include <set>
 
+
+std::string concatenate(std::vector<string> v, std::string delim) {	
+	for (size_t i=0; i<(v.size()-1); i++) {
+		v[i] = v[i] + delim;
+	}
+	std::string s;
+	for (const auto &piece : v) s += piece;
+	return s;
+}
+
 bool is_equal(double a, double b, double error_factor=1.0) {
 	return a==b || std::abs(a-b)<std::abs(std::min(a,b))*std::numeric_limits<double>::epsilon()*error_factor;
 }

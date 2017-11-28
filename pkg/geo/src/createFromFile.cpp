@@ -74,7 +74,8 @@ bool GeoRaster::createFromFile(std::string fname) {
 			return true;
 		}
 	} else {
-	
+	 /// gdal files
+	 
 		return false;
    }
    return true;
