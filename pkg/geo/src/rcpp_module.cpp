@@ -54,6 +54,7 @@ RCPP_MODULE(GeoRaster){
 		.field_readonly( "range", &GeoRaster::range )
 
 		.method("crop", &GeoRaster::crop, "crop")
+		.method("trim", &GeoRaster::trim, "trim")
 
 //		.method("sqrt1", &GeoRaster::SQRT, "sqrt")
 //		.method("sqrt2", &SQRTfree, "sqrt")

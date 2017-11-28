@@ -42,8 +42,7 @@ v[39:49] <- 1
 v[113:155] <- 2
 v[200] <- 6
 values(r) <- v
-#s <- trim(r) 
-
+s <- trim(r) 
 
 trim("    hi folks    !   ")
 }

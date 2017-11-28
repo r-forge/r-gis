@@ -25,13 +25,13 @@ GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
 	}
 
 	std::vector<double> res = out.resolution();
-	double xres = res[0];
-	double yres = res[1];
+	double xr = xres();
+	double yr = yres();
 	
-	unsigned col1 = colFromX(out.extent.xmin + 0.5 * xres);
-	unsigned col2 = colFromX(out.extent.xmax - 0.5 * xres);
-	unsigned row1 = rowFromY(out.extent.ymax - 0.5 * yres);
-	unsigned row2 = rowFromY(out.extent.ymin + 0.5 * yres);
+	unsigned col1 = colFromX(out.extent.xmin + 0.5 * xr);
+	unsigned col2 = colFromX(out.extent.xmax - 0.5 * xr);
+	unsigned row1 = rowFromY(out.extent.ymax - 0.5 * yr);
+	unsigned row2 = rowFromY(out.extent.ymin + 0.5 * yr);
 	if ((row1==1) && (row2==nrow) && (col1==1) && (col2==ncol)) {
 		// return deep copy of input 
 	}

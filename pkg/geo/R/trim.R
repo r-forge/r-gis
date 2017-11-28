@@ -56,9 +56,11 @@ setMethod('trim', signature(x='matrix'),
 
 
 setMethod('trim', signature(x='GeoRaster'), 
-function(x, padding=0, values=NA, filename='', ...) {
+function(x, padding=0, filename='', ...) {
 
-	x@ptr$trim(padding, values, filename, ...)
+	r <- methods::new('GeoRaster')
+	r@ptr <- x@ptr$trim(padding, filename)
+	r
 
 }
 )

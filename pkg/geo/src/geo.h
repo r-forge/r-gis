@@ -93,10 +93,10 @@ class GeoRaster {
 		void setCRS(std::string _crs) { crs = _crs; }
 		std::vector<string> getNames()	{ return(names); }
 		void setNames(std::vector<string> _names) { names = _names; }
-				
-		std::vector<double> resolution() {
-			return std::vector<double> { (extent.xmax - extent.xmin) / ncol, (extent.ymax - extent.ymin) / nrow };
-		}
+	
+		std::vector<double> resolution() { return std::vector<double> { (extent.xmax - extent.xmin) / ncol, (extent.ymax - extent.ymin) / nrow };}
+		double xres() { return (extent.xmax - extent.xmin) / ncol ;}
+		double yres() { return (extent.ymax - extent.ymin) / nrow ;}
 
 		std::vector<double> origin();	
 		
@@ -141,10 +141,6 @@ class GeoRaster {
 
 		void setRange();
 		
-		GeoExtent align(GeoExtent e, string snap="near");
-		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
-		
-		GeoRaster trim(unsigned padding=0, double val=NAN, std::string filename="");
 		
 		void readStart();
 		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
@@ -154,6 +150,12 @@ class GeoRaster {
 		void writeValues(std::vector<double> vals, unsigned row);
 		void writeStop();
 		GeoRaster writeRaster(std::string filename);
+
+		GeoExtent align(GeoExtent e, string snap="near");
+		
+		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
+		GeoRaster trim(unsigned padding=0, std::string filename="");
+		GeoRaster aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename="");
 		
 };
 

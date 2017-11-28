@@ -3,6 +3,7 @@ using namespace std;
 #include <cctype>
 #include <locale>
 #include <set>
+#include <string>
 
 
 std::string concatenate(std::vector<string> v, std::string delim) {	
@@ -62,6 +63,14 @@ std::vector<double> str2double(std::vector<string> s) {
 		return std::stod(val);
 	});
 	return d;
+}
+
+std::vector<double> double2str(std::vector<double> d) { 
+	std::vector<string> s (d.size());
+	std::transform(d.begin(), d.end(), s.begin(), [](const std::double& val) {
+		return std::to_string(val);
+	});
+	return s;
 }
 
 
