@@ -1,68 +1,74 @@
 using namespace std;
 #include "geo.h"
 
-/*
-setMethod('trim', signature(x='Raster'), 
-function(x, padding=0, values=NA, filename='', ...) {
+GeoRaster GeoRaster::trim(unsigned padding, double val, std::string filename) {
 
+	unsigned nr = nrow;
+	unsigned nc = ncol;
+	unsigned nl = nlyr();
+	unsigned nrl = nr * nl;
+	unsigned ncl = nc * nl;
 
-	filename <- trim(filename)
-
-	nr <- nrow(x)
-	nc <- ncol(x)
-	nrl <- nr * nlayers(x)
-	ncl <- nc * nlayers(x)
-	
-	cnt <- 0
-
-	for (r in 1:nr) {
-		v <- getValues(x, r)
-		if (sum(v %in% values) < ncl) {
-			break 
+	unsigned cnt = 0;
+	std::vector<double> v;
+	size_t r;
+	for (r=0; r<nr; r++) {
+		v = readValues(r, 1, 1, nc);
+		if (std::count (v.begin(), v.end(), val) < ncl) {
+			break;
 		}
-		cnt <- cnt + 1
+		cnt += 1;
 	}
-	if ( cnt == nr) { stop('only NA values found') }
-	firstrow <- min(max(r-padding, 1), nr)
 	
-	for (r in nr:firstrow) {
-		v <- getValues(x, r)
-		if (sum(v %in% values) < ncl) { 
-			break 
+	if ( cnt == nr) { //stop('only NA values found')
+	}
+	
+	unsigned firstrow = std::min(std::max(unsigned(r) - padding, unsigned(1)), nr);
+
+	for (r=nr; r<firstrow; r--) {
+		v = readValues(r, 1, 1, nc);
+		if (std::count (v.begin(), v.end(), val) < ncl) {
+			break;
 		}
 	}
-	lastrow <- max(min(r+padding, nr), 1)
 	
+	unsigned lastrow = max(min(unsigned(r)+padding, nr), unsigned(1));
+	
+	unsigned tmp;
 	if (lastrow < firstrow) { 
-		tmp <- firstrow
-		firstrow <- lastrow
-		lastrow <- tmp
+		tmp = firstrow;
+		firstrow = lastrow;
+		lastrow = tmp;
 	}
+	size_t c;
+	for (c=1; c<nc; c++) {
+		v = readValues(1, nrow, c, 1);
+		if (std::count (v.begin(), v.end(), val) < nrl) {
+			break;
+		}
+	}
+	unsigned firstcol = min(max(unsigned(c)-padding, unsigned(1)), nc);
 	
-	for (c in 1:nc) {
-		v <- getValuesBlock(x, 1 ,nrow(x), c, 1)
-		if (sum(v %in% values) < nrl) { break }
+	for (size_t c=nc; c>firstcol; c--) {
+		v = readValues(1, nrow, c, 1);
+		if (std::count (v.begin(), v.end(), val) < nrl) {
+			break;
+		}
 	}
-	firstcol <- min(max(c-padding, 1), nc) 
-	
-	for (c in nc:1) {
-		v <- getValuesBlock(x, 1 ,nrow(x), c, 1)
-		if (sum(v %in% values) < nrl) { break }
-	}
-	lastcol <- max(min(c+padding, nc), 1)
+	unsigned lastcol = std::max(std::min(unsigned(c)+padding, nc), unsigned(1));
 	
 	if (lastcol < firstcol) { 
-		tmp <- firstcol
-		firstcol <- lastcol
-		lastcol <- tmp
+		tmp = firstcol;
+		firstcol = lastcol;
+		lastcol = tmp;
 	}
 	
-	xr <- xres(x)
-	yr <- yres(x)
-	e <- extent(xFromCol(x, firstcol)-0.5*xr, xFromCol(x, lastcol)+0.5*xr, yFromRow(x, lastrow)-0.5*yr, yFromRow(x, firstrow)+0.5*yr)
+	std::vector<double> res = resolution();
+	double xr = res[0];
+	double yr = res[1];
 	
-	return( crop(x, e, filename=filename, ...) )
+	GeoExtent e = GeoExtent(xFromCol(firstcol)-0.5*xr, xFromCol(lastcol)+0.5*xr, yFromRow(lastrow)-0.5*yr, yFromRow(firstrow)+0.5*yr);
+	
+	return( crop(e, filename=filename) ) ;
 }
-)
 
-*/

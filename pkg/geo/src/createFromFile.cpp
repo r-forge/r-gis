@@ -46,6 +46,8 @@ bool GeoRaster::createFromFile(std::string fname) {
 			std::vector<string> vmax = strsplit(smax, ":");
 			std::vector<double> dmin = str2double(vmin);
 			std::vector<double> dmax = str2double(vmax);	
+			
+			range.resize(2, std::vector<double>(nbnd));
 			range[0].insert(range[0].end(), dmin.begin(), dmin.end());
 			range[1].insert(range[1].end(), dmax.begin(), dmax.end());
 			for (unsigned i=0; i< vmin.size(); i++) {

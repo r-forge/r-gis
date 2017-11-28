@@ -8,5 +8,5 @@ std::vector<std::string> strsplit(std::string s, std::string delimiter);
 std::vector<double> str2double(std::vector<string> s);
 string getFileExt(const string& s);
 string setFileExt(const string& s, const string& ext);
-void trim(std::string &s);
+void lrtrim(std::string &s);
 

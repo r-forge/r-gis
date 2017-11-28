@@ -131,6 +131,7 @@ class GeoRaster {
 		std::vector< std::vector<double> > xyFromCell( double cell );
 		std::vector< std::vector<unsigned> > rowColFromCell(std::vector<double> cell);
 		
+		BlockSize getBlockSize(std::string filename="");
 		
 		double valuesCell(double);
 		double valuesCell(int, int);
@@ -143,7 +144,7 @@ class GeoRaster {
 		GeoExtent align(GeoExtent e, string snap="near");
 		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
 		
-		BlockSize getBlockSize(std::string filename="");
+		GeoRaster trim(unsigned padding=0, double val=NAN, std::string filename="");
 		
 		void readStart();
 		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);

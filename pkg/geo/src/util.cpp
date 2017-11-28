@@ -98,7 +98,7 @@ void rtrim(std::string &s) {
 }
 
 // trim from both ends (in place)
-void trim(std::string &s) {
+void lrtrim(std::string &s) {
     ltrim(s);
     rtrim(s);
 }
@@ -116,8 +116,8 @@ std::string rtrim_copy(std::string s) {
 }
 
 // trim from both ends (copying)
-std::string trim_copy(std::string s) {
-    trim(s);
+std::string lrtrim_copy(std::string s) {
+    lrtrim(s);
     return s;
 }
 

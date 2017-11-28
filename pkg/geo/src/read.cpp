@@ -56,7 +56,6 @@ std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned
 
 std::vector<double>  GeoRaster::getValues() { 
 
-
 	if (source.memory[0]) {
 
 		return values; 

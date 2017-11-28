@@ -2,7 +2,6 @@ using namespace std;
 #include "geo.h"
 
 GeoRaster::GeoRaster(std::string fname) {
-	range.resize(2);
 	createFromFile(fname);
 }
 		

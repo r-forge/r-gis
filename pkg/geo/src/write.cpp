@@ -8,7 +8,7 @@ bool canProcessInMemory() {
 
 BlockSize GeoRaster::getBlockSize(std::string filename) {
 	BlockSize bs;
-	trim(filename);
+	lrtrim(filename);
 	// check of can be processed in memory
 	// if not generate fileanme 
 	// R session should always send a temp folder to static var when pkg is loaded?
