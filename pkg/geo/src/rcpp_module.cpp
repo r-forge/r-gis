@@ -34,6 +34,7 @@ RCPP_MODULE(GeoRaster){
 		.method("writeRaster", &GeoRaster::writeRaster, "writeRaster")
 		
 		.method("readValues", &GeoRaster::readValues, "readValues")	
+
 		.property("values", &GeoRaster::getValues, &GeoRaster::setValues )
 
 		.property("crs", &GeoRaster::getCRS, &GeoRaster::setCRS )
@@ -43,15 +44,16 @@ RCPP_MODULE(GeoRaster){
 		.property("origin", &GeoRaster::origin)
 
 		.property("inMemory", &GeoRaster::inMemory )
-		.property("nlyr", &GeoRaster::nlyr )
 		.property("filenames", &GeoRaster::filenames )
 		
-		.field_readonly( "nrow", &GeoRaster::nrow )
-		.field_readonly( "ncol", &GeoRaster::ncol )
+		.field_readonly("nrow", &GeoRaster::nrow )
+		.field_readonly("ncol", &GeoRaster::ncol )
+		.field_readonly("nlyr", &GeoRaster::nlyr )
 	
-		.field_readonly( "hasValues", &GeoRaster::hasValues )
-		.field_readonly( "hasRange", &GeoRaster::hasRange )
-		.field_readonly( "range", &GeoRaster::range )
+		.field_readonly("hasValues", &GeoRaster::hasValues )
+		.field_readonly("hasRange", &GeoRaster::hasRange )
+		.field_readonly("range_min", &GeoRaster::range_min )
+		.field_readonly("range_max", &GeoRaster::range_max )
 
 		.method("crop", &GeoRaster::crop, "crop")
 		.method("trim", &GeoRaster::trim, "trim")

@@ -40,7 +40,6 @@ class RasterSource {
 		std::vector<std::vector<int> > layers;		
 		std::vector<string> datatype;
 		std::vector<double> NAflag;
-		
 };
 
 
@@ -53,6 +52,8 @@ class BlockSize {
 };
 
 
+
+
 class GeoRaster {
 	
 	private:
@@ -62,16 +63,23 @@ class GeoRaster {
 		GeoExtent extent;
 		std::string crs ="+proj=longlat +datum=WGS84";
 		RasterSource source;
+		bool is_R = true;
+
+		void setnlyr() { 
+			nlyr = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
+		}
 		
 	public:
 		//double NA = std::numeric_limits<double>::quiet_NaN();
 	
-		unsigned nrow, ncol;
-		// values
+		unsigned nrow, ncol, nlyr;
+		unsigned size() { return ncol * nrow * nlyr ; }
 		bool hasValues;
 		std::vector<double> values;
+		
 		std::vector<bool> hasRange;
-		std::vector< std::vector<double> > range;
+		std::vector<double> range_min;
+		std::vector<double> range_max;
 		std::vector<string> names;
 		std::vector<bool> inMemory() { return source.memory; }
 
@@ -100,10 +108,6 @@ class GeoRaster {
 
 		std::vector<double> origin();	
 		
-		int nlyr() { 
-			int lyrs = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
-			return(lyrs);
-		}
 		std::vector<string> filenames() { return source.filename; }
 
 		
@@ -143,9 +147,10 @@ class GeoRaster {
 		
 		
 		void readStart();
-		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
 		void readStop();
+		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
 
+		
 		void writeStart(std::string filename);
 		void writeValues(std::vector<double> vals, unsigned row);
 		void writeStop();

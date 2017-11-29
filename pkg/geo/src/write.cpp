@@ -72,7 +72,7 @@ void GeoRaster::writeValues(std::vector<double> vals, unsigned row){
 
 void GeoRaster::setValues(std::vector<double> _values) {
 	//bool result = false;
-	//if (_values.size() == (ncol * nrow * nlyr())) {
+	//if (_values.size() == size()) {
 		values = _values;
 		
 		std::vector<bool> mem {true};
@@ -111,24 +111,15 @@ void vector_minmax(std::vector<double> v, double &min, int &imin, double &max, i
 
 
 void GeoRaster::setRange() {
-// this does not work when the first element is NAN
 	double vmin, vmax;
 	int imin, imax;
-	vector_minmax(values, vmin, imin, vmax, imax); 
-
-	std::vector< std::vector<double> > v(2, vector<double>(1));
-	v[0][0] = vmin;
-	v[1][0] = vmax;
-	
-/*	auto result = std::minmax_element (values.begin(), values.end());
-	v[0][0] = *result.first;
-	v[1][0] = *result.second;
-*/	
-
-	range = v;
-	hasRange = std::vector<bool> {true};
+	// for each layer {
+		vector_minmax(values, vmin, imin, vmax, imax); 
+		range_min.push_back(vmin);
+		range_max.push_back(vmax);
+		hasRange.push_back(true);
+	//}
 }
-
 
 
 

@@ -53,8 +53,8 @@ setMethod ('show' , 'GeoRaster',
 
 			if (any(.hasRange(object))) {
 				r <- range(object)
-				minv <- format(r[[1]])
-				maxv <- format(r[[2]])
+				minv <- format(r[1,])
+				maxv <- format(r[2,])
 				minv <- gsub('Inf', '?', minv)
 				maxv <- gsub('-Inf', '?', maxv)
 				if (nl > mnr) {

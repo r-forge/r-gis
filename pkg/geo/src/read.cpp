@@ -20,20 +20,22 @@ void GeoRaster::readStop(){
 
 std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols){
 	
-	// probably should be using zero based indexing at the C level
+	if (is_R) {
+		row = row-1;
+		col = col-1;
+	}
 
-	unsigned nr = std::min(nrows, nrow-row+1);
-	unsigned nc = std::min(ncols, ncol-col+1);
+//	unsigned nlayers = nlyr();
+	unsigned nr = std::min(nrows, nrow-row);
+	unsigned nc = std::min(ncols, ncol-col);
 	if ((nr != nrows) || (nc != ncols)) {
 		// message
 		nrows = nr;
 		ncols = nc;
 	}
 	
-	std::vector<double> out(nrows*ncols, NAN);
-	
+	std::vector<double> out(nrows*ncols);
 	if (source.memory[0]) {
-
 		size_t k = 0;
 		size_t ij;
 		for (size_t i = (row-1); i < (row+nrows-1); i++) {
@@ -63,5 +65,4 @@ std::vector<double>  GeoRaster::getValues() {
 		return readValues(1, nrow, 1, ncol);
 	}
 }
-
 

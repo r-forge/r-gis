@@ -3,6 +3,7 @@ using namespace std;
 
 GeoRaster::GeoRaster(std::string fname) {
 	createFromFile(fname);
+	setnlyr();
 }
 		
 GeoRaster::GeoRaster() {
@@ -17,8 +18,8 @@ GeoRaster::GeoRaster() {
 	source.layers.resize(1, vector<int>(1));
 	source.layers[0][1] = 1;
 	source.datatype.push_back("");
-	range.resize(2);
 	names.push_back("lyr.1");
+	setnlyr();
 }
 
 
@@ -37,8 +38,8 @@ GeoRaster::GeoRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::st
 	source.layers.resize(1, vector<int>(1));
 	source.layers[0][1] = 1;
 	source.datatype.push_back("");
-	range.resize(2);
 	crs=_crs;
 	for (unsigned i=0; i<rcl[2]; i++) {	names.push_back("lyr." + std::to_string(i)) ; }
+	setnlyr();	
 }
 

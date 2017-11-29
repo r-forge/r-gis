@@ -3,9 +3,8 @@ using namespace std;
 
 GeoRaster GeoRaster::trim(unsigned padding, std::string filename) {
 
-	unsigned nl = nlyr();
-	unsigned nrl = nrow * nl;
-	unsigned ncl = ncol * nl;
+	unsigned nrl = nrow * nlyr;
+	unsigned ncl = ncol * nlyr;
 	
 	std::vector<double> v;
 	unsigned r;

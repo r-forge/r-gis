@@ -27,7 +27,7 @@ bool GeoRaster::createFromFile(std::string fname) {
 			double ymin = atof(ini.GetValue("georeference", "ymin"));
 			double ymax = atof(ini.GetValue("georeference", "ymax"));	
 			GeoExtent e(xmin, xmax, ymin, ymax);
-			if (nlyr() == 0) {
+			if (nlyr == 0) {
 				setExtent(e, false);
 				ncol = ncols;
 				nrow = nrows;
@@ -38,7 +38,7 @@ bool GeoRaster::createFromFile(std::string fname) {
 			
 			string crs = ini.GetValue("georeference", "projection");
 			string dtp = ini.GetValue("data", "datatype");
-			int nbnd = atoi(ini.GetValue("data", "nbands"));
+			unsigned nbnd = atoi(ini.GetValue("data", "nbands"));
 
 			string smin = ini.GetValue("data", "minvalue");
 			string smax = ini.GetValue("data", "maxvalue");
@@ -46,13 +46,13 @@ bool GeoRaster::createFromFile(std::string fname) {
 			std::vector<string> vmax = strsplit(smax, ":");
 			std::vector<double> dmin = str2double(vmin);
 			std::vector<double> dmax = str2double(vmax);	
-			
-			range.resize(2, std::vector<double>(nbnd));
-			range[0].insert(range[0].end(), dmin.begin(), dmin.end());
-			range[1].insert(range[1].end(), dmax.begin(), dmax.end());
-			for (unsigned i=0; i< vmin.size(); i++) {
+			for (unsigned i=0; i<nbnd; i++) {
 				hasRange.push_back( true );
+				range_min.push_back(dmin[i]);
+				range_max.push_back(dmax[i]);
 			}
+			//range[0].insert(range[0].end(), dmin.begin(), dmin.end());
+			//range[1].insert(range[1].end(), dmax.begin(), dmax.end());
 
 			string snames = ini.GetValue("description", "layername");
 			std::vector<string> vnames = strsplit(snames, ":");

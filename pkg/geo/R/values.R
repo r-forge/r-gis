@@ -70,7 +70,9 @@ setMethod('values<-', signature(x='GeoRaster', 'numeric'),
 
 setMethod('range', signature(x='GeoRaster'), 
 	function(x, ..., na.rm=TRUE) {
-		x@ptr$range
+		rmin <- x@ptr$range_min
+		rmax <- x@ptr$range_max
+		rbind(rmin, rmax)
 	}
 )
 
