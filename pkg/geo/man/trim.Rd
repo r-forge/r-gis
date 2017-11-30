@@ -9,19 +9,18 @@
 \title{Trim}
 
 \description{
-Trim (shrink) a GeoRaster object by removing outer rows and columns that all have the same value (e.g. NA).
+Trim (shrink) a GeoRaster object by removing outer rows and columns that are NA.
 
 Or remove the whitespace before or after a string of characters (or a matrix, or the character values in a data.frame).
 }
 
 \usage{
-\S4method{trim}{GeoRaster}(x, padding=0, values=NA, filename='', ...)
+\S4method{trim}{GeoRaster}(x, padding=0, filename='', ...)
 \S4method{trim}{character}(x, internal=FALSE, ...)
 }
 
 \arguments{
   \item{x}{GeoRaster, string, matrix, or data.frame}
-  \item{values}{numeric. Value(s) based on which a GeoRaster should be trimmed}
   \item{padding}{integer. Number of outer rows/columns to keep}
   \item{filename}{character. Optional output filename}
   \item{internal}{logical. If \code{TRUE}, sequential internal spaces are replaced by a single space}
