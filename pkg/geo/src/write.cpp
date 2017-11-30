@@ -1,6 +1,8 @@
 using namespace std;
 #include "geo.h"
+#include "SimpleIni.h"
 #include "util.h"
+
 
 bool canProcessInMemory() {
 	return true;
@@ -47,8 +49,11 @@ GeoRaster GeoRaster::writeRaster(std::string filename) {
 void GeoRaster::writeStart(std::string filename){
 	if (filename != "") {
 		source.filename[0] = filename;
-		// open filestream
-		
+		if (source.driver[0] == "native") {
+			// open filestream
+		} else {
+			// open filestream		
+		}
 	} else {
 		source.filename[0] = "";
 	}
@@ -58,12 +63,20 @@ void GeoRaster::writeStart(std::string filename){
 void GeoRaster::writeStop(){
 	if (source.filename[0] != "") {
 		// close filestream
+		if (source.driver[0] == "native") {
+			//bool ok = 
+			GeoRaster::writeHDR();
+		}
 	}
 }
 
 void GeoRaster::writeValues(std::vector<double> vals, unsigned row){
 	if (source.filename[0] != "") {
-		// write
+		if (source.driver[0] == "native") {
+		
+		} else {
+			// write with gdal
+		}
 	} else {
 		setValues(vals);
 	}
@@ -96,11 +109,11 @@ void vector_minmax(std::vector<double> v, double &min, int &imin, double &max, i
     max = std::numeric_limits<double>::lowest();
     for (auto &val : v) {
 		if (!std::isnan(val)) {
-			if (val>max) {
+			if (val > max) {
 				imax = p;
 				max = val;
 			}
-			if (val<min) {
+			if (val < min) {
 				imin = p;
 				min = val;
 			}
@@ -123,36 +136,39 @@ void GeoRaster::setRange() {
 
 
 
-/*
 bool GeoRaster::writeHDR() { 
 
 	CSimpleIniA ini;	
 	ini.SetValue("section", "key", "newvalue");
 		
 	ini.SetValue("version", NULL, NULL);
-	ini.SetValue("version", version, "2");
+	ini.SetValue("version", "version", "2");
 	
 	ini.SetValue("georeference", NULL, NULL);
-	ini.SetValue("georeference", "xmin", xmin);
-	ini.SetValue("georeference", "xmax", xmax);
-	ini.SetValue("georeference", "ymin", ymin);
-	ini.SetValue("georeference", "ymax", ymax);
-	ini.SetValue("georeference", "projection", crs);
 
-	ini.SetValue("dimensions", "nrows", nrow);
-	ini.SetValue("dimensions", "ncols", ncol);
-	ini.SetValue("dimensions", "nlyrs", nlyr);
-	ini.SetValue("dimensions", "lyrnms", names);		
+	ini.SetValue("georeference", "xmin", to_string(extent.xmin).c_str());
+	ini.SetValue("georeference", "xmax", to_string(extent.xmax).c_str());
+	ini.SetValue("georeference", "ymin", to_string(extent.ymin).c_str());
+	ini.SetValue("georeference", "ymax", to_string(extent.ymax).c_str());
+	ini.SetValue("georeference", "projection", crs.c_str());
+
+	ini.SetValue("dimensions", "nrow", to_string(nrow).c_str());
+	ini.SetValue("dimensions", "ncol", to_string(ncol).c_str());
+	ini.SetValue("dimensions", "nlyr", to_string(nlyr).c_str());
+	ini.SetValue("dimensions", "names", concatenate(names, std::string(":|:")).c_str());		
 
 	ini.SetValue("data", NULL, NULL);
-	ini.SetValue("data", "datatype", datatype);
-	ini.SetValue("data", "nodata", NAvalue);
+	ini.SetValue("data", "datatype", "FLT4S"); // ojo
+	ini.SetValue("data", "nodata", to_string(-1 * numeric_limits<double>::max()).c_str());
 
-	std::vector<double> smin = double2str(vmin);
-	std::vector<double> smax = double2str(vmax);
-	smin = concatenate(smin, ":|:");
-	smax = concatenate(smax, ":|:");
-	ini.SetValue("data", "minvalue", smin);
-	ini.SetValue("data", "maxvalue", smax);
+	ini.SetValue("data", "range_min", concatenate(dbl2str(range_min), std::string(":|:")).c_str());
+	ini.SetValue("data", "range_max", concatenate(dbl2str(range_max), std::string(":|:")).c_str());
+
+	SI_Error rc = ini.SaveFile(source.filename[0].c_str());
+	if (rc < 0) {
+		return false;
+	} else {
+		return true;
+	}	
 }
-*/
+

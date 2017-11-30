@@ -6,6 +6,7 @@ using namespace std;
 #include <string>
 
 
+
 std::string concatenate(std::vector<string> v, std::string delim) {	
 	for (size_t i=0; i<(v.size()-1); i++) {
 		v[i] = v[i] + delim;
@@ -57,7 +58,7 @@ std::vector<std::string> strsplit(std::string s, std::string delimiter){
 }
 
 
-std::vector<double> str2double(std::vector<string> s) { 
+std::vector<double> str2dbl(std::vector<string> s) { 
 	std::vector<double> d (s.size());
 	std::transform(s.begin(), s.end(), d.begin(), [](const std::string& val) {
 		return std::stod(val);
@@ -65,15 +66,14 @@ std::vector<double> str2double(std::vector<string> s) {
 	return d;
 }
 
-
-
-std::vector<string> double2str(std::vector<double> d) { 
+std::vector<string> dbl2str(std::vector<double> d) { 
 	std::vector<string> s (d.size());
 	std::transform(d.begin(), d.end(), s.begin(),
-			[](double d) { return std::to_string(d); }
+			[](double i) { return std::to_string(i); }
 	);
 	return s;
 }
+
 
 
 string getFileExt(const string& s) {

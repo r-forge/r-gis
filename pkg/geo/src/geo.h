@@ -154,6 +154,7 @@ class GeoRaster {
 		void writeStart(std::string filename);
 		void writeValues(std::vector<double> vals, unsigned row);
 		void writeStop();
+		bool writeHDR();
 		GeoRaster writeRaster(std::string filename);
 
 		GeoExtent align(GeoExtent e, string snap="near");

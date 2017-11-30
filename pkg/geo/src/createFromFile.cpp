@@ -44,8 +44,8 @@ bool GeoRaster::createFromFile(std::string fname) {
 			string smax = ini.GetValue("data", "maxvalue");
 			std::vector<string> vmin = strsplit(smin, ":");
 			std::vector<string> vmax = strsplit(smax, ":");
-			std::vector<double> dmin = str2double(vmin);
-			std::vector<double> dmax = str2double(vmax);	
+			std::vector<double> dmin = str2dbl(vmin);
+			std::vector<double> dmax = str2dbl(vmax);	
 			for (unsigned i=0; i<nbnd; i++) {
 				hasRange.push_back( true );
 				range_min.push_back(dmin[i]);
