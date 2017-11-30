@@ -4,10 +4,6 @@
 # Licence GPL v3
 
 
-if (!isGeneric("crs")) {
-	setGeneric("crs", function(x)
-		standardGeneric("crs"))
-}	
 
 setMethod("crs", signature('GeoRaster'), 
 	function(x) {
@@ -15,10 +11,6 @@ setMethod("crs", signature('GeoRaster'),
 	}
 )
 
-if (!isGeneric("crs<-")) {
-	setGeneric("crs<-", function(x, ..., value)
-		standardGeneric("crs<-"))
-}	
 
 setMethod("crs<-", signature('GeoRaster', 'character'), 
 	function(x, ..., value) {

@@ -127,13 +127,13 @@ class GeoRaster {
 		double yFromRow(unsigned rownr);
 		std::vector<double> xFromCol(std::vector<unsigned> colnr);
 		double xFromCol(unsigned colnr);
-		std::vector<unsigned> colFromX(std::vector<double> x);
-		unsigned colFromX(double x);
-		std::vector<unsigned> rowFromY(std::vector<double> y);
-		unsigned rowFromY(double y);
+		std::vector<double> colFromX(std::vector<double> x);
+		double colFromX(double x);
+		std::vector<double> rowFromY(std::vector<double> y);
+		double rowFromY(double y);
 		std::vector< std::vector<double> > xyFromCell( std::vector<double> cell );
 		std::vector< std::vector<double> > xyFromCell( double cell );
-		std::vector< std::vector<unsigned> > rowColFromCell(std::vector<double> cell);
+		std::vector< std::vector<double> > rowColFromCell(std::vector<double> cell);
 		
 		BlockSize getBlockSize(std::string filename="");
 		
@@ -141,7 +141,6 @@ class GeoRaster {
 		double valuesCell(int, int);
 		std::vector<double> valuesCell(std::vector<double>);	
 		std::vector<double> valuesRow(int);	
-		std::vector<std::vector<double>> valuesAll();	
 
 		void setRange();
 		
@@ -149,7 +148,6 @@ class GeoRaster {
 		void readStart();
 		void readStop();
 		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
-
 		
 		void writeStart(std::string filename);
 		void writeValues(std::vector<double> vals, unsigned row);

@@ -3,9 +3,16 @@
 
 using namespace Rcpp;
 
+
+NumericMatrix getValuesM(GeoRaster* r) {
+	NumericMatrix x(r->ncell(), r->nlyr);
+	std::copy(r->values.begin(), r->values.end(), x.begin());
+	return(x);
+}
+
+
 RCPP_EXPOSED_CLASS(GeoRaster)
 RCPP_EXPOSED_CLASS(GeoExtent)
-
 	
 RCPP_MODULE(GeoRaster){
     using namespace Rcpp;
@@ -26,17 +33,20 @@ RCPP_MODULE(GeoRaster){
 		.method("cellFromRowCol", ( std::vector<double> (GeoRaster::*)(std::vector<unsigned>,std::vector<unsigned>) )( &GeoRaster::cellFromRowCol ))
 		.method("yFromRow", ( std::vector<double> (GeoRaster::*)(std::vector<unsigned>) )( &GeoRaster::yFromRow ))
 		.method("xFromCol", ( std::vector<double> (GeoRaster::*)(std::vector<unsigned>) )( &GeoRaster::xFromCol ))
-		.method("colFromX", ( std::vector<unsigned> (GeoRaster::*)(std::vector<double>) )( &GeoRaster::colFromX ))
-		.method("rowFromY", ( std::vector<unsigned> (GeoRaster::*)(std::vector<double>) )( &GeoRaster::rowFromY ))
+		.method("colFromX", ( std::vector<double> (GeoRaster::*)(std::vector<double>) )( &GeoRaster::colFromX ))
+		.method("rowFromY", ( std::vector<double> (GeoRaster::*)(std::vector<double>) )( &GeoRaster::rowFromY ))
 		.method("xyFromCell", ( std::vector< std::vector<double> > (GeoRaster::*)(std::vector<double>) )( &GeoRaster::xyFromCell ))
-		.method("rowColFromCell", ( std::vector< std::vector<unsigned> > (GeoRaster::*)(std::vector<double>) )( &GeoRaster::rowColFromCell ))
+		.method("rowColFromCell", ( std::vector< std::vector<double> > (GeoRaster::*)(std::vector<double>) )( &GeoRaster::rowColFromCell ))
+
 		.method("setRange", &GeoRaster::setRange, "setRange")
 		.method("writeRaster", &GeoRaster::writeRaster, "writeRaster")
-		
 		.method("readValues", &GeoRaster::readValues, "readValues")	
 
 		.property("values", &GeoRaster::getValues, &GeoRaster::setValues )
+		
+		.method("getValues", &getValuesM)
 
+		
 		.property("crs", &GeoRaster::getCRS, &GeoRaster::setCRS )
 		.property("extent", &GeoRaster::getExtent, &GeoRaster::setExtent )
 		.property("names", &GeoRaster::getNames, &GeoRaster::setNames )
@@ -57,8 +67,12 @@ RCPP_MODULE(GeoRaster){
 
 		.method("crop", &GeoRaster::crop, "crop")
 		.method("trim", &GeoRaster::trim, "trim")
-
-//		.method("sqrt1", &GeoRaster::SQRT, "sqrt")
-//		.method("sqrt2", &SQRTfree, "sqrt")
+		
 	;	
+	
+	
 }
+
+
+
+

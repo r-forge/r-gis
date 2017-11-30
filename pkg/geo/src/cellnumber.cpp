@@ -16,14 +16,14 @@ std::vector<double> GeoRaster::cellFromXY (std::vector<double> x, std::vector<do
   
 	for (size_t i = 0; i < size; i++) {
 		// cannot use trunc here because trunc(-0.1) == 0
-		double row = std::floor((extent.ymax - y[i]) * yr_inv);
+		unsigned row = std::floor((extent.ymax - y[i]) * yr_inv);
 		// points in between rows go to the row below
 		// except for the last row, when they must go up
 		if (y[i] == extent.ymin) {  
 			row = nrow-1 ;
 		}
 		
-		double col = floor((x[i] - extent.xmin) * xr_inv);
+		unsigned col = floor((x[i] - extent.xmin) * xr_inv);
 		// as for rows above. Go right, except for last column
 		if (x[i] == extent.xmax) {
 			col = ncol - 1 ;
@@ -33,7 +33,7 @@ std::vector<double> GeoRaster::cellFromXY (std::vector<double> x, std::vector<do
 			cells[i] = NAN;
 		} else {
 			// result[i] = static_cast<int>(row) * ncols + static_cast<int>(col) + 1;
-			cells[i] = row * ncol + col + 1 ;
+			cells[i] = row * ncol + col;
 		}
 	}
   
@@ -50,7 +50,6 @@ double GeoRaster::cellFromXY (double x, double y) {
 
 
 std::vector<double> GeoRaster::cellFromRowCol(std::vector<unsigned> rownr, std::vector<unsigned> colnr) {
-
 	
 	size_t rownr_size = rownr.size();
 	size_t colnr_size = colnr.size();
@@ -66,7 +65,7 @@ std::vector<double> GeoRaster::cellFromRowCol(std::vector<unsigned> rownr, std::
 		double c = colnr[i < colnr_size ? i : i % colnr_size];
 
     // Detect out-of-bounds rows/cols and use NA for those
-		result[i] = (r < 1 || r > nrow || c < 1 || c > ncol) ? NAN : (r-1) * ncol + c;
+		result[i] = (r < 0 || r >= nrow || c < 0 || c >= ncol) ? NAN : r * ncol + c;
 	}
   
 	return result;
@@ -85,9 +84,9 @@ std::vector<double> GeoRaster::yFromRow(std::vector<unsigned> rownr) {
 	size_t size = rownr.size();
 	std::vector<double> result( size );
 	double ymax = extent.ymax;
-	double yr = double(resolution()[1]);
+	double yr = yres();
 	for (size_t i = 0; i < size; i++) {
-		result[i] = (rownr[i] < 1 || rownr[i] > nrow ) ? NAN : ymax - ((rownr[i]-0.5) * yr);
+		result[i] = (rownr[i] < 0 || rownr[i] >= nrow ) ? NAN : ymax - ((rownr[i]+0.5) * yr);
 	}
 	return result;
 }
@@ -106,7 +105,7 @@ std::vector<double> GeoRaster::xFromCol(std::vector<unsigned> colnr) {
 	double xmin = extent.xmin;
 	double xr = xres();
 	for (size_t i = 0; i < size; i++) {
-		result[i] = (colnr[i] < 1 || colnr[i] > ncol ) ? NAN : xmin + ((colnr[i]-0.5) * xr);
+		result[i] = (colnr[i] < 0 || colnr[i] >= ncol ) ? NAN : xmin + ((colnr[i]+0.5) * xr);
 	}
 	return result;
 }
@@ -117,9 +116,9 @@ double GeoRaster::xFromCol(unsigned colnr) {
 	return x[0]; 
 }
 
-std::vector<unsigned> GeoRaster::colFromX(std::vector<double> x) {
+std::vector<double> GeoRaster::colFromX(std::vector<double> x) {
 	size_t size = x.size();
-	std::vector<unsigned> result( size );
+	std::vector<double> result(size);
 	double xmin = extent.xmin;
 	double xmax = extent.xmax;
 	double xr = xres();
@@ -128,41 +127,39 @@ std::vector<unsigned> GeoRaster::colFromX(std::vector<double> x) {
 		if (x[i] == xmax) {  
 			result[i] = ncol ;
 		} else {
-			result[i] = (x[i] < xmin || x[i] > xmax ) ? NAN : ((x[i] - xmin) / xr) + 1;
+			result[i] = (x[i] < xmin || x[i] > xmax ) ? NAN : trunc((x[i] - xmin) / xr);
 		}
 	}
 	return result;
 }
 
 
-unsigned GeoRaster::colFromX(double x) {
+double GeoRaster::colFromX(double x) {
 	std::vector<double> X = {x};
-	std::vector<unsigned> col = colFromX(X);
-	return col[0]; 
+	return colFromX(X)[0];
 }
 
 
-std::vector<unsigned> GeoRaster::rowFromY(std::vector<double> y) {
+std::vector<double> GeoRaster::rowFromY(std::vector<double> y) {
 	size_t size = y.size();
-	std::vector<unsigned> result( size );
+	std::vector<double> result(size);
 	double ymin = extent.ymin;
 	double ymax = extent.ymax;
-	double yr = double(resolution()[1]);
+	double yr = yres();
 	
 	for (size_t i = 0; i < size; i++) {
 		if (y[i] == ymin) {  
 			result[i] = nrow ;
 		} else {
-			result[i] = (y[i] < ymin || y[i] > ymax ) ? NAN : ((ymax - y[i]) / yr) + 1;
+			result[i] = (y[i] < ymin || y[i] > ymax ) ? NAN : trunc((ymax - y[i]) / yr);
 		}
 	}
 	return result;
 }
 
-unsigned GeoRaster::rowFromY(double y) {
+double GeoRaster::rowFromY(double y) {
 	std::vector<double> Y = {y};
-	std::vector<unsigned> row = rowFromY(Y);
-	return row[0]; 
+	return rowFromY(Y)[0];
 }
 
 
@@ -176,10 +173,10 @@ std::vector< std::vector<double> > GeoRaster::xyFromCell( std::vector<double> ce
   
 	std::vector< std::vector<double> > result(2, std::vector<double> (size) );
 	for (size_t i = 0; i < size; i++) {
-		double c = cell[i] - 1;
-		size_t col = fmod(c, ncol);
-		size_t row = (c / ncol);
-		result[0][i] = (col + 0.5) * xr + xmin;
+		unsigned row = (cell[i] / ncol);
+		unsigned col = fmod(cell[i], ncol);
+		//unsigned col = cell[i] - row * ncol
+		result[0][i] = xmin + (col + 0.5) * xr;
 		result[1][i] = ymax - (row + 0.5) * yr;
 	}
 	return result;
@@ -188,25 +185,26 @@ std::vector< std::vector<double> > GeoRaster::xyFromCell( std::vector<double> ce
 
 std::vector< std::vector<double> > GeoRaster::xyFromCell( double cell ) {
 	std::vector<double> Cell = {cell};
-	std::vector< std::vector<double> >  xy = xyFromCell(Cell);
-	return xy; 
+	return xyFromCell(Cell);
 }
 
 
-std::vector< std::vector<unsigned> > GeoRaster::rowColFromCell(std::vector<double> cell) {
+std::vector< std::vector<double> > GeoRaster::rowColFromCell(std::vector<double> cell) {
 	size_t size = cell.size();
-	std::vector< std::vector<unsigned> > result(2, std::vector<unsigned> (size) );
+	std::vector< std::vector<double> > result(2, std::vector<double> (size) );
 
 	double nc = ncell();
 	
 	for (size_t i = 0; i < size; i++) {
-		if ((cell[i] < 1 || cell[i] > nc )) {  
-			result[0][i] = -1;
-			result[1][i] = -1;
+		if ((cell[i] < 0 || cell[i] >= nc )) {  
+			result[0][i] = NAN;
+			result[1][i] = NAN;
 		} else {
-			result[0][i] = ((cell[i] -1)/ ncol) + 1;
-			result[1][i] = (cell[i] - ((result[0][i] - 1) * ncol));
+			result[0][i] = trunc(cell[i]/ ncol);
+			result[1][i] = (cell[i] - ((result[0][i]) * ncol));
 		}
 	}
 	return result;
 }
+
+

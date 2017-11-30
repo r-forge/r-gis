@@ -2,18 +2,6 @@
 # Date :  October 2017
 # Version 0.9
 # Licence GPL v3
-
-
-if (!isGeneric("ext")) {
-	setGeneric("ext", function(x, ...)
-		standardGeneric("ext"))
-}	
-
-if (!isGeneric("ext<-")) {
-	setGeneric("ext<-", function(x, value)
-		standardGeneric("ext<-"))
-}	
-
 	
 
 setMethod('ext', signature(x='missing'), 

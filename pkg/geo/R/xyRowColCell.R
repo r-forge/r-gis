@@ -4,54 +4,54 @@
 # Licence GPL v3
 
 yRow <- function(obj, row) {
-	obj@ptr$yFromRow(row)
+	obj@ptr$yFromRow(row - 1)
 }	
 
 xCol <- function(obj, col) {
-	obj@ptr$xFromCol(col)
+	obj@ptr$xFromCol(col - 1)
 }  
 
 colX <- function(obj, x)	{
-	obj@ptr$colFromX(x)
+	obj@ptr$colFromX(x) + 1
 }
 
 rowY <- function(obj, y)	{
-	obj@ptr$rowFromY(y)
+	obj@ptr$rowFromY(y) + 1
 }	
 	
 cellXY <- function(obj, xy) {
-	obj@ptr$cellFromXY(xy[,1], xy[,2])
+	obj@ptr$cellFromXY(xy[,1], xy[,2]) + 1
 }
 
 cellRowCol <- function(obj, row, col) {
-	obj@ptr$cellFromRowCol(row, col)
+	obj@ptr$cellFromRowCol(row-1, col-1)
 }
 	
 xyCell <- function(obj, cell) {
-	xy <- obj@ptr$xyFromCell(cell)
+	xy <- obj@ptr$xyFromCell(cell-1)
 	do.call(cbind, xy)
 }
 
 yCell <- function(obj, cell) {
-	xyCell(obj, cell)[,2]
+	xyCell(obj, cell-1)[,2]
 }  
 	
 xCell <- function(obj, cell) {
-	xyCell(obj, cell)[,1]
+	xyCell(obj, cell-1)[,1]
 }  
 
 
 rowcolCell <- function(obj, cell) {
-	rc <- obj@ptr$rowColFromCell(cell)
+	rc <- obj@ptr$rowColFromCell(cell-1)
 	do.call(cbind, rc)
 }
 	
 rowCell <- function(obj, cell) {
-	rowcolCell(obj, cell)[,1]
+	rowcolCell(obj, cell-1)[,1]
 }
 
 colCell <- function(obj, cell) {
-	rowcolCell(obj, cell)[,2]
+	rowcolCell(obj, cell-1)[,2]
 }
 
 

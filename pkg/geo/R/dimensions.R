@@ -35,10 +35,6 @@ setMethod('dim<-', signature(x='GeoRaster'),
 
 
 
-if (!isGeneric("ncell")) {
-	setGeneric("ncell", function(x)
-		standardGeneric("ncell"))
-}	
 
 setMethod('ncell', signature(x='GeoRaster'), 
 	function(x) {
@@ -86,21 +82,6 @@ setMethod('nlayer', signature(x='GeoRaster'),
 
 
 
-
-if (!isGeneric("res")) {
-	setGeneric("res", function(x)
-		standardGeneric("res"))
-}
-
-if (!isGeneric("xres")) {
-	setGeneric("xres", function(x)
-		standardGeneric("xres"))
-}
-if (!isGeneric("yres")) {
-	setGeneric("yres", function(x)
-		standardGeneric("yres"))
-}
-
 setMethod('res', signature(x='GeoRaster'), 
 function(x) {
 		x@ptr$res
@@ -118,4 +99,15 @@ function(x) {
 		res(x)[2]
 	}
 )
+
+
+if (!isGeneric("ext")) {
+	setGeneric("ext", function(x, ...)
+		standardGeneric("ext"))
+}	
+
+if (!isGeneric("ext<-")) {
+	setGeneric("ext<-", function(x, value)
+		standardGeneric("ext<-"))
+}	
 

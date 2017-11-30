@@ -3,16 +3,6 @@
 # Version 0.9
 # Licence GPL v3
 
-if (!isGeneric("values")) {
-	setGeneric("values", function(x, ...)
-		standardGeneric("values"))
-}	
-
-if (!isGeneric("values<-")) {
-	setGeneric("values<-", function(x, ..., value)
-		standardGeneric("values<-"))
-}	
-
 
 setMethod("values", signature(x='GeoRaster'), 
 function(x, ...) {
@@ -76,10 +66,6 @@ setMethod('range', signature(x='GeoRaster'),
 	}
 )
 
-if (!isGeneric("setRange")) {
-	setGeneric("setRange", function(x)
-		standardGeneric("setRange"))
-}	
 
 setMethod('setRange', signature(x='GeoRaster'), 
 	function(x) {
@@ -88,4 +74,3 @@ setMethod('setRange', signature(x='GeoRaster'),
 		}
 	}
 )
-
