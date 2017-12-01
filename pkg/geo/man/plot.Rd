@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{plot}
-\alias{plot,GeoRaster,ANY-method}
+\alias{plot,GeoRaster,missing-method}
 
 \title{Plot a GeoRaster object}
 
@@ -12,7 +12,7 @@ Plot (that is, make a map of) the values of a GeoRaster object
 }
 
 \usage{
-\S4method{plot}{GeoRaster,ANY}(x, y, maxpixels=500000, ...)
+\S4method{plot}{GeoRaster,missing}(x, y, maxpixels=500000, ...)
 }
 
 \arguments{

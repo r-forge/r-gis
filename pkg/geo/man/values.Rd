@@ -1,5 +1,8 @@
 \name{values}
 
+\docType{methods}
+
+
 \alias{values}
 \alias{values,GeoRaster-method}
 \alias{values<-}
@@ -12,9 +15,8 @@ values returns all cell values of a GeoRaster object.
 }
 
 \usage{
-values(x, ...)
-
-values(x, ...) <- value
+\S4method{values}{GeoRaster}(x,...)
+\S4method{values}{GeoRaster,numeric}(x,...)<-value
 }
 
 \arguments{

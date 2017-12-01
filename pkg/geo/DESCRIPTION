@@ -2,9 +2,9 @@ Package: geo
 Type: Package
 Title: raster data
 Version: 0.0-1
-Date: 2017-11-25
+Date: 2017-11-30
 Depends: methods
-LinkingTo: BH, Rcpp
+LinkingTo: Rcpp
 Imports: Rcpp
 SystemRequirements: C++11
 Author: Robert J. Hijmans

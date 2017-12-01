@@ -32,7 +32,8 @@
 	x
 }
 
-validNames <- function(x, prefix='lyr') {
+
+.validNames <- function(x, prefix='lyr') {
 	x <- trim(as.character(x))
 	x[is.na(x)] <- ""
 #	if (.standardnames()) {
@@ -58,7 +59,7 @@ setMethod('names<-', signature(x='GeoRaster'),
 		if (length(value) != nl) {
 			stop('incorrect number of layer names')
 		}
-		v <- validNames(value)
+		v <- .validNames(value)
 		if (!all(v == value)) {
 			warning('names changed to make the valid')
 		}

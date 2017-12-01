@@ -3,6 +3,7 @@
 # Version 0.9
 # Licence GPL v3
 
+if (!isGeneric("georst") ) { setGeneric("georst", function(x, ...) standardGeneric("georst")) }
 
 setMethod('georst', signature(x='missing'), 
 	function(nrow=180, ncol=360, nlayer=1, xmin=-180, xmax=180, ymin=-90, ymax=90, crs, extent, resolution, ...) {

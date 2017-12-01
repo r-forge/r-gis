@@ -1,18 +1,22 @@
 \name{dimensions}
 
+\docType{methods}
+
 \alias{ncol}
 \alias{nrow}
 \alias{ncell}
 \alias{nlayer}
 \alias{dim}
+\alias{ncol<-}
+\alias{nrow<-}
 \alias{ncell,ANY-method}
 \alias{nrow,GeoRaster-method}
 \alias{ncol,GeoRaster-method}
 \alias{nlayer,GeoRaster-method}
 \alias{ncell,GeoRaster-method}
 \alias{length,GeoRaster-method}
-\alias{nrow<-}
-\alias{ncol<-}
+\alias{nrow<-,GeoRaster-method}
+\alias{ncol<-,GeoRaster-method}
 \alias{dim,GeoRaster-method}
 \alias{dim<-,GeoRaster-method}
 \alias{length,GeoRaster-method}
@@ -33,16 +37,17 @@ When setting dimensions, raster values are lost.
 }
 
 \usage{
-ncol(x)
-nrow(x)
-ncell(x)
-nlayer(x)
-res(x)
-xres(x)
-yres(x)
+\S4method{ncol}{GeoRaster}(x)
+\S4method{nrow}{GeoRaster}(x)
+\S4method{ncell}{GeoRaster}(x)
+\S4method{nlayer}{GeoRaster}(x)
+\S4method{res}{GeoRaster}(x)
+\S4method{xres}{GeoRaster}(x)
+\S4method{yres}{GeoRaster}(x)
 
-ncol(x) <- value
-nrow(x) <- value
+\S4method{ncol}{GeoRaster}(x)<-value
+\S4method{nrow}{GeoRaster}(x)<-value
+
 }
 
 

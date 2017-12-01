@@ -1,19 +1,31 @@
 \name{xyRowColCell}
 
 \alias{xFromCol}
+\alias{xFromCol,GeoRaster,numeric-method}
 \alias{yFromRow}
+\alias{yFromRow,GeoRaster,numeric-method}
 \alias{xyFromCell}
+\alias{xyFromCell,GeoRaster,numeric-method}
 \alias{xFromCell}
+\alias{xFromCell,GeoRaster,numeric-method}
 \alias{yFromCell}
-
+\alias{yFromCell,GeoRaster,numeric-method}
 \alias{cellFromRowCol}
+\alias{cellFromRowCol,GeoRaster,numeric,numeric-method}
 \alias{colFromX}
+\alias{colFromX,GeoRaster,numeric-method}
 \alias{rowFromY}
+\alias{rowFromY,GeoRaster,numeric-method}
 \alias{cellFromXY}
+\alias{cellFromXY,GeoRaster,matrix-method}
 \alias{rowFromCell}
+\alias{rowFromCell,GeoRaster,numeric-method}
 \alias{colFromCell}
-\alias{rowcolFromCell}
-
+\alias{colFromCell,GeoRaster,numeric-method}
+\alias{rowColFromCell}
+\alias{rowColFromCell,GeoRaster,numeric-method}
+\alias{cellFromXY}
+\alias{cellFromXY,GeoRaster,matrix-method}
 
   
 \title{Coordinates from a row, column or cell number and vice versa}
@@ -28,34 +40,35 @@ row numbers start at 1 at the top, column numbers start at 1 at the left.
 }
 
 \usage{
-xFromCol(obj, col)
-yFromRow(obj, row)
-xyFromCell(obj, cell)
-xFromCell(obj, cell)
-yFromCell(obj, cell)
-colFromX(obj, x)
-rowFromY(obj, y)
-cellFromXY(obj, xy)
-cellFromRowCol(obj, row, col)
-rowFromCell(obj, cell)
-colFromCell(obj, cell)
-rowcolFromCell(obj, cell)
+\S4method{xFromCol}{GeoRaster,numeric}(object, col)
+\S4method{yFromRow}{GeoRaster,numeric}(object, row)
+\S4method{xyFromCell}{GeoRaster,numeric}(object, cell, ...)
+\S4method{xFromCell}{GeoRaster,numeric}(object, cell)
+\S4method{yFromCell}{GeoRaster,numeric}(object, cell)
+\S4method{colFromX}{GeoRaster,numeric}(object, x)
+\S4method{rowFromY}{GeoRaster,numeric}(object, y)
+\S4method{cellFromRowCol}{GeoRaster,numeric,numeric}(object, row, col)
+\S4method{rowFromCell}{GeoRaster,numeric}(object, cell)
+\S4method{colFromCell}{GeoRaster,numeric}(object, cell)
+\S4method{rowColFromCell}{GeoRaster,numeric}(object, cell)
+\S4method{cellFromXY}{GeoRaster,matrix}(object, xy)
 }
 
 
 \arguments{
-  \item{obj}{GeoRaster object}
+  \item{object}{GeoRaster objectect}
   \item{cell}{integer. cell number(s)}
   \item{col}{integer. column number(s)}
   \item{row}{integer row number(s)}
   \item{x}{x coordinate(s)}
   \item{y}{y coordinate(s)}
   \item{xy}{matrix of x and y coordinates}
+  \item{...}{additional arguments. None implemented}  
 }
   
 \details{
 Cell numbers start at 1 in the upper left corner, and increase from left to right, and then from top to bottom.
-The last cell number equals the number of cells of the GeoRaster object.
+The last cell number equals the number of cells of the GeoRaster objectect.
 }
 
 \value{
@@ -65,7 +78,7 @@ xyFromCell: matrix(x,y) with coordinate pairs
 
 colFromX, rowFromY, cellFromXY, cellFromRowCol, rowFromCell, colFromCell: vector of row, column, or cell numbers
 
-rowcolFromCell: matrix of row and column numbers
+rowColFromCell: matrix of row and column numbers
 }
 
 
@@ -84,7 +97,6 @@ cellFromRowCol(r, 1, 1:3)
 colFromX(r, 10)
 rowFromY(r, 10)
 cellFromXY(r, cbind(c(10,5), c(15, 88)))
-
 }
 
 \keyword{spatial}

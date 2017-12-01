@@ -1,5 +1,8 @@
 \name{extent}
 
+\docType{methods}
+
+
 \alias{ext}
 \alias{ext<-}
 \alias{ext,GeoExtent-method}
@@ -16,10 +19,8 @@ Get a GeoExtent object of a GeoRaster object, or coordinates from such an object
 }
 
 \usage{
-ext(x, ...)
-
-ext(x) <- value
-
+\S4method{ext}{GeoRaster}(x, ...)
+\S4method{ext}{GeoRaster,GeoExtent}(x)<-value
 }
 
 \arguments{

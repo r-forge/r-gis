@@ -1,5 +1,7 @@
 \name{crop}
 
+\docType{methods}
+
 \alias{crop}
 \alias{crop,GeoRaster-method}
 

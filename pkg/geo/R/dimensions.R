@@ -29,7 +29,7 @@ setMethod('dim<-', signature(x='GeoRaster'),
 			value <- value[1:3]
 		}		
 		value <- as.integer(pmax(round(value), c(1,1,1)))
-		rst(value, as.vector(extent(x)), crs(x))
+		georst(value, as.vector(extent(x)), crs(x))
 	}
 )
 

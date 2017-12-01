@@ -9,7 +9,7 @@ if (!isGeneric("plot")) {
 		standardGeneric("plot"))
 }	
 
-setMethod("plot", signature(x='GeoRaster', y='ANY'), 
+setMethod("plot", signature(x='GeoRaster', y='missing'), 
 	function(x, y, maxpixels=500000, ...)  {
 		require(lattice)
 		m <- matrix(values(x), nrow=nrow(x), byrow=TRUE)

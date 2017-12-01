@@ -1,8 +1,11 @@
 \name{crs}
 
+\docType{methods}
+
 \alias{crs}
 \alias{crs<-}
 \alias{crs,GeoRaster-method}
+\alias{crs<-,GeoRaster-method}
 \alias{crs<-,GeoRaster,character-method}
 
 
@@ -15,7 +18,7 @@ Get or set the coordinate reference system (CRS) of a GeoRaster object.
 \usage{
 \S4method{crs}{GeoRaster}(x)
 
-crs(x, ...) <- value
+\S4method{crs}{GeoRaster}(x, ...)<-value
 }
 
 \arguments{
