@@ -2,8 +2,7 @@ using namespace std;
 #include "geo.h"
 
 GeoRaster::GeoRaster(std::string fname) {
-	createFromFile(fname);
-	setnlyr();
+	constructFromFile(fname);
 }
 		
 GeoRaster::GeoRaster() {

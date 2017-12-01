@@ -117,7 +117,7 @@ class GeoRaster {
 		void setValues(std::vector<double> _values);
 
 
-		bool createFromFile(std::string fname);
+		bool constructFromFile(std::string fname);
 
 		std::vector<double> cellFromXY (std::vector<double> x, std::vector<double> y);
 		double cellFromXY(double x, double y);

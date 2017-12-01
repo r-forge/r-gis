@@ -6,7 +6,7 @@ using namespace std;
 #include "util.h"
 
 
-bool GeoRaster::createFromFile(std::string fname) {
+bool GeoRaster::constructFromFile(std::string fname) {
 	
 	string ext = getFileExt(fname);
 	
@@ -110,11 +110,13 @@ bool GeoRaster::createFromFile(std::string fname) {
 			source.filename.push_back( setFileExt(fname, ".gri") );
 			source.driver.push_back("raster");
 			setCRS(crs);
-			
+			setnlyr();
+
 			return true;
 		}
 	} else {
 	 /// gdal files
+
 	 
 		return false;
    }
