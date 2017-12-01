@@ -4,7 +4,7 @@
 # Licence GPL v3
 
 
-setMethod('rst', signature(x='missing'), 
+setMethod('georst', signature(x='missing'), 
 	function(nrow=180, ncol=360, nlayer=1, xmin=-180, xmax=180, ymin=-90, ymax=90, crs, extent, resolution, ...) {
 
 		if (missing(extent)) {	extent <- ext(xmin, xmax, ymin, ymax) }
@@ -45,7 +45,7 @@ setMethod('rst', signature(x='missing'),
 	return(x)
 }
 
-setMethod('rst', signature(x='character'), 
+setMethod('georst', signature(x='character'), 
 	function(x, ...) {
 		f <- .fullFilename(x)
 		r <- methods::new('GeoRaster')
@@ -55,7 +55,7 @@ setMethod('rst', signature(x='character'),
 )
 
 
-setMethod('rst', signature(x='GeoRaster'), 
+setMethod('georst', signature(x='GeoRaster'), 
 	function(x, ...) {
 		r <- methods::new('GeoRaster')
 		r@ptr <- GeoRaster$new(dim(x), as.vector(ext(x)), crs(x))

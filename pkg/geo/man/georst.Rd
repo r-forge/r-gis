@@ -1,11 +1,11 @@
-\name{rst}
+\name{georst}
 
 \docType{methods}
 
-\alias{rst}
-\alias{rst,missing-method}
-\alias{rst,character-method}
-\alias{rst,GeoRaster-method}
+\alias{georst}
+\alias{georst,missing-method}
+\alias{georst,character-method}
+\alias{georst,GeoRaster-method}
 
 \title{Create a GeoRaster object}
 
@@ -21,11 +21,11 @@ When a GeoRaster is created from a file, it does (initially) not contain any cel
 
 \usage{
 
-\S4method{rst}{missing}(nrow=180, ncol=360, nlayer=1, xmin=-180, xmax=180, ymin=-90, ymax=90, crs, extent, resolution, ...)
+\S4method{georst}{missing}(nrow=180, ncol=360, nlayer=1, xmin=-180, xmax=180, ymin=-90, ymax=90, crs, extent, resolution, ...)
 
-\S4method{rst}{character}(x, ...)
+\S4method{georst}{character}(x, ...)
 
-\S4method{rst}{GeoRaster}(x, ...) 
+\S4method{georst}{GeoRaster}(x, ...) 
 
 }
 
@@ -52,7 +52,7 @@ GeoRaster
 
 \examples{
 # Create a GeoRaster object from scratch
-r1 <- rst(nrow=108, ncol=21, xmin=0, xmax=10)
+r1 <- georst(nrow=108, ncol=21, xmin=0, xmax=10)
 
 # Create a GeoRaster object from a file
 #   N.B.: For your own files, omit the 'system.file' and 'package="geo"' bits
@@ -60,9 +60,9 @@ r1 <- rst(nrow=108, ncol=21, xmin=0, xmax=10)
 
 f <- system.file("external/test.grd", package="geo")
 f
-r <- rst(f)
+r <- georst(f)
 
-logo <- rst(system.file("external/rlogo.grd", package="raster"))   
+logo <- georst(system.file("external/rlogo.grd", package="raster"))   
 }
 
 

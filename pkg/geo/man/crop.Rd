@@ -30,7 +30,7 @@ GeoRaster
 
 
 \examples{
-r <- rst(nrow=45, ncol=90)
+r <- georst(nrow=45, ncol=90)
 values(r) <- 1:ncell(r)
 e <- ext(-160, 10, 30, 60)
 rc <- crop(r, e)

@@ -69,10 +69,5 @@ RCPP_MODULE(GeoRaster){
 		.method("trim", &GeoRaster::trim, "trim")
 		
 	;	
-	
-	
+		
 }
-
-
-
-

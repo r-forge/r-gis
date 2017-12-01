@@ -59,7 +59,7 @@ integer
 
 
 \examples{
-r <- rst()
+r <- georst()
 ncell(r)
 ncol(r)
 nrow(r)

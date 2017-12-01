@@ -35,7 +35,7 @@ Same as \code{x}.
 \author{Robert J. Hijmans and Jacob van Etten}
 
 \examples{
-r <- rst(ncol=18,nrow=18)
+r <- georst(ncol=18,nrow=18)
 v <- rep(NA, ncell(r))
 v[39:49] <- 1
 v[113:155] <- 2

@@ -1,57 +1,57 @@
 # Author: Robert J. Hijmans
-# Date :  October 2008
+# Date :  October 2017
 # Version 1.0
 # Licence GPL v3
 
-yRow <- function(obj, row) {
+yFromRow <- function(obj, row) {
 	obj@ptr$yFromRow(row - 1)
 }	
 
-xCol <- function(obj, col) {
+xFromCol <- function(obj, col) {
 	obj@ptr$xFromCol(col - 1)
 }  
 
-colX <- function(obj, x)	{
+colFromX <- function(obj, x)	{
 	obj@ptr$colFromX(x) + 1
 }
 
-rowY <- function(obj, y)	{
+rowFromY <- function(obj, y)	{
 	obj@ptr$rowFromY(y) + 1
 }	
 	
-cellXY <- function(obj, xy) {
+cellFromXY <- function(obj, xy) {
 	obj@ptr$cellFromXY(xy[,1], xy[,2]) + 1
 }
 
-cellRowCol <- function(obj, row, col) {
+cellFromRowCol <- function(obj, row, col) {
 	obj@ptr$cellFromRowCol(row-1, col-1)
 }
 	
-xyCell <- function(obj, cell) {
+xyFromCell <- function(obj, cell) {
 	xy <- obj@ptr$xyFromCell(cell-1)
 	do.call(cbind, xy)
 }
 
-yCell <- function(obj, cell) {
-	xyCell(obj, cell-1)[,2]
+yFromCell <- function(obj, cell) {
+	xyFromCell(obj, cell)[,2]
 }  
 	
-xCell <- function(obj, cell) {
-	xyCell(obj, cell-1)[,1]
+xFromCell <- function(obj, cell) {
+	xyFromCell(obj, cell)[,1]
 }  
 
 
-rowcolCell <- function(obj, cell) {
+rowcolFromCell <- function(obj, cell) {
 	rc <- obj@ptr$rowColFromCell(cell-1)
 	do.call(cbind, rc)
 }
 	
-rowCell <- function(obj, cell) {
-	rowcolCell(obj, cell-1)[,1]
+rowFromCell <- function(obj, cell) {
+	rowcolFromCell(obj, cell)[,1]
 }
 
-colCell <- function(obj, cell) {
-	rowcolCell(obj, cell-1)[,2]
+colFromCell <- function(obj, cell) {
+	rowcolFromCell(obj, cell)[,2]
 }
 
 

@@ -35,7 +35,7 @@ Character
 
 
 \examples{
-s <- rst(ncols=5, nrows=5, nlayer=3)
+s <- georst(ncols=5, nrows=5, nlayer=3)
 nlayer(s)
 names(s)
 names(s) <- c('a', 'b', 'c')

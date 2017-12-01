@@ -29,7 +29,7 @@ matrix
 
 
 \examples{
-r <- rst(system.file("external/test.grd", package="geo"))
+r <- georst(system.file("external/test.grd", package="geo"))
 r
 v <- values(r)
 values(r) <- v * 10

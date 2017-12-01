@@ -1,18 +1,18 @@
-\name{xyCell}
+\name{xyRowColCell}
 
-\alias{xCol}
-\alias{yRow}
-\alias{xyCell}
-\alias{xCell}
-\alias{yCell}
+\alias{xFromCol}
+\alias{yFromRow}
+\alias{xyFromCell}
+\alias{xFromCell}
+\alias{yFromCell}
 
-\alias{cellRowCol}
-\alias{colX}
-\alias{rowY}
-\alias{cellXY}
-\alias{rowCell}
-\alias{colCell}
-\alias{rowcolCell}
+\alias{cellFromRowCol}
+\alias{colFromX}
+\alias{rowFromY}
+\alias{cellFromXY}
+\alias{rowFromCell}
+\alias{colFromCell}
+\alias{rowcolFromCell}
 
 
   
@@ -28,18 +28,18 @@ row numbers start at 1 at the top, column numbers start at 1 at the left.
 }
 
 \usage{
-xCol(obj, col)
-yRow(obj, row)
-xyCell(obj, cell)
-xCell(obj, cell)
-yCell(obj, cell)
-colX(obj, x)
-rowY(obj, y)
-cellXY(obj, xy)
-cellRowCol(obj, row, col)
-rowCell(obj, cell)
-colCell(obj, cell)
-rowcolCell(obj, cell)
+xFromCol(obj, col)
+yFromRow(obj, row)
+xyFromCell(obj, cell)
+xFromCell(obj, cell)
+yFromCell(obj, cell)
+colFromX(obj, x)
+rowFromY(obj, y)
+cellFromXY(obj, xy)
+cellFromRowCol(obj, row, col)
+rowFromCell(obj, cell)
+colFromCell(obj, cell)
+rowcolFromCell(obj, cell)
 }
 
 
@@ -59,30 +59,31 @@ The last cell number equals the number of cells of the GeoRaster object.
 }
 
 \value{
-xCol, yCol, xCell, yCell: vector of x or y coordinates 
+xFromCol, yFromCol, xFromCell, yFromCell: vector of x or y coordinates 
 
-xyCell: matrix(x,y) with coordinate pairs 
+xyFromCell: matrix(x,y) with coordinate pairs 
+
+colFromX, rowFromY, cellFromXY, cellFromRowCol, rowFromCell, colFromCell: vector of row, column, or cell numbers
+
+rowcolFromCell: matrix of row and column numbers
 }
 
-
-\seealso{
-\code{\link{cellXY}}
-}
 
 \examples{
-r <- rst()
+r <- georst()
 
-xCol(r, c(1, 120, 180))
-yRow(r, 90)
-xyCell(r, 10000)
-xyCell(r, c(0, 1, 32581, ncell(r), ncell(r)+1))
+xFromCol(r, c(1, 120, 180))
+yFromRow(r, 90)
+xyFromCell(r, 10000)
+xyFromCell(r, c(0, 1, 32581, ncell(r), ncell(r)+1))
 
-cellRowCol(r, 5, 5)
-cellRowCol(r, 1:2, 1:2)
+cellFromRowCol(r, 5, 5)
+cellFromRowCol(r, 1:2, 1:2)
+cellFromRowCol(r, 1, 1:3)
 
-colX(r, 10)
-rowY(r, 10)
-cellXY(r, cbind(c(10,5), c(15, 88)))
+colFromX(r, 10)
+rowFromY(r, 10)
+cellFromXY(r, cbind(c(10,5), c(15, 88)))
 
 }
 
