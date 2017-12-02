@@ -3,71 +3,49 @@
 // Version 0.9
 // Licence GPL v3
 
-/*
-std::vector<double> GeoRaster::sampleRegular(unsigned size, GeoExtent ext, bool cells, bool asRaster) {
+using namespace std;
+#include <vector>
+#include "geo.h"
+
+
+// std::vector<double> GeoRaster::sampleRegular(unsigned size, bool cells, bool asRaster) {
+
 
 //	stopifnot(hasValues(x) | isTRUE(xy))
 //  stopifnot(size > 0)
-	
-//	if (!hasWindow) {
-		rcut = x;
-		firstrow = 1;
-		lastrow = nrow(rcut);
-		firstcol = 1;
-		lastcol = ncol(rcut);
-*/
-/*	} else {
-		rcut = crop(raster(x), ext)
-		ext = extent(rcut)
-		yr = yres(rcut)
-		xr = xres(rcut)
-		firstrow = rowFromY(x, ext@ymax-0.5 *yr)
-		lastrow = rowFromY(x, ext@ymin+0.5*yr)
-		firstcol = colFromX(x, ext@xmin+0.5*xr)
-		lastcol = colFromX(x, ext@xmax-0.5*xr)
-	} */
+
 /*
-	allx = FALSE;
+	bool allx = false;
 	if (size >= rcut.ncell()) {
-		if (!is.null(ext)) {
-			xx = x.crop(ext);
-		}
 		if (asRaster) {
-			return(xx);
-		}
-		
-		nr = rcut.nrow;
-		nc = rcut.ncol;
-		allx = true;
+			GeoRaster r = *this;
+			return(r);
+		} 
+		unsigned n = ncell();
+		std::vector<unsigned> cells(n);
+		for (size_t i=0; i<n; i++){ cell[i] = i; }
 		
 	} else {
-	
-		Y = X = sqrt(ncell(rcut)/size)
-		nr = max(1, floor((lastrow - firstrow + 1) / Y))
-		nc = max(1, floor((lastcol - firstcol + 1) / X))
-
-		rows = (lastrow - firstrow + 1)/nr * 1:nr + firstrow - 1
-		rows = rows - (0.5 * (lastrow - firstrow + 1)/nr)
-		cols = (lastcol - firstcol + 1)/nc * 1:nc  + firstcol - 1
-		cols = cols - (0.5 * (lastcol - firstcol + 1)/nc)
-
-		cols = unique(round(cols))
-		rows = unique(round(rows))
-		cols = cols[cols > 0]
-		rows = rows[rows > 0]
-		nr = length(rows)
-		nc = length(cols)
+		double f = nrow/(nrow+ncol) 
+		double nrd = f * size;
+		double ncd = (1-f) * size;
+		f = sqrt(size/(nr*nc));
+		nrd = nrd * f;
+		ncd = ncd * f;
+		unsigned nr = round(nrd);
+		unsigned nc = round(ncd);
+		std::vector<unsigned> rows(nr);
+		std::vector<unsigned> cols(nc);
+		nrd = nrd + 1;
+		ncd = ncd + 1;
+		for (size_t i=0; i<nr; i++){ rows[i] = round((i+1) * nrow/(nrd)); }
+		for (size_t i=0; i<nc; i++){ cols[i] = round((i+1) * ncol/(ncd)); }		
+		std::vector<unsigned> cells = cellFromRowCol(rows, cols);		
 	}
 	
-	hv = hasValues(x)
-	if (allx) {
-		cell = 1:ncell(rcut)
-	} else {
-		cell = cellFromRowCol(x, rep(rows, each=nc), rep(cols, times=nr))
-	}
+
 	
-	if (asRaster) {
-			
+	if (asRaster) {			
 			if (allx) {
 				if (!is.null(ext)) {
 					return(crop(x, ext))

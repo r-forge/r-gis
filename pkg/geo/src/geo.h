@@ -83,10 +83,11 @@ class GeoRaster {
 		std::vector<string> names;
 		std::vector<bool> inMemory() { return source.memory; }
 
-		// consructors
+		// constructors
 		GeoRaster(std::string fname);
 		GeoRaster();
 		GeoRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::string _crs);
+		GeoRaster(unsigned _nrow, unsigned _ncol, unsigned _nlyr, GeoExtent ext, std::string _crs);
 		
 		double ncell() { return nrow * ncol; }
 
@@ -159,8 +160,14 @@ class GeoRaster {
 		
 		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
 		GeoRaster trim(unsigned padding=0, std::string filename="");
+		GeoRaster mask(GeoRaster mask, double maskvalue, double updatevalue, bool inverse, string filename);
+
 		GeoRaster aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename="");
+
+		std::vector<unsigned> get_aggregate_dims( std::vector<unsigned> fact );
+		std::vector<std::vector<double> > get_aggregates(std::vector<unsigned> dim);
 		
+		std::vector<double> sampleRegular(unsigned size, bool cells, bool asRaster);
 };
 
 
