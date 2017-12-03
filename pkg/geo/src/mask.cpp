@@ -4,16 +4,15 @@ using namespace std;
 #include "geo.h"
 
 
-GeoRaster GeoRaster::mask(GeoRaster mask, string filename) {
+GeoRaster GeoRaster::mask(GeoRaster mask, string filename, bool overwrite) {
 
 // check for size; need for recycling 
 	GeoRaster out = *this;
 	out.values.resize(0);
-	BlockSize bs = out.getBlockSize(filename);
- 	out.writeStart(filename);
+
+ 	out.writeStart(bs.filename, overwrite);
 	readStart();
 	mask.readStart();
-	
 	std::vector<double> v, m;
 	for (size_t i = 0; i < bs.n; i++) {
 		v = readValues(bs.row[i], bs.nrows[i], 0, ncol);

@@ -1,7 +1,7 @@
 using namespace std;
 #include "geo.h"
 
-GeoRaster GeoRaster::trim(unsigned padding, std::string filename) {
+GeoRaster GeoRaster::trim(unsigned padding, std::string filename, bool overwrite) {
 
 	unsigned nrl = nrow * nlyr;
 	unsigned ncl = ncol * nlyr;
@@ -9,7 +9,7 @@ GeoRaster GeoRaster::trim(unsigned padding, std::string filename) {
 	std::vector<double> v;
 	unsigned r;
 	for (r=0; r<nrow; r++) {
-		v = readValues(r, 1, 1, ncol);
+		v = readValues(r, 1, 0, ncol);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < ncl) {
 			break;
 		}
@@ -19,8 +19,8 @@ GeoRaster GeoRaster::trim(unsigned padding, std::string filename) {
 	}
 	unsigned firstrow = std::min(std::max(r - padding, unsigned(1)), nrow);
 
-	for (r=nrow; r>firstrow; r--) {
-		v = readValues(r, 1, 1, ncol);
+	for (r=nrow-1; r>firstrow; r--) {
+		v = readValues(r, 1, 0, ncol);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < ncl) {
 			break;
 		}
@@ -35,16 +35,16 @@ GeoRaster GeoRaster::trim(unsigned padding, std::string filename) {
 		lastrow = tmp;
 	}
 	unsigned c;
-	for (c=1; c<ncol; c++) {
-		v = readValues(1, nrow, c, 1);
+	for (c=0; c<ncol; c++) {
+		v = readValues(0, nrow, c, 1);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < nrl) {
 			break;
 		}
 	}
 	unsigned firstcol = min(max(c-padding, unsigned(1)), ncol);
 	
-	for (size_t c=ncol; c>firstcol; c--) {
-		v = readValues(1, nrow, c, 1);
+	for (size_t c=ncol-1; c>firstcol; c--) {
+		v = readValues(0, nrow, c, 1);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < nrl) {
 			break;
 		}
@@ -63,6 +63,6 @@ GeoRaster GeoRaster::trim(unsigned padding, std::string filename) {
 	
 	GeoExtent e = GeoExtent(xFromCol(firstcol)-0.5*xr, xFromCol(lastcol)+0.5*xr, yFromRow(lastrow)-0.5*yr, yFromRow(firstrow)+0.5*yr);
 	
-	return( crop(e, filename=filename) ) ;
+	return( crop(e, filename, "near", overwrite) ) ;
 }
 

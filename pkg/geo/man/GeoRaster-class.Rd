@@ -3,8 +3,10 @@
 \docType{class}
 
 \alias{GeoRaster}
+\alias{BlockSize}
 \alias{GeoRaster-class}
 \alias{Rcpp_GeoRaster-class}
+\alias{Rcpp_BlockSize-class}
 
 \alias{show,GeoRaster-method}
 

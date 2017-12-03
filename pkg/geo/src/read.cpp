@@ -3,18 +3,20 @@ using namespace std;
 #include "rst_read.h"
 
 
-void GeoRaster::readStart() {
+bool GeoRaster::readStart() {
 // for now assuming a single source
 // will have to become a loop over sources
 	if (!source.memory[0]) {
 		// open filestream
 	}
+	return true;
 }
 
-void GeoRaster::readStop() {
+bool GeoRaster::readStop() {
 	if (!source.memory[0]) {
 		// close filestream
 	}
+	return true;
 }
 
 

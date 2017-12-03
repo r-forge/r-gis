@@ -106,7 +106,7 @@ std::vector<std::vector<double> > GeoRaster::get_aggregates(std::vector<unsigned
 }
 
 
-GeoRaster GeoRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename) {
+GeoRaster GeoRaster::aggregate(std::vector<unsigned> fact, string fun, bool narm, string filename, bool overwrite) {
 
 //std::vector<double> GeoRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename) {
 

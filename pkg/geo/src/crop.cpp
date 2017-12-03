@@ -6,7 +6,7 @@ using namespace std;
 
 
 
-GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
+GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap, bool overwrite) {
 
 	GeoRaster out = *this;
 	out.values.resize(0);
@@ -38,8 +38,7 @@ GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
 
 	unsigned ncols = out.ncol;
 
-	BlockSize bs = out.getBlockSize(filename);
- 	out.writeStart(filename);
+ 	out.writeStart(filename, overwrite);
 	readStart();
 	
 	std::vector<double> v;
@@ -47,7 +46,6 @@ GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
 		v = readValues(row1+bs.row[i], bs.nrows[i], col1, ncols);	
 		out.writeValues(v, bs.row[i]);
 	} 
-	
 	out.writeStop();
 	readStop();
 	

@@ -8,7 +8,7 @@ bool canProcessInMemory() {
 	return true;
 }
 
-BlockSize GeoRaster::getBlockSize(std::string filename) {
+BlockSize GeoRaster::getBlockSize(std::string filename, bool overwrite) {
 	BlockSize bs;
 	lrtrim(filename);
 	// check of can be processed in memory
@@ -35,17 +35,20 @@ BlockSize GeoRaster::getBlockSize(std::string filename) {
 }
 
 
-GeoRaster GeoRaster::writeRaster(std::string filename) {
+GeoRaster GeoRaster::writeRaster(std::string filename, bool overwrite) {
 //	if ((filename == "") { stop}
 //	if ((!hasValues) {stop }
-	writeStart(filename);
-	writeValues(getValues(), 1);
+	writeStart(filename, overwrite);
+	writeValues(getValues(), 0);
 	writeStop();
 	return GeoRaster(filename);
 }
 
 
-void GeoRaster::writeStart(std::string filename){
+bool GeoRaster::writeStart(std::string filename, bool overwrite) {
+	
+	bs = getBlockSize(filename, overwrite);
+
 	if (filename != "") {
 		source.filename[0] = filename;
 		if (source.driver[0] == "native") {
@@ -56,10 +59,12 @@ void GeoRaster::writeStart(std::string filename){
 	} else {
 		source.filename[0] = "";
 	}
+	return true;
 }
 
 
-void GeoRaster::writeStop(){
+
+bool GeoRaster::writeStop(){
 	if (source.filename[0] != "") {
 		// close filestream
 		if (source.driver[0] == "native") {
@@ -67,9 +72,10 @@ void GeoRaster::writeStop(){
 			GeoRaster::writeHDR();
 		}
 	}
+	return true;
 }
 
-void GeoRaster::writeValues(std::vector<double> vals, unsigned row){
+bool GeoRaster::writeValues(std::vector<double> vals, unsigned row){
 	if (source.filename[0] != "") {
 		if (source.driver[0] == "native") {
 		
@@ -79,6 +85,7 @@ void GeoRaster::writeValues(std::vector<double> vals, unsigned row){
 	} else {
 		setValues(vals);
 	}
+	return true;
 }
 
 

@@ -63,10 +63,10 @@ class GeoRaster {
 		GeoExtent extent;
 		std::string crs ="+proj=longlat +datum=WGS84";
 		RasterSource source;
-
 		void setnlyr() { 
 			nlyr = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
 		}
+		BlockSize getBlockSize(std::string filename="", bool overwrite=false);
 		
 	public:
 		//double NA = std::numeric_limits<double>::quiet_NaN();
@@ -74,6 +74,9 @@ class GeoRaster {
 		unsigned nrow, ncol, nlyr;
 		unsigned size() { return ncol * nrow * nlyr ; }
 		bool hasValues;
+		
+		BlockSize bs;
+		
 		std::vector<double> values;
 		
 		std::vector<bool> hasRange;
@@ -135,7 +138,6 @@ class GeoRaster {
 		std::vector< std::vector<double> > xyFromCell( double cell );
 		std::vector< std::vector<double> > rowColFromCell(std::vector<double> cell);
 		
-		BlockSize getBlockSize(std::string filename="");
 		
 		double valuesCell(double);
 		double valuesCell(int, int);
@@ -145,23 +147,23 @@ class GeoRaster {
 		void setRange();
 		
 		
-		void readStart();
-		void readStop();
+		bool readStart();
+		bool readStop();
 		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
 		
-		void writeStart(std::string filename);
-		void writeValues(std::vector<double> vals, unsigned row);
-		void writeStop();
+		bool writeStart(std::string filename, bool overwrite);
+		bool writeValues(std::vector<double> vals, unsigned row);
+		bool writeStop();
 		bool writeHDR();
-		GeoRaster writeRaster(std::string filename);
-
+		
+		GeoRaster writeRaster(std::string filename, bool overwrite);
 		GeoExtent align(GeoExtent e, string snap="near");
 		
-		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
-		GeoRaster trim(unsigned padding=0, std::string filename="");
-		GeoRaster mask(GeoRaster mask, string filename);
+		GeoRaster crop(GeoExtent e, string filename="", string snap="near", bool overwrite=false);
+		GeoRaster trim(unsigned padding=0, std::string filename="", bool overwrite=false);
+		GeoRaster mask(GeoRaster mask, string filename="", bool overwrite=false);
 
-		GeoRaster aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename="");
+		GeoRaster aggregate(std::vector<unsigned> fact, string fun, bool narm, string filename="", bool overwrite=false);
 		//std::vector<double> aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename="");
 
 		std::vector<unsigned> get_aggregate_dims( std::vector<unsigned> fact );

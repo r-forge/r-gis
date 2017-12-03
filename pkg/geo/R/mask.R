@@ -5,9 +5,10 @@
 
 
 setMethod('mask', signature(x='GeoRaster', mask='GeoRaster'), 
-function(x, mask, filename="", ...){ 
+function(x, mask, filename="", ...) { 
+	overwrite <- .overwrite(...)
 	r <- methods::new('GeoRaster')
-	r@ptr <- x@ptr$mask(mask@ptr, filename[1])
+	r@ptr <- x@ptr$mask(mask@ptr, filename[1], overwrite)
 	return(r)
 }
 )

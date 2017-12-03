@@ -53,10 +53,11 @@ setMethod('trim', signature(x='matrix'),
 setMethod('trim', signature(x='GeoRaster'), 
 function(x, padding=0, filename='', ...) {
 
+	overwrite <- .overwrite(...)
 	r <- methods::new('GeoRaster')
-	r@ptr <- x@ptr$trim(padding, filename)
+	ptr <- try(x@ptr$trim(padding, filename, overwrite))
+	if (class(ptr) == 'try-error') { stop("trim error") } else { r@ptr <- ptr }
 	r
-
 }
 )
 

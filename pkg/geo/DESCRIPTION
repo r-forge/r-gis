@@ -12,3 +12,4 @@ Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 Description: Classes and basic methods for geographic data. 
 License: GPL (>=3)
 LazyLoad: yes
+RoxygenNote: 6.0.1

@@ -8,12 +8,12 @@
 \title{Aggregate raster cells}
 
 \description{
-Aggregate a Raster* object to create a new RasterLayer or RasterBrick with a lower resolution (larger cells). 
+Aggregate a GeoRaster object to create a new RasterLayer or RasterBrick with a lower resolution (larger cells). 
 Aggregation groups rectangular areas to create larger cells. The value for the resulting cells is computed with a user-specified function. 
 }
 
 \usage{
-\S4method{aggregate}{GeoRaster}(x, fact=2, fun=mean, na.rm=TRUE, filename='', ...)
+\S4method{aggregate}{GeoRaster}(x, fact=2, fun="mean", na.rm=TRUE, filename='', ...)
 }
 
 \arguments{
@@ -27,7 +27,7 @@ Aggregation groups rectangular areas to create larger cells. The value for the r
 
 
 \details{
-Aggregation starts at the upper-left end of a raster. If a division of the number of columns or rows with \code{factor} does not return an integer, the extent of the resulting Raster object will either be somewhat smaller or somewhat larger then the original RasterLayer. For example, if an input RasterLayer has 100 columns, and \code{fact=12}, the output Raster object will have 9 columns and the maximum x coordinate (and perhaps minimum y coordinate) of the output GeoRaster is also adjusted.
+Aggregation starts at the upper-left end of a raster. If a division of the number of columns or rows with \code{factor} does not return an integer, the extent of the resulting Raster object will be somewhat larger then that of the original GeoRaster. For example, if an input RasterLayer has 100 columns, and \code{fact=12}, the output Raster object will have 9 columns and the maximum x coordinate of the output GeoRaster is also adjusted.
   
 The function \code{fun} should take multiple numbers, and return a single number. For example \code{mean}, \code{modal}, \code{min} or \code{max}. 
 It should also accept a \code{na.rm} argument (or ignore it as one of the 'dots' arguments). 
