@@ -44,11 +44,6 @@ array3D GeoRaster::readValues3D(unsigned row, unsigned nrows, unsigned col, unsi
 	// have to make sure that this happens at the right places
 	// and not more than once ..
 	
-	if (is_R) {
-		row = row-1;
-		col = col-1;
-	}
-	
 	// for now
 	unsigned nlyrs = nlyr;
 	

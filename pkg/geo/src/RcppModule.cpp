@@ -10,7 +10,6 @@ NumericMatrix getValuesM(GeoRaster* r) {
 	return(x);
 }
 
-
 RCPP_EXPOSED_CLASS(GeoRaster)
 RCPP_EXPOSED_CLASS(GeoExtent)
 	
@@ -67,7 +66,11 @@ RCPP_MODULE(GeoRaster){
 
 		.method("crop", &GeoRaster::crop, "crop")
 		.method("trim", &GeoRaster::trim, "trim")
-		
+		.method("mask", &GeoRaster::mask, "mask")
+		.method("aggregate", &GeoRaster::aggregate, "aggregate")
+		.method("get_aggregates", &GeoRaster::get_aggregates, "get_aggregates")
+		.method("get_aggregate_dims", &GeoRaster::get_aggregate_dims, "get_aggregate_dims")
+			
 	;	
 		
 }

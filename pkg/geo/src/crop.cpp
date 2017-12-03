@@ -44,7 +44,7 @@ GeoRaster GeoRaster::crop(GeoExtent e, std::string filename, std::string snap) {
 	
 	std::vector<double> v;
 	for (size_t i = 0; i < bs.n; i++) {
-		v = readValues(row1+bs.row[i]-1, bs.nrows[i], col1, ncols);	
+		v = readValues(row1+bs.row[i], bs.nrows[i], col1, ncols);	
 		out.writeValues(v, bs.row[i]);
 	} 
 	

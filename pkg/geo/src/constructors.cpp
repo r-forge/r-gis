@@ -38,9 +38,10 @@ GeoRaster::GeoRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::st
 	source.layers[0][1] = 1;
 	source.datatype.push_back("");
 	crs=_crs;
-	for (unsigned i=0; i<rcl[2]; i++) {	names.push_back("lyr." + std::to_string(i)) ; }
+	for (unsigned i=0; i < rcl[2]; i++) {	names.push_back("lyr." + std::to_string(i+1)) ; }
 	setnlyr();	
 }
+
 
 GeoRaster::GeoRaster(unsigned _nrow, unsigned _ncol, unsigned _nlyr, GeoExtent ext, std::string _crs) {
 	nrow=_nrow; ncol=_ncol;
@@ -55,7 +56,7 @@ GeoRaster::GeoRaster(unsigned _nrow, unsigned _ncol, unsigned _nlyr, GeoExtent e
 	source.layers[0][1] = 1;
 	source.datatype.push_back("");
 	crs=_crs;
-	for (unsigned i=0; i < _nlyr; i++) {	names.push_back("lyr." + std::to_string(i)) ; }
+	for (unsigned i=0; i < _nlyr; i++) {	names.push_back("lyr." + std::to_string(i+1)) ; }
 	setnlyr();	
 }
 

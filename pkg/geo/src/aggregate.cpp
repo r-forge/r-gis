@@ -7,21 +7,60 @@ using namespace std;
 #include "geo.h"
 
 
+template <typename T>
+std::vector<T> flatten(const std::vector<std::vector<T>>& v) {
+    std::size_t total_size = 0;
+    for (const auto& sub : v)
+        total_size += sub.size(); // I wish there was a transform_accumulate
+    std::vector<T> result;
+    result.reserve(total_size);
+    for (const auto& sub : v)
+        result.insert(result.end(), sub.begin(), sub.end());
+    return result;
+}
+
+std::vector<double> flat(std::vector<std::vector<double>> v) {
+    unsigned s1 = v.size();
+    unsigned s2 = v[0].size();
+	
+	std::size_t s = s1 * s2;
+    std::vector<double> result(s);
+    for (size_t i=0; i<s1; i++) {
+		for (size_t j=0; j<s2; j++) {
+			result[i*s2+j] = v[i][j];
+		}
+	}
+	return result;
+}
+
 
 std::vector<unsigned> GeoRaster::get_aggregate_dims( std::vector<unsigned> fact ) {
 	// fact has aggregation factors in the three dimensions
-	// int dy = dim[0], dx = dim[1], dz = dim[2];
+	unsigned fs = fact.size();
 	fact.resize(6);
+	if (fs == 1) {
+		fact[1] = fact[0];
+		fact[2] = 1;		
+	} else if (fs == 2) {
+		fact[2] = 1;		
+	}
+	// int dy = dim[0], dx = dim[1], dz = dim[2];
+	fact[0] = std::max(unsigned(1), std::min(fact[0], nrow));
+	fact[1] = std::max(unsigned(1), std::min(fact[1], ncol));
+	fact[2] = std::max(unsigned(1), std::min(fact[2], nlyr));
 	// new dimensions: rows, cols, lays
-	fact[3] = std::ceil(nrow / fact[0]);
-	fact[4] = std::ceil(ncol / fact[1]);
-	fact[5] = std::ceil(nlyr / fact[2]);
+	fact[3] = std::ceil(double(nrow) / fact[0]);
+	fact[4] = std::ceil(double(ncol) / fact[1]);
+	fact[5] = std::ceil(double(nlyr) / fact[2]);
 	return fact;
 }
 
 
 std::vector<std::vector<double> > GeoRaster::get_aggregates(std::vector<unsigned> dim) {
 	// blocks per row (=ncol), col (=nrow) 
+	
+//	dim = get_aggregate_dims(dim);
+	
 	unsigned dy = dim[0], dx = dim[1], dz = dim[2];
 	unsigned bpC = dim[3];
 	unsigned bpR = dim[4];
@@ -69,7 +108,9 @@ std::vector<std::vector<double> > GeoRaster::get_aggregates(std::vector<unsigned
 
 GeoRaster GeoRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename) {
 
-	fact = get_aggregate_dims(fact);
+//std::vector<double> GeoRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename) {
+
+//	fact = get_aggregate_dims(fact);
 	
 	unsigned f = 1, mean = 0; // sum
 	if (fun == "mean") {
@@ -81,19 +122,23 @@ GeoRaster GeoRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun
 		f = 3;	
 	}
 
-	// output: each row is a new cell 
-	double NA = std::numeric_limits<double>::quiet_NaN();
+
+	double xmax = extent.xmin + fact[4] * yres();
+	double ymin = extent.ymax - fact[5] * xres();
+	GeoExtent e = GeoExtent(extent.xmin, xmax, ymin, extent.ymax);
+	GeoRaster r = GeoRaster(fact[3], fact[4], fact[5], e, crs);
+
+	if (!hasValues) { return r; }
 	
-	std::vector< std::vector<double> > v(fact[3]*fact[4], std::vector<double>(fact[5], NA));
-											 
-	// get the aggregates	
+	// output: each row is a new cell 
+	std::vector< std::vector<double> > v(fact[5], std::vector<double>(fact[3]*fact[4]));
+
 	// get the aggregates	
 	std::vector<std::vector< double > > a = get_aggregates(fact);
 
 	int nblocks = a.size();
 	int naggs = a[0].size();
- 	
- 
+
 	for (int i = 0; i < nblocks; i++) {
 		unsigned row = (i / ncol) % nrow; 
 		unsigned col = i % ncol;
@@ -107,12 +152,11 @@ GeoRaster GeoRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun
 			x = - std::numeric_limits<double>::infinity() ; 
 		} 
 		
-		double cnt = 0;
-		
+		double cnt = 0;	
 		for (int j = 0; j < naggs; j++) {
 			if (std::isnan(a[i][j])) {
 				if (!narm) {
-					x = NA;
+					x = NAN;
 					goto breakout;
 				}
 			} else {
@@ -131,21 +175,17 @@ GeoRaster GeoRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun
 				x = x / cnt;
 			} 
 		} else {
-		  x = NA;
+			x = NAN;
 		}
 		breakout:
-		v[cell][lyr] = x;
+		v[lyr][cell] = x;
 	}
 	
-	double xmax = extent.xmin + fact[4] * yres();
-	double ymin = extent.ymax - fact[5] * xres();
-	GeoExtent e = GeoExtent(extent.xmin, xmax, ymin, extent.ymax);
-	GeoRaster r = GeoRaster(fact[3], fact[4], fact[5], e, crs);
-	
-	// transform v to single dim vector first
-	//r.values = v; 
-	
+
+	r.setValues( flat(v) ); 
+
 	return(r);
+
 }
 
 

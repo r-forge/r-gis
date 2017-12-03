@@ -3,7 +3,7 @@ using namespace std;
 #include "rst_read.h"
 
 
-void GeoRaster::readStart(){
+void GeoRaster::readStart() {
 // for now assuming a single source
 // will have to become a loop over sources
 	if (!source.memory[0]) {
@@ -11,7 +11,7 @@ void GeoRaster::readStart(){
 	}
 }
 
-void GeoRaster::readStop(){
+void GeoRaster::readStop() {
 	if (!source.memory[0]) {
 		// close filestream
 	}
@@ -20,11 +20,6 @@ void GeoRaster::readStop(){
 
 std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols){
 	
-	if (is_R) {
-		row = row-1;
-		col = col-1;
-	}
-
 //	unsigned nlayers = nlyr();
 	unsigned nr = std::min(nrows, nrow-row);
 	unsigned nc = std::min(ncols, ncol-col);
@@ -38,8 +33,8 @@ std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned
 	if (source.memory[0]) {
 		size_t k = 0;
 		size_t ij;
-		for (size_t i = (row-1); i < (row+nrows-1); i++) {
-			for (size_t j = (col-1); j < (col+ncols-1); j++) {
+		for (size_t i = row; i < (row+nrows); i++) {
+			for (size_t j = col; j < (col+ncols); j++) {
 				ij = i * ncol + j;
 				out[k] = values[ij];
 				k++;
@@ -56,13 +51,10 @@ std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned
 
 
 std::vector<double>  GeoRaster::getValues() { 
-
 	if (source.memory[0]) {
-
 		return values; 
 	} else {
-
-		return readValues(1, nrow, 1, ncol);
+		return readValues(0, nrow, 0, ncol);
 	}
 }
 

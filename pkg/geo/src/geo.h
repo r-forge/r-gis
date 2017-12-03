@@ -63,7 +63,6 @@ class GeoRaster {
 		GeoExtent extent;
 		std::string crs ="+proj=longlat +datum=WGS84";
 		RasterSource source;
-		bool is_R = true;
 
 		void setnlyr() { 
 			nlyr = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
@@ -160,9 +159,10 @@ class GeoRaster {
 		
 		GeoRaster crop(GeoExtent e, string filename="", string snap="near");
 		GeoRaster trim(unsigned padding=0, std::string filename="");
-		GeoRaster mask(GeoRaster mask, double maskvalue, double updatevalue, bool inverse, string filename);
+		GeoRaster mask(GeoRaster mask, string filename);
 
 		GeoRaster aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename="");
+		//std::vector<double> aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename="");
 
 		std::vector<unsigned> get_aggregate_dims( std::vector<unsigned> fact );
 		std::vector<std::vector<double> > get_aggregates(std::vector<unsigned> dim);

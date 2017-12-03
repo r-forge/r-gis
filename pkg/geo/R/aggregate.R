@@ -8,16 +8,31 @@
 # June 2014: support for aggregation over z (layers) in addition to x and y
 
 
+.makeTextFun <- function(fun) {
+	if (class(fun) != 'character') {
+		if (is.primitive(fun)) {
+			test <- try(deparse(fun)[[1]], silent=TRUE)
+			if (test == '.Primitive(\"sum\")') { fun <- 'sum' 
+			} else if (test == '.Primitive(\"min\")') { fun <- 'min' 
+			} else if (test == '.Primitive(\"max\")') { fun <- 'max' 
+			}
+		} else {
+			test1 <- isTRUE(try( deparse(fun)[2] == 'UseMethod(\"mean\")', silent=TRUE))
+			test2 <- isTRUE(try( fun@generic == 'mean', silent=TRUE))
+			if (test1 | test2) { 
+				fun <- 'mean' 
+			}
+		} 
+	}
+	return(fun)
+}
+
+
 setMethod('aggregate', signature(x='GeoRaster'), 
 function(x, fact=2, fun='mean', expand=TRUE, na.rm=TRUE, filename="", ...)  {
-
 	fact <- round(fact)
 	lf <- length(fact)
-	if (lf == 1) {
-		fact <- c(fact, fact, 1)
-	} else if (lf == 2) {
-		fact <- c(fact, 1)
-	} else if (lf > 3) {
+	if (lf > 3) {
 		stop('fact should have length 1, 2, or 3')
 	}
 	if (any(fact < 1)) {
@@ -27,46 +42,34 @@ function(x, fact=2, fun='mean', expand=TRUE, na.rm=TRUE, filename="", ...)  {
 		warning('all fact(s) were 1, nothing to aggregate')
 		return(x)
 	}
-	xfact <- fact[1]
-	yfact <- fact[2]
-	zfact <- fact[3]
-	
-	ncx <- ncol(x)
-	nrx <- nrow(x)
-	nlx <- nlayers(x)
-	if (xfact > ncx) {
-		warning('aggregation factor is larger than the number of columns') 
-		 xfact <- ncx 
-		 if (!na.rm) xfact <- xfact + 1
-	}
-	if (yfact > nrx) {
-		warning('aggregation factor is larger than the number of rows')
-		yfact <- nrx
-		if (!na.rm) yfact <- yfact + 1
-	}
-	if (zfact > nlx) {
-		warning('aggregation factor is larger than the number of layers')
-		zfact <- nlx
-		if (!na.rm) zfact <- zfact + 1
-	}
-
+	dims <- x@ptr$get_aggregate_dims(fact)
 	fun <- .makeTextFun(fun)
 	if (class(fun) == 'character') { 
 		op <- as.integer(match(fun, c('sum', 'mean', 'min', 'max')) - 1)
 	} else {
 		op <- NA
 	}
-	
-	if (!is.na(op)) {
-	
-		dims <- as.integer(yfact, xfact, zfact);
+
+	if (!is.na(op)) {	
 		r <- methods::new('GeoRaster')
 		#	fun='mean', expand=TRUE, na.rm=TRUE, filename=""
-		r@ptr <- x@ptr$aggregate(dims);
+		ptr <- try(x@ptr$aggregate(dims, na.rm, fun, filename));
+		if (class(ptr) == 'try-error') {
+			stop("aggregate error")
+		} else {
+			r@ptr <- ptr
+		}
 		return(r)
 	} else {
-	
-		
+		e <- as.vector(ext(x))
+		rs <- res(x)
+		e[2] = e[1] + dims[4] * rs[2];
+		e[3] = e[4] - dims[5] * rs[1];
+		a <- georst(nrow=dims[4], ncol=dims[4], nlyr=dims[6],  crs=crs(x), ext=e)
+		v <- x@ptr$get_aggregates(dims)
+		v <- do.call(rbind, v)
+		values(a) <- apply(v, 1, fun, na.rm=na.rm)
+		a		
 	}
 }
 )

@@ -4,13 +4,7 @@ using namespace std;
 #include "geo.h"
 
 
-std::vector<std::vector<double> > matrix(int nrow, int ncol) {
-	std::vector<std::vector<double> > m (nrow, std::vector<double>(ncol));
-	return(m);
-}
-
-
-GeoRaster GeoRaster::mask(GeoRaster mask, double maskvalue, double updatevalue, bool inverse, string filename) {
+GeoRaster GeoRaster::mask(GeoRaster mask, string filename) {
 
 // check for size; need for recycling 
 	GeoRaster out = *this;
@@ -21,38 +15,32 @@ GeoRaster GeoRaster::mask(GeoRaster mask, double maskvalue, double updatevalue, 
 	mask.readStart();
 	
 	std::vector<double> v, m;
-	if (inverse) {
-		for (size_t i = 0; i < bs.n; i++) {
-			v = readValues(bs.row[i], bs.nrows[i], 1, ncol);
-			m = mask.readValues(bs.row[i], bs.nrows[i], 1, ncol);
-			for (size_t i=0; i < v.size(); i++) {
-				if (m[i] != maskvalue) {
-					v[i] = updatevalue;
-				} 
-			}
-			out.writeValues(v, bs.row[i]);
-		}	
-	} else {
-		for (size_t i = 0; i < bs.n; i++) {
-			v = readValues(bs.row[i], bs.nrows[i], 1, ncol);
-			m = mask.readValues(bs.row[i], bs.nrows[i], 1, ncol);
-			for (size_t i=0; i < v.size(); i++) {
-				if (m[i] == maskvalue) {
-					v[i] = updatevalue;
-				} 
-			}
-			out.writeValues(v, bs.row[i]);
+	for (size_t i = 0; i < bs.n; i++) {
+		v = readValues(bs.row[i], bs.nrows[i], 0, ncol);
+		m = mask.readValues(bs.row[i], bs.nrows[i], 0, ncol);
+		for (size_t i=0; i < v.size(); i++) {
+			if (std::isnan(m[i])) {
+				v[i] = NAN;
+			} 
 		}
+		out.writeValues(v, bs.row[i]);
 	}
-
 	out.writeStop();
 	readStop();	
 	mask.readStop();	
+	
 	return(out);
 }
 
 
 /*
+
+std::vector<std::vector<double> > matrix(int nrow, int ncol) {
+	std::vector<std::vector<double> > m (nrow, std::vector<double>(ncol));
+	return(m);
+}
+
+
 int main() {
 	std::vector<vector<double> > d = matrix(10, 2);
 	std::vector<double> m (10);

@@ -22,13 +22,13 @@ BlockSize GeoRaster::getBlockSize(std::string filename) {
 	bs.filename = filename;
 	if (filename == "") {
 	// in memory
-		bs.row = {1};
-		bs.nrows = {nrow};
+		bs.row = {0};
+		bs.nrows = {nrow-1};
 		bs.n = 1;
 	} else {
 	// to be improved, see raster::blockSize
-		bs.row = {1, unsigned(ceil(nrow/2))};
-		bs.nrows = {bs.row[1] - 1, nrow-bs.row[1] + 1};
+		bs.row = {0, unsigned(floor(nrow/2))};
+		bs.nrows = {bs.row[1], nrow-bs.row[1]};
 		bs.n = 2;
 	}
 	return bs;
@@ -38,7 +38,6 @@ BlockSize GeoRaster::getBlockSize(std::string filename) {
 GeoRaster GeoRaster::writeRaster(std::string filename) {
 //	if ((filename == "") { stop}
 //	if ((!hasValues) {stop }
-	
 	writeStart(filename);
 	writeValues(getValues(), 1);
 	writeStop();
@@ -87,19 +86,18 @@ void GeoRaster::setValues(std::vector<double> _values) {
 	//bool result = false;
 	//if (_values.size() == size()) {
 		values = _values;
-		
-		std::vector<bool> mem {true};
-		source.memory = mem;
+		hasValues = true;
+
+		source.memory = std::vector<bool> {true};
 		// todo clear source...
 		setRange();
-		hasValues = true;
-		std::vector<string> n {"layer"};
-		names = n;
-				
+
+		//names = std::vector<string> {"layer"};
 		//result = true;
 	//} 
 	//return (result);
 }
+
 
 
 void vector_minmax(std::vector<double> v, double &min, int &imin, double &max, int &imax) {
@@ -128,9 +126,9 @@ void GeoRaster::setRange() {
 	int imin, imax;
 	// for each layer {
 		vector_minmax(values, vmin, imin, vmax, imax); 
-		range_min.push_back(vmin);
-		range_max.push_back(vmax);
-		hasRange.push_back(true);
+		range_min = std::vector<double> {vmin};
+		range_max = std::vector<double> {vmax};
+		hasRange = std::vector<bool> {true};
 	//}
 }
 
