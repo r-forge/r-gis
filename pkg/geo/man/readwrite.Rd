@@ -46,7 +46,9 @@ If you want to write all values of a Raster* object at once, you can also use \c
 
 
 \value{
-GeoRaster
+\code{writeStart} returns a list that can be used for processing the file in chunks.
+
+The other methods invisibly return a logical value indicating whether they were succesful or not. Their purpose is the side-effect of opening or closing files. 
 }
 
 \keyword{ spatial }

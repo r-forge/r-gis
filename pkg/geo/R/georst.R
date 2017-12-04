@@ -36,7 +36,7 @@ setMethod('georst', signature(x='missing'),
 
 
 .fullFilename <- function(x, expand=FALSE) {
-	x <- trim(x)
+	x <- trimws(x)
 	if (identical(basename(x), x)) {
 		x <- file.path(getwd(), x)
 	}

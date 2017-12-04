@@ -9,12 +9,12 @@ setMethod('crop', signature(x='GeoRaster', y='ANY'),
 function(x, y, filename="", snap="near", ...) {
 
 	if (!inherits(y, 'GeoExtent')) {
-		y <- ext(y)
+		y <- try(ext(y))
+		if (class(y) == 'try-error') { stop("cannot get an extent from y") }
 	}
 	
 	overwrite <- .overwrite(...)
 	r <- methods::new('GeoRaster')
-	
 	ptr <- try(x@ptr$crop(y@ptr, filename, snap, overwrite))
 	if (class(ptr) == 'try-error') { stop("crop error") } else { r@ptr <- ptr }
 

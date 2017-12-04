@@ -1,15 +1,15 @@
 Package: geo
 Type: Package
 Title: raster data
-Version: 0.0-1
-Date: 2017-11-30
+Version: 0.0-2
+Date: 2017-12-3
 Depends: methods
-LinkingTo: Rcpp
+LinkingTo: Rcpp,RcppArmadillo
 Imports: Rcpp
 SystemRequirements: C++11
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
-Description: Classes and basic methods for geographic data. 
+Description: Classes and basic methods for geographic data 
 License: GPL (>=3)
 LazyLoad: yes
 RoxygenNote: 6.0.1

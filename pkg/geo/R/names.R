@@ -34,7 +34,7 @@
 
 
 .validNames <- function(x, prefix='lyr') {
-	x <- trim(as.character(x))
+	x <- trimws(as.character(x))
 	x[is.na(x)] <- ""
 #	if (.standardnames()) {
 		x[x==''] <- prefix

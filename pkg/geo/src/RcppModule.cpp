@@ -10,7 +10,13 @@ NumericMatrix getValuesM(GeoRaster* r) {
 	return(x);
 }
 
-RCPP_EXPOSED_CLASS(BlockSize)
+List getBlockSizeR(GeoRaster* r) {              //+1 for R
+	List L = List::create(Named("row") = r->bs.row, Named("nrows") = r->bs.nrows, 
+	                      Named("n") = r->bs.n, Named("filename")=r->bs.filename);
+	return(L);
+}
+
+
 RCPP_EXPOSED_CLASS(GeoExtent)
 RCPP_EXPOSED_CLASS(GeoRaster)
 	
@@ -18,15 +24,6 @@ RCPP_MODULE(GeoRaster){
     using namespace Rcpp;
 
 
-    class_<BlockSize>("BlockSize")
-		.constructor()
-		.field("row", &BlockSize::row)
-		.field("nrows", &BlockSize::nrows)
-		.field("n", &BlockSize::n)
-		.field("filename", &BlockSize::filename)
-	;	
-	
-	
     class_<GeoExtent>("GeoExtent")
 		.constructor()
 		.constructor<double, double, double, double>()
@@ -52,13 +49,13 @@ RCPP_MODULE(GeoRaster){
 		.method("readStop", &GeoRaster::readStop, "readStop") 
 		.method("readValues", &GeoRaster::readValues, "readValues")	
 		.method("getValues", &getValuesM)
+		.method("getBlockSize", &getBlockSizeR)
 		.property("values", &GeoRaster::getValues, &GeoRaster::setValues )	
 
 		.method("setRange", &GeoRaster::setRange, "setRange")
 		.method("writeStart", &GeoRaster::writeStart, "writeStart") 
 		.method("writeStop", &GeoRaster::writeStop, "writeStop") 
 		.method("writeValues", &GeoRaster::writeValues, "writeValues") 
-		.field_readonly("blockSize", &GeoRaster::bs )
 
 		.method("writeRaster", &GeoRaster::writeRaster, "writeRaster")
 		

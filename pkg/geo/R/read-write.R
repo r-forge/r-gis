@@ -5,7 +5,6 @@
 
 
 
-
 setMethod('readStart', signature(x='GeoRaster'), 
 	function(x, ...) {
 		success <- try(x@ptr$readStart(), silent=TRUE)
@@ -35,8 +34,9 @@ setMethod('writeStart', signature(x='GeoRaster', filename='character'),
 		if (inherits(success, "try-error")) {
 			stop("Cannot open file for writing")
 		} 
-		b <- x@ptr$blockSize 
-		bb <- list(row=b$row+1, nrows=b$nrows, n=b$n, filename=b$filename) 
+		b <- x@ptr$getBlockSize()
+		b$row <- b$row + 1
+		b		
 	}
 )
 
@@ -60,5 +60,20 @@ setMethod('writeValues', signature(x='GeoRaster', v='vector'),
 		}
 		invisible(success)
 	}
+)
+
+
+
+setMethod('writeRaster', signature(x='GeoRaster', filename='character'), 
+function(x, filename, ...) {
+	if (!hasValues(x)) {
+		warning('all cell values are NA')
+	}
+	success <- try(x@ptr$writeRaster(filename), silent=TRUE)
+	if (!isTRUE(success)) {
+		stop("Cannot write to the output file")
+	}
+	invisible(success)
+}	
 )
 
