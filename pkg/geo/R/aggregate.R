@@ -65,11 +65,7 @@ function(x, fact=2, fun='mean', na.rm=TRUE, filename="", ...)  {
 		r <- methods::new('GeoRaster')
 		#	fun='mean', expand=TRUE, na.rm=TRUE, filename=""
 		ptr <- try(x@ptr$aggregate(dims, fun, na.rm, filename, overwrite));
-		if (class(ptr) == 'try-error') {
-			stop("aggregate error")
-		} else {
-			r@ptr <- ptr
-		}
+		if (class(ptr) == 'try-error') { stop("aggregate error") } else { r@ptr <- ptr }
 		return(r)
 	} else {
 		e <- as.vector(ext(x))

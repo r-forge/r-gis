@@ -37,9 +37,8 @@ Same as \code{x}.
 \examples{
 r <- georst(ncol=18,nrow=18)
 v <- rep(NA, ncell(r))
-v[39:49] <- 1
-v[113:155] <- 2
-v[200] <- 6
+v[39:40] <- 1
+v[205] <- 2
 values(r) <- v
 s <- trim(r) 
 

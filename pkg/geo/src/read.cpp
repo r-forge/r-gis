@@ -23,20 +23,26 @@ bool GeoRaster::readStop() {
 std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols){
 	
 //	unsigned nlayers = nlyr();
-	unsigned nr = std::min(nrows, nrow-row);
-	unsigned nc = std::min(ncols, ncol-col);
-	if ((nr != nrows) || (nc != ncols)) {
+	unsigned  r = std::min(std::max(unsigned(0), row), nrow-1);
+	unsigned  c = std::min(std::max(unsigned(0), col), ncol-1);
+	unsigned nr = std::max(unsigned(1), std::min(nrows, nrow-r));
+	unsigned nc = std::max(unsigned(1), std::min(ncols, ncol-c));
+	if ((r != row) || (c != col) || (nr != nrows) || (nc != ncols)) {
 		// message
+		row = r;
+		col = c;
 		nrows = nr;
 		ncols = nc;
 	}
+	unsigned endrow = row + nrows;
+	unsigned endcol = col + ncols;
 	
 	std::vector<double> out(nrows*ncols);
 	if (source.memory[0]) {
 		size_t k = 0;
 		size_t ij;
-		for (size_t i = row; i < (row+nrows); i++) {
-			for (size_t j = col; j < (col+ncols); j++) {
+		for (size_t i = row; i < endrow; i++) {
+			for (size_t j = col; j < endcol; j++) {
 				ij = i * ncol + j;
 				out[k] = values[ij];
 				k++;

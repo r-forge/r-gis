@@ -8,7 +8,7 @@
 \alias{writeStop}
 \alias{writeValues}
 
-\alias{readStart,GeoRaster}
+\alias{readStart,GeoRaster-method}
 \alias{readStop,GeoRaster-method}
 \alias{writeStart,GeoRaster,character-method}
 \alias{writeStop,GeoRaster-method}
