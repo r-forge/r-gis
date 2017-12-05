@@ -52,9 +52,10 @@ bool GeoRaster::writeStart(std::string filename, bool overwrite) {
 	if (filename != "") {
 		source.filename[0] = filename;
 		if (source.driver[0] == "native") {
-			// open filestream
+			
+//			filestream = std::ofstream(filename, ios::out | ios::binary);
 		} else {
-			// open filestream		
+			// open GDAL filestream		
 		}
 	} else {
 		source.filename[0] = "";
@@ -66,6 +67,10 @@ bool GeoRaster::writeStart(std::string filename, bool overwrite) {
 
 bool GeoRaster::writeStop(){
 	if (source.filename[0] != "") {
+		if (source.driver[0] == "native") {
+		//	*filestream.close();
+		}
+		
 		// close filestream
 		if (source.driver[0] == "native") {
 			//bool ok = 

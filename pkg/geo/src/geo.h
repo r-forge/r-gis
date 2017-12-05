@@ -3,6 +3,7 @@ using namespace std;
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 
 class GeoExtent {
@@ -67,6 +68,7 @@ class GeoRaster {
 			nlyr = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
 		}
 		BlockSize getBlockSize(std::string filename="", bool overwrite=false);
+//		std::ofstream filestream;
 		
 	public:
 		//double NA = std::numeric_limits<double>::quiet_NaN();
