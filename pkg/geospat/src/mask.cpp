@@ -9,20 +9,19 @@ GeoRaster GeoRaster::mask(GeoRaster mask, string filename, bool overwrite) {
 // check for size; need for recycling 
 	GeoRaster out = *this;
 	out.values.resize(0);
-
- 	out.writeStart(bs.filename, overwrite);
+  	out.writeStart(filename, overwrite);
 	readStart();
 	mask.readStart();
 	std::vector<double> v, m;
-	for (size_t i = 0; i < bs.n; i++) {
-		v = readValues(bs.row[i], bs.nrows[i], 0, ncol);
-		m = mask.readValues(bs.row[i], bs.nrows[i], 0, ncol);
+	for (size_t i = 0; i < out.bs.n; i++) {
+		v = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);
+		m = mask.readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);
 		for (size_t i=0; i < v.size(); i++) {
 			if (std::isnan(m[i])) {
 				v[i] = NAN;
 			} 
 		}
-		out.writeValues(v, bs.row[i]);
+		out.writeValues(v, out.bs.row[i]);
 	}
 	out.writeStop();
 	readStop();	

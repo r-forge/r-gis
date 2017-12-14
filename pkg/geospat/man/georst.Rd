@@ -14,8 +14,7 @@ Methods to create a GeoRaster object. RasterLayer objects can be created from sc
 
 A GeoRaster represents a geospatially references surface divided into rows, columns, and layers.
 
-When a GeoRaster is created from a file, it does (initially) not contain any cell (pixel) values in (RAM) memory, it only has the parameters that describe the RasterLayer. You can access cell-values with \code{\link[raster]{values}, \link[raster]{extract}} and related functions. You can assign new values with  \code{\link[raster]{values}}.
-
+When a GeoRaster is created from a file, it does (initially) not contain any cell (pixel) values in (RAM) memory, it only has the parameters that describe the GeoRaster. You can access cell-values with \code{\link{values}}.
 }
 
 
@@ -26,7 +25,6 @@ When a GeoRaster is created from a file, it does (initially) not contain any cel
 \S4method{georst}{character}(x, ...)
 
 \S4method{georst}{GeoRaster}(x, ...) 
-
 }
 
 \arguments{

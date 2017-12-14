@@ -1,2 +1,2 @@
 
-loadModule("geospat", TRUE)
+loadModule("geo", TRUE)

@@ -1,15 +1,15 @@
 Package: geospat
 Type: Package
 Title: raster data
-Version: 0.0-2
-Date: 2017-12-3
+Version: 0.0-3
+Date: 2017-12-13
 Depends: methods
-LinkingTo: Rcpp,RcppArmadillo
+LinkingTo: Rcpp, RcppArmadillo
 Imports: Rcpp
 SystemRequirements: C++11
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
-Description: Classes and basic methods for geographic data 
+Description: Classes and basic methods for geographic data, notably raster data. This package is to replace the raster package.
 License: GPL (>=3)
 LazyLoad: yes
 RoxygenNote: 6.0.1
