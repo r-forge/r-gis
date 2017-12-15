@@ -26,23 +26,24 @@ bool GeoRaster::constructFromFile(std::string fname) {
 			double ymax = atof(ini.GetValue("georeference", "ymax"));	
 			GeoExtent e(xmin, xmax, ymin, ymax);
 
-			std::vector<double> dmin, dmax; 			
 			unsigned nlyrs;
 			double vna;
-			string dtp, crs;
-			unsigned version = atoi(ini.GetValue("version", "version", "1"));
-			if (version == 1) {
+			string dtp, crs, smin, smax;
+			std::vector<double> dmin, dmax; 			
+
+			string version = ini.GetValue("version", "version", "1");
+			if (version == "1") {
 				unsigned nrows = atoi(ini.GetValue("georeference", "nrows"));
 				unsigned ncols = atoi(ini.GetValue("georeference", "ncols"));
 				GeoExtent e(xmin, xmax, ymin, ymax);
-				if (nlyr == 0) {
+//				if (nlyr == 0) {
 					setExtent(e, false);
 					ncol = ncols;
 					nrow = nrows;
 					
-				} else if (!compare(nrows, ncols, e)) {
-					return false;
-				}
+	//			} else if (!compare(nrows, ncols, e)) {
+	//				return false;
+	//			}
 				
 				crs = ini.GetValue("georeference", "projection");
 
@@ -50,8 +51,8 @@ bool GeoRaster::constructFromFile(std::string fname) {
 				nlyrs = atoi(ini.GetValue("data", "nbands"));
 				vna  = atof(ini.GetValue("data", "nodatavalue"));
 
-				string smin = ini.GetValue("data", "minvalue");
-				string smax = ini.GetValue("data", "maxvalue");
+				smin = ini.GetValue("data", "minvalue");
+				smax = ini.GetValue("data", "maxvalue");
 				dmin = str2dbl(strsplit(smin, ":"));
 				dmax = str2dbl(strsplit(smax, ":"));	
 
@@ -62,53 +63,56 @@ bool GeoRaster::constructFromFile(std::string fname) {
 				
 			} else {  // version 2
 			
-				unsigned nrows = atoi(ini.GetValue("georeference", "nrows"));
-				unsigned ncols = atoi(ini.GetValue("georeference", "ncols"));
-				if (nlyr == 0) {
-					setExtent(e, false);
-					ncol = ncols;
-					nrow = nrows;
+				unsigned nrows = atoi(ini.GetValue("dimensions", "nrow"));
+				unsigned ncols = atoi(ini.GetValue("dimensions", "ncol"));
+				setExtent(e, false);
+				ncol = ncols;
+				nrow = nrows;
 					
-				} else if (!compare(nrows, ncols, e)) {
-					return false;
-				}
-				
-				crs = ini.GetValue("georeference", "projection");
-				dtp = ini.GetValue("data", "datatype");
-				nlyrs = atoi(ini.GetValue("data", "nlyr"));
-
-				string smin = ini.GetValue("data", "range_min");
-				string smax = ini.GetValue("data", "range_max");
-				std::vector<double> dmin = str2dbl(strsplit(smin, ":"));
-				std::vector<double> dmax = str2dbl(strsplit(smax, ":"));	
-
-				string snames = ini.GetValue("description", "layername");
+				//} else if (!compare(nrows, ncols, e)) {
+				//	return false;
+				//}
+				nlyrs = atoi(ini.GetValue("dimensions", "nlyr"));
+				string snames = ini.GetValue("dimensions", "names");
 				std::vector<string> vnames = strsplit(snames, ":");
 				names.insert(names.end(), vnames.begin(), vnames.end());
+				
+				crs = ini.GetValue("georeference", "crs");
 
-				vna  = atof(ini.GetValue("data", "nodatavalue"));
+				dtp = ini.GetValue("data", "datatype");
+				smin = ini.GetValue("data", "range_min");
+				smax = ini.GetValue("data", "range_max");		
+				dmin = str2dbl(strsplit(smin, ":|:"));
+				dmax = str2dbl(strsplit(smax, ":|:"));	
+				vna = atof(ini.GetValue("data", "nodata"));
 			}
 
 			source.datatype.push_back(dtp);
 			source.nlayers.push_back(nlyrs);		
+			
 			hasValues = true; 
 			source.NAflag.push_back(vna);
-			//source.layers.push_back( std::vector<int> )
 
-			for (unsigned i=0; i<nlyrs; i++) {
+			//source.layers.push_back( std::vector<int> )
+			/*for (size_t i=0; i<nlyrs; i++) {
 				hasRange.push_back( true );
 				range_min.push_back(dmin[i]);
 				range_max.push_back(dmax[i]);
-			}
+			}*/
+			hasRange = {true};
+			range_min = {dmin};
+			range_max = {dmax};
+			
+			
 			//range[0].insert(range[0].end(), dmin.begin(), dmin.end());
 			//range[1].insert(range[1].end(), dmax.begin(), dmax.end());
-			
 			source.memory.push_back(false);
 			source.filename.push_back( setFileExt(fname, ".gri") );
+			
 			source.driver.push_back("raster");
 			setCRS(crs);
 			setnlyr();
-
+            
 			return true;
 		}
 	} else {

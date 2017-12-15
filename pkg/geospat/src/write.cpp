@@ -149,8 +149,7 @@ void GeoRaster::setRange() {
 bool GeoRaster::writeHDR() { 
 
 	CSimpleIniA ini;	
-	ini.SetValue("section", "key", "newvalue");
-		
+
 	ini.SetValue("version", NULL, NULL);
 	ini.SetValue("version", "version", "2");
 	
@@ -160,7 +159,7 @@ bool GeoRaster::writeHDR() {
 	ini.SetValue("georeference", "xmax", to_string(extent.xmax).c_str());
 	ini.SetValue("georeference", "ymin", to_string(extent.ymin).c_str());
 	ini.SetValue("georeference", "ymax", to_string(extent.ymax).c_str());
-	ini.SetValue("georeference", "projection", crs.c_str());
+	ini.SetValue("georeference", "crs", crs.c_str());
 
 	ini.SetValue("dimensions", "nrow", to_string(nrow).c_str());
 	ini.SetValue("dimensions", "ncol", to_string(ncol).c_str());
