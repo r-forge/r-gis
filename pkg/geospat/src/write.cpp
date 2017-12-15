@@ -52,8 +52,7 @@ bool GeoRaster::writeStart(std::string filename, bool overwrite) {
 	if (filename != "") {
 		source.filename[0] = filename;
 		if (source.driver[0] == "native") {
-			
-//			filestream = std::ofstream(filename, ios::out | ios::binary);
+			//FS->open(filename, ios::out | ios::binary);
 		} else {
 			// open GDAL filestream		
 		}
@@ -68,7 +67,8 @@ bool GeoRaster::writeStart(std::string filename, bool overwrite) {
 bool GeoRaster::writeStop(){
 	if (source.filename[0] != "") {
 		if (source.driver[0] == "native") {
-		//	*filestream.close();
+			//(*FS).close();
+			//writeHDR();
 		}
 		
 		// close filestream
@@ -83,7 +83,7 @@ bool GeoRaster::writeStop(){
 bool GeoRaster::writeValues(std::vector<double> vals, unsigned row){
 	if (source.filename[0] != "") {
 		if (source.driver[0] == "native") {
-		
+			//FS->write((char*)&values[0], values.size() * sizeof(double));
 		} else {
 			// write with gdal
 		}
@@ -99,12 +99,12 @@ void GeoRaster::setValues(std::vector<double> _values) {
 	//if (_values.size() == size()) {
 		values = _values;
 		hasValues = true;
-
-		source.memory = std::vector<bool> {true};
+		source.memory = {true};
+		
 		// todo clear source...
 		setRange();
 
-		//names = std::vector<string> {"layer"};
+		names = std::vector<string> {"layer"};
 		//result = true;
 	//} 
 	//return (result);

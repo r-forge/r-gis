@@ -28,7 +28,8 @@ bool GeoRaster::constructFromFile(std::string fname) {
 
 			std::vector<double> dmin, dmax; 			
 			unsigned nlyrs;
-			
+			double vna;
+			string dtp, crs;
 			unsigned version = atoi(ini.GetValue("version", "version", "1"));
 			if (version == 1) {
 				unsigned nrows = atoi(ini.GetValue("georeference", "nrows"));
@@ -43,11 +44,11 @@ bool GeoRaster::constructFromFile(std::string fname) {
 					return false;
 				}
 				
-				string crs = ini.GetValue("georeference", "projection");
+				crs = ini.GetValue("georeference", "projection");
 
-				string dtp = ini.GetValue("data", "datatype");
+				dtp = ini.GetValue("data", "datatype");
 				nlyrs = atoi(ini.GetValue("data", "nbands"));
-				double vna  = atof(ini.GetValue("data", "nodatavalue"));
+				vna  = atof(ini.GetValue("data", "nodatavalue"));
 
 				string smin = ini.GetValue("data", "minvalue");
 				string smax = ini.GetValue("data", "maxvalue");
@@ -58,10 +59,6 @@ bool GeoRaster::constructFromFile(std::string fname) {
 				std::vector<string> vnames = strsplit(snames, ":");
 				names.insert(names.end(), vnames.begin(), vnames.end());
 
-				source.datatype.push_back (dtp);
-				source.nlayers.push_back(nlyrs);		
-				hasValues = true; 
-				source.NAflag.push_back(vna);
 				
 			} else {  // version 2
 			
@@ -76,8 +73,8 @@ bool GeoRaster::constructFromFile(std::string fname) {
 					return false;
 				}
 				
-				string crs = ini.GetValue("georeference", "projection");
-				string dtp = ini.GetValue("data", "datatype");
+				crs = ini.GetValue("georeference", "projection");
+				dtp = ini.GetValue("data", "datatype");
 				nlyrs = atoi(ini.GetValue("data", "nlyr"));
 
 				string smin = ini.GetValue("data", "range_min");
@@ -89,13 +86,13 @@ bool GeoRaster::constructFromFile(std::string fname) {
 				std::vector<string> vnames = strsplit(snames, ":");
 				names.insert(names.end(), vnames.begin(), vnames.end());
 
-				double vna  = atof(ini.GetValue("data", "nodatavalue"));
-				source.datatype.push_back (dtp);
-				source.nlayers.push_back(nlyrs);		
-				hasValues = true; 
-				source.NAflag.push_back(vna);
+				vna  = atof(ini.GetValue("data", "nodatavalue"));
 			}
 
+			source.datatype.push_back(dtp);
+			source.nlayers.push_back(nlyrs);		
+			hasValues = true; 
+			source.NAflag.push_back(vna);
 			//source.layers.push_back( std::vector<int> )
 
 			for (unsigned i=0; i<nlyrs; i++) {

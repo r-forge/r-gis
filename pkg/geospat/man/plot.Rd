@@ -12,14 +12,14 @@ Plot (that is, make a map of) the values of a GeoRaster object
 }
 
 \usage{
-\S4method{plot}{GeoRaster,missing}(x, y, maxpixels=500000, ...)
+\S4method{plot}{GeoRaster,missing}(x, y, maxpixels=500000, xlab="", ylab="", ...)
 }
 
 \arguments{
   \item{x}{Raster* object}
   \item{y}{missing}
   \item{maxpixels}{integer > 0. Maximum number of cells to use for the plot}
-  \item{...}{dot dot dot}  
+  \item{...}{additional arguments for levelplot}  
 }
 
 

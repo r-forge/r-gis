@@ -9,7 +9,7 @@ if (!isGeneric("setRange")) {setGeneric("setRange", function(x) standardGeneric(
 setMethod("values", signature(x='GeoRaster'), 
 function(x, ...) {
 	if (.hasValues(x)) {
-		x@ptr$values
+		x@ptr$getValues()
 	} 
 }
 )
@@ -17,7 +17,6 @@ function(x, ...) {
 
 setMethod('values<-', signature(x='GeoRaster', 'numeric'), 
 	function(x, value) {
-
 	if (is.matrix(value)) { 
 		if (nlayer(value) == ncol(x) & ncell(value) == nrow(x)) {
 			value <- as.vector(value) 
@@ -38,7 +37,7 @@ setMethod('values<-', signature(x='GeoRaster', 'numeric'),
 
 	# new pointer
 	y <- georst(x)
-	y@ptr$values <- value
+	y@ptr$setValues(value)
 	y
 }
 )

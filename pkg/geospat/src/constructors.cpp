@@ -9,15 +9,15 @@ GeoRaster::GeoRaster() {
 	nrow=10; ncol=10; 
 	extent = GeoExtent();
 	hasValues = false; 
-	hasRange.push_back(false);
-	source.memory.push_back(true);
-	source.filename.push_back("");
-	source.driver.push_back("");
-	source.nlayers.push_back(1);
-	source.layers.resize(1, vector<int>(1));
-	source.layers[0][1] = 1;
-	source.datatype.push_back("");
-	names.push_back("lyr.1");
+	hasRange = {false};
+	source.memory = {true};
+	source.filename = {""};
+	source.driver = {""};
+	source.nlayers = {1};
+	source.layers.resize(1, std::vector<int>(1));
+	source.layers[0][0] = 1;
+	source.datatype = {"FLT4S"};
+	names = {"lyr.1"};
 	setnlyr();
 }
 

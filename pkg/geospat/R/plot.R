@@ -10,10 +10,10 @@ if (!isGeneric("plot")) {
 }	
 
 setMethod("plot", signature(x='GeoRaster', y='missing'), 
-	function(x, y, maxpixels=500000, ...)  {
+	function(x, y, maxpixels=500000, xlab="", ylab="", ...)  {
 		require(lattice)
 		m <- matrix(values(x), nrow=nrow(x), byrow=TRUE)
-		lattice::levelplot(t(m[nrow(m):1, , drop=FALSE]))
+		lattice::levelplot(t(m[nrow(m):1, , drop=FALSE]), xlab=xlab, ylab=ylab, ...)
 	}
 )
 

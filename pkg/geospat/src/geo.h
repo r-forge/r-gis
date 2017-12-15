@@ -37,7 +37,7 @@ class RasterSource {
 		std::vector<bool> memory;
 		std::vector<string> filename;
 		std::vector<string> driver;
-		std::vector<int> nlayers;		
+		std::vector<unsigned> nlayers;		
 		std::vector<std::vector<int> > layers;		
 		std::vector<string> datatype;
 		std::vector<double> NAflag;
@@ -58,7 +58,6 @@ class BlockSize {
 class GeoRaster {
 	
 	private:
-		//fstream* file;
 		std::string msg;
 
 		
@@ -70,11 +69,13 @@ class GeoRaster {
 			nlyr = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
 		}
 		BlockSize getBlockSize(std::string filename="", bool overwrite=false);
-//		std::ofstream filestream;
 		
 	public:
 		//double NA = std::numeric_limits<double>::quiet_NaN();
 	
+	    std::vector<unsigned> getnlayers() {
+			return source.nlayers;
+		}		
 		unsigned nrow, ncol, nlyr;
 		unsigned size() { return ncol * nrow * nlyr ; }
 		bool hasValues;
@@ -106,7 +107,12 @@ class GeoRaster {
 		
 		std::string getCRS()	{ return(crs); }
 		void setCRS(std::string _crs) { crs = _crs; }
-		std::vector<string> getNames()	{ return(names); }
+		std::vector<string> getNames()	{ 
+			if (names.size() < 1) {
+				return std::vector<string> {"layer"}; // rep for each layer
+			}
+			return(names); 
+		}
 		void setNames(std::vector<string> _names) { names = _names; }
 	
 		std::vector<double> resolution() { return std::vector<double> { (extent.xmax - extent.xmin) / ncol, (extent.ymax - extent.ymin) / nrow };}
@@ -163,6 +169,7 @@ class GeoRaster {
 		GeoRaster writeRaster(std::string filename, bool overwrite);
 		GeoExtent align(GeoExtent e, string snap="near");
 		
+		GeoRaster test(string filename);
 		GeoRaster crop(GeoExtent e, string filename="", string snap="near", bool overwrite=false);
 		GeoRaster trim(unsigned padding=0, std::string filename="", bool overwrite=false);
 		GeoRaster mask(GeoRaster mask, string filename="", bool overwrite=false);

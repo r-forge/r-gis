@@ -6,7 +6,9 @@ using namespace Rcpp;
 
 NumericMatrix getValuesM(GeoRaster* r) {
 	NumericMatrix x(r->ncell(), r->nlyr);
-	std::copy(r->values.begin(), r->values.end(), x.begin());
+	std::vector<double> v;
+	v = r->getValues();
+	std::copy(v.begin(), v.end(), x.begin());
 	return(x);
 }
 
@@ -48,9 +50,10 @@ RCPP_MODULE(geo){
 		.method("readStart", &GeoRaster::readStart, "readStart") 
 		.method("readStop", &GeoRaster::readStop, "readStop") 
 		.method("readValues", &GeoRaster::readValues, "readValues")	
-		.method("getValues", &getValuesM)
+		.method("getValues", &GeoRaster::getValues)
 		.method("getBlockSize", &getBlockSizeR)
-		.property("values", &GeoRaster::getValues, &GeoRaster::setValues )	
+//		.property("values", &GeoRaster::getValues, &GeoRaster::setValues )	
+		.method("setValues", &GeoRaster::setValues)
 
 		.method("setRange", &GeoRaster::setRange, "setRange")
 		.method("writeStart", &GeoRaster::writeStart, "writeStart") 
@@ -64,6 +67,7 @@ RCPP_MODULE(geo){
 		.property("names", &GeoRaster::getNames, &GeoRaster::setNames )
 		.property("res", &GeoRaster::resolution)
 		.property("origin", &GeoRaster::origin)
+		.property("layers", &GeoRaster::getnlayers)
 
 
 		.property("inMemory", &GeoRaster::inMemory )
@@ -78,6 +82,9 @@ RCPP_MODULE(geo){
 		.field_readonly("range_min", &GeoRaster::range_min )
 		.field_readonly("range_max", &GeoRaster::range_max )
 
+		.method("test", &GeoRaster::test, "test")
+		
+		
 		.method("crop", &GeoRaster::crop, "crop")
 		.method("trim", &GeoRaster::trim, "trim")
 		.method("mask", &GeoRaster::mask, "mask")
