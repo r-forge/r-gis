@@ -24,7 +24,7 @@ Plot (that is, make a map of) the values of a GeoRaster object
 
 
 \examples{ 
-f <- system.file("external/test.grd", package="geo") 
+f <- system.file("external/test.grd", package="geospat") 
 r <- georst(f)
 plot(r)
 }

@@ -31,7 +31,7 @@ matrix
 
 
 \examples{
-r <- georst(system.file("external/test.grd", package="geo"))
+r <- georst(system.file("external/test.grd", package="geospat"))
 r
 v <- values(r)
 values(r) <- v * 10

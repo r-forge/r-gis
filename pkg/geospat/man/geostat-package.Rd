@@ -1,11 +1,11 @@
-\name{geo-package}
-\alias{geo-package}
+\name{geospat-package}
+\alias{geospat-package}
 
-\alias{geo}
+\alias{geospat}
 
 \docType{package}
 
-\title{geo}
+\title{geospat}
 
 \description{
 This package is conceived as a replacement of the raster package. It has a very similar, but simpler, interface, and it is faster.

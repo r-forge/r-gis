@@ -58,7 +58,9 @@ class BlockSize {
 class GeoRaster {
 	
 	private:
+		//fstream* file;
 		std::string msg;
+
 		
 	protected:
 		GeoExtent extent;

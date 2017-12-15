@@ -53,10 +53,10 @@ GeoRaster
 r1 <- georst(nrow=108, ncol=21, xmin=0, xmax=10)
 
 # Create a GeoRaster object from a file
-#   N.B.: For your own files, omit the 'system.file' and 'package="geo"' bits
+#   N.B.: For your own files, omit the 'system.file' and 'package="geospat"' bits
 #   these are just to get the path to files installed with the package
 
-f <- system.file("external/test.grd", package="geo")
+f <- system.file("external/test.grd", package="geospat")
 f
 r <- georst(f)
 
