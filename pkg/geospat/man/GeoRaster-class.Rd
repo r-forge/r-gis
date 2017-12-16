@@ -6,6 +6,11 @@
 \alias{GeoRaster-class}
 \alias{Rcpp_GeoRaster-class}
 
+\alias{RasterSource}
+\alias{RasterSource-class}
+\alias{Rcpp_RasterSource-class}
+
+
 \alias{show,GeoRaster-method}
 
 

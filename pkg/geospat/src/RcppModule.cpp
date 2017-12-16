@@ -13,14 +13,16 @@ NumericMatrix getValuesM(GeoRaster* r) {
 }
 
 List getBlockSizeR(GeoRaster* r) {              //+1 for R
-	List L = List::create(Named("row") = r->bs.row, Named("nrows") = r->bs.nrows, 
-	                      Named("n") = r->bs.n, Named("filename")=r->bs.filename);
+	List L = List::create(Named("row") = r->bs.row, Named("nrows") = r->bs.nrows, Named("n") = r->bs.n);
 	return(L);
 }
 
 
 RCPP_EXPOSED_CLASS(GeoExtent)
 RCPP_EXPOSED_CLASS(GeoRaster)
+RCPP_EXPOSED_CLASS(RasterSource)
+
+
 	
 RCPP_MODULE(geo){
     using namespace Rcpp;
@@ -33,11 +35,24 @@ RCPP_MODULE(geo){
 		.property("valid", &GeoExtent::valid)		
 	;	
 
+    class_<RasterSource>("RasterSource")
+	
+		.field_readonly("memory", &RasterSource::memory)
+		.field_readonly("filename", &RasterSource::filename)
+		.field_readonly("driver", &RasterSource::driver)
+		.field_readonly("nlayers", &RasterSource::nlayers)
+		.field_readonly("datatype", &RasterSource::datatype)
+		.field_readonly("NAflag", &RasterSource::NAflag)
+		//std::vector<std::vector<int> > layers;		
+	;	
+
     class_<GeoRaster>("GeoRaster")
 		.constructor()
 	    .constructor<std::string>()
 		.constructor<std::vector<unsigned>, std::vector<double>, std::string>()
-	
+
+		.field_readonly("source", &GeoRaster::source )
+		
 		.method("cellFromXY", ( std::vector<double> (GeoRaster::*)(std::vector<double>,std::vector<double>) )( &GeoRaster::cellFromXY ))
 		.method("cellFromRowCol", ( std::vector<double> (GeoRaster::*)(std::vector<unsigned>,std::vector<unsigned>) )( &GeoRaster::cellFromRowCol ))
 		.method("yFromRow", ( std::vector<double> (GeoRaster::*)(std::vector<unsigned>) )( &GeoRaster::yFromRow ))
@@ -67,8 +82,7 @@ RCPP_MODULE(geo){
 		.property("names", &GeoRaster::getNames, &GeoRaster::setNames )
 		.property("res", &GeoRaster::resolution)
 		.property("origin", &GeoRaster::origin)
-		.property("layers", &GeoRaster::getnlayers)
-
+		//.property("layers", &GeoRaster::getnlayers)
 
 		.property("inMemory", &GeoRaster::inMemory )
 		.property("filenames", &GeoRaster::filenames )

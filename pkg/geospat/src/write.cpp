@@ -1,31 +1,25 @@
-using namespace std;
 #include "geo.h"
 #include "SimpleIni.h"
 #include "util.h"
+//#include <fstream>
+using namespace std;
 
 
 bool canProcessInMemory() {
 	return true;
 }
 
-BlockSize GeoRaster::getBlockSize(std::string filename, bool overwrite) {
+BlockSize GeoRaster::getBlockSize() {
 	BlockSize bs;
-	lrtrim(filename);
-	// check of can be processed in memory
-	// if not generate fileanme 
-	// R session should always send a temp folder to static var when pkg is loaded?
-
-	if (!canProcessInMemory() && filename == "") {
-		filename = "random_file_name.grd";
-	}
-	
-	bs.filename = filename;
-	if (filename == "") {
+		
+	if (source.filename[0] == "") {
 	// in memory
 		bs.row = {0};
 		bs.nrows = {nrow};
 		bs.n = 1;
+		
 	} else {
+	
 	// to be improved, see raster::blockSize
 		bs.row = {0, unsigned(floor(nrow/2))};
 		bs.nrows = {bs.row[1], nrow-bs.row[1]};
@@ -44,49 +38,94 @@ GeoRaster GeoRaster::writeRaster(std::string filename, bool overwrite) {
 	return GeoRaster(filename);
 }
 
-
 bool GeoRaster::writeStart(std::string filename, bool overwrite) {
 	
-	bs = getBlockSize(filename, overwrite);
-
-	if (filename != "") {
-		source.filename[0] = filename;
-		if (source.driver[0] == "native") {
-			//FS->open(filename, ios::out | ios::binary);
+	lrtrim(filename);
+	if (filename == "") {
+		if (!canProcessInMemory()) {
+			filename = "random_file_name.grd";
+		}
+	}
+	
+	if (filename == "") {
+		source.driver = {"memory"};
+	} else {
+		// if (!overwrite) check if file exists
+		string ext = getFileExt(filename);
+		lowercase(ext);
+		if (ext == ".grd") {
+			source.driver = {"native"};
+			string fname = setFileExt(filename, ".gri");
+//			openFS(filename);
+//			ofstream f;
+//			outfs = &f;
+//			outfs->open(filename, ios::out | ios::binary);
+//			(*outfs).open(filename, ios::out | ios::binary);
 		} else {
+			source.driver = {"gdal"} ;			
 			// open GDAL filestream		
 		}
-	} else {
-		source.filename[0] = "";
 	}
+	
+	source.filename = {filename};
+	bs = getBlockSize();
+	return true;
+}
+
+bool GeoRaster::writeStartFs(std::string filename, bool overwrite,  fstream& f) {
+	
+	lrtrim(filename);
+	if (filename == "") {
+		if (!canProcessInMemory()) {
+			filename = "random_file_name.grd";
+		}
+	}
+	
+	if (filename == "") {
+		source.driver = {"memory"};
+
+	} else {
+		// if (!overwrite) check if file exists
+		string ext = getFileExt(filename);
+		lowercase(ext);
+		if (ext == ".grd") {
+			source.driver = {"native"};
+			string fname = setFileExt(filename, ".gri");
+			f.open(fname, ios::out | ios::binary);
+			fs = &f;
+		} else {
+			source.driver = {"gdal"} ;			
+			// open GDAL filestream		
+		}
+	}
+	
+	source.filename = {filename};
+	bs = getBlockSize();
 	return true;
 }
 
 
-
 bool GeoRaster::writeStop(){
-	if (source.filename[0] != "") {
-		if (source.driver[0] == "native") {
-			//(*FS).close();
-			//writeHDR();
-		}
-		
-		// close filestream
-		if (source.driver[0] == "native") {
-			//bool ok = 
-			GeoRaster::writeHDR();
-		}
+
+	if (source.driver[0] == "native") {
+		(*fs).close();
+		writeHDR();
+	} else if (source.driver[0] == "gdal") {
+	
 	}
 	return true;
 }
 
 bool GeoRaster::writeValues(std::vector<double> vals, unsigned row){
-	if (source.filename[0] != "") {
-		if (source.driver[0] == "native") {
-			//FS->write((char*)&values[0], values.size() * sizeof(double));
-		} else {
-			// write with gdal
-		}
+	
+	if (source.driver[0] == "native") {
+	
+		size_t size = vals.size();
+		(*fs).write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
+
+	} else if (source.driver[0] == "gdal") {
+		// write with gdal
+
 	} else {
 		setValues(vals);
 	}
@@ -147,33 +186,27 @@ void GeoRaster::setRange() {
 
 
 bool GeoRaster::writeHDR() { 
-
 	CSimpleIniA ini;	
-
 	ini.SetValue("version", NULL, NULL);
 	ini.SetValue("version", "version", "2");
-	
 	ini.SetValue("georeference", NULL, NULL);
-
 	ini.SetValue("georeference", "xmin", to_string(extent.xmin).c_str());
 	ini.SetValue("georeference", "xmax", to_string(extent.xmax).c_str());
 	ini.SetValue("georeference", "ymin", to_string(extent.ymin).c_str());
 	ini.SetValue("georeference", "ymax", to_string(extent.ymax).c_str());
 	ini.SetValue("georeference", "crs", crs.c_str());
-
 	ini.SetValue("dimensions", "nrow", to_string(nrow).c_str());
 	ini.SetValue("dimensions", "ncol", to_string(ncol).c_str());
 	ini.SetValue("dimensions", "nlyr", to_string(nlyr).c_str());
 	ini.SetValue("dimensions", "names", concatenate(names, std::string(":|:")).c_str());		
-
 	ini.SetValue("data", NULL, NULL);
-	ini.SetValue("data", "datatype", "FLT4S"); // ojo
+	ini.SetValue("data", "datatype", "FLT8S"); // double
 	ini.SetValue("data", "nodata", to_string(-1 * numeric_limits<double>::max()).c_str());
-
 	ini.SetValue("data", "range_min", concatenate(dbl2str(range_min), std::string(":|:")).c_str());
 	ini.SetValue("data", "range_max", concatenate(dbl2str(range_max), std::string(":|:")).c_str());
 
-	SI_Error rc = ini.SaveFile(source.filename[0].c_str());
+	string f = setFileExt(source.filename[0], ".grd");
+	SI_Error rc = ini.SaveFile(f.c_str());
 	if (rc < 0) {
 		return false;
 	} else {

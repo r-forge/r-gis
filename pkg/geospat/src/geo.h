@@ -49,7 +49,6 @@ class BlockSize {
 		std::vector<unsigned> row;
 		std::vector<unsigned> nrows;
 		unsigned n;
-		std::string filename;
 };
 
 
@@ -59,19 +58,19 @@ class GeoRaster {
 	
 	private:
 		std::string msg;
-
+		fstream* fs;
 		
 	protected:
 		GeoExtent extent;
 		std::string crs ="+proj=longlat +datum=WGS84";
-		RasterSource source;
 		void setnlyr() { 
 			nlyr = std::accumulate(source.nlayers.begin(), source.nlayers.end(), 0); 
 		}
-		BlockSize getBlockSize(std::string filename="", bool overwrite=false);
+		BlockSize getBlockSize();
 		
 	public:
 		//double NA = std::numeric_limits<double>::quiet_NaN();
+		RasterSource source;
 	
 	    std::vector<unsigned> getnlayers() {
 			return source.nlayers;
@@ -162,9 +161,15 @@ class GeoRaster {
 		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
 		
 		bool writeStart(std::string filename, bool overwrite);
+		bool writeStartFs(std::string filename, bool overwrite, fstream& f);
+		
 		bool writeValues(std::vector<double> vals, unsigned row);
 		bool writeStop();
 		bool writeHDR();
+		
+		
+		void openFS(string const &filename);
+
 		
 		GeoRaster writeRaster(std::string filename, bool overwrite);
 		GeoExtent align(GeoExtent e, string snap="near");

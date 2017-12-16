@@ -19,6 +19,8 @@ Plot (that is, make a map of) the values of a GeoRaster object
   \item{x}{Raster* object}
   \item{y}{missing}
   \item{maxpixels}{integer > 0. Maximum number of cells to use for the plot}
+  \item{xlab}{character}
+  \item{ylab}{character}
   \item{...}{additional arguments for levelplot}  
 }
 

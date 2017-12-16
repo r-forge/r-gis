@@ -51,7 +51,11 @@ std::vector<double> GeoRaster::readValues(unsigned row, unsigned nrows, unsigned
 	} else {
 		// read from file
 		string file = source.filename[0];
-		out = readFLT4(file, 0, ncell());
+		if (source.datatype[0] == "FLT8S") {
+			out = readFLT8(file, 0, ncell());
+		} else {
+			out = readFLT4(file, 0, ncell());
+		}
 	}
 	return(out);	
 }

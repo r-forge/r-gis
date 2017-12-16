@@ -36,30 +36,19 @@ bool GeoRaster::constructFromFile(std::string fname) {
 				unsigned nrows = atoi(ini.GetValue("georeference", "nrows"));
 				unsigned ncols = atoi(ini.GetValue("georeference", "ncols"));
 				GeoExtent e(xmin, xmax, ymin, ymax);
-//				if (nlyr == 0) {
-					setExtent(e, false);
-					ncol = ncols;
-					nrow = nrows;
-					
-	//			} else if (!compare(nrows, ncols, e)) {
-	//				return false;
-	//			}
-				
+				setExtent(e, false);
+				ncol = ncols;
+				nrow = nrows;
 				crs = ini.GetValue("georeference", "projection");
-
 				dtp = ini.GetValue("data", "datatype");
 				nlyrs = atoi(ini.GetValue("data", "nbands"));
 				vna  = atof(ini.GetValue("data", "nodatavalue"));
-
 				smin = ini.GetValue("data", "minvalue");
 				smax = ini.GetValue("data", "maxvalue");
 				dmin = str2dbl(strsplit(smin, ":"));
 				dmax = str2dbl(strsplit(smax, ":"));	
-
 				string snames = ini.GetValue("description", "layername");
-				std::vector<string> vnames = strsplit(snames, ":");
-				names.insert(names.end(), vnames.begin(), vnames.end());
-
+				names = { strsplit(snames, ":") }; 
 				
 			} else {  // version 2
 			
@@ -68,17 +57,10 @@ bool GeoRaster::constructFromFile(std::string fname) {
 				setExtent(e, false);
 				ncol = ncols;
 				nrow = nrows;
-					
-				//} else if (!compare(nrows, ncols, e)) {
-				//	return false;
-				//}
 				nlyrs = atoi(ini.GetValue("dimensions", "nlyr"));
 				string snames = ini.GetValue("dimensions", "names");
-				std::vector<string> vnames = strsplit(snames, ":");
-				names.insert(names.end(), vnames.begin(), vnames.end());
-				
+				names = { strsplit(snames, ":|:") }; 
 				crs = ini.GetValue("georeference", "crs");
-
 				dtp = ini.GetValue("data", "datatype");
 				smin = ini.GetValue("data", "range_min");
 				smax = ini.GetValue("data", "range_max");		
@@ -87,29 +69,21 @@ bool GeoRaster::constructFromFile(std::string fname) {
 				vna = atof(ini.GetValue("data", "nodata"));
 			}
 
-			source.datatype.push_back(dtp);
-			source.nlayers.push_back(nlyrs);		
+			source.datatype = { dtp };
+			source.nlayers = { nlyrs };		
 			
 			hasValues = true; 
-			source.NAflag.push_back(vna);
-
-			//source.layers.push_back( std::vector<int> )
-			/*for (size_t i=0; i<nlyrs; i++) {
-				hasRange.push_back( true );
-				range_min.push_back(dmin[i]);
-				range_max.push_back(dmax[i]);
-			}*/
+			source.NAflag = { vna };
 			hasRange = {true};
 			range_min = {dmin};
-			range_max = {dmax};
-			
+			range_max = {dmax};		
 			
 			//range[0].insert(range[0].end(), dmin.begin(), dmin.end());
 			//range[1].insert(range[1].end(), dmax.begin(), dmax.end());
 			source.memory.push_back(false);
 			source.filename.push_back( setFileExt(fname, ".gri") );
 			
-			source.driver.push_back("raster");
+			source.driver = {"raster"};
 			setCRS(crs);
 			setnlyr();
             
