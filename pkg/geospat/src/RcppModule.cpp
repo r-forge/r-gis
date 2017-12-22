@@ -84,8 +84,9 @@ RCPP_MODULE(geo){
 		.property("origin", &GeoRaster::origin)
 		//.property("layers", &GeoRaster::getnlayers)
 
+
 		.property("inMemory", &GeoRaster::inMemory )
-		.property("filenames", &GeoRaster::filenames )
+//		.property("filenames", &GeoRaster::filenames )
 		
 		.field_readonly("nrow", &GeoRaster::nrow )
 		.field_readonly("ncol", &GeoRaster::ncol )

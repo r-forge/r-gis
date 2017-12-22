@@ -120,7 +120,7 @@ class GeoRaster {
 
 		std::vector<double> origin();	
 		
-		std::vector<string> filenames() { return source.filename; }
+		//std::vector<string> filenames() { return source.filename; }
 
 		
 		bool compare(unsigned nrows, unsigned ncols, GeoExtent e );

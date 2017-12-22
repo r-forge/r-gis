@@ -56,11 +56,6 @@ bool GeoRaster::writeStart(std::string filename, bool overwrite) {
 		if (ext == ".grd") {
 			source.driver = {"native"};
 			string fname = setFileExt(filename, ".gri");
-//			openFS(filename);
-//			ofstream f;
-//			outfs = &f;
-//			outfs->open(filename, ios::out | ios::binary);
-//			(*outfs).open(filename, ios::out | ios::binary);
 		} else {
 			source.driver = {"gdal"} ;			
 			// open GDAL filestream		
@@ -119,10 +114,8 @@ bool GeoRaster::writeStop(){
 bool GeoRaster::writeValues(std::vector<double> vals, unsigned row){
 	
 	if (source.driver[0] == "native") {
-	
 		size_t size = vals.size();
 		(*fs).write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
-
 	} else if (source.driver[0] == "gdal") {
 		// write with gdal
 
