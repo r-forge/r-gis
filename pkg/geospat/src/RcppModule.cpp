@@ -101,6 +101,8 @@ RCPP_MODULE(geo){
 		
 		
 		.method("crop", &GeoRaster::crop, "crop")
+		.method("focal", &GeoRaster::focal, "focal")
+		.method("focalValues", &GeoRaster::focal_values, "focalValues")
 		.method("trim", &GeoRaster::trim, "trim")
 		.method("mask", &GeoRaster::mask, "mask")
 		.method("aggregate", &GeoRaster::aggregate, "aggregate")

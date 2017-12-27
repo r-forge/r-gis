@@ -1,11 +1,7 @@
 # Author: Robert J. Hijmans
-# Date : July 2010
+# Date : December 2017
 # Version 1.0
 # Licence GPL v3
-
-# October 2012: Major overhaul (including C interface)
-# November 2012: fixed bug with expand=F
-# June 2014: support for aggregation over z (layers) in addition to x and y
 
 
 .makeTextFun <- function(fun) {

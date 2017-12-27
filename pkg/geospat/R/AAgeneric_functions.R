@@ -2,6 +2,7 @@
 if (!isGeneric("mask")) { setGeneric("mask", function(x, mask, ...) standardGeneric("mask")) }	
 if (!isGeneric("crop")) { setGeneric("crop", function(x, y, ...) standardGeneric("crop")) }	
 if (!isGeneric("trim")) { setGeneric("trim", function(x, ...) standardGeneric("trim")) }	
+if (!isGeneric("focal")) { setGeneric("focal", function(x, ...) standardGeneric("focal")) }
 
 if (!isGeneric("crs")) { setGeneric("crs", function(x, ...)	standardGeneric("crs")) }	
 if (!isGeneric("crs<-")) { setGeneric("crs<-", function(x, ..., value) standardGeneric("crs<-")) }	
