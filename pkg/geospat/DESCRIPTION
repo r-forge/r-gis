@@ -1,8 +1,8 @@
 Package: geospat
 Type: Package
 Title: raster data
-Version: 0.0-3
-Date: 2017-12-13
+Version: 0.0-4
+Date: 2017-01-22
 Depends: methods
 LinkingTo: Rcpp, RcppArmadillo
 Imports: Rcpp
