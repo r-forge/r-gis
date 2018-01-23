@@ -1,6 +1,6 @@
 Package: geospat
 Type: Package
-Title: raster data
+Title: Classes and Methods for Raster Data
 Version: 0.0-4
 Date: 2017-01-22
 Depends: methods
