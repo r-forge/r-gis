@@ -52,7 +52,7 @@ setMethod('values<-', signature(x='GeoRaster', 'numeric'),
 }
 
 .filenames <- function(x) {
-	x@ptr$filenames
+	x@ptr$source$filename
 }
 
 .hasRange <- function(x) {

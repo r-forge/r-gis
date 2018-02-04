@@ -42,7 +42,7 @@ function(x, w=3, fun='mean', na.rm=TRUE, filename="", ...)  {
 			readStart(x)
 			b <- writeStart(out, filename)
 			for (i in 1:b$n) {
-				v <- matrix(x@ptr$focalValues(bs$row[i], bs$nrows[i], w), ncol=prod(w), byrow=TRUE)
+				v <- matrix(x@ptr$focalValues(b$row[i], b$nrows[i], w), ncol=prod(w), byrow=TRUE)
 				v <- apply(v, 1, fun, na.rm=na.rm)
 				writeValues(out, v, b$row[i])
 			}
