@@ -71,7 +71,7 @@ std::vector<double> GeoRaster::focal_values(std::vector<unsigned> w, double fill
 
 
 
-GeoRaster GeoRaster::focal(std::vector<unsigned> w, double fillvalue, bool narm, std::string filename, bool overwrite) {
+GeoRaster GeoRaster::focal(std::vector<unsigned> w, double fillvalue, bool narm, unsigned fun, std::string filename, bool overwrite) {
     
 	bool wmat = false;
 	int ww;
@@ -90,13 +90,16 @@ GeoRaster GeoRaster::focal(std::vector<unsigned> w, double fillvalue, bool narm,
 	std::vector<double> v, f, d;
 	
 	
+	std::vector<double> fv;
+	
 	for (size_t i = 0; i < out.bs.n; i++) {
 		d = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);	
-		f = focal_get(d, w, dim, NAN);
+		f = focal_get(d, w, dim, fillvalue);
 		v.resize(out.bs.nrows[i] * ncol);
 		for (size_t j = 0; j < v.size(); j++) {
 			double z = 0;
 			int n = 0;
+			fv.resize(0);
 			for (int k = 0; k < ww; k++) {
 				int m = j * ww + k; 
 				if (std::isnan(f[m])) {
@@ -109,7 +112,7 @@ GeoRaster GeoRaster::focal(std::vector<unsigned> w, double fillvalue, bool narm,
 					if (wmat) {
 						z = z + f[m] * w[n];
 					} else {
-						z = z + f[m];
+						fv.push_back(f[m]);
 					}
 					n++;
 				}
@@ -118,7 +121,17 @@ GeoRaster GeoRaster::focal(std::vector<unsigned> w, double fillvalue, bool narm,
 				if (!wmat) {
 					v[j] = z / n;
 				} else {
-					v[j] = z;
+					if (fv.size() == 0) {
+						v[j] = NAN;
+					} else  if (fun == 0) { //mean
+						v[j] = std::accumulate(fv.begin(), fv.end(), 0.0) / fv.size();
+					} else if (fun == 1) { //min
+						v[j] = *std::min_element(fv.begin(), fv.end());
+					} else if (fun == 2) { //max
+						v[j] = *std::max_element(fv.begin(), fv.end());
+					} else { // sum
+						v[j] = std::accumulate(fv.begin(), fv.end(), 0.0);
+					}
 				}
 			} else {
 				v[j] = NAN;	

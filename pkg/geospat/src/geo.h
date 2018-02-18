@@ -178,7 +178,8 @@ class GeoRaster {
 		GeoRaster crop(GeoExtent e, string filename="", string snap="near", bool overwrite=false);
 		GeoRaster trim(unsigned padding=0, std::string filename="", bool overwrite=false);
 		GeoRaster mask(GeoRaster mask, string filename="", bool overwrite=false);
-		GeoRaster focal(std::vector<unsigned> w, double fillvalue, bool narm, std::string filename, bool overwrite);
+		GeoRaster focal(std::vector<unsigned> w, double fillvalue, bool narm, unsigned fun, std::string filename, bool overwrite);
+		
 		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows);
 
 		GeoRaster aggregate(std::vector<unsigned> fact, string fun, bool narm, string filename="", bool overwrite=false);
