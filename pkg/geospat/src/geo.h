@@ -6,6 +6,51 @@ using namespace std;
 #include <fstream>
 
 
+class SpatPolygons {
+	public:
+		unsigned n;
+		std::vector<unsigned> id, part, start, end;
+		std::vector<unsigned> nparts;
+		std::vector<bool> hasholes, ishole;
+		std::vector<double> x, y; 
+		std::vector<double> attr; 
+		bool hasAttr;
+		
+		SpatPolygons getPolygon(unsigned i);
+		SpatPolygons getPart(unsigned polyid, unsigned partid);
+};
+
+SpatPolygons SpatPolygons::getPart(unsigned polyid, unsigned partid) {
+	SpatPolygons p;
+	p.n = 1;
+	p.id = std::vector<unsigned> {0};
+	// check that part <= nparts[poly]
+	p.part = p.id;
+	p.start = p.id;
+
+	auto i = std::find(id.begin(), id.end(), polyid );
+	int ix = std::distance(id.begin(), i);
+	auto j = std::find(part.begin()+ix, part.end(), partid );
+	int jx = std::distance(part.begin(), j);
+
+	p.end = std::vector<unsigned> { end[jx] - start[jx] };
+	p.ishole = std::vector<bool> { ishole[jx] };
+	p.hasholes = p.ishole;
+	
+	std::vector<double>::const_iterator first = x.begin() + start[jx];
+	std::vector<double>::const_iterator last  = x.begin() + end[jx];
+	p.x = std::vector<double>(first, last);	
+	p.y = std::vector<double>(first, last);	
+	
+	p.hasAttr = hasAttr;
+	if (hasAttr) {
+		p.attr = std::vector<double> { attr[polyid] }; 
+	}
+	return(p);
+}
+
+
+
 class GeoExtent {
 	public:
 		double xmin, xmax, ymin, ymax;
@@ -179,6 +224,7 @@ class GeoRaster {
 		GeoRaster trim(unsigned padding=0, std::string filename="", bool overwrite=false);
 		GeoRaster mask(GeoRaster mask, string filename="", bool overwrite=false);
 		GeoRaster focal(std::vector<unsigned> w, double fillvalue, bool narm, unsigned fun, std::string filename, bool overwrite);
+		GeoRaster rasterizePolygons(SpatPolygons p, string filename, bool overwrite);
 		
 		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows);
 
