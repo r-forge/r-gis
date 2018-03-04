@@ -3,7 +3,6 @@
 
 using namespace std;
 #include <vector>
-#include <iostream>
 #include "geo.h"
   
 std::vector<double> rasterize_single_polygon(std::vector<double> r, double value, std::vector<double> pX, std::vector<double> pY, int nrows, int ncols, double xmin, double ymax, double rx, double ry) {
