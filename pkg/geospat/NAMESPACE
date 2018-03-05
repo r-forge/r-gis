@@ -1,4 +1,0 @@
-import(Rcpp)
-importFrom("methods", "new", "validObject")
-useDynLib(geospat, .registration = TRUE)
-exportPattern("^[[:alpha:]]+")

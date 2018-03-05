@@ -1,2 +1,0 @@
-
-loadModule("GeoRaster", TRUE)

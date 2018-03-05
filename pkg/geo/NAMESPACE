@@ -1,4 +1,0 @@
-import(Rcpp)
-importFrom("methods", "new", "validObject")
-useDynLib(geo, .registration = TRUE)
-exportPattern("^[[:alpha:]]+")
