@@ -1,22 +1,75 @@
 
-spPolygons <- function(x) {
 
-#	x <- list(  rbind(c(-180,-20), c(-140,55), c(10, 0), c(-140,-60), c(-180,-20)),
-#				rbind(c(-10,0), c(140,60), c(160,0), c(140,-55), c(-10,0)),
-#				rbind(c(-125,0), c(0,60), c(40,5), c(15,-45), c(-125,0)))
-
-	p <- SpatPolyPart$new()
-	pp <- SpatPoly$new()
-	ppp <- SpatPolygons$new()
-
-	for (i in 1:length(x)) {
-		p$set(x[[i]][,1], x[[i]][,2])
-		pp$addPart(p)
+spPolygons <- function(x, ..., attr=NULL, crs=NA) {
+	Part <- function(xy) {
+		p <- SpatPolyPart$new()
+		p$set(xy[,1], xy[,2])
+		p
 	}
-	ppp$addPoly(pp)
 
-	x <- methods::new('SpatPolygons')
+	Parts <- function(x) {
+		pp <- SpatPoly$new()
+		if (length(x) == 1) {
+			pp$addPart(x)	
+		} else {
+			for (i in 1:length(x)) {
+				pp$addPart(x[[i]])
+			}
+		}
+		pp
+	}
+	
+	x <- c(list(x), list(...))
+	y <- rapply(x, Part, how='replace')
+	z <- lapply(y, Parts)
+
+	ppp <-  SpatPolygons$new()
+	lapply(z, function(i) ppp$addPoly(i))
+
+	if (!is.na(crs)) {
+		ppp$crs <- crs
+	}
+	
+	x <- methods::new("SpatPolygons")
 	x@ptr <- ppp
 	x
 }
+
+
+setMethod ('length' , 'SpatPolygons', 
+	function(x) {
+		x@ptr$size()
+	}
+)
+
+setMethod('ext', signature(x='SpatPolygons'), 
+	function(x, ...){ 
+		e <- methods::new('SpatExtent')
+		e@ptr <- x@ptr$extent
+		return(e)
+	}
+)	
+
+
+setMethod("crs", signature('SpatPolygons'), 
+	function(x) {
+		x@ptr$crs
+	}
+)
+
+setMethod ('show' , 'SpatPolygons', 
+	function(object) {
+		
+		cat('class       :' , class(object), '\n')
+
+		d <- length(object)
+		cat('geometries  : ', d, ' \n', sep="" ) 
+		e <- as.vector(ext(object))
+		cat('extent      : ' , e[1], ', ', e[2], ', ', e[3], ', ', e[4], '  (xmin, xmax, ymin, ymax)\n', sep="")
+		crs <- crs(object)
+		cat('coord. ref. :' , crs(object), '\n')
+		
+	}
+)
+
 

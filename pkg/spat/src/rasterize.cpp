@@ -45,7 +45,7 @@ std::vector<double> rasterize_polygon(std::vector<double> r, double value, std::
 
 
 
-SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, string filename, bool overwrite) {
+SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, double background, string filename, bool overwrite) {
 
 	SpatRaster out = *this;
 	out.values.resize(0);
@@ -61,7 +61,7 @@ SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, string filename, bool o
 	unsigned n = p.size();
 	
 	for (size_t i = 0; i < out.bs.n; i++) {
-		std::vector<double> v(out.bs.nrows[i] * ncol);
+		std::vector<double> v(out.bs.nrows[i] * ncol, background);
 		
 		for (size_t j = 0; j < n; j++) {
 			
@@ -69,7 +69,7 @@ SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, string filename, bool o
 			
 			//value = p.getAtt(j);
 			//if (std::isnan(value)) { value = j;}
-			value = j;
+			value = j+1;
 			
 			unsigned np = poly.size();
 			

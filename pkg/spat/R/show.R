@@ -87,7 +87,6 @@ setMethod ('show' , 'SpatRaster',
 			}			
 		}
 		
-		
 	}
 )
 

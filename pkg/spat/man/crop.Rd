@@ -17,8 +17,8 @@ crop returns a new SpatRaster that is the geographic subset of an object as spec
 }
 
 \arguments{
-  \item{x}{Raster* object or SpatialPolygons*, SpatialLines*, or SpatialPoints* object}
-  \item{y}{Extent object, or any object from which an Extent object can be extracted (see Details)}
+  \item{x}{SpatRaster object}
+  \item{y}{SpatExtent object}
   \item{filename}{Character, output filename. Optional}
   \item{snap}{Character. One of 'near', 'in', or 'out'}  
   \item{...}{Additional arguments as for \code{\link{writeRaster}}}  
