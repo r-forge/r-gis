@@ -39,6 +39,11 @@ RCPP_MODULE(spat){
 		.field_readonly("y", &SpatPolyPart::y )
 		.field_readonly("extent", &SpatPolyPart::extent )
 		.method("set", &SpatPolyPart::set, "set")
+		.method("setHole", &SpatPolyPart::setHole, "setHole")
+		.method("getHoleX", &SpatPolyPart::getHoleX, "getHoleX")
+		.method("getHoleY", &SpatPolyPart::getHoleY, "getHoleY")
+		.method("nHoles", &SpatPolyPart::nHoles, "nHoles")
+		.method("hasHoles", &SpatPolyPart::hasHoles, "hasHoles")
 		
 	;	
     class_<SpatPoly>("SpatPoly")

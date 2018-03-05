@@ -5,42 +5,41 @@ using namespace std;
 #include <vector>
 #include "geo.h"
   
-std::vector<double> rasterize_polygon(std::vector<double> r, double value, std::vector<double> pX, std::vector<double> pY, int nrows, int ncols, double xmin, double ymax, double rx, double ry) {
+std::vector<double> rasterize_polygon(std::vector<double> r, double value, std::vector<double> pX, std::vector<double> pY, unsigned nrows, unsigned ncols, double xmin, double ymax, double rx, double ry) {
 
-  int i, j, nodes, row, col ;
-  int n = pX.size();
-  std::vector<int> nCol(n);
+	unsigned n = pX.size();
+	std::vector<unsigned> nCol(n);
   
-  for (row=0; row<nrows; row++) {
+	for (size_t row=0; row<nrows; row++) {
   
-    double y = ymax - (row+0.5) * ry;
-    
-    //  Build a list of nodes.
-    nodes = 0; 
-    j = n-1;
-    for (i=0; i<n; i++) {
-      if (((pY[i] < y) && (pY[j] >= y)) ||   ((pY[j] < y) && (pY[i] >= y))) {
-        nCol[nodes++]=(int)  (((pX[i] - xmin + (y-pY[i])/(pY[j]-pY[i]) * (pX[j]-pX[i])) + 0.5 * rx ) / rx); 
-      }
-      j = i; 
-    }
-    
-    std::sort(nCol.begin(), nCol.begin()+nodes);
-    
-    //  Fill the pixels between node pairs.
-    for (i=0; i < nodes; i+=2) {
-      if (nCol[i] >= ncols) break;
-      if (nCol[i+1] > 0) {
-        if (nCol[i] < 0) nCol[i]=0 ;
-        if (nCol[i+1] > ncols) nCol[i+1] = ncols;
-        int ncell = ncols * row;
-        for (col = nCol[i]; col < nCol[i+1]; col++) {
-           r[col + ncell] = value;
-        }
-      }
-    }
-  }
-  return(r);
+		double y = ymax - (row+0.5) * ry;
+		
+		//  Build a list of nodes.
+		unsigned nodes = 0; 
+		size_t j = n-1;
+		for (size_t i=0; i<n; i++) {
+			if (((pY[i] < y) && (pY[j] >= y)) || ((pY[j] < y) && (pY[i] >= y))) {
+				nCol[nodes++]=(int)  (((pX[i] - xmin + (y-pY[i])/(pY[j]-pY[i]) * (pX[j]-pX[i])) + 0.5 * rx ) / rx); 
+			}
+			j = i; 
+		}
+		
+		std::sort(nCol.begin(), nCol.begin()+nodes);
+		
+		//  Fill the pixels between node pairs.
+		for (size_t i=0; i < nodes; i+=2) {
+			if (nCol[i] >= ncols) break;
+			if (nCol[i+1] > 0) {
+				if (nCol[i] < 0) nCol[i]=0 ;
+				if (nCol[i+1] > ncols) nCol[i+1] = ncols;
+				int ncell = ncols * row;
+				for (size_t col = nCol[i]; col < nCol[i+1]; col++) {
+					r[col + ncell] = value;
+				}
+			}
+		}
+	}
+	return(r);
 }  
 
 
@@ -74,9 +73,20 @@ SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, double background, stri
 			unsigned np = poly.size();
 			
 			for (size_t k = 0; k < np; k++) {
-				
 				part = poly.getPart(k);
-				v = rasterize_polygon(v, value, part.x, part.y, nrow, ncol, extent.xmin, extent.ymax, resx, resy);
+				if (part.hasHoles()) {
+					std::vector<double> vv = rasterize_polygon(v, value, part.x, part.y, nrow, ncol, extent.xmin, extent.ymax, resx, resy);
+					for (size_t h=0; h < part.nHoles(); h++) {
+						vv = rasterize_polygon(vv, background, part.xhole[h], part.yhole[h], nrow, ncol, extent.xmin, extent.ymax, resx, resy);
+					}
+					for (size_t q=0; q < vv.size(); q++) {
+						if (vv[i] != background) {
+							v[i] = vv[i];
+						}
+					}
+				} else {
+					v = rasterize_polygon(v, value, part.x, part.y, nrow, ncol, extent.xmin, extent.ymax, resx, resy);
+				}
 			}
 		}
 		out.writeValues(v, out.bs.row[i]);

@@ -1,6 +1,8 @@
 
+	
 
-spPolygons <- function(x, ..., attr=NULL, crs=NA) {
+
+.spatPolygons <- function(x, ..., attr=NULL, crs=NA) {
 	Part <- function(xy) {
 		p <- SpatPolyPart$new()
 		p$set(xy[,1], xy[,2])

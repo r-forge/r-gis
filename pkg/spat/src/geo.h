@@ -33,12 +33,15 @@ class SpatExtent {
 
 
 
+
 class SpatPolyPart {
 	public:
 		std::vector<double> x, y; 
-		std::vector<double> hx, hy; 
+		std::vector< std::vector<double>> xHole, yHole; 
+
 		SpatExtent extent;
-		bool hasHole() { return hx.size() > 0;}
+		bool hasHoles() { return xHole.size() > 0;}
+		unsigned nHoles() { return xHole.size();}
 		bool set(std::vector<double> X, std::vector<double> Y) { 
 			x = X; y = Y;  
 			extent.xmin = *std::min_element(X.begin(), X.end());
@@ -47,6 +50,14 @@ class SpatPolyPart {
 			extent.ymax = *std::max_element(Y.begin(), Y.end());
 			return true;
 		}
+		bool setHole(std::vector<double> X, std::vector<double> Y) { 
+			xHole.push_back(X);
+			yHole.push_back(Y);
+			return true;
+		}
+		std::vector<double> getHoleX(unsigned i) { return( xHole[i] ) ; }
+		std::vector<double> getHoleY(unsigned i) { return( yHole[i] ) ; }
+		
 };
 
 class SpatPoly {
