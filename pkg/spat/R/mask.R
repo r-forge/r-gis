@@ -4,8 +4,8 @@
 # Licence GPL v3
 
 
-setMethod('mask', signature(x='SpatRaster', y='SpatRaster'), 
-function(x, y, filename="", ...) { 
+setMethod('mask', signature(x='SpatRaster', mask='SpatRaster'), 
+function(x, mask, filename="", ...) { 
     overwrite <- .overwrite(...)
     r <- methods::new("GeoRaster")
     r@ptr <- x@ptr$mask(mask@ptr, filename[1], overwrite)
