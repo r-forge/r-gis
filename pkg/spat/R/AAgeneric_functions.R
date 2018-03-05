@@ -3,6 +3,7 @@ if (!isGeneric("mask")) { setGeneric("mask", function(x, mask, ...) standardGene
 if (!isGeneric("crop")) { setGeneric("crop", function(x, y, ...) standardGeneric("crop")) }	
 if (!isGeneric("trim")) { setGeneric("trim", function(x, ...) standardGeneric("trim")) }	
 if (!isGeneric("focal")) { setGeneric("focal", function(x, ...) standardGeneric("focal")) }
+if (!isGeneric("rasterize")) {setGeneric("rasterize", function(x, y, ...) standardGeneric("rasterize"))}	
 
 if (!isGeneric("crs")) { setGeneric("crs", function(x, ...)	standardGeneric("crs")) }	
 if (!isGeneric("crs<-")) { setGeneric("crs<-", function(x, ..., value) standardGeneric("crs<-")) }	
@@ -34,3 +35,4 @@ if (!isGeneric('writeValues')) { setGeneric('writeValues', function(x, v, start)
 if (!isGeneric('writeRaster')) {setGeneric('writeRaster', function(x, filename, ...) standardGeneric('writeRaster'))}
 
 # (!isGeneric("#")) { setGeneric("#", function(object) standardGeneric("#")) }
+if (!isGeneric("image")) {setGeneric("image", function(x,...) standardGeneric("image"))}	
