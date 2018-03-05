@@ -1,0 +1,4 @@
+import(Rcpp)
+importFrom("methods", "new", "validObject")
+useDynLib(spat, .registration = TRUE)
+exportPattern("^[[:alpha:]]+")
