@@ -1,7 +1,7 @@
 using namespace std;
 #include <vector>
 #include <iostream>
-#include "geo.h"
+#include "spat.h"
 
 
 SpatRaster SpatRaster::mask(SpatRaster mask, string filename, bool overwrite) {

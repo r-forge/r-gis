@@ -1,7 +1,7 @@
 using namespace std;
 #include <vector>
 #include <iostream>
-#include "geo.h"
+#include "spat.h"
 #include "util.h"
 
 

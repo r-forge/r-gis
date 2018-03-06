@@ -4,7 +4,7 @@ using namespace std;
 #include <vector>
 #include <limits>
 #include <cmath>
-#include "geo.h"
+#include "spat.h"
 
 
 template <typename T>

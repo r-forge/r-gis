@@ -1,5 +1,5 @@
 using namespace std;
-#include "geo.h"
+#include "spat.h"
 
 SpatRaster::SpatRaster(std::string fname) {
 	constructFromFile(fname);

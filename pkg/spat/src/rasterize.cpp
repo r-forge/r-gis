@@ -3,7 +3,7 @@
 
 using namespace std;
 #include <vector>
-#include "geo.h"
+#include "spat.h"
   
 std::vector<double> rasterize_polygon(std::vector<double> r, double value, std::vector<double> pX, std::vector<double> pY, unsigned nrows, unsigned ncols, double xmin, double ymax, double rx, double ry) {
 
@@ -77,11 +77,11 @@ SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, double background, stri
 				if (part.hasHoles()) {
 					std::vector<double> vv = rasterize_polygon(v, value, part.x, part.y, nrow, ncol, extent.xmin, extent.ymax, resx, resy);
 					for (size_t h=0; h < part.nHoles(); h++) {
-						vv = rasterize_polygon(vv, background, part.xhole[h], part.yhole[h], nrow, ncol, extent.xmin, extent.ymax, resx, resy);
+						vv = rasterize_polygon(vv, background, part.xHole[h], part.yHole[h], nrow, ncol, extent.xmin, extent.ymax, resx, resy);
 					}
 					for (size_t q=0; q < vv.size(); q++) {
-						if (vv[i] != background) {
-							v[i] = vv[i];
+						if (vv[q] != background) {
+							v[q] = vv[q];
 						}
 					}
 				} else {

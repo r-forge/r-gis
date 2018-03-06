@@ -1,5 +1,5 @@
 using namespace std;
-#include "geo.h"
+#include "spat.h"
 #include "util.h"
 
 bool SpatRaster::compare(unsigned nrows, unsigned ncols, SpatExtent e ) {

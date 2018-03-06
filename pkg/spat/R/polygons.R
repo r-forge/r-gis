@@ -31,6 +31,9 @@
 	if (!is.na(crs)) {
 		ppp$crs <- crs
 	}
+	if (!is.null(attr)) {
+		ppp$attr <- attr[,1]
+	}
 	
 	x <- methods::new("SpatPolygons")
 	x@ptr <- ppp

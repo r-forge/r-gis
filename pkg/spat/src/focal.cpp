@@ -3,7 +3,7 @@
 */
 
 #include <vector>
-#include "geo.h"
+#include "spat.h"
 
 
 // todo: three dimensional focal

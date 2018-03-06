@@ -5,7 +5,7 @@
 
 using namespace std;
 #include <vector>
-#include "geo.h"
+#include "spat.h"
 
 
 // std::vector<double> SpatRaster::sampleRegular(unsigned size, bool cells, bool asRaster) {

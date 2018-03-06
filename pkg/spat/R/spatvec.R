@@ -59,7 +59,7 @@ setMethod("spatPolygons", signature(x='data.frame'),
 		x@ptr <- ppp
 		x
 	}
-}	
+)	
 
 
 	
