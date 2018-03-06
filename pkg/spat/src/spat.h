@@ -105,6 +105,17 @@ class SpatPolygons {
 		}
 		double getAtt(unsigned i) {	return attr[i]; };
 		bool setAtt(unsigned i, double a) { attr[i] = a; return true; };
+		
+		SpatPolygons subset(std::vector<unsigned> range) { 
+			SpatPolygons out;
+			for (size_t i=0; i < range.size(); i++) {
+				out.addPoly( polys[range[i]] ); 
+				out.attr.push_back(attr[i]);
+			}
+			out.crs = crs;
+			return out;	
+		};
+		
 };
 
 
