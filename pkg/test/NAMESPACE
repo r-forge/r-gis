@@ -1,3 +1,0 @@
-exportMethods(extent)
-exportPattern("^[^\\.]")
-
