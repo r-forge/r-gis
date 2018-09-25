@@ -1,0 +1,14 @@
+*.tar.gz
+*Rcheck/
+*.o
+*.so
+*.exe
+*.Rhistory
+*.R~
+*.dll
+*.zip
+.Rproj.user
+
+windows/
+inst/gdal/
+inst/proj/
