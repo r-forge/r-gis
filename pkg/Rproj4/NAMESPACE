@@ -1,4 +1,0 @@
-import(Rcpp)
-useDynLib(Rproj4)
-exportPattern("^[^\\.]")
-
