@@ -147,7 +147,7 @@ class SpatRaster {
 	
 	private:
 		std::string msg;
-		fstream* fs;
+		//fstream* fs;
 		
 	protected:
 		SpatExtent extent;
@@ -160,6 +160,7 @@ class SpatRaster {
 	public:
 		//double NA = std::numeric_limits<double>::quiet_NaN();
 		RasterSource source;
+		SpatExtent window;
 	
 	    std::vector<unsigned> getnlayers() {
 			return source.nlayers;
@@ -185,6 +186,13 @@ class SpatRaster {
 		SpatRaster();
 		SpatRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::string _crs);
 		SpatRaster(unsigned _nrow, unsigned _ncol, unsigned _nlyr, SpatExtent ext, std::string _crs);
+
+		SpatRaster arith(SpatRaster x, std::string oper, std::string filename="", bool overwrite=false);
+		SpatRaster arith(double x, std::string oper, std:: string filename="", bool overwrite=false);
+		SpatRaster arith_rev(double x, std::string oper, std::string filename, bool overwrite);
+		
+		SpatRaster operator + (SpatRaster x) { return arith(x, "+", "", false); }
+
 		
 		double ncell() { return nrow * ncol; }
 
@@ -252,7 +260,7 @@ class SpatRaster {
 		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols);
 		bool readStop();
 		bool writeStart(std::string filename, bool overwrite);
-		bool writeStartFs(std::string filename, bool overwrite, fstream& f);		
+		//bool writeStartFs(std::string filename, bool overwrite, fstream& f);		
 		bool writeValues(std::vector<double> vals, unsigned row);
 		bool writeStop();
 		bool writeHDR();
