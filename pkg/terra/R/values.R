@@ -3,7 +3,8 @@
 # Version 0.9
 # Licence GPL v3
 
-if (!isGeneric("setRange")) {setGeneric("setRange", function(x) standardGeneric("setRange"))}	
+if (!isGeneric("setMinMax")) {setGeneric("setMinMax", function(x) standardGeneric("setMinMax"))}	
+if (!isGeneric("minmax")) {setGeneric("minmax", function(x) standardGeneric("minmax"))}	
 
 
 setMethod("values", signature(x='SpatRaster'), 
@@ -11,7 +12,7 @@ function(x, matrix=TRUE, ...) {
 	if (.hasValues(x)) {
 		v <- x@ptr$getValues()
 		if (matrix) {
-			v <- matrix(v, ncol=nlayer(x))
+			v <- matrix(v, ncol=nlyr(x))
 			colnames(v) <- names(x)
 		}
 	} else {
@@ -44,7 +45,6 @@ setMethod('values<-', signature(x='SpatRaster', 'ANY'),
 	} 
 	stopifnot((length(value) %% ncell(x)) == 0)
 
-	# new pointer
 	y <- rast(x)
 	y@ptr$setValues(value)
 	y
@@ -61,15 +61,15 @@ setMethod('values<-', signature(x='SpatRaster', 'ANY'),
 }
 
 .filenames <- function(x) {
-	x@ptr$source$filename
+	x@ptr$filenames
 }
 
-.hasRange <- function(x) {
+.hasMinMax <- function(x) {
 	x@ptr$hasRange
 }
 
-setMethod('range', signature(x='SpatRaster'), 
-	function(x, ..., na.rm=TRUE) {
+setMethod('minmax', signature(x='SpatRaster'), 
+	function(x) {
 		rmin <- x@ptr$range_min
 		rmax <- x@ptr$range_max
 		rbind(rmin, rmax)
@@ -77,9 +77,9 @@ setMethod('range', signature(x='SpatRaster'),
 )
 
 
-setMethod('setRange', signature(x='SpatRaster'), 
+setMethod('setMinMax', signature(x='SpatRaster'), 
 	function(x) {
-		if (!.hasRange(x)) {
+		if (!.hasMinMax(x)) {
 			x@ptr$setRange
 		}
 	}

@@ -1,174 +1,223 @@
 #include "spat.h"
 #include "SimpleIni.h"
 #include "util.h"
-//#include <fstream>
-# include <cstdio> // remove
 using namespace std;
 
-
-bool canProcessInMemory() {
-	return true;
-}
-
-BlockSize SpatRaster::getBlockSize() {
-	BlockSize bs;
-		
-	if (source.filename[0] == "") {
-	// in memory
-		bs.row = {0};
-		bs.nrows = {nrow};
-		bs.n = 1;
-		
-	} else {
-	
-	// to be improved, see raster::blockSize
-		bs.row = {0, unsigned(floor(nrow/2))};
-		bs.nrows = {bs.row[1], nrow-bs.row[1]};
-		bs.n = 2;
+bool SpatRaster::isSource(std::string filename) {
+	std::vector<string> ff = filenames();
+	for (size_t i=0; i<ff.size(); i++) {
+		if (ff[i] == filename) {
+			return true;
+		}
 	}
-	return bs;
+	return false;
 }
 
 
-SpatRaster SpatRaster::writeRaster(std::string filename, bool overwrite) {
-//	if ((filename == "") { stop}
-//	if ((!hasValues) {stop }
-	writeStart(filename, overwrite);
-	writeValues(getValues(), 0);
-	writeStop();
-	return SpatRaster(filename);
+bool SpatRaster::writeRaster(std::string filename, bool overwrite) {
+	lrtrim(filename);
+	if (filename == "") {
+		filename = "random_file_name.grd";
+	} else if (file_exists(filename)) {
+		if (overwrite) {
+			if (isSource(filename)) {
+				error = true;
+				error_message = "cannot overwrite object to itself";
+			}
+			remove(filename.c_str());
+		} else {
+			error = true;
+			error_message = "file exists";
+		    return false;
+		}
+	}
+
+	string ext = getFileExt(filename);
+	lowercase(ext);
+
+	if (ext == ".grd") {
+		ofstream fs(filename, ios::ate | ios::binary);
+		std::vector<double> v = getValues();
+		fs.write((char*)&v[0], v.size() * sizeof(double));
+		fs.close();
+        return writeHDR(filename);
+	} else {
+        #ifdef useGDAL
+        return writeRasterGDAL(filename, overwrite);
+		#else
+		error = true;
+		error_message = "gdal is not available";
+	    return false;
+        #endif // useGDAL
+	}
 }
-
-
-bool file_exists(const std::string& name) {
-	ifstream f(name.c_str());
-	return f.good(); 
-}
-
 
 
 bool SpatRaster::writeStart(std::string filename, bool overwrite) {
-	
+
+//	double inf = std::numeric_limits<double>::infinity();
+//	s.min_range = inf;
+//	s.max_range = -inf;
+	bool success = true;
 	lrtrim(filename);
 	if (filename == "") {
-		if (!canProcessInMemory()) {
+		if (!canProcessInMemory(4)) {
 			filename = "random_file_name.grd";
 		}
 	}
-	
-	if (filename == "") {
-		source.driver = {"memory"};
-	} else {
 
+	if (filename == "") {
+		source[0].driver = "memory";
+		source[0].memory = true;
+
+	} else {
+		source[0].memory = false;
+		bool exists = file_exists(filename);
 		string ext = getFileExt(filename);
 		lowercase(ext);
 		if (ext == ".grd") {
-			source.driver = {"raster"};				
-			bool exists = file_exists(filename);
+			source[0].driver = {"raster"};
 			if (exists) {
 				if (overwrite) {
 					remove(filename.c_str());
 				} else {
 					// stop()
 				}
-			} 			
+			}
 			//(*fs).open(fname, ios::out | ios::binary);
 		} else {
-			source.driver = {"gdal"} ;			
-			// open GDAL filestream		
+			// open GDAL filestream
+			#ifdef useGDAL
+			source[0].driver = {"gdal"} ;
+			success = writeStartGDAL(filename, overwrite);
+			#else
+			error = true;
+			error_message = "gdal is not available";
+			return false;
+			#endif
 		}
+
 	}
-	
-	source.filename = {filename};
-	bs = getBlockSize();
-	return true;
+	if (open_write) {
+		warning = true;
+		warning_message.push_back("file was already open");
+	}
+	open_write = true;
+	source[0].filename = {filename};
+	bs = getBlockSize(4);
+	return success;
+}
+
+
+
+bool SpatRaster::writeValues(std::vector<double> vals, unsigned row){
+	if (!open_write) {
+		error = true;
+		error_message = "cannot write (no open file)";
+		return false;
+	}
+	bool success = true;
+	if (source[0].driver == "raster") {
+		unsigned size = vals.size();
+		//(*fs).write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
+		string fname = setFileExt(source[0].filename, ".gri");
+		ofstream fs(fname, ios::ate | ios::binary);
+		fs.write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
+		fs.close();
+
+	} else if (source[0].driver == "gdal") {
+		#ifdef useGDAL
+		success = writeValuesGDAL(vals, row);
+		#else
+		error = true;
+		error_message = "gdal is not available";
+		return false;
+		#endif
+	} else {
+        source[0].values = vals;
+        source[0].hasValues = true;
+        source[0].memory = true;
+        setRange();
+	}
+	return success;
 }
 
 
 bool SpatRaster::writeStop(){
+	if (!open_write) {
+		error = true;
+		error_message = "cannot close a file that is not open";
+		return false;
+	}
+	open_write = false;
+	bool success = true;
 
-	if (source.driver[0] == "raster") {
+	if (source[0].driver == "raster") {
 		//(*fs).close();
-		writeHDR();
-	} else if (source.driver[0] == "gdal") {
-	
+		writeHDR(source[0].filename);
+	} else if (source[0].driver == "gdal") {
+		#ifdef useGDAL
+		success = writeStopGDAL();
+		#else
+		error = true;
+		error_message = "gdal is not available";
+		return false;
+		#endif
 	}
-	return true;
-}
-
-bool SpatRaster::writeValues(std::vector<double> vals, unsigned row){
-	
-	if (source.driver[0] == "raster") {
-		unsigned size = vals.size();
-		//(*fs).write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
-		string fname = setFileExt(source.filename[0], ".gri");
-		ofstream fs(fname, ios::ate | ios::binary);
-		fs.write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
-		fs.close();
-		
-	} else if (source.driver[0] == "gdal") {
-		// write with gdal
-	} else {
-		setValues(vals);
-	}
-	return true;
+	source[0].hasValues = true;
+	return success;
 }
 
 
-void SpatRaster::setValues(std::vector<double> _values) {
-	//bool result = false;
-	//if (_values.size() == size()) {
-		values = _values;
-		hasValues = true;
-		source.memory = {true};
-		
-		// todo clear source...
+bool SpatRaster::setValues(std::vector<double> _values) {
+	bool result = false;
+	SpatRaster g = geometry();
+
+	if (_values.size() == g.size()) {
+
+		RasterSource s = g.source[0];
+		s.values = _values;
+		s.hasValues = true;
+		s.memory = true;
+		s.names = getNames();
+		setSource(s);
 		setRange();
-
-		names = std::vector<string> {"layer"};
-		//result = true;
-	//} 
-	//return (result);
+		result = true;
+	} else {
+		error = true;
+		error_message = "incorrect number of values";
+	}
+	return (result);
 }
 
-
-
-void vector_minmax(std::vector<double> v, double &min, int &imin, double &max, int &imax) {
-    std::vector<double>::size_type p=0;
-    imax = -1; imin=-1;
-    min = std::numeric_limits<double>::max();
-    max = std::numeric_limits<double>::lowest();
-    for (auto &val : v) {
-		if (!std::isnan(val)) {
-			if (val > max) {
-				imax = p;
-				max = val;
-			}
-			if (val < min) {
-				imin = p;
-				min = val;
-			}
-		}
-        p++;
-    }
-}
 
 
 void SpatRaster::setRange() {
+
 	double vmin, vmax;
-	int imin, imax;
-	// for each layer {
-		vector_minmax(values, vmin, imin, vmax, imax); 
-		range_min = std::vector<double> {vmin};
-		range_max = std::vector<double> {vmax};
-		hasRange = std::vector<bool> {true};
-	//}
+	unsigned nsources = nsrc();
+	unsigned nc = ncell();
+	unsigned start;
+
+	for (size_t i=0; i<nsources; i++) {
+		unsigned nlyrs = source[i].nlyr;
+		source[i].range_min.resize(nlyrs);
+		source[i].range_max.resize(nlyrs);
+		source[i].hasRange.resize(nlyrs);
+		for (size_t j=0; j<nlyrs; j++) {
+			start = nc * j;
+			minmax(source[i].values.begin()+start, source[i].values.begin()+start+nc, vmin, vmax);
+			source[i].range_min[i] = vmin;
+			source[i].range_max[i] = vmax;
+			source[i].hasRange[i] = true;
+		}
+	}
 }
 
 
 
-bool SpatRaster::writeHDR() { 
-	CSimpleIniA ini;	
+bool SpatRaster::writeHDR(string filename) {
+	CSimpleIniA ini;
 	ini.SetValue("version", NULL, NULL);
 	ini.SetValue("version", "version", "2");
 	ini.SetValue("georeference", NULL, NULL);
@@ -179,21 +228,17 @@ bool SpatRaster::writeHDR() {
 	ini.SetValue("georeference", "crs", crs.c_str());
 	ini.SetValue("dimensions", "nrow", to_string(nrow).c_str());
 	ini.SetValue("dimensions", "ncol", to_string(ncol).c_str());
-	ini.SetValue("dimensions", "nlyr", to_string(nlyr).c_str());
-	ini.SetValue("dimensions", "names", concatenate(names, std::string(":|:")).c_str());		
+	ini.SetValue("dimensions", "nlyr", to_string(nlyr()).c_str());
+	ini.SetValue("dimensions", "names", concatenate(getNames(), std::string(":|:")).c_str());
 	ini.SetValue("data", NULL, NULL);
 	ini.SetValue("data", "datatype", "FLT8S"); // double
 	ini.SetValue("data", "nodata", to_string(-1 * numeric_limits<double>::max()).c_str());
-	ini.SetValue("data", "range_min", concatenate(dbl2str(range_min), std::string(":|:")).c_str());
-	ini.SetValue("data", "range_max", concatenate(dbl2str(range_max), std::string(":|:")).c_str());
+	ini.SetValue("data", "range_min", concatenate(dbl2str(range_min()), std::string(":|:")).c_str());
+	ini.SetValue("data", "range_max", concatenate(dbl2str(range_max()), std::string(":|:")).c_str());
 
-	string f = setFileExt(source.filename[0], ".grd");
-	SI_Error rc = ini.SaveFile(f.c_str());
-	if (rc < 0) {
-		return false;
-	} else {
-		return true;
-	}	
+	//string f = setFileExt(filename, ".grd");
+	SI_Error rc = ini.SaveFile(filename.c_str());
+	return rc >= 0 ;
 }
 
 
@@ -202,14 +247,14 @@ bool SpatRaster::writeHDR() {
 
 /*
 bool SpatRaster::writeStartFs(std::string filename, bool overwrite,  fstream& f) {
-	
+
 	lrtrim(filename);
 	if (filename == "") {
-		if (!canProcessInMemory()) {
+		if (!canProcessInMemory(4)) {
 			filename = "random_file_name.grd";
 		}
 	}
-	
+
 	if (filename == "") {
 		source.driver = {"memory"};
 
@@ -224,13 +269,13 @@ bool SpatRaster::writeStartFs(std::string filename, bool overwrite,  fstream& f)
 			(*fs).open(fname, ios::out | ios::binary);
 			fs = &f;
 		} else {
-			source.driver = {"gdal"} ;			
-			// open GDAL filestream		
+			source.driver = {"gdal"} ;
+			// open GDAL filestream
 		}
 	}
-	
+
 	source.filename = {filename};
-	bs = getBlockSize();
+	bs = getBlockSize(4);
 	return true;
 }
 */

@@ -4,7 +4,7 @@
 
 #include <vector>
 #include "spat.h"
-
+#include <algorithm>
 
 // todo: three dimensional focal
 
@@ -56,7 +56,7 @@ std::vector<double> SpatRaster::focal_values(std::vector<unsigned> w, double fil
 	unsigned nrows2 = std::min(nrows, nrows+wr);
 
 	readStart();
-	std::vector<double> d = readValues(row2, nrows2, 0, ncol);	
+	std::vector<double> d = readValues(row2, nrows2, 0, ncol, 0, nlyr());	
 	readStop();
 
 	std::vector<double> f = focal_get(d, dim, w, fillvalue);	
@@ -94,8 +94,8 @@ SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm,
 		window.push_back(w[1]);
 	}
 	
-	SpatRaster out = *this;
-	if (!hasValues) { return(out); }
+	SpatRaster out = geometry();
+	if (!source[0].hasValues) { return(out); }
 	std::vector<unsigned> dim = {0, ncol};
 	
  	out.writeStart(filename, overwrite);
@@ -106,7 +106,7 @@ SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm,
 	std::vector<double> fv;
 	
 	for (size_t i = 0; i < out.bs.n; i++) {
-		d = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);	
+		d = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol, 0, nlyr());	
 		dim[0] = out.bs.nrows[i];
 		f = focal_get(d, dim, window, fillvalue);
 		v.resize(out.bs.nrows[i] * ncol);

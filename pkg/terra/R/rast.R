@@ -1,12 +1,12 @@
 # Author: Robert J. Hijmans
 # Date :  October 2017
-# Version 0.9
+# Version 1.0
 # Licence GPL v3
 
 if (!isGeneric("rast") ) { setGeneric("rast", function(x, ...) standardGeneric("rast")) }
 
 setMethod('rast', signature(x='missing'), 
-	function(x, nrow=180, ncol=360, nlayer=1, xmin=-180, xmax=180, ymin=-90, ymax=90, crs, extent, resolution, ...) {
+	function(x, nrow=180, ncol=360, nlyr=1, xmin=-180, xmax=180, ymin=-90, ymax=90, crs, extent, resolution, ...) {
 
 		if (missing(extent)) {	extent <- ext(xmin, xmax, ymin, ymax) }
 		e <- as.vector(extent)
@@ -23,12 +23,14 @@ setMethod('rast', signature(x='missing'),
 		
 
 		r <- methods::new('SpatRaster')
-		r@ptr <- SpatRaster$new(c(nrow, ncol, nlayer), e, crs)
+		r@ptr <- SpatRaster$new(c(nrow, ncol, nlyr), e, crs)
 		
 		if (!missing(resolution)) {
 		#	res(r) <- resolution
 			stop()
 		}
+		
+		.messages(r, "rast")		
 
 		return(r)
 	}
@@ -51,6 +53,7 @@ setMethod('rast', signature(x='character'),
 		f <- .fullFilename(x)
 		r <- methods::new('SpatRaster')
 		r@ptr <- SpatRaster$new(f)
+		.messages(r, "rast")		
 		return(r)
 	}
 )
@@ -61,6 +64,7 @@ setMethod('rast', signature(x='SpatRaster'),
 		r <- methods::new('SpatRaster')
 		r@ptr <- SpatRaster$new(dim(x), as.vector(ext(x)), crs(x))
 		# also need the keep the names ?
+		.messages(r, "rast")		
 		return(r)
 	}
 )
@@ -71,6 +75,7 @@ setMethod('rast', signature(x='matrix'),
 		r <- methods::new('SpatRaster')
 		r@ptr <- SpatRaster$new(c(dim(x), 1), c(0, ncol(x), 0, nrow(x)), "")
 		values(r) <- x
+		.messages(r, "rast")		
 		return(r)
 	}
 )
@@ -85,6 +90,7 @@ setMethod('rast', signature(x='array'),
 		r <- methods::new('SpatRaster')
 		r@ptr <- SpatRaster$new(dims, c(0, dims[2], 0, dims[1]), "")
 		values(r) <- x
+		.messages(r, "rast")		
 		return(r)
 	}
 )

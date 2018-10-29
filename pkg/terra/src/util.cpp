@@ -1,9 +1,42 @@
 using namespace std;
-#include <algorithm> 
+#include <algorithm>
 #include <cctype>
 #include <locale>
 #include <set>
 #include <string>
+#include <cmath>
+#include <vector>
+#include <fstream>
+
+void vector_minmax(std::vector<double> v, double &min, int &imin, double &max, int &imax) {
+    std::vector<double>::size_type p=0;
+    imax = -1; imin=-1;
+    min = std::numeric_limits<double>::max();
+    max = std::numeric_limits<double>::lowest();
+    for (auto &val : v) {
+		if (!std::isnan(val)) {
+			if (val > max) {
+				imax = p;
+				max = val;
+			}
+			if (val < min) {
+				imin = p;
+				min = val;
+			}
+		}
+        p++;
+    }
+	if (imax == -1) {
+		max = NAN;
+		min = NAN;
+	}
+}
+
+
+bool file_exists(const std::string& name) {
+	ifstream f(name.c_str());
+	return f.good();
+}
 
 
 double roundn(double x, int n){
@@ -15,7 +48,7 @@ double roundn(double x, int n){
 
 
 
-std::string concatenate(std::vector<string> v, std::string delim) {	
+std::string concatenate(std::vector<string> v, std::string delim) {
 	for (size_t i=0; i<(v.size()-1); i++) {
 		v[i] = v[i] + delim;
 	}
@@ -38,7 +71,7 @@ void lowercase(std::string &s) {
 
 bool is_in_set(string s, std::vector<string> ss) {
 	std::set<std::string> sset (ss.begin(), ss.end());
-	return sset.find(s) != sset.end();	
+	return sset.find(s) != sset.end();
 }
 
 std::string is_in_set_default(string s, std::vector<string> ss, string defvalue, bool tolower) {
@@ -46,7 +79,7 @@ std::string is_in_set_default(string s, std::vector<string> ss, string defvalue,
 	std::set<std::string> sset (ss.begin(), ss.end());
 	if (sset.find(s) == sset.end() ) {
 		s = defvalue;
-	} 
+	}
 	return s;
 }
 
@@ -66,7 +99,7 @@ std::vector<std::string> strsplit(std::string s, std::string delimiter){
 }
 
 
-std::vector<double> str2dbl(std::vector<string> s) { 
+std::vector<double> str2dbl(std::vector<string> s) {
 	std::vector<double> d (s.size());
 	std::transform(s.begin(), s.end(), d.begin(), [](const std::string& val) {
 		return std::stod(val);
@@ -74,7 +107,7 @@ std::vector<double> str2dbl(std::vector<string> s) {
 	return d;
 }
 
-std::vector<string> dbl2str(std::vector<double> d) { 
+std::vector<string> dbl2str(std::vector<double> d) {
 	std::vector<string> s (d.size());
 	std::transform(d.begin(), d.end(), s.begin(),
 			[](double i) { return std::to_string(i); }
@@ -98,6 +131,18 @@ string setFileExt(const string& s, const string& ext) {
 		return(s.substr(0, i) + ext);
 	}
 	return(s + ext);
+}
+
+string basename(string filename) {
+	const size_t i = filename.find_last_of("\\/");
+	if (std::string::npos != i) {
+		filename.erase(0, i + 1);
+	}
+	const size_t p = filename.rfind('.');
+	if (std::string::npos != p) {
+		filename.erase(p);
+	}
+	return filename;
 }
 
 
@@ -139,4 +184,5 @@ std::string lrtrim_copy(std::string s) {
     lrtrim(s);
     return s;
 }
+
 

@@ -23,7 +23,7 @@ setMethod ('show' , 'SpatRaster',
 		cat('class       :' , class(object), '\n')
 
 		d <- dim(object)
-		cat('dimensions  : ', d[1], ', ', d[2], ', ', d[3], '  (nrow, ncol, nlayer)\n', sep="" ) 
+		cat('dimensions  : ', d[1], ', ', d[2], ', ', d[3], '  (nrow, ncol, nlyr)\n', sep="" ) 
 		#cat ('ncell       :' , ncell(object), '\n')
 
 		xyres <- res(object)
@@ -36,23 +36,37 @@ setMethod ('show' , 'SpatRaster',
 		cat('coord. ref. :' , crs(object), '\n')
 		
 		mnr <- 15
+
+		ln <- names(object)
+		nl <- nlyr(object)
+			
+		if (nl > mnr) {
+			ln <- c(ln[1:mnr], '...')
+		}
+
 		if (.hasValues(object)) {
-			nl <- nlayer(object)
-		
+			nsr <- nsrc(object)	
 			m <- .inMemory(object)
 			f <- .filenames(object)
 			sources <- rep('memory', length(m))
 			sources[!m] <- f[!m] 
-			cat('data source :', sources, '\n')
-			
-			ln <- names(object)
-			
-			if (nl > mnr) {
-				ln <- c(ln[1:mnr], '...')
+			if (nsr > 1) {
+				lbs <- .nlyrBySource(object)
+				cat('data sources:', sources[1], paste0('(', lbs[1] , ifelse(lbs[1]>1, ' layers)', ' layer)')), '\n')
+				for (i in 2:(min(10, nsr))) {
+					cat('             ', sources[i], paste0('(', lbs[i] , ifelse(lbs[i]>1, ' layers)', ' layer)')), '\n')
+				}			
+				
+				if (nsr > 10) {
+					cat('             ', '... and', nsr-10, 'more sources\n')				
+				}
+			} else {
+				cat('data source :', sources[1], '\n')
 			}
+			
 
-			if (any(.hasRange(object))) {
-				r <- range(object)
+			if (any(.hasMinMax(object))) {
+				r <- minmax(object)
 				minv <- format(r[1,])
 				maxv <- format(r[2,])
 				minv <- gsub('Inf', '?', minv)
@@ -85,6 +99,9 @@ setMethod ('show' , 'SpatRaster',
 			} else {
 				cat('names       :', paste(ln, collapse=', '), '\n')
 			}			
+		} else {
+			cat('data sources:', 'no data\n')
+			cat('names       :', paste(ln, collapse=', '), '\n')
 		}
 		
 	}
