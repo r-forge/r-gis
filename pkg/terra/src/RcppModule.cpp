@@ -1,58 +1,24 @@
 #include <Rcpp.h>
-#include "spat.h"
+#include "spatraster.h"
 
 using namespace Rcpp;
-
-/*
-NumericMatrix getValuesM(SpatRaster* r) {
-	NumericMatrix x(r->ncell(), r->nlyr() );
-	std::vector<double> v;
-	v = r->getValues();
-	std::copy(v.begin(), v.end(), x.begin());
-	return(x);
-}
-*/
-
-List getBlockSizeR(SpatRaster* r, unsigned n) {              //+1 for R
-    BlockSize bs = r->getBlockSize(n);
-	List L = List::create(Named("row") = bs.row, Named("nrows") = bs.nrows, Named("n") = bs.n);
-	return(L);
-}
+#include "RcppFunctions.h"
 
 RCPP_EXPOSED_CLASS(SpatExtent)
-
 RCPP_EXPOSED_CLASS(RasterSource)
 RCPP_EXPOSED_CLASS(SpatRaster)
+RCPP_EXPOSED_CLASS(SpatVector)
 
-//RCPP_EXPOSED_CLASS(SpatDataFrame)
-RCPP_EXPOSED_CLASS(SpatGeomRing)
-RCPP_EXPOSED_CLASS(SpatGeomRings)
-RCPP_EXPOSED_CLASS(SpatPolygons)
-//RCPP_EXPOSED_CLASS(SpatGeomSegment)
-//RCPP_EXPOSED_CLASS(SpatGeomSegments)
-//RCPP_EXPOSED_CLASS(SpatLines)
-//RCPP_EXPOSED_CLASS(SpatPoints)
-//RCPP_EXPOSED_CLASS(SpatVector)
+//RCPP_EXPOSED_CLASS(SpatGeomRing)
+//RCPP_EXPOSED_CLASS(SpatGeomRings)
+//RCPP_EXPOSED_CLASS(SpatPolygons)
 
 	
 RCPP_MODULE(spat){
 
     using namespace Rcpp;
 
-/*	
-    class_<SpatDataFrame>("SpatDataFrame")
-		.constructor()	
-//		.field("dv", &SpatDataFrame::dv)
-//		.field("iv", &SpatDataFrame::iv)
-//		.field("sv", &SpatDataFrame::sv)
-		.field("itype", &SpatDataFrame::itype)
-		.field("iplace", &SpatDataFrame::iplace)
-		.field("names", &SpatDataFrame::names)
-//		.field_readonly("NAS", &SpatDataFrame::NAS)
-	;	
-*/
-	
-    class_<SpatGeomRing>("SpatGeomRing")
+/*    class_<SpatGeomRing>("SpatGeomRing")
 		.constructor()
 		.field_readonly("x", &SpatGeomRing::x )
 		.field_readonly("y", &SpatGeomRing::y )
@@ -74,18 +40,32 @@ RCPP_MODULE(spat){
 	;	
 	
     class_<SpatPolygons>("SpatPolygons")
+		.constructor()	
 //		.field("polygons", &SpatPolygons::polys )
 		.field_readonly("extent", &SpatPolygons::extent )
-//		.field("df", &SpatPolygons::df )
 		.field("crs", &SpatPolygons::crs )
 		.constructor()
 		.method("getPoly", &SpatPolygons::getGeometry, "getPoly")
 		.method("addPoly", &SpatPolygons::addGeometry, "addPoly")
 		.method("size", &SpatPolygons::size, "size")
-
-//		.method("getAtt", &SpatPolygons::getAtt, "getAtt")
-//		.method("setAtt", &SpatPolygons::setAtt, "setAtt")
 	;	
+*/
+    class_<SpatVector>("SpatVector")
+		.constructor()	
+		.method("names", &SpatVector::names, "names")		
+		.method("nrow", &SpatVector::nrow, "nrow")		
+		.method("ncol", &SpatVector::ncol, "ncol")		
+		.property("crs", &SpatVector::getCRS, &SpatVector::setCRS, "crs")		
+		.method("type", &SpatVector::type, "type")		
+		.method("extent", &SpatVector::extent, "extent")		
+		.method("read", &SpatVector::read, "read")		
+		.method("getAttributes", &getAttributes, "getAttributes")
+		.method("getGeometry", &getGeometry, "getGeometry")
+		.field("error", &SpatVector::error )
+		.field("warning", &SpatVector::warning )
+		.field("error_message", &SpatVector::error_message )
+		.field("warning_message", &SpatVector::warning_message )
+	;
 
 	
     class_<SpatExtent>("SpatExtent")
@@ -179,7 +159,7 @@ RCPP_MODULE(spat){
 		.field("error_message", &SpatRaster::error_message )
 		.field("warning_message", &SpatRaster::warning_message )
 		
-		.method("rasterizePolygons", &SpatRaster::rasterizePolygons, "rasterizePolygons")
+	//	.method("rasterizePolygons", &SpatRaster::rasterizePolygons, "rasterizePolygons")
 		.method("crop", &SpatRaster::crop, "crop")
 		.method("focal", &SpatRaster::focal, "focal")
 		.method("focalValues", &SpatRaster::focal_values, "focalValues")
@@ -199,7 +179,6 @@ RCPP_MODULE(spat){
 		.method("summary_numb", &SpatRaster::summary_numb, "summary_numb")
 		.method("logic_rast", ( SpatRaster (SpatRaster::*)(SpatRaster, std::string, std::string, bool) )( &SpatRaster::logic ))
 		.method("logic_numb", ( SpatRaster (SpatRaster::*)(bool, std::string, std::string, bool) )( &SpatRaster::logic ))
-		
 	;
 }
 

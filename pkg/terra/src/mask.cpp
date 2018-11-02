@@ -1,13 +1,8 @@
-using namespace std;
 #include <vector>
-#include "spat.h"
+#include "spatraster.h"
 
 
-
-
-
-
-SpatRaster SpatRaster::mask(SpatRaster x, string filename, bool overwrite) {
+SpatRaster SpatRaster::mask(SpatRaster x, std::string filename, bool overwrite) {
 
 // check for size; need for recycling
 	//SpatRaster out = *this;

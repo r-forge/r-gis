@@ -1,9 +1,5 @@
-using namespace std;
-
-#include "spat.h"
 #include <cmath>
-
-
+#include "spatraster.h"
 
 std::vector<double> SpatRaster::cellFromXY (std::vector<double> x, std::vector<double> y) {
 

@@ -7,7 +7,7 @@ Depends: methods, R (>= 3.3.0)
 LinkingTo: Rcpp
 Imports: Rcpp
 Suggests: lattice
-SystemRequirements: C++11
+SystemRequirements: C++11, GDAL (>= 2.0.1), GEOS (>= 3.4.0), PROJ (>= 4.8.0)
 Author: Robert J. Hijmans
 Maintainer: Robert J. Hijmans <r.hijmans@gmail.com>
 Description: Classes and basic methods for spatial data, notably raster data. This package has been designed to replace the raster package.

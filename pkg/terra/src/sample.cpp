@@ -3,9 +3,9 @@
 // Version 0.9
 // Licence GPL v3
 
-using namespace std;
 #include <vector>
-#include "spat.h"
+#include "spatraster.h"
+using namespace std;
 
 
 // std::vector<double> SpatRaster::sampleRegular(unsigned size, bool cells, bool asRaster) {

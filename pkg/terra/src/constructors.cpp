@@ -1,5 +1,4 @@
-using namespace std;
-#include "spat.h"
+#include "spatraster.h"
 
 
 SpatRaster::SpatRaster(std::string fname) {
@@ -106,7 +105,7 @@ SpatRaster SpatRaster::geometry(long nlyrs) {
 	} else {
 		s.nlyr = nlyrs;
 	}
-	std::vector<string> nms(s.nlyr);
+	std::vector<std::string> nms(s.nlyr);
 	for (size_t i=0; i < s.nlyr; i++) { nms[i] = "lyr" + std::to_string(i+1); }
 	s.names = nms;
 	SpatRaster out;

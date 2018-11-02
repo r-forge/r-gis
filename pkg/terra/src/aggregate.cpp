@@ -1,10 +1,9 @@
 /* Robert Hijmans, October 2014 */
 
-using namespace std;
 #include <vector>
 #include <limits>
 #include <cmath>
-#include "spat.h"
+#include "spatraster.h"
 
 
 template <typename T>
@@ -106,7 +105,7 @@ std::vector<std::vector<double> > SpatRaster::get_aggregates(std::vector<unsigne
 }
 
 
-SpatRaster SpatRaster::aggregate(std::vector<unsigned> fact, string fun, bool narm, string filename, bool overwrite) {
+SpatRaster SpatRaster::aggregate(std::vector<unsigned> fact, std::string fun, bool narm, std::string filename, bool overwrite) {
 
 //std::vector<double> SpatRaster::aggregate(std::vector<unsigned> fact, bool narm, string fun, string filename) {
 

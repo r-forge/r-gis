@@ -1,21 +1,6 @@
-using namespace std;
+//using namespace std;
 #include "extent.h"
-/*
-class SpatDataFrame {
-	public:
-		std::vector<string> names;
-		std::vector<unsigned> itype;
-		std::vector<unsigned> iplace;
-		std::vector< std::vector<double>> dv;
-		std::vector< std::vector<long>> iv;
-		std::vector< std::vector<string>> sv;
-		string NAS = "____NA_+";
-		
-	SpatDataFrame subsetrows(std::vector<unsigned> range);
-	SpatDataFrame subsetcols(std::vector<unsigned> range);
-	void addRow();
-};
-*/
+#include "dataframe.h"
 
 class SpatGeomRing {
 	public:
@@ -75,7 +60,6 @@ class SpatPolygons {
 		std::vector<SpatGeomRings> geometries; 
 
 	public:
-	//	SpatDataFrame df;
 		SpatExtent extent;		
 		std::string crs;
 
@@ -88,17 +72,13 @@ class SpatPolygons {
 			} else {
 				extent = p.extent;
 			}
-			//df.addRow();
 			return true; 
 		}
-		//double getAtt(unsigned i) {	return attr[i]; };
-		//bool setAtt(unsigned i, double a) { attr[i] = a; return true; };
 		
 		SpatPolygons subset(std::vector<unsigned> range) { 
 			SpatPolygons out;
 			for (size_t i=0; i < range.size(); i++) {
 				out.addGeometry( geometries[range[i]] ); 
-				//out.attr.push_back(attr[i]);
 			}
 			out.crs = crs;
 			return out;	
@@ -146,7 +126,6 @@ class SpatLines {
 		std::vector<SpatGeomSegments> geometries; 
 
 	public:
-	//	SpatDataFrame df;
 		SpatExtent extent;		
 		std::string crs;
 
@@ -159,17 +138,13 @@ class SpatLines {
 			} else {
 				extent = p.extent;
 			}
-		//	df.addRow();
 			return true; 
 		}
-		//double getAtt(unsigned i) {	return attr[i]; };
-		//bool setAtt(unsigned i, double a) { attr[i] = a; return true; };
 		
 		SpatLines subset(std::vector<unsigned> range) { 
 			SpatLines out;
 			for (size_t i=0; i < range.size(); i++) {
 				out.addGeometry( geometries[range[i]] ); 
-			//	out.attr.push_back(attr[i]);
 			}
 			out.crs = crs;
 			return out;	
@@ -183,8 +158,8 @@ class SpatLines {
 class SpatPoints {
 	public:
 		std::vector<double> x, y; 
-	//	SpatDataFrame df;
 		SpatExtent extent;
+		std::string crs;
 		bool set(std::vector<double> X, std::vector<double> Y) { 
 			x = X; y = Y;  
 			extent.xmin = *std::min_element(X.begin(), X.end());
@@ -197,18 +172,38 @@ class SpatPoints {
 
 
 class SpatVector {
+
 	public:
+		//SpatVector();
+
 		SpatPoints pts;
 		SpatLines lns;
 		SpatPolygons pos;
 
 		bool error = false;
 		bool warning = false;
-		string error_message;
-		std::vector<string> warning_message;
+		std::string error_message;
+		std::vector<std::string> warning_message;
+		unsigned gtype;
 		
-	bool read(std::string fname);
-	bool write(std::string filename, bool overwrite);
+		bool read(std::string fname);
+		bool write(std::string filename, bool overwrite);
+
+		SpatDataFrame df;
+
+		std::vector<std::string> names();
+		unsigned nrow();
+		unsigned ncol();
+		std::string getCRS();
+		void setCRS(std::string crs);
+		SpatExtent extent();
+		std::string type();
+		
+		std::vector<double> getDv(unsigned i);
+		std::vector<long> getIv(unsigned i);
+		std::vector<std::string> getSv(unsigned i);
+		std::vector<unsigned> getItype();
+		std::vector<unsigned> getIplace();
 	
 };
 

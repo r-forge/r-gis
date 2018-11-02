@@ -1,6 +1,5 @@
-using namespace std;
-#include "spat.h"
 #include <functional>
+#include "spatraster.h"
 
 
 template <typename T>
@@ -130,8 +129,8 @@ std::vector<T> operator<(const std::vector<T>& a, const std::vector<T>& b) {
 }
 
 
-bool smooth_operator(string oper) {
-	std::vector<string> f {"+", "-", "*", "/", "%", "==", "!=", ">", ",", ">=", "<="}; 
+bool smooth_operator(std::string oper) {
+	std::vector<std::string> f {"+", "-", "*", "/", "%", "==", "!=", ">", ",", ">=", "<="}; 
 	return (std::find(f.begin(), f.end(), oper) != f.end());
 }
 

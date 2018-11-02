@@ -1,7 +1,7 @@
-using namespace std;
-#include "spat.h"
+#include "spatraster.h"
 #include "util.h"
 #include "ogrsf_frmts.h"
+using namespace std;
 
 
 bool SpatVector::write(std::string filename, bool overwrite) {
@@ -54,5 +54,7 @@ bool SpatVector::write(std::string filename, bool overwrite) {
         OGRFeature::DestroyFeature( poFeature );
     }
     GDALClose( poDS );
+	return true;
 }
+
 

@@ -1,9 +1,7 @@
-using namespace std;
 #include <vector>
-#include "spat.h"
-
 #include <algorithm>
 #include <functional>
+#include "spatraster.h"
 
 
 template <typename T>
@@ -56,7 +54,7 @@ SpatRaster SpatRaster::logic(SpatRaster x, std::string oper, std::string filenam
 	
 	SpatRaster out = geometry();
 	
-	std::vector<string> f {"&", "|"}; 
+	std::vector<std::string> f {"&", "|"}; 
 	if (std::find(f.begin(), f.end(), oper) == f.end()) {
 		out.error = true;
 		out.error_message = "unknown logic function";

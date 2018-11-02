@@ -1,11 +1,11 @@
-using namespace std;
-#include "spat.h"
+#include "spatraster.h"
 #include "util.h"
 
 #include "gdal_priv.h"
 #include "cpl_conv.h" // for CPLMalloc()
 #include "cpl_string.h"
 #include "ogr_spatialref.h"
+using namespace std;
 
 bool SpatRaster::constructFromFileGDAL(std::string fname) {
 
