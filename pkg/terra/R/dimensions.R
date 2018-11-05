@@ -12,7 +12,7 @@ setMethod('nrow', signature(x='SpatRaster'),
 	function(x){ return(x@ptr$nrow)}
 )
 
-setMethod('nrow', signature(x='SpatVector'), 
+setMethod('nrow', signature(x='SpatLayer'), 
 	function(x){ return(x@ptr$nrow())}
 )
 
@@ -20,7 +20,7 @@ setMethod('ncol', signature(x='SpatRaster'),
 	function(x){ return(x@ptr$ncol) }
 )
 
-setMethod('ncol', signature(x='SpatVector'), 
+setMethod('ncol', signature(x='SpatLayer'), 
 	function(x){ return(x@ptr$ncol())}
 )
 
@@ -92,15 +92,30 @@ setMethod('nsrc', signature(x='SpatRaster'),
 	x@ptr$nlyrBySource();
 }
 
-'ncol<-' <- function(x, value) {
-	dim(x) <- c(nrow(x), value)
-	return(x)
-}	
 
-'nrow<-' <- function(x, value) {
-	dim(x) <- c(value, ncol(x))
-	return(x)
-}	
+setMethod("ncol<-", signature('SpatRaster', 'numeric'), 
+	function(x, ..., value) {
+		dim(x) <- c(nrow(x), value)
+		return(x)
+	}
+)
+
+setMethod("nrow<-", signature('SpatRaster', 'numeric'), 
+	function(x, ..., value) {
+		dim(x) <- c(value, ncol(x))
+		return(x)
+	}
+)
+
+#'ncol<-' <- function(x, value) {
+#	dim(x) <- c(nrow(x), value)
+#	return(x)
+#}	
+
+#'nrow<-' <- function(x, value) {
+#	dim(x) <- c(value, ncol(x))
+#	return(x)
+#}	
 
 
 

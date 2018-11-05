@@ -1,73 +1,18 @@
 #include <Rcpp.h>
 #include "spatraster.h"
 
-using namespace Rcpp;
 #include "RcppFunctions.h"
 
 RCPP_EXPOSED_CLASS(SpatExtent)
+RCPP_EXPOSED_CLASS(SpatMessages)
 RCPP_EXPOSED_CLASS(RasterSource)
 RCPP_EXPOSED_CLASS(SpatRaster)
-RCPP_EXPOSED_CLASS(SpatVector)
+RCPP_EXPOSED_CLASS(SpatLayer)
 
-//RCPP_EXPOSED_CLASS(SpatGeomRing)
-//RCPP_EXPOSED_CLASS(SpatGeomRings)
-//RCPP_EXPOSED_CLASS(SpatPolygons)
-
-	
 RCPP_MODULE(spat){
 
     using namespace Rcpp;
 
-/*    class_<SpatGeomRing>("SpatGeomRing")
-		.constructor()
-		.field_readonly("x", &SpatGeomRing::x )
-		.field_readonly("y", &SpatGeomRing::y )
-		.field_readonly("extent", &SpatGeomRing::extent )
-		.method("set", &SpatGeomRing::set, "set")
-		.method("setHole", &SpatGeomRing::setHole, "setHole")
-		.method("getHoleX", &SpatGeomRing::getHoleX, "getHoleX")
-		.method("getHoleY", &SpatGeomRing::getHoleY, "getHoleY")
-		.method("nHoles", &SpatGeomRing::nHoles, "nHoles")
-		.method("hasHoles", &SpatGeomRing::hasHoles, "hasHoles")
-		
-	;	
-    class_<SpatGeomRings>("SpatGeomRings")
-		.constructor()	
-		.field_readonly("extent", &SpatGeomRings::extent )
-		.method("getPart", &SpatGeomRings::getGeom, "getPart")
-		.method("addPart", &SpatGeomRings::addGeom, "addPart")
-		.method("size", &SpatGeomRings::size, "size")
-	;	
-	
-    class_<SpatPolygons>("SpatPolygons")
-		.constructor()	
-//		.field("polygons", &SpatPolygons::polys )
-		.field_readonly("extent", &SpatPolygons::extent )
-		.field("crs", &SpatPolygons::crs )
-		.constructor()
-		.method("getPoly", &SpatPolygons::getGeometry, "getPoly")
-		.method("addPoly", &SpatPolygons::addGeometry, "addPoly")
-		.method("size", &SpatPolygons::size, "size")
-	;	
-*/
-    class_<SpatVector>("SpatVector")
-		.constructor()	
-		.method("names", &SpatVector::names, "names")		
-		.method("nrow", &SpatVector::nrow, "nrow")		
-		.method("ncol", &SpatVector::ncol, "ncol")		
-		.property("crs", &SpatVector::getCRS, &SpatVector::setCRS, "crs")		
-		.method("type", &SpatVector::type, "type")		
-		.method("extent", &SpatVector::extent, "extent")		
-		.method("read", &SpatVector::read, "read")		
-		.method("getAttributes", &getAttributes, "getAttributes")
-		.method("getGeometry", &getGeometry, "getGeometry")
-		.field("error", &SpatVector::error )
-		.field("warning", &SpatVector::warning )
-		.field("error_message", &SpatVector::error_message )
-		.field("warning_message", &SpatVector::warning_message )
-	;
-
-	
     class_<SpatExtent>("SpatExtent")
 		.constructor()
 		.constructor<double, double, double, double>()
@@ -75,8 +20,35 @@ RCPP_MODULE(spat){
 		.property("valid", &SpatExtent::valid)		
 	;	
 
-    class_<RasterSource>("RasterSource")
+    class_<SpatMessages>("SpatMessages")
+		.constructor()
+		.field("success", &SpatMessages::success)		
+		.field("has_error", &SpatMessages::has_error)		
+		.field("has_warning", &SpatMessages::has_warning)		
+		.field("error", &SpatMessages::error)		
+		.field("warnings", &SpatMessages::warnings)		
+	;	
+
+
+    class_<SpatLayer>("SpatLayer")
+		.constructor()	
+		.method("names", &SpatLayer::names, "names")		
+		.method("nrow", &SpatLayer::nrow, "nrow")		
+		.method("ncol", &SpatLayer::ncol, "ncol")		
+		.method("length", &SpatLayer::size, "length")		
+		.property("crs", &SpatLayer::getCRS, &SpatLayer::setCRS, "crs")		
+		.method("type", &SpatLayer::type, "type")		
+		.method("extent", &SpatLayer::getExtent, "extent")		
+		.method("read", &SpatLayer::read, "read")		
+		.method("getAttributes", &getAttributes, "getAttributes")
+		.method("getGeometry", &getGeometry, "getGeometry")
+		.method("setGeometry", &SpatLayer::setGeometry, "setGeometry")
+		.field("messages", &SpatLayer::msg, "messages")
+	;
+
 	
+
+    class_<RasterSource>("RasterSource")	
 		.field_readonly("memory", &RasterSource::memory)
 		.field_readonly("filename", &RasterSource::filename)
 		.field_readonly("driver", &RasterSource::driver)
@@ -132,17 +104,13 @@ RCPP_MODULE(spat){
 		.method("nsrc", &SpatRaster::nsrc, "nsrc" )	
 		
 		.method("nlyrBySource", &SpatRaster::nlyrBySource, "nlyrBySource" )		
-				
 		.method("nlyr", &SpatRaster::nlyr, "nlyr" )
 		.property("extent", &SpatRaster::getExtent, &SpatRaster::setExtent )
 		.property("crs", &SpatRaster::getCRS, &SpatRaster::setCRS )
-
 		.property("names", &SpatRaster::getNames)
 		.method("setNames", &SpatRaster::setNames, "setNames" )
-
 		.property("res", &SpatRaster::resolution)
 		.property("origin", &SpatRaster::origin)
-
 		.property("inMemory", &SpatRaster::inMemory )
 		.property("filenames", &SpatRaster::filenames )
 		.property("hasValues", &SpatRaster::hasValues )
@@ -153,13 +121,10 @@ RCPP_MODULE(spat){
 		.property("range_min", &SpatRaster::range_min )
 		.property("range_max", &SpatRaster::range_max )
 
+		.field("messages", &SpatRaster::msg, "messages")
 		
-		.field("error", &SpatRaster::error )
-		.field("warning", &SpatRaster::warning )
-		.field("error_message", &SpatRaster::error_message )
-		.field("warning_message", &SpatRaster::warning_message )
 		
-	//	.method("rasterizePolygons", &SpatRaster::rasterizePolygons, "rasterizePolygons")
+		.method("rasterizePolygons", &SpatRaster::rasterizePolygons, "rasterizePolygons")
 		.method("crop", &SpatRaster::crop, "crop")
 		.method("focal", &SpatRaster::focal, "focal")
 		.method("focalValues", &SpatRaster::focal_values, "focalValues")

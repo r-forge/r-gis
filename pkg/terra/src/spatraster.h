@@ -1,6 +1,6 @@
 #include <fstream>
 #include <numeric>
-#include "spatvector.h"
+#include "spatVector.h"
 
 #define useGDAL
 
@@ -90,11 +90,9 @@ class SpatRaster {
 		BlockSize bs;
 		BlockSize getBlockSize(unsigned n);
 
-		bool error = false;
-		bool warning = false;
-		std::string error_message;
-		std::vector<std::string> warning_message;
-
+		SpatMessages msg;
+		void setError(std::string s) { msg.setError(s); }
+		void addWarning(std::string s) { msg.addWarning(s); }
 
 		//double NA = std::numeric_limits<double>::quiet_NaN();
 
@@ -272,7 +270,7 @@ class SpatRaster {
 		SpatRaster mask(SpatRaster x, std::string filename="", bool overwrite=false);
 		SpatRaster focal(std::vector<double> w, double fillvalue, bool narm, unsigned fun, std::string filename, bool overwrite);
 		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows);
-		SpatRaster rasterizePolygons(SpatPolygons p, double background, std::string filename, bool overwrite);
+		SpatRaster rasterizePolygons(SpatLayer p, double background, std::string filename, bool overwrite);
 
 		std::vector<double> sampleRegular(unsigned size, bool cells, bool asRaster);
 };

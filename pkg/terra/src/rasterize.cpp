@@ -3,9 +3,8 @@
 
 #include <vector>
 #include "spatraster.h"
-using namespace std;
 
-std::vector<double> rasterize_polygon(std::vector<double> r, double value, std::vector<double> pX, std::vector<double> pY, unsigned nrows, unsigned ncols, double xmin, double ymax, double rx, double ry) {
+std::vector<double> rasterize_polygon(std::vector<double> r, double value, const std::vector<double> &pX, const std::vector<double> &pY, const unsigned nrows, const unsigned ncols, const double xmin, const double ymax, const double rx, const double ry) {
 
 	unsigned n = pX.size();
 	std::vector<unsigned> nCol(n);
@@ -44,10 +43,9 @@ std::vector<double> rasterize_polygon(std::vector<double> r, double value, std::
 	return(r);
 }
 
-#include <iostream>
 
 
-SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, double background, string filename, bool overwrite) {
+SpatRaster SpatRaster::rasterizePolygons(SpatLayer p, double background, std::string filename, bool overwrite) {
 
 	SpatRaster out = geometry();
   	out.writeStart(filename, overwrite);
@@ -55,8 +53,9 @@ SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, double background, stri
 	double resx = xres();
 	double resy = yres();
 
-	SpatGeomRings poly;
-	SpatGeomRing part;
+	SpatGeom poly;
+	SpatPart part;
+	SpatHole hole;
 
 	unsigned n = p.size();
 
@@ -66,7 +65,7 @@ SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, double background, stri
 
 		for (size_t j = 0; j < n; j++) {
 
-			poly = p.getGeometry(j);
+			poly = p.getGeom(j);
 			//value = p.getAtt(j);
 			//if (std::isnan(value)) { value = j;}
 			value = j+1;
@@ -74,11 +73,12 @@ SpatRaster SpatRaster::rasterizePolygons(SpatPolygons p, double background, stri
 			unsigned np = poly.size();
 
 			for (size_t k = 0; k < np; k++) {
-				part = poly.getGeom(k);
+				part = poly.getPart(k);
 				if (part.hasHoles()) {
 					std::vector<double> vv = rasterize_polygon(v, value, part.x, part.y, nrow, ncol, extent.xmin, extent.ymax, resx, resy);
 					for (size_t h=0; h < part.nHoles(); h++) {
-						vv = rasterize_polygon(vv, background, part.xHole[h], part.yHole[h], nrow, ncol, extent.xmin, extent.ymax, resx, resy);
+						hole = part.getHole(h);
+						vv = rasterize_polygon(vv, background, hole.x, hole.y, nrow, ncol, extent.xmin, extent.ymax, resx, resy);
 					}
 					for (size_t q=0; q < vv.size(); q++) {
 						if (vv[q] != background) {

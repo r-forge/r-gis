@@ -1,13 +1,11 @@
-#include "spatvector.h"
+#include "spatVector.h"
 #include "util.h"
 
 #include "ogrsf_frmts.h"
 #include "ogr_spatialref.h"
-using namespace std;
 
-
-string geomType(OGRLayer *poLayer) {
-	string s = "";
+std::string geomType(OGRLayer *poLayer) {
+	std::string s = "";
     poLayer->ResetReading();
     OGRFeature *poFeature;
     while( (poFeature = poLayer->GetNextFeature()) != NULL ) {
@@ -19,6 +17,7 @@ string geomType(OGRLayer *poLayer) {
 	OGRFeature::DestroyFeature( poFeature );
 	return s;
 }	
+
 
 SpatDataFrame readAttributes(OGRLayer *poLayer) {
 	OGRFieldType ft;
@@ -86,60 +85,197 @@ SpatDataFrame readAttributes(OGRLayer *poLayer) {
 
 
 
-void readPoints (OGRLayer *poLayer, std::vector<double> &x, std::vector<double> &y) {
-	OGRFeature *poFeature;
-    poLayer->ResetReading();
-	size_t i=0;
-    while( (poFeature = poLayer->GetNextFeature()) != NULL ) {
-        OGRGeometry *poGeometry = poFeature->GetGeometryRef();     
-        if( poGeometry != NULL) { // && wkbFlatten(poGeometry->getGeometryType()) == wkbPoint ) {
-			OGRPoint *poPoint = (OGRPoint *) poGeometry;
-            x[i] = poPoint->getX();
-			y[i] = poPoint->getY();
-        } else {
-            x[i] = NAN;
-			y[i] = NAN;
-        }
-		i++;
-    }
-    OGRFeature::DestroyFeature( poFeature );
-}
 
+bool SpatLayer::read(std::string fname) {
 
-
-bool SpatVector::read(std::string fname) {
+	msg.success = true;
 
     GDALAllRegister();
     GDALDataset *poDS = static_cast<GDALDataset*>(GDALOpenEx( fname.c_str(), GDAL_OF_VECTOR, NULL, NULL, NULL ));
     if( poDS == NULL ) {
-        error_message = "Cannot open file";
-		error = true;
+        setError("Cannot open file");
 		return false;
     }
-	string crs = "";
+	std::string crs = "";
 	OGRSpatialReference *poSRS = poDS->GetLayer(0)->GetSpatialRef();
 	if (poSRS) {
 		char *pszPRJ = NULL;
 		poSRS->exportToProj4(&pszPRJ);
 		crs = pszPRJ;
 	}
-	
-	OGRLayer  *poLayer = poDS->GetLayerByName( basename(fname).c_str() );
-	df = readAttributes(poLayer);
+	OGRLayer *poLayer = poDS->GetLayerByName( basename(fname).c_str() );
 
-	string geomtype = geomType(poLayer);
-	if (geomtype == "POINT") {
-		gtype = 1;
-		std::vector<double> X(df.nrow());
-		std::vector<double> Y(df.nrow());
-		readPoints (poLayer, X, Y);
-		pts.set(X, Y);
-	} else {
-		//printf("unknown geomtype");		
-	}
+	df = readAttributes(poLayer);
 	
+
+	OGRwkbGeometryType wkbgeom = wkbFlatten( poLayer ->GetGeomType());
+	OGRFeature *poFeature;
+	OGRPoint ogrPt;
+	unsigned np, nh, ng;
+
+	poLayer->ResetReading();
+	if ((wkbgeom == wkbPoint) | (wkbgeom == wkbMultiPoint)) {
+		SpatPart p(0,0);
+		while( (poFeature = poLayer->GetNextFeature()) != NULL ) {
+			OGRGeometry *poGeometry = poFeature->GetGeometryRef();
+			SpatGeom g;
+			g.gtype = points;
+			if (poGeometry != NULL) 
+				if ( wkbFlatten(poGeometry->getGeometryType()) == wkbPoint ) {
+				#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(2,3,0)
+					OGRPoint *poPoint = poGeometry->toPoint();
+				#else
+					OGRPoint *poPoint = (OGRPoint *) poGeometry;
+				#endif
+					p.x[0] = poPoint->getX();
+					p.y[0] = poPoint->getY();
+					g.addPart(p);
+				} else {
+					OGRMultiPoint *poMultipoint = ( OGRMultiPoint * )poGeometry;
+					ng = poMultipoint ->getNumGeometries();
+					std::vector<double> X(ng);
+					std::vector<double> Y(ng);
+					for (size_t i=0; i<ng; i++) {
+		              	OGRGeometry *poMpGeometry = poMultipoint->getGeometryRef(i);
+					#if GDAL_VERSION_NUM >= GDAL_COMPUTE_VERSION(2,3,0)
+						OGRPoint *poPoint = poMpGeometry->toPoint();
+					#else
+						OGRPoint *poPoint = (OGRPoint *) poMpGeometry;
+					#endif
+						X[i] = poPoint->getX();
+						Y[i] = poPoint->getY();
+					}				
+					SpatPart pp(X, Y);
+					g.addPart(pp);
+			} else {
+				p.x[0] = NAN;
+				p.y[0] = NAN;
+				g.addPart(p);
+			}
+			addGeom(g);
+		}
+	} else if (wkbgeom == wkbLineString) {
+		while ( (poFeature = poLayer->GetNextFeature()) != NULL ) {
+			OGRGeometry *poGeometry = poFeature->GetGeometryRef();     
+			SpatGeom g;
+			g.gtype = lines;
+			if (poGeometry != NULL) {
+				if (wkbFlatten ( poGeometry ->getGeometryType() ) == wkbLineString) {
+					OGRLineString *poGeom = (OGRLineString *) poGeometry;
+					np = poGeom->getNumPoints();
+					std::vector<double> X(np);
+					std::vector<double> Y(np);
+					for (size_t i=0; i<np; i++) {
+						poGeom->getPoint(i, &ogrPt);
+						X[i] = ogrPt.getX();
+						Y[i] = ogrPt.getY();
+					}
+					SpatPart p(X, Y);
+					g.addPart(p);
+				} else {
+					OGRMultiLineString *poGeom = ( OGRMultiLineString * )poGeometry;
+					ng = poGeom->getNumGeometries();
+					for (size_t i=0; i<ng; i++) {										
+						OGRGeometry *poLineGeometry = poGeom->getGeometryRef(i);
+						OGRLineString *poLine = ( OGRLineString * )poLineGeometry;
+						np = poLine->getNumPoints();
+						std::vector<double> X(np);
+						std::vector<double> Y(np);
+						for (size_t j=0; j<np; j++ ) {
+							poLine->getPoint(j, &ogrPt);
+							X[j] = ogrPt.getX();
+							Y[j] = ogrPt.getY();
+						}
+						SpatPart p(X, Y);
+						g.addPart(p);
+					} 
+				}
+			}
+			addGeom(g);
+		}
+	} else if (wkbgeom == wkbPolygon) {
+		while ( (poFeature = poLayer->GetNextFeature()) != NULL ) {
+			OGRGeometry *poGeometry = poFeature ->GetGeometryRef();
+			SpatGeom g;
+			g.gtype = polygons;
+			if (poGeometry != NULL) { 
+				if ( (poGeometry->getGeometryType() ) == wkbPolygon ) {
+					OGRPolygon *poGeom = ( OGRPolygon * )poGeometry;
+					OGRLinearRing *poRing = poGeom->getExteriorRing();
+					np = poRing->getNumPoints();				
+					std::vector<double> X(np);
+					std::vector<double> Y(np);
+					for (size_t i=0; i<np; i++) {
+						poRing->getPoint(i, &ogrPt);
+						X[i] = ogrPt.getX();
+						Y[i] = ogrPt.getY();
+					}
+					SpatPart p(X, Y);
+					
+					nh = poGeom->getNumInteriorRings();
+					for (size_t i=0; i<nh; i++) {
+						OGRLinearRing *poHole = poGeom->getInteriorRing(i);
+						np = poHole->getNumPoints();
+						std::vector<double> X(np);
+						std::vector<double> Y(np);
+						for (size_t j=0; j<np; j++) {
+							poHole->getPoint(j, &ogrPt);
+							X[j] = ogrPt.getX();
+							Y[j] = ogrPt.getY();
+						}
+						p.addHole(X, Y);
+					}
+					g.addPart(p);
+				} else { //if ( (poGeometry ->getGeometryType()) == wkbMultiPolygon ) {
+					OGRMultiPolygon *poGeom = ( OGRMultiPolygon * )poGeometry;
+					ng = poGeom->getNumGeometries();
+					for (size_t i=0; i<ng; i++) {
+						OGRGeometry *poPolygonGeometry = poGeom->getGeometryRef(i);
+						OGRPolygon *poPolygon = ( OGRPolygon * )poPolygonGeometry;
+						OGRLinearRing *poRing = poPolygon->getExteriorRing();
+						np = poRing->getNumPoints();
+						std::vector<double> X(np);
+						std::vector<double> Y(np);
+						for (size_t j=0; j<np; j++ ) {
+							poRing->getPoint(j, &ogrPt);
+							X[j] = ogrPt.getX();
+							Y[j] = ogrPt.getY();
+						}
+						SpatPart p(X, Y);
+
+						nh = poPolygon->getNumInteriorRings();
+						for (size_t j=0; j<nh; j++) {
+							OGRLinearRing *poHole = poPolygon->getInteriorRing(j);
+							np = poHole->getNumPoints();
+							std::vector<double> X(np);
+							std::vector<double> Y(np);
+							for (size_t k = 0; k < np; k++ ) {
+								poHole->getPoint(k, &ogrPt);
+								X[k] = ogrPt.getX();
+								Y[k] = ogrPt.getY();
+							}
+							p.addHole(X, Y);
+						}
+						g.addPart(p);
+					} 
+				}
+				addGeom(g); 
+			}
+		}
+	} else {
+        setError("Cannot open file");
+		std::string gt = geomType(poLayer);		
+		printf("unknown geomtype: %s \n", gt.c_str());
+	} 
+	
+	OGRFeature::DestroyFeature( poFeature );
     GDALClose( poDS );
 	setCRS(crs);
-	return true;
+	return msg.success;
 }
 
+
+ // get the extent
+ //       OGREnvelope oExt;
+ //       if( poLayer->GetExtent( &oExt, TRUE ) == OGRERR_NONE ){
+ //           cout << "Extent: (" << oExt.MinX << ", " << oExt.MinY << ") - (" << oExt.MaxX << ", " << oExt.MaxY << ")" << endl;

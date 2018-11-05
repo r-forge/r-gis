@@ -44,4 +44,22 @@ class SpatExtent {
 };
 
 
+class SpatMessages {
+	public:
+		bool success = true;
+		bool has_error = false;
+		bool has_warning = false;
+		std::string error;
+		std::vector<std::string> warnings;
+		
+		void setError(std::string s) {
+			has_error = true;
+			error = s;
+			success = false;
+		}
+		void addWarning(std::string s) {
+			has_warning = true;
+			warnings.push_back(s);
+		}
+};
 

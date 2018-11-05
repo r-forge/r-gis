@@ -5,7 +5,6 @@
 #include "cpl_conv.h" // for CPLMalloc()
 #include "cpl_string.h"
 #include "ogr_spatialref.h"
-using namespace std;
 
 bool SpatRaster::constructFromFileGDAL(std::string fname) {
 
@@ -97,7 +96,7 @@ bool SpatRaster::constructFromFileGDAL(std::string fname) {
 			s.hasRAT.push_back(false);
 		}
 		
-		s.names.push_back( "lyr" + to_string(i+1) ) ;
+		s.names.push_back( "lyr" + std::to_string(i+1) ) ;
 	}
 	GDALClose( (GDALDatasetH) poDataset );
 
@@ -129,8 +128,7 @@ std::vector<double> SpatRaster::readChunkGDAL(unsigned row, unsigned nrows, unsi
 		poBand = gdalconnection->GetRasterBand(lyr + i + 1);
 		CPLErr err = poBand->RasterIO(GF_Read, row, col, ncols, nrows, &out[cell], ncols, nrows, GDT_Float64, 0, 0);
 		if (err == 4) {
-			error = true;
-			error_message = "cannot read values";
+			setError("cannot read values");
 			std::vector<double> errout;
 			return errout;
 		}
@@ -162,8 +160,7 @@ std::vector<double> SpatRaster::readValuesGDAL(unsigned row, unsigned nrows, uns
 		poBand = poDataset->GetRasterBand(lyr + i + 1);
 		CPLErr err = poBand->RasterIO(GF_Read, row, col, ncols, nrows, &out[cell], ncols, nrows, GDT_Float64, 0, 0);
 		if (err == 4) {
-			error = true;
-			error_message = "cannot read values";
+			setError("cannot read values");
 			std::vector<double> errout;
 			return errout;
 		}

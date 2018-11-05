@@ -1,4 +1,3 @@
-//using namespace std;
 #include <vector>
 #include <string>
 
@@ -14,12 +13,27 @@ class SpatDataFrame {
 		
 		unsigned nrow();
 		unsigned ncol();
-		SpatDataFrame subsetrows(std::vector<unsigned> range);
-		SpatDataFrame subsetcols(std::vector<unsigned> range);
+		SpatDataFrame subset_rows(std::vector<unsigned> range);
+		SpatDataFrame subset_cols(std::vector<unsigned> range);
 		std::vector<double> getD(unsigned i);
 		std::vector<long> getI(unsigned i);
 		std::vector<std::string> getS(unsigned i);
 	
-	void add_row();
+		void add_row();
+		void add_column(unsigned dtype, std::string name);
+		bool add_column(std::vector<double> x, std::string name);
+		bool add_column(std::vector<long> x, std::string name);
+		bool add_column(std::vector<std::string> x, std::string name);
+		
+		void insert_column(std::vector<double>);
+		void insert_column(std::vector<long>);		
+		void insert_column(std::vector<std::string>);
+
+		void resize(unsigned n);
+		void reserve(unsigned n);
+		
+		bool rbind();
+		bool cbind();
+		
 };
 

@@ -5,13 +5,11 @@
 \alias{as.vector}
 \alias{as.matrix}
 \alias{as.array}
-\alias{as.data.frame}
 
 \alias{as.vector,SpatRaster-method}
 \alias{as.matrix,SpatRaster-method}
 \alias{as.array,SpatRaster-method}
 \alias{as.data.frame,SpatRaster-method}
-
 
 
 \title{Coercion to other object types}

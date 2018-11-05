@@ -6,7 +6,7 @@
 #include "util.h"
 
 
-SpatDataFrame SpatDataFrame::subsetrows(std::vector<unsigned> range) { 
+SpatDataFrame SpatDataFrame::subset_rows(std::vector<unsigned> range) { 
 	SpatDataFrame out;
 	out.names = names;
 	out.itype = itype;
@@ -28,7 +28,7 @@ SpatDataFrame SpatDataFrame::subsetrows(std::vector<unsigned> range) {
 	return out;	
 }	
 
-SpatDataFrame SpatDataFrame::subsetcols(std::vector<unsigned> range) { 
+SpatDataFrame SpatDataFrame::subset_cols(std::vector<unsigned> range) { 
 	SpatDataFrame out;
 	unsigned dcnt=0;
 	unsigned icnt=0;
@@ -95,5 +95,81 @@ void SpatDataFrame::add_row() {
 	}
 }
 
+
+void SpatDataFrame::reserve(unsigned n) {
+	for (size_t i=0; i<dv.size(); i++) {
+		dv[i].reserve(n);
+	}
+	for (size_t i=0; i<iv.size(); i++) {
+		iv[i].reserve(n);
+	}
+	for (size_t i=0; i<sv.size(); i++) {
+		sv[i].reserve(n);
+	}
+}
+
+void SpatDataFrame::resize(unsigned n) {
+	for (size_t i=0; i<dv.size(); i++) {
+		dv[i].resize(n, NAN);
+	}
+	long longNA = NA<long>::value;
+	for (size_t i=0; i<iv.size(); i++) {
+		iv[i].resize(n, longNA);
+	}
+	for (size_t i=0; i<sv.size(); i++) {
+		sv[i].resize(n, NAS);
+	}
+}
 	
-	
+void SpatDataFrame::add_column(unsigned dtype, std::string name) {
+	unsigned nr = nrow();
+	if (dtype == 0) {
+		std::vector<double> dins(nr, NAN);
+		iplace.push_back(dv.size());
+		dv.push_back(dins);
+	} else if (dtype == 1) {
+		long longNA = NA<long>::value;
+		std::vector<long> iins(nr, longNA);
+		iplace.push_back(iv.size());
+		iv.push_back(iins);
+	} else {
+		std::vector<std::string> sins(nr, NAS);
+		iplace.push_back(sv.size());
+		sv.push_back(sins);
+	}
+	itype.push_back(dtype);	
+	names.push_back(name);
+}
+
+bool SpatDataFrame::add_column(std::vector<double> x, std::string name) {
+	unsigned nr = nrow();
+	if ((nr != 0) & (nr != x.size())) return false; 
+	dv.push_back(x);
+	iplace.push_back(dv.size());
+	itype.push_back(0);	
+	names.push_back(name);
+	return true;
+}
+
+
+bool SpatDataFrame::add_column(std::vector<long> x, std::string name) {
+	unsigned nr = nrow();
+	if ((nr != 0) & (nr != x.size())) return false; 
+	iv.push_back(x);
+	iplace.push_back(iv.size());
+	itype.push_back(1);	
+	names.push_back(name);
+	return true;
+}
+
+
+bool SpatDataFrame::add_column(std::vector<std::string> x, std::string name) {
+	unsigned nr = nrow();
+	if ((nr != 0) & (nr != x.size())) return false; 
+	sv.push_back(x);
+	iplace.push_back(sv.size());
+	itype.push_back(2);	
+	names.push_back(name);
+	return true;
+}
+
