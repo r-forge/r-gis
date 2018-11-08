@@ -32,10 +32,9 @@
 }
 
 setMethod('aggregate', signature(x='SpatRaster'), 
-function(x, fact=2, fun='mean', na.rm=TRUE, filename="", ...)  {
+function(x, fact=2, fun='mean', na.rm=TRUE, filename="", overwrite=FALSE, ...)  {
 
 	#expand=TRUE, 
-	overwrite <- .overwrite(...)
 	
 	fact <- round(fact)
 	lf <- length(fact)
@@ -61,8 +60,7 @@ function(x, fact=2, fun='mean', na.rm=TRUE, filename="", ...)  {
 		r <- methods::new('SpatRaster')
 		#	fun='mean', expand=TRUE, na.rm=TRUE, filename=""
 		x@ptr <- x@ptr$aggregate(dims, fun, na.rm, filename, overwrite)
-		.messages(x, "aggregate")		
-		return(x)
+		return (show_messages(x, "aggregate"))
 	} else {
 		e <- as.vector(ext(x))
 		rs <- res(x)

@@ -3,7 +3,7 @@
 # Version 1.0
 # Licence GPL v3
 
-.messages <- function(x, f="") {
+show_messages <- function(x, f="") {
 	if (x@ptr$messages$has_warning) { 
 		messages <- paste0(f, ": ", paste(x@ptr$messages$warnings, collapse="\n"))
 		x@ptr$messages$warnings <- ""
@@ -12,6 +12,7 @@
 	}
 	if (x@ptr$messages$has_error) {	
 		stop(paste0(f, ": ", x@ptr$messages$error), call.=FALSE)
-	}			
+	}
+	x
 }
 

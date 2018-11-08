@@ -88,18 +88,15 @@ SpatPart SpatGeom::getPart(unsigned i) {
 }
 
 std::vector<double> SpatLayer::getDv(unsigned i) {
-	unsigned j = df.iplace[i];
-	return df.dv[j];
+	return df.getD(i);
 }
 
 std::vector<long> SpatLayer::getIv(unsigned i){
-	unsigned j = df.iplace[i];
-	return df.iv[j];
+	return df.getI(i);
 }
 
 std::vector<std::string> SpatLayer::getSv(unsigned i){
-	unsigned j = df.iplace[i];
-	return df.sv[j];
+	return df.getS(i);
 }
 
 std::vector<unsigned> SpatLayer::getItype(){
@@ -280,15 +277,15 @@ void SpatLayer::setGeometry(std::string type, std::vector<unsigned> geom, std::v
 	unsigned lastgeom = geom[0];
 	unsigned lastpart = part[0];
 	std::vector<double> X, Y;
-	X.push_back(x[0]);
-	Y.push_back(y[0]);
+//	X.push_back(x[0]);
+//	Y.push_back(y[0]);
 	bool isHole = hole[0];
 
 	SpatGeom g;
 	g.gtype = getGType(type);
 	
 	for (size_t i=0; i<geom.size(); i++) {
-		if ((lastgeom != geom[i]) | (lastpart != part[i])) {
+		if ((lastgeom != geom[i]) || (lastpart != part[i])) {
 			if (isHole) {
 				SpatHole h(X, Y);
 				g.addHole(h);
@@ -329,3 +326,4 @@ SpatLayer SpatLayer::subset(std::vector<unsigned> range) {
 	out.crs = crs;
 	return out;	
 };
+

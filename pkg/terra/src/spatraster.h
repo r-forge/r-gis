@@ -22,6 +22,15 @@ class ColorTable {
 
 class RasterSource {
 	public:
+		//fstream* fs;
+#ifdef useGDAL
+		GDALDataset* gdalconnection;
+#endif
+		bool open_read;
+		bool open_write;
+
+		RasterSource();
+
 		unsigned ncol, nrow, nlyr;
 		SpatExtent extent;
 		std::string crs;
@@ -68,13 +77,6 @@ class BlockSize {
 
 class SpatRaster {
 
-	private:
-		//fstream* fs;
-#ifdef useGDAL
-		GDALDataset* gdalconnection;
-#endif
-		bool open_read;
-		bool open_write;
 	protected:
 		SpatExtent extent;
 		SpatExtent window;
@@ -101,7 +103,7 @@ class SpatRaster {
 		void setExtent(SpatExtent e) { extent = e ; }
 		void setExtent(SpatExtent ext, bool keepRes=false, std::string snap="");  // also set it for sources?
 		std::string getCRS() { return(crs); }
-		void setCRS(std::string _crs); 
+		void setCRS(std::string _crs);
 
 		std::vector<double> resolution();
 		double ncell() { return nrow * ncol; }
@@ -166,6 +168,7 @@ class SpatRaster {
         SpatRaster geometry(long nlyrs=-1);
 
 		bool constructFromFile(std::string fname);
+		bool constructFromFiles(std::vector<std::string> fnames);
 		bool constructFromFileGDAL(std::string fname);
 
 		SpatRaster addSources(SpatRaster x);
@@ -175,23 +178,25 @@ class SpatRaster {
 // helper methods
 ////////////////////////////////////////////////////
 
-		bool compare_geom(SpatRaster x, bool lyrs, bool crs);
+		bool compare_geom(SpatRaster x, bool lyrs, bool crs, bool warncrs=false);
 
 		std::vector<double> cellFromXY (std::vector<double> x, std::vector<double> y);
 		double cellFromXY(double x, double y);
-		std::vector<double> cellFromRowCol(std::vector<unsigned> rownr, std::vector<unsigned> colnr);
-		double cellFromRowCol(unsigned rownr, unsigned colnr);
-		std::vector<double> yFromRow(std::vector<unsigned> rownr);
-		double yFromRow(unsigned rownr);
-		std::vector<double> xFromCol(std::vector<unsigned> colnr);
-		double xFromCol(unsigned colnr);
-		std::vector<double> colFromX(std::vector<double> x);
-		double colFromX(double x);
-		std::vector<double> rowFromY(std::vector<double> y);
-		double rowFromY(double y);
-		std::vector< std::vector<double> > xyFromCell( std::vector<double> cell );
+		std::vector<double> cellFromRowCol(std::vector<unsigned> row, std::vector<unsigned> col);
+		double cellFromRowCol(unsigned row, unsigned col);
+		std::vector<double> yFromRow(std::vector<unsigned> &row);
+		double yFromRow(unsigned row);
+		std::vector<double> xFromCol(std::vector<unsigned> &col);
+		double xFromCol(unsigned col);
+
+		std::vector<unsigned> colFromX(std::vector<double> &x);
+		unsigned colFromX(double x);
+		std::vector<unsigned> rowFromY(std::vector<double> &y);
+		unsigned rowFromY(double y);
+		std::vector< std::vector<double> > xyFromCell( std::vector<double> &cell );
 		std::vector< std::vector<double> > xyFromCell( double cell );
-		std::vector< std::vector<double> > rowColFromCell(std::vector<double> cell);
+
+		std::vector< std::vector<unsigned> > rowColFromCell(std::vector<double> &cell);
         std::vector<unsigned> sourcesFromLyrs(std::vector<unsigned> lyrs);
 
 		int sourceFromLyr(unsigned lyr);
@@ -211,26 +216,29 @@ class SpatRaster {
 // read and write
 ////////////////////////////////////////////////////
 
+		// for all sources
 		bool readStart();
 		std::vector<double> readValues(unsigned row, unsigned nrows, unsigned col, unsigned ncols, unsigned lyr, unsigned nlyrs);
 		std::vector<double> readBlock(BlockSize bs, unsigned i);
-
 		bool readStop();
-		std::vector<double> readValuesGDAL(unsigned row, unsigned nrows, unsigned col, unsigned ncols, unsigned lyr, unsigned nlyrs);
-
-		bool readStartGDAL();
-		bool readStopGDAL();
-		std::vector<double> readChunkGDAL(unsigned row, unsigned nrows, unsigned col, unsigned ncols, unsigned lyr, unsigned nlyrs);
-
 
 		bool writeStart(std::string filename, bool overwrite);
 		bool writeValues(std::vector<double> vals, unsigned row);
 		bool writeStop();
 		bool writeHDR(std::string filename);
 
-		bool writeStopGDAL();
-		bool writeValuesGDAL(std::vector<double> vals, unsigned row);
 		bool writeStartGDAL(std::string filename, bool overwrite);
+		bool writeValuesGDAL(std::vector<double> vals, unsigned row);
+		bool writeStopGDAL();
+
+
+		// for a specific gdal source
+		std::vector<double> readValuesGDAL(unsigned src, unsigned row, unsigned nrows, unsigned col, unsigned ncols);
+		std::vector<double> readRowColGDAL(unsigned src, const std::vector<unsigned> &rows, const std::vector<unsigned> &cols);
+
+		bool readStartGDAL(unsigned src);
+		bool readStopGDAL(unsigned src);
+		std::vector<double> readChunkGDAL(unsigned src, unsigned row, unsigned nrows, unsigned col, unsigned ncols);
 
 		void openFS(std::string const &filename);
 
@@ -245,34 +253,32 @@ class SpatRaster {
 // main methods
 ////////////////////////////////////////////////////
 
-		SpatRaster arith(SpatRaster x, std::string oper, std::string filename, bool overwrite=false);
-		SpatRaster arith(double x, std::string oper, std::string filename, bool overwrite=false);
-		SpatRaster arith_rev(double x, std::string oper, std::string filename, bool overwrite);
-		SpatRaster math(std::string fun, std::string filename, bool overwrite);
-		SpatRaster trig(std::string fun, std::string filename, bool overwrite);
-		SpatRaster logic(SpatRaster x, std::string oper, std::string filename, bool overwrite=false);
-		SpatRaster logic(bool x, std::string oper, std::string filename, bool overwrite=false);
-		SpatRaster isnot(std::string filename, bool overwrite);
-		SpatRaster cum(std::string fun, bool narm, std::string filename, bool overwrite);
-		SpatRaster summary(std::string fun, bool narm, std::string filename, bool overwrite);
-		SpatRaster summary_numb(std::string fun, std::vector<double> add, bool narm, std::string filename, bool overwrite);
-
-		SpatRaster operator + (SpatRaster x) { return arith(x, "+", "", false); }
-		//SpatRaster test(std::string filename);
-
 		SpatRaster aggregate(std::vector<unsigned> fact, std::string fun, bool narm, std::string filename="", bool overwrite=false);
+		SpatRaster arith(SpatRaster x, std::string oper, std::string filename="", bool overwrite=false);
+		SpatRaster arith(double x, std::string oper, std::string filename="", bool overwrite=false);
+		SpatRaster arith_rev(double x, std::string oper, std::string filename="", bool overwrite=false);
 		std::vector<unsigned> get_aggregate_dims( std::vector<unsigned> fact );
 		std::vector<std::vector<double> > get_aggregates(std::vector<unsigned> dim);
-
 		SpatExtent align(SpatExtent e, std::string snap="near");
 		SpatRaster crop(SpatExtent e, std::string filename="", std::string snap="near", bool overwrite=false);
-		SpatRaster trim(unsigned padding=0, std::string filename="", bool overwrite=false);
-		SpatRaster mask(SpatRaster x, std::string filename="", bool overwrite=false);
-		SpatRaster focal(std::vector<double> w, double fillvalue, bool narm, unsigned fun, std::string filename, bool overwrite);
-		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows);
-		SpatRaster rasterizePolygons(SpatLayer p, double background, std::string filename, bool overwrite);
+		SpatRaster cum(std::string fun, bool narm, std::string filename="", bool overwrite=false);
+		std::vector<double> extractLayer(SpatLayer v, std::string fun="");
+		std::vector<double> extractCell(std::vector<double> &cell);
 
+
+		SpatRaster focal(std::vector<double> w, double fillvalue, bool narm, unsigned fun, std::string filename="", bool overwrite=false);
+		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows);
+		SpatRaster isnot(std::string filename="", bool overwrite=false);
+		SpatRaster logic(SpatRaster x, std::string oper, std::string filename="", bool overwrite=false);
+		SpatRaster logic(bool x, std::string oper, std::string filename="", bool overwrite=false);
+		SpatRaster mask(SpatRaster x, std::string filename="", bool overwrite=false);
+		SpatRaster math(std::string fun, std::string filename="", bool overwrite=false);
+		SpatRaster trig(std::string fun, std::string filename="", bool overwrite=false);
+		SpatRaster rasterizePolygons(SpatLayer p, double background, std::string filename="", bool overwrite=false);
 		std::vector<double> sampleRegular(unsigned size, bool cells, bool asRaster);
+		SpatRaster summary(std::string fun, bool narm, std::string filename="", bool overwrite=false);
+		SpatRaster summary_numb(std::string fun, std::vector<double> add, bool narm, std::string filename="", bool overwrite=false);
+		SpatRaster trim(unsigned padding=0, std::string filename="", bool overwrite=false);
 };
 
 
@@ -289,5 +295,4 @@ SpatRaster SQRTfree(SpatRaster* g) {
 	return r;
 }
 */
-
 

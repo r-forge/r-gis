@@ -1,6 +1,7 @@
 #include "spatraster.h"
 #include "SimpleIni.h"
-#include "util.h"
+#include "string_utils.h"
+#include "math_utils.h"
 
 bool SpatRaster::isSource(std::string filename) {
 	std::vector<std::string> ff = filenames();
@@ -92,10 +93,10 @@ bool SpatRaster::writeStart(std::string filename, bool overwrite) {
 		}
 
 	}
-	if (open_write) {
+	if (source[0].open_write) {
 		addWarning("file was already open");
 	}
-	open_write = true;
+	source[0].open_write = true;
 	source[0].filename = {filename};
 	bs = getBlockSize(4);
 	return success;
@@ -104,7 +105,7 @@ bool SpatRaster::writeStart(std::string filename, bool overwrite) {
 
 
 bool SpatRaster::writeValues(std::vector<double> vals, unsigned row){
-	if (!open_write) {
+	if (!source[0].open_write) {
 		setError("cannot write (no open file)");
 		return false;
 	}
@@ -135,11 +136,11 @@ bool SpatRaster::writeValues(std::vector<double> vals, unsigned row){
 
 
 bool SpatRaster::writeStop(){
-	if (!open_write) {
+	if (!source[0].open_write) {
 		setError("cannot close a file that is not open");
 		return false;
 	}
-	open_write = false;
+	source[0].open_write = false;
 	bool success = true;
 
 	if (source[0].driver == "raster") {
@@ -169,6 +170,7 @@ bool SpatRaster::setValues(std::vector<double> _values) {
 		s.hasValues = true;
 		s.memory = true;
 		s.names = getNames();
+		s.driver = "memory";
 		setSource(s);
 		setRange();
 		result = true;
