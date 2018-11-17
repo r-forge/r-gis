@@ -1,8 +1,25 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 #include <vector>
-#include "spatraster.h"
+#include "spatRaster.h"
 
 
-SpatRaster SpatRaster::mask(SpatRaster x, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::mask(SpatRaster x, SpatOptions opt) {
 
 // check for size; need for recycling
 	//SpatRaster out = *this;
@@ -11,13 +28,13 @@ SpatRaster SpatRaster::mask(SpatRaster x, std::string filename, bool overwrite) 
 //	out.source.resize(1);
  //   our.source[0].nlyr = 1;
 //	out.values.resize(0);
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	x.readStart();
 	std::vector<double> v, m;
 	for (size_t i = 0; i < out.bs.n; i++) {
-		v = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol, 0, nlyr());
-		m = x.readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol, 0, nlyr());
+		v = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);
+		m = x.readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);
 		for (size_t i=0; i < v.size(); i++) {
 			if (std::isnan(m[i])) {
 				v[i] = NAN;

@@ -1,7 +1,44 @@
-#include "spatraster.h"
-#include "SimpleIni.h"
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
+#include <random>
+#include <chrono>
+#include "spatRaster.h"
+#include "SimpleIni/SimpleIni.h"
 #include "string_utils.h"
 #include "math_utils.h"
+
+
+std::string tempFile(std::string tmpdir, std::string extension, double seed) {
+    std::vector<char> characters = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K',
+    'L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m',
+    'n','o','p','q','r','s','t','u','v','w','x','y','z' };
+    std::default_random_engine generator(std::random_device{}());
+    generator.seed(seed);
+    std::uniform_int_distribution<> distrib(0, characters.size()-1);
+    auto draw = [ characters, &distrib, &generator ]() {
+		return characters[ distrib(generator) ];
+	};
+    std::string filename(15, 0);
+    std::generate_n(filename.begin(), 15, draw);
+	filename = tmpdir + "/terra_" + filename + extension;
+	return filename;
+}
+
 
 bool SpatRaster::isSource(std::string filename) {
 	std::vector<std::string> ff = filenames();
@@ -14,10 +51,15 @@ bool SpatRaster::isSource(std::string filename) {
 }
 
 
-bool SpatRaster::writeRaster(std::string filename, bool overwrite) {
+bool SpatRaster::writeRaster(SpatOptions opt) {
+	
+	std::string filename = opt.get_filename();
+	std::string datatype = opt.get_datatype();
+	bool overwrite = opt.get_overwrite();
 	lrtrim(filename);
 	if (filename == "") {
-		filename = "random_file_name.grd";
+		double seed = std::chrono::system_clock::now().time_since_epoch().count();
+		filename = tempFile(".", ".tif", seed);
 	} else if (file_exists(filename)) {
 		if (overwrite) {
 			if (isSource(filename)) {
@@ -39,8 +81,9 @@ bool SpatRaster::writeRaster(std::string filename, bool overwrite) {
 		fs.close();
         return writeHDR(filename);
 	} else {
+		std::string format = opt.get_filetype();
         #ifdef useGDAL
-        return writeRasterGDAL(filename, overwrite);
+        return writeRasterGDAL(filename, format, datatype, overwrite);
 		#else
 		setError("GDAL is not available");
 	    return false;
@@ -49,16 +92,19 @@ bool SpatRaster::writeRaster(std::string filename, bool overwrite) {
 }
 
 
-bool SpatRaster::writeStart(std::string filename, bool overwrite) {
+bool SpatRaster::writeStart(SpatOptions opt) {
 
 //	double inf = std::numeric_limits<double>::infinity();
 //	s.min_range = inf;
 //	s.max_range = -inf;
 	bool success = true;
-	lrtrim(filename);
+	std::string filename = opt.get_filename();
+	std::string datatype = opt.get_datatype();
+	
 	if (filename == "") {
 		if (!canProcessInMemory(4)) {
-			filename = "random_file_name.grd";
+			double seed = std::chrono::system_clock::now().time_since_epoch().count();
+			filename = tempFile(".", ".tif", seed);
 		}
 	}
 
@@ -74,7 +120,7 @@ bool SpatRaster::writeStart(std::string filename, bool overwrite) {
 		if (ext == ".grd") {
 			source[0].driver = "raster";
 			if (exists) {
-				if (overwrite) {
+				if (opt.get_overwrite()) {
 					remove(filename.c_str());
 				} else {
 					// stop()
@@ -85,7 +131,8 @@ bool SpatRaster::writeStart(std::string filename, bool overwrite) {
 			// open GDAL filestream
 			#ifdef useGDAL
 			source[0].driver = "gdal" ;
-			success = writeStartGDAL(filename, overwrite);
+			std::string format = opt.get_filetype();
+			success = writeStartGDAL(filename, format, datatype, opt.get_overwrite());
 			#else
 			setError("GDAL is not available");
 			return false;
@@ -104,7 +151,7 @@ bool SpatRaster::writeStart(std::string filename, bool overwrite) {
 
 
 
-bool SpatRaster::writeValues(std::vector<double> vals, unsigned row){
+bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row){
 	if (!source[0].open_write) {
 		setError("cannot write (no open file)");
 		return false;
@@ -129,7 +176,7 @@ bool SpatRaster::writeValues(std::vector<double> vals, unsigned row){
         source[0].values = vals;
         source[0].hasValues = true;
         source[0].memory = true;
-        setRange();
+        source[0].setRange();
 	}
 	return success;
 }
@@ -171,8 +218,9 @@ bool SpatRaster::setValues(std::vector<double> _values) {
 		s.memory = true;
 		s.names = getNames();
 		s.driver = "memory";
+		
+		s.setRange(); 
 		setSource(s);
-		setRange();
 		result = true;
 	} else {
 		setError("incorrect number of values");
@@ -180,27 +228,29 @@ bool SpatRaster::setValues(std::vector<double> _values) {
 	return (result);
 }
 
-
-
-void SpatRaster::setRange() {
-
-	double vmin, vmax;
-	unsigned nsources = nsrc();
-	unsigned nc = ncell();
-	unsigned start;
-
-	for (size_t i=0; i<nsources; i++) {
-		unsigned nlyrs = source[i].nlyr;
-		source[i].range_min.resize(nlyrs);
-		source[i].range_max.resize(nlyrs);
-		source[i].hasRange.resize(nlyrs);
-		for (size_t j=0; j<nlyrs; j++) {
-			start = nc * j;
-			minmax(source[i].values.begin()+start, source[i].values.begin()+start+nc, vmin, vmax);
-			source[i].range_min[i] = vmin;
-			source[i].range_max[i] = vmax;
-			source[i].hasRange[i] = true;
+void SpatRaster::setRange() { 
+	for (size_t i=0; i<nsrc(); i++) {
+		if (source[i].memory) { // for now. should read from files as needed
+			source[i].setRange();
 		}
+	}
+}
+
+
+
+void RasterSource::setRange() {
+	double vmin, vmax;
+	unsigned nc = ncol * nrow;
+	unsigned start;
+	range_min.resize(nlyr);
+	range_max.resize(nlyr);
+	hasRange.resize(nlyr);
+	for (size_t i=0; i<nlyr; i++) {
+		start = nc * i;
+		minmax(values.begin()+start, values.begin()+start+nc, vmin, vmax);
+		range_min[i] = vmin;
+		range_max[i] = vmax;
+		hasRange[i] = true;
 	}
 }
 
@@ -236,7 +286,7 @@ bool SpatRaster::writeHDR(std::string filename) {
 
 
 /*
-bool SpatRaster::writeStartFs(std::string filename, bool overwrite,  fstream& f) {
+bool SpatRaster::writeStartFs(std::string filename, std::string format, std::string datatype, bool overwrite,  fstream& f) {
 
 	lrtrim(filename);
 	if (filename == "") {

@@ -3,17 +3,21 @@ loadModule("spat", TRUE)
 
 
 .onAttach <- function(libname, pkgname) {
-	minv <- "2.8.7"
-	m <- "\n\nThis is an early version of the \"terra\" package, for evaluation only\n"
-	e <- try(vv <- utils::packageVersion("raster"), silent=T )
+	min_raster <- "2.8.10"
+	tv <- utils::packageVersion("terra")
+	m <- paste0("\nterra ", tv, "\nThis is an early version of the \"terra\" package, for evaluation only\n")
+	e <- try(vv <- utils::packageVersion("raster"), silent=TRUE)
 	if (class(e)[1] == "try-error") {
-		m <- paste0(m,"For this package to work you need to install version ", minv, 
+		m <- paste0(m,"For this package to work you need to install version ", min_raster, 
 		" or higher of the \"raster\" package\n" )	
-	} else if (vv < minv ) {
-		m <- paste0(m,"For this package to work you need to install version ", minv, 
+	} else if (vv < min_raster) {
+		m <- paste0(m,"For this package to work you need to install version ", min_raster, 
 		" or higher of the \"raster\" package\nYou have version: ", vv,"\n" )
 	} 
 	packageStartupMessage(m)
+	
+##############################
+	.create_options()
 }
 
 

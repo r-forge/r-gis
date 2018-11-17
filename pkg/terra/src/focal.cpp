@@ -1,9 +1,24 @@
-/* Robert Hijmans, October 2011 
-  adapted December 2017
-*/
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
+
 
 #include <vector>
-#include "spatraster.h"
+#include "spatRaster.h"
 #include <algorithm>
 
 // todo: three dimensional focal
@@ -56,7 +71,7 @@ std::vector<double> SpatRaster::focal_values(std::vector<unsigned> w, double fil
 	unsigned nrows2 = std::min(nrows, nrows+wr);
 
 	readStart();
-	std::vector<double> d = readValues(row2, nrows2, 0, ncol, 0, nlyr());	
+	std::vector<double> d = readValues(row2, nrows2, 0, ncol);	
 	readStop();
 
 	std::vector<double> f = focal_get(d, dim, w, fillvalue);	
@@ -71,7 +86,7 @@ std::vector<double> SpatRaster::focal_values(std::vector<unsigned> w, double fil
 
 
 
-SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm, unsigned fun, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm, unsigned fun, SpatOptions opt) {
     
 	bool wmat = false;
 	int ww;
@@ -98,7 +113,7 @@ SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm,
 	if (!source[0].hasValues) { return(out); }
 	std::vector<unsigned> dim = {0, ncol};
 	
- 	out.writeStart(filename, overwrite);
+ 	out.writeStart(opt);
 	readStart();
 	std::vector<double> v, f, d;
 	
@@ -106,7 +121,7 @@ SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm,
 	std::vector<double> fv;
 	
 	for (size_t i = 0; i < out.bs.n; i++) {
-		d = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol, 0, nlyr());	
+		d = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);	
 		dim[0] = out.bs.nrows[i];
 		f = focal_get(d, dim, window, fillvalue);
 		v.resize(out.bs.nrows[i] * ncol);

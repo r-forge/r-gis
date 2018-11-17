@@ -5,22 +5,24 @@
 \alias{mask}
 \alias{mask,SpatRaster,SpatRaster-method}
 
-\title{Mask values in a SpatRaster object}
+\title{Mask values in a SpatRaster}
 
 \description{
 Create a new SpatRaster that has the same values as SpatRaster \code{x}, except for the cells that are \code{NA} in another SpatRaster (the 'mask'). These cells become \code{NA}.
 } 
 
 \usage{
-\S4method{mask}{SpatRaster,SpatRaster}(x, mask, filename="", overwrite=FALSE, ...)
+\S4method{mask}{SpatRaster,SpatRaster}(x, mask, filename="", overwrite=FALSE, wopt=list(), ...)
 }
 
 \arguments{
-\item{x}{SpatRaster object}
-\item{mask}{SpatRaster object}
-\item{filename}{character. Optional output filename}
-\item{overwrite}{Logical. If \code{TRUE}, \code{filename} is overwritten}
-\item{...}{additional arguments as in \code{\link{writeRaster}}}
+\item{x}{SpatRaster}
+\item{mask}{SpatRaster}
+  \item{filename}{character. Output filename. Optional}
+  \item{overwrite}{logical. If \code{TRUE}, \code{filename} is overwritten}
+  \item{wopt}{list. Options for writing files as in \code{\link{writeRaster}}}
+  \item{...}{Additional arguments. None implemented}  
+
 }
 
 \value{SpatRaster object}

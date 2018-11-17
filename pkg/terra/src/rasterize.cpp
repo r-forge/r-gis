@@ -1,8 +1,25 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 // Based on  public-domain code by Darel Rex Finley, 2007
 // http://alienryderflex.com/polygon_fill/
 
 #include <vector>
-#include "spatraster.h"
+#include "spatRaster.h"
 
 std::vector<double> rasterize_polygon(std::vector<double> r, double value, const std::vector<double> &pX, const std::vector<double> &pY, const unsigned nrows, const unsigned ncols, const double xmin, const double ymax, const double rx, const double ry) {
 
@@ -45,10 +62,10 @@ std::vector<double> rasterize_polygon(std::vector<double> r, double value, const
 
 
 
-SpatRaster SpatRaster::rasterizePolygons(SpatLayer p, double background, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::rasterizePolygons(SpatVector p, double background, SpatOptions opt) {
 
 	SpatRaster out = geometry();
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	double value = 1;
 	double resx = xres();
 	double resy = yres();

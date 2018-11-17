@@ -1,4 +1,21 @@
-#include "extent.h"
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
+#include "spatBase.h"
 #include "dataframe.h"
 
 enum SpatGeomType { points, lines, polygons, unknown };
@@ -47,11 +64,19 @@ class SpatGeom {
 
 
 class SpatLayer {
-	private:
+	public:
 		std::vector<SpatGeom> geoms; 
 		SpatExtent extent;		
-	public:
+		SpatDataFrame df;
 		std::string crs;
+};
+		
+class SpatVector {
+		
+	public:
+		SpatLayer lyr;
+		std::vector<SpatLayer> lyrs; 
+
 		std::vector<std::string> names();
 		unsigned nrow();
 		unsigned ncol();
@@ -65,13 +90,12 @@ class SpatLayer {
 		std::string getCRS();
 		void setCRS(std::string CRS);
 
-		SpatDataFrame df;
 
 		SpatGeom getGeom(unsigned i);
 		bool addGeom(SpatGeom p);
 		SpatDataFrame getGeometryDF();
 		
-		SpatLayer subset(std::vector<unsigned> range);
+		SpatVector subset(std::vector<unsigned> range);
 		void setGeometry(std::string type, std::vector<unsigned> id, std::vector<unsigned> part, std::vector<double> x, std::vector<double> y, std::vector<bool> hole);
 		
 		std::vector<double> area();
@@ -79,7 +103,7 @@ class SpatLayer {
 		unsigned size();
 	
 		bool read(std::string fname);
-		bool write(std::string filename, bool overwrite);
+		bool write(std::string filename, std::string format, bool overwrite);
 
 // attributes		
 		std::vector<double> getDv(unsigned i);
@@ -93,6 +117,7 @@ class SpatLayer {
 		void addWarning(std::string s) { msg.addWarning(s); }
 };
 
+/*
 
 class SpatVector {
 	public:
@@ -103,3 +128,4 @@ class SpatVector {
 		void addWarning(std::string s) { msg.addWarning(s); }
 };
 
+*/

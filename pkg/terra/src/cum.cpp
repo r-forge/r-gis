@@ -1,6 +1,23 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 #include <type_traits>
 #include <vector>
-#include "spatraster.h"
+#include "spatRaster.h"
 #include "NA.h"
 
 
@@ -326,7 +343,7 @@ std::vector<T> vrange(std::vector<T>& v, bool narm) {
 
 
 
-SpatRaster SpatRaster::cum(std::string fun, bool narm, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions opt) {
 
 	SpatRaster out = geometry();
 
@@ -335,8 +352,12 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, std::string filename, boo
 		out.setError("unknown cum function");
 		return out;
 	}
+	if (!hasValues()) {
+		out.setError("raster has no values");
+		return out;
+	}	
 
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	unsigned nl = out.nlyr();
 	std::vector<double> v(nl);
@@ -370,7 +391,7 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, std::string filename, boo
 
 
 
-SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bool narm, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bool narm, SpatOptions opt) {
 
 	SpatRaster out = geometry(1);
 
@@ -389,7 +410,7 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 		out.source[0].names[0] = fun;
 	}
 
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	unsigned nl = nlyr();
 	std::vector<double> v(nl);
@@ -434,8 +455,8 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 }
 
 
-SpatRaster SpatRaster::summary(std::string fun, bool narm, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::summary(std::string fun, bool narm, SpatOptions opt) {
 	std::vector<double> add;
-	return summary_numb(fun, add, narm, filename, overwrite);
+	return summary_numb(fun, add, narm, opt);
 }
 

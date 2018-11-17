@@ -3,7 +3,7 @@
 \docType{methods}
 
 \alias{rasterize}
-\alias{rasterize,SpatLayer,SpatRaster-method}
+\alias{rasterize,SpatVector,SpatRaster-method}
 
 \title{rasterize}
 
@@ -12,16 +12,17 @@ rasterize polygons
 }
 
 \usage{
-\S4method{rasterize}{SpatLayer,SpatRaster}(x, y, background=NA, filename="", overwrite=FALSE, ...)
+\S4method{rasterize}{SpatVector,SpatRaster}(x, y, background=NA, filename="", overwrite=FALSE, wopt=list(), ...)
 
 }
 
 \arguments{
-  \item{x}{SpatLayer object}
-  \item{y}{SpatRaster object}
+  \item{x}{SpatVector}
+  \item{y}{SpatRaster}
   \item{background}{numeric. Value for cells that are not covered by a polygon}
-  \item{filename}{Character. Output filename. Optional}
-  \item{overwrite}{Logical. If \code{TRUE}, \code{filename} is overwritten}
+  \item{filename}{character. Output filename. Optional}
+  \item{overwrite}{logical. If \code{TRUE}, \code{filename} is overwritten}
+  \item{wopt}{list. Options for writing files as in \code{\link{writeRaster}}}
   \item{...}{Additional arguments. None implemented}  
 }
 

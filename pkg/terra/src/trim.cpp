@@ -1,6 +1,23 @@
-#include "spatraster.h"
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
 
-SpatRaster SpatRaster::trim(unsigned padding, std::string filename, bool overwrite) {
+#include "spatRaster.h"
+
+SpatRaster SpatRaster::trim(unsigned padding, SpatOptions opt) {
 
 	long nrl = nrow * nlyr();
 	long ncl = ncol * nlyr();
@@ -8,7 +25,7 @@ SpatRaster SpatRaster::trim(unsigned padding, std::string filename, bool overwri
 	std::vector<double> v;
 	unsigned r;
 	for (r=0; r<nrow; r++) {
-		v = readValues(r, 1, 0, ncol, 0, nlyr());
+		v = readValues(r, 1, 0, ncol);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < ncl) {
 			break;
 		}
@@ -19,7 +36,7 @@ SpatRaster SpatRaster::trim(unsigned padding, std::string filename, bool overwri
 	unsigned firstrow = std::min(std::max(r - padding, unsigned(0)), nrow);
 
 	for (r=nrow-1; r>firstrow; r--) {
-		v = readValues(r, 1, 0, ncol, 0, nlyr());
+		v = readValues(r, 1, 0, ncol);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < ncl) {
 			break;
 		}
@@ -35,7 +52,7 @@ SpatRaster SpatRaster::trim(unsigned padding, std::string filename, bool overwri
 	}
 	unsigned c;
 	for (c=0; c<ncol; c++) {
-		v = readValues(0, nrow, c, 1, 0, nlyr());
+		v = readValues(0, nrow, c, 1);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < nrl) {
 			break;
 		}
@@ -44,7 +61,7 @@ SpatRaster SpatRaster::trim(unsigned padding, std::string filename, bool overwri
 	
 	
 	for (c=ncol-1; c>firstcol; c--) {
-		v = readValues(0, nrow, c, 1, 0, nlyr());
+		v = readValues(0, nrow, c, 1);
 		if (std::count_if( v.begin(), v.end(), [](double d) { return std::isnan(d); } ) < nrl) {
 			break;
 		}
@@ -62,6 +79,6 @@ SpatRaster SpatRaster::trim(unsigned padding, std::string filename, bool overwri
 	double yr = res[1];
 	SpatExtent e = SpatExtent(xFromCol(firstcol)-0.5*xr, xFromCol(lastcol)+0.5*xr, yFromRow(lastrow)-0.5*yr, yFromRow(firstrow)+0.5*yr);
 	
-	return( crop(e, filename, "near", overwrite) ) ;
+	return( crop(e, "near", opt) ) ;
 }
 

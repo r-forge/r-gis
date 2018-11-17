@@ -1,7 +1,7 @@
 # Author: Robert J. Hijmans
 # Date : December 2017
 # Version 1.0
-# Licence GPL v3
+# License GPL v3
 
 
 
@@ -24,8 +24,9 @@ setMethod('readStop', signature(x='SpatRaster'),
 
 
 setMethod('writeStart', signature(x='SpatRaster', filename='character'), 
-	function(x, filename, overwrite=FALSE, ...) {
-		x@ptr$writeStart(filename, overwrite)
+	function(x, filename="", overwrite=FALSE, wopt=list(), ...) {
+		opt <- .runOptions(filename[1], overwrite[1], wopt)
+		x@ptr$writeStart(opt)
 		show_messages(x, "writeStart")		
 		b <- x@ptr$getBlockSize(4)
 		b$row <- b$row + 1
@@ -54,8 +55,9 @@ setMethod('writeValues', signature(x='SpatRaster', v='vector'),
 
 
 setMethod('writeRaster', signature(x='SpatRaster', filename='character'), 
-function(x, filename, overwrite=FALSE, ...) {
-	success <- x@ptr$writeRaster(filename, overwrite=overwrite)
+function(x, filename="", overwrite=FALSE, wopt=list(), ...) {
+	opt <- .runOptions(filename[1], overwrite[1],wopt)
+	success <- x@ptr$writeRaster(opt)
 	show_messages(x, "writeRaster")
 	invisible(rast(filename))
 }

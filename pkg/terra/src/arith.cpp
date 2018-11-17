@@ -1,202 +1,206 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 #include <functional>
-#include "spatraster.h"
+#include "spatRaster.h"
 
 
 template <typename T>
-std::vector<T> operator+(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::plus<T>());
-    return result;
+void operator+(std::vector<T>& a, const std::vector<T>& b) {
+    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::plus<T>());
 }
 
 
 template <typename T>
-std::vector<T> operator-(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::minus<T>());
-    return result;
+void operator-(std::vector<T>& a, const std::vector<T>& b) {
+    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::minus<T>());
 }
 
 
 template <typename T>
-std::vector<T> operator/(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::divides<T>());
-    return result;
+void operator/(std::vector<T>& a, const std::vector<T>& b) {
+    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::divides<T>());
 }
 
 template <typename T>
-std::vector<T> operator*(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::multiplies<T>());
-    return result;
+void operator*(std::vector<T>& a, const std::vector<T>& b) {
+    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::multiplies<T>());
 }
 
 
 template <typename T>
-std::vector<T> operator%(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-//    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::modulus<T>());
-	for (size_t i=0; i<a.size(); i++) {
-		result[i] = std::fmod(a[i], b[i]);
-	}
-    return result;
-}
-
-
-template <typename T>
-std::vector<T> operator==(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::equal_to<T>());
+void operator%(std::vector<T>& a, const std::vector<T>& b) {
+//    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::modulus<T>());
 	for (size_t i=0; i<a.size(); i++) {
 		if (std::isnan(a[i]) || std::isnan(b[i])) {
-			result[i] = NAN;
-		} 
+			a[i] = NAN;
+		} else {
+			a[i] = std::fmod(a[i], b[i]);
+		}
 	}
-    return result;
-}
-
-template <typename T>
-std::vector<T> operator!=(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::not_equal_to<T>());
-	for (size_t i=0; i<a.size(); i++) {
-		if (std::isnan(a[i]) || std::isnan(b[i])) {
-			result[i] = NAN;
-		} 
-	}
-    return result;
-}
-
-template <typename T>
-std::vector<T> operator>=(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::greater_equal<T>());
-	for (size_t i=0; i<a.size(); i++) {
-		if (std::isnan(a[i]) || std::isnan(b[i])) {
-			result[i] = NAN;
-		} 
-	}
-    return result;
-}
-
-template <typename T>
-std::vector<T> operator<=(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::less_equal<T>());
-	for (size_t i=0; i<a.size(); i++) {
-		if (std::isnan(a[i]) || std::isnan(b[i])) {
-			result[i] = NAN;
-		} 
-	}
-    return result;
 }
 
 
 template <typename T>
-std::vector<T> operator>(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::greater<T>());
+void operator==(std::vector<T>& a, const std::vector<T>& b) {
+//    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::equal_to<T>());
 	for (size_t i=0; i<a.size(); i++) {
 		if (std::isnan(a[i]) || std::isnan(b[i])) {
-			result[i] = NAN;
-		} 
+			a[i] = NAN;
+		} else {
+			a[i] = a[i] == b[i];
+		}
 	}
-    return result;
 }
 
 template <typename T>
-std::vector<T> operator<(const std::vector<T>& a, const std::vector<T>& b) {
-    std::vector<T> result;
-    result.reserve(a.size());
-    std::transform(a.begin(), a.end(), b.begin(), std::back_inserter(result), std::less<T>());
+void operator!=(std::vector<T>& a, const std::vector<T>& b) {
+//    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::not_equal_to<T>());
 	for (size_t i=0; i<a.size(); i++) {
 		if (std::isnan(a[i]) || std::isnan(b[i])) {
-			result[i] = NAN;
-		} 
+			a[i] = NAN;
+		} else {
+			a[i] = a[i] != b[i];
+		}
 	}
-    return result;
+}
+
+template <typename T>
+void operator>=(std::vector<T>& a, const std::vector<T>& b) {
+//    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::greater_equal<T>());
+	for (size_t i=0; i<a.size(); i++) {
+		if (std::isnan(a[i]) || std::isnan(b[i])) {
+			a[i] = NAN;
+		} else {
+			a[i] = a[i] >= b[i];
+		}
+	}
+}
+
+template <typename T>
+void operator<=(std::vector<T>& a, const std::vector<T>& b) {
+//    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::less_equal<T>());
+	for (size_t i=0; i<a.size(); i++) {
+		if (std::isnan(a[i]) || std::isnan(b[i])) {
+			a[i] = NAN;
+		} else {
+			a[i] = a[i] <= b[i];
+		}
+	}
+ }
+
+
+template <typename T>
+void operator>(std::vector<T>& a, const std::vector<T>& b) {
+//    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::greater<T>());
+	for (size_t i=0; i<a.size(); i++) {
+		if (std::isnan(a[i]) || std::isnan(b[i])) {
+			a[i] = NAN;
+		} else {
+			a[i] = a[i] > b[i];
+		}
+	}
+}
+
+template <typename T>
+void operator<(std::vector<T>& a, const std::vector<T>& b) {
+//    std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::less<T>());
+	for (size_t i=0; i<a.size(); i++) {
+		if (std::isnan(a[i]) || std::isnan(b[i])) {
+			a[i] = NAN;
+		} else {
+			a[i] = a[i] < b[i];
+		}
+	}
 }
 
 
 bool smooth_operator(std::string oper) {
-	std::vector<std::string> f {"+", "-", "*", "/", "%", "==", "!=", ">", ",", ">=", "<="}; 
+	std::vector<std::string> f {"+", "-", "*", "/", "%", "==", "!=", ">", ",", ">=", "<="};
 	return (std::find(f.begin(), f.end(), oper) != f.end());
 }
 
 
-SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, std::string filename, bool overwrite) {
-	
+SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions opt) {
+
 	SpatRaster out = geometry();
 
 	if (!smooth_operator(oper)) {
 		out.setError("unknown arith function");
 		return out;
 	}
-	
+
 	if (!compare_geom(x, true, false)) {
 		out.setError("dimensions and/or extent do not match");
 		return(out);
 	}
-	
-  	out.writeStart(filename, overwrite);
+	bool hasv = hasValues() & x.hasValues();
+	if (!hasv) {
+		out.setError("raster has no values"); // or warn and treat as NA?
+		return out;
+	}
+  	out.writeStart(opt);
 	readStart();
 	x.readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
 		std::vector<double> b = x.readBlock(out.bs, i);
 		if (oper == "+") {
-			a = a + b; 
+			a + b;
 		} else if (oper == "-") {
-			a = a - b; 
+			a - b;
 		} else if (oper == "*") {
-			a = a * b; 
+			a * b;
 		} else if (oper == "/") {
-			a = a / b; 
+			a / b;
 		} else if (oper == "%") {
-			 a = a % b; 
+			 a % b;
 		} else if (oper == "==") {
-			a = a == b; 
+			a == b;
 		} else if (oper == "!=") {
-			a = a == b; 
+			a == b;
 		} else if (oper == ">=") {
-			a = a >= b; 
+			a >= b;
 		} else if (oper == "<=") {
-			a = a <= b; 
+			a <= b;
 		} else if (oper == ">") {
-			a = a > b; 
+			a > b;
 		} else if (oper == "<") {
-			a = a < b; 
-		} 
+			a < b;
+		}
 		out.writeValues(a, out.bs.row[i]);
 	}
 	out.writeStop();
-	readStop();	
-	x.readStop();	
+	readStop();
+	x.readStop();
 	return(out);
 }
 
 
 
-SpatRaster SpatRaster::arith(double x, std::string oper, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::arith(double x, std::string oper, SpatOptions opt) {
 
 	SpatRaster out = geometry();
 	if (!smooth_operator(oper)) {
 		out.setError("unknown arith function");
 		return out;
 	}
-	
-  	out.writeStart(filename, overwrite);
+
+  	out.writeStart(opt);
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
@@ -230,20 +234,20 @@ SpatRaster SpatRaster::arith(double x, std::string oper, std::string filename, b
 		out.writeValues(a, out.bs.row[i]);
 	}
 	out.writeStop();
-	readStop();		
+	readStop();
 	return(out);
 }
 
 
-SpatRaster SpatRaster::arith_rev(double x, std::string oper, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::arith_rev(double x, std::string oper, SpatOptions opt) {
 
 	SpatRaster out = geometry();
 	if (!smooth_operator(oper)) {
 		out.setError("unknown arith function");
 		return out;
 	}
-	
-  	out.writeStart(filename, overwrite);
+
+  	out.writeStart(opt);
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
@@ -264,7 +268,7 @@ SpatRaster SpatRaster::arith_rev(double x, std::string oper, std::string filenam
 		} else if (oper == ">=") {
 			for(double& d : a) d = x >= d;
 		} else if (oper == "<=") {
-			for(double& d : a) d = x <= d;			
+			for(double& d : a) d = x <= d;
 		} else if (oper == ">") {
 			for(double& d : a)  d = x > d;
 		} else if (oper == "<") {
@@ -275,7 +279,7 @@ SpatRaster SpatRaster::arith_rev(double x, std::string oper, std::string filenam
 		out.writeValues(a, out.bs.row[i]);
 	}
 	out.writeStop();
-	readStop();		
+	readStop();
 	return(out);
 }
 

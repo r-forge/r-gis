@@ -3,6 +3,12 @@
 # Version 0.9
 # Licence GPL v3
 
+setMethod("readValues", signature(x='SpatRaster'), 
+function(x, row=1, nrows=nrow(x), col=1, ncols=ncol(x), ...) {
+	x@ptr$readValues(row-1, nrows-1, col-1, ncols-1)
+}
+)
+
 
 setMethod("values", signature(x='SpatRaster'), 
 function(x, matrix=TRUE, ...) {
@@ -64,6 +70,17 @@ setMethod('values<-', signature(x='SpatRaster', 'ANY'),
 .hasMinMax <- function(x) {
 	x@ptr$hasRange
 }
+
+
+
+setMethod('sources', signature(x='SpatRaster'), 
+	function(x, ...) {
+		src <- x@ptr$filenames
+		src[src == ""] <= "memory"
+		data.frame(source=src, nlyr=x@ptr$nlyrBySource())
+	}
+)
+
 
 setMethod('minmax', signature(x='SpatRaster'), 
 	function(x) {

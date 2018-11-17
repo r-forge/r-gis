@@ -1,7 +1,24 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include "spatraster.h"
+#include "spatRaster.h"
 
 
 template <typename T>
@@ -32,9 +49,9 @@ std::vector<T> operator|(const std::vector<T>& a, const std::vector<T>& b) {
 }
 
 
-SpatRaster SpatRaster::isnot(std::string filename, bool overwrite) {
+SpatRaster SpatRaster::isnot(SpatOptions opt) {
 	SpatRaster out = geometry();
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
@@ -50,7 +67,7 @@ SpatRaster SpatRaster::isnot(std::string filename, bool overwrite) {
 
 
 
-SpatRaster SpatRaster::logic(SpatRaster x, std::string oper, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::logic(SpatRaster x, std::string oper, SpatOptions opt) {
 	
 	SpatRaster out = geometry();
 	
@@ -65,7 +82,7 @@ SpatRaster SpatRaster::logic(SpatRaster x, std::string oper, std::string filenam
 		return(out);
 	}
 	
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	x.readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
@@ -88,11 +105,11 @@ SpatRaster SpatRaster::logic(SpatRaster x, std::string oper, std::string filenam
 
 
 
-SpatRaster SpatRaster::logic(bool x, std::string oper, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::logic(bool x, std::string oper, SpatOptions opt) {
 
 	SpatRaster out = geometry();
 	
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	std::vector<double> v, m;
 	for (size_t i = 0; i < out.bs.n; i++) {

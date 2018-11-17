@@ -1,12 +1,29 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 #include <functional>
-#include "spatraster.h"
+#include "spatRaster.h"
 
 template <typename T> int sign(T value) {
     return (T(0) < value) - (value < T(0));
 }
 
 
-SpatRaster SpatRaster::math(std::string fun, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::math(std::string fun, SpatOptions opt) {
 
 	SpatRaster out = geometry();
 	std::vector<std::string> f {"abs", "sqrt", "ceiling", "floor", "trunc", "log", "log10", "log2", "log1p", "exp", "expm1", "sign"}; 
@@ -15,7 +32,7 @@ SpatRaster SpatRaster::math(std::string fun, std::string filename, bool overwrit
 		return out;
 	}
 
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
@@ -52,7 +69,7 @@ SpatRaster SpatRaster::math(std::string fun, std::string filename, bool overwrit
 }
 
 
-SpatRaster SpatRaster::trig(std::string fun, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::trig(std::string fun, SpatOptions opt) {
 
 	SpatRaster out = geometry();
 
@@ -62,10 +79,10 @@ SpatRaster SpatRaster::trig(std::string fun, std::string filename, bool overwrit
 		return out;
 	}
 	
-  	out.writeStart(filename, overwrite);
+  	out.writeStart(opt);
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
-		std::vector<double> a = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol, 0, nlyr());
+		std::vector<double> a = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol);
 		if (fun == "sin") {
 			for(double& d : a) if (!std::isnan(d)) d = sin(d);
 		} else if (fun == "cos") {

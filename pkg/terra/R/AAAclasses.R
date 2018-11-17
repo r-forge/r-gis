@@ -17,7 +17,7 @@ setClass('SpatRaster',
 )
 
 
-setClass('SpatLayer',
+setClass('SpatVector',
 	representation (
 		ptr = "C++Object"
 	),	
@@ -40,6 +40,19 @@ setClass('SpatExtent',
 	),
 	validity = function(object)	{
 		object@ptr$valid
+	}
+)
+
+
+setClass('SpatOptions',
+	representation (
+		ptr = "C++Object"
+	),	
+	prototype (	
+		ptr = NULL
+	),
+	validity = function(object)	{
+		return (true)
 	}
 )
 

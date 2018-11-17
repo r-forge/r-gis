@@ -1,8 +1,31 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 #include <vector>
-#include "spatraster.h"
+#include "spatRaster.h"
 
 
-SpatRaster SpatRaster::addSources(SpatRaster x) {
+RasterSource::RasterSource() {
+	open_write = false;
+	open_read = false;
+}
+
+
+SpatRaster SpatRaster::combineSources(SpatRaster x) {
 	SpatRaster out = deepCopy();
 	if (compare_geom(x, false, false)) {
         if (!hasValues()) {
@@ -16,6 +39,17 @@ SpatRaster SpatRaster::addSources(SpatRaster x) {
 	return(out);
 }
 
+void SpatRaster::addSource(SpatRaster x) {
+	if (compare_geom(x, false, false)) {
+        if (!hasValues()) {  //or if n src == 0?
+            source = x.source;
+        } else {
+            source.insert(source.end(), x.source.begin(), x.source.end());
+        }
+	} else {
+		setError("dimensions and/or extent do not match");
+	}
+}
 
 
 unsigned SpatRaster::nsrc() {
@@ -80,6 +114,21 @@ std::vector<double> RasterSource::getValues(unsigned lyr) {
 }
 
 
+void RasterSource::resize(unsigned n) {
+	names.resize(n);
+    hasRange.resize(n);
+    range_min.resize(n);
+    range_max.resize(n);
+	has_scale_offset.resize(n);
+	scale.resize(n);
+	offset.resize(n);
+    hasCT.resize(n);
+	CT.resize(n);
+    hasRAT.resize(n);
+	RAT.resize(n);
+	nlyr = n;
+}
+
 
 std::vector<RasterSource> RasterSource::subset(std::vector<unsigned> lyrs) {
 	std::vector<RasterSource> out;
@@ -100,15 +149,7 @@ std::vector<RasterSource> RasterSource::subset(std::vector<unsigned> lyrs) {
         out = { *this };
     } else {
         RasterSource rs = *this;
-        rs.names.resize(0);
-        rs.hasRange.resize(0);
-        rs.range_min.resize(0);
-        rs.range_max.resize(0);
-        rs.hasCT.resize(0);
-		rs.CT.resize(0);
-        rs.hasRAT.resize(0);
-		rs.RAT.resize(0);
-
+        rs.resize(0);
 
         if (memory) {
             if (hasValues) {
@@ -123,6 +164,10 @@ std::vector<RasterSource> RasterSource::subset(std::vector<unsigned> lyrs) {
                     rs.range_max.push_back(range_max[j]);
                     rs.hasCT.push_back(hasCT[j]);
                     rs.hasRAT.push_back(hasRAT[j]);
+					//rs.RAT.push_back(RAT[j]);
+					rs.has_scale_offset.push_back(has_scale_offset[j]);
+					rs.scale.push_back(scale[j]);
+					rs.offset.push_back(offset[j]);
                 }
             }
         } else {
@@ -135,6 +180,9 @@ std::vector<RasterSource> RasterSource::subset(std::vector<unsigned> lyrs) {
                 rs.range_max.push_back(range_max[j]);
                 rs.hasCT.push_back(hasCT[j]);
                 rs.hasRAT.push_back(hasRAT[j]);
+				rs.has_scale_offset.push_back(has_scale_offset[j]);
+				rs.scale.push_back(scale[j]);
+				rs.offset.push_back(offset[j]);
             }
         }
         rs.nlyr = nl;
@@ -167,12 +215,12 @@ std::vector<unsigned> validLayers( std::vector<unsigned> lyrs , unsigned nl) {
 }
 
 
-SpatRaster SpatRaster::subset(std::vector<unsigned> lyrs, std::string filename, bool overwrite) {
+SpatRaster SpatRaster::subset(std::vector<unsigned> lyrs, SpatOptions opt) {
 
     SpatRaster out = geometry();
     out.source.resize(0);
 
-    unsigned oldsize = lyrs.size();
+    unsigned oldsize = lyrs.size(); 
     lyrs = validLayers(lyrs, nlyr());
 
 	if (lyrs.size() == 0) {
@@ -208,8 +256,8 @@ SpatRaster SpatRaster::subset(std::vector<unsigned> lyrs, std::string filename, 
     vrs = source[ss].subset(slyr);
     out.source.insert(out.source.end(), vrs.begin(), vrs.end());
 
-    if (filename != "") {
-        out.writeRaster(filename, overwrite);
+    if (opt.get_filename() != "") {
+        out.writeRaster(opt);
     }
     return out;
 }

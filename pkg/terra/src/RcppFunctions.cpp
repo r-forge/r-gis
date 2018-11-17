@@ -1,5 +1,22 @@
+// Copyright (c) 2018  Robert J. Hijmans
+//
+// This file is part of the "spat" library.
+//
+// spat is free software: you can redistribute it and/or modify it
+// under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 2 of the License, or
+// (at your option) any later version.
+//
+// spat is distributed in the hope that it will be useful, but
+// WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with spat. If not, see <http://www.gnu.org/licenses/>.
+
 #include <Rcpp.h>
-#include "spatraster.h"
+#include "spatRaster.h"
 
 
 /*
@@ -20,7 +37,7 @@ Rcpp::List getBlockSizeR(SpatRaster* r, unsigned n) {
 
 
 
-Rcpp::List getAttributes(SpatLayer* v) {
+Rcpp::List getAttributes(SpatVector* v) {
 	unsigned n = v->ncol();
 	Rcpp::List out(n);	
 	std::vector<unsigned> itype = v->getItype();
@@ -42,7 +59,7 @@ Rcpp::List getAttributes(SpatLayer* v) {
 }
 
 
-Rcpp::DataFrame getGeometry(SpatLayer* v) {
+Rcpp::DataFrame getGeometry(SpatVector* v) {
 	SpatDataFrame df = v->getGeometryDF();
 
 	Rcpp::DataFrame out = Rcpp::DataFrame::create(
@@ -52,6 +69,23 @@ Rcpp::DataFrame getGeometry(SpatLayer* v) {
 			Rcpp::Named("y") = df.dv[1],
 			Rcpp::Named("hole") = df.iv[2]
 	);
+	return out;
+}
+
+
+SpatRaster rcppReclassify(SpatRaster* x, Rcpp::NumericMatrix rcl, unsigned right, bool lowest, SpatOptions opt) {
+	
+	unsigned nc = rcl.ncol();
+	unsigned nr = rcl.nrow();
+	printf("nc %u nr %u \n", nr, nr);
+	std::vector< std::vector<double>> rc(nc);
+	for (size_t c=0; c<nc; c++) {
+		for (size_t r=0; r<nr; r++) {
+			rc[c].push_back(rcl(r,c));
+		}
+	}
+
+	SpatRaster out = x->reclassify(rc, right, lowest, opt);
 	return out;
 }
 

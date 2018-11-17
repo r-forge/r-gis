@@ -3,6 +3,8 @@
 \docType{methods}
 
 \alias{Summary-methods}
+
+\alias{Summary,SpatRaster-method}
 \alias{mean,SpatRaster-method}
 
 \title{ Summary methods }
@@ -11,7 +13,7 @@
 
 Summary method compute cell (pixel) level statistics across layers, and most return a single layer (the exception is \code{range}). 
 
-The following summary methods are available for SpatRaster objects: \code{mean, max, min, range, prod, sum, any, all}
+The following summary methods are available for SpatRaster: \code{mean, max, min, range, prod, sum, any, all}
 
 See \code{reduce} to compute statistics that are not included here (e.g. median) or any other custom functions.
  
@@ -20,7 +22,11 @@ Because generic functions are used, the method applied is chosen based on the fi
 To summarize the values of all cells by layer see \code{layerStats}.
 }
 
+
 \value{SpatRaster}
+
+\seealso{ \code{\link[raster]{Math-methods}} }
+
 
 \examples{
 set.seed(0)

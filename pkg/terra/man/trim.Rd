@@ -6,19 +6,21 @@
 \title{Trim a SpatRaster}
 
 \description{
-Trim (shrink) a SpatRaster object by removing outer rows and columns that are \code{NA}.
+Trim (shrink) a SpatRaster by removing outer rows and columns that are \code{NA}.
 }
 
 \usage{
-\S4method{trim}{SpatRaster}(x, padding=0, filename="", overwrite=FALSE, ...)
+\S4method{trim}{SpatRaster}(x, padding=0, filename="", overwrite=FALSE, wopt=list(), ...)
 }
 
 \arguments{
   \item{x}{SpatRaster}
   \item{padding}{integer. Number of outer rows/columns to keep}
-  \item{filename}{Character. Output filename. Optional}
-  \item{overwrite}{Logical. If \code{TRUE}, \code{filename} is overwritten}
-  \item{...}{Additional arguments. None implemented}  
+   \item{filename}{character. Output filename. Optional}
+  \item{overwrite}{logical. If \code{TRUE}, \code{filename} is overwritten}
+  \item{wopt}{list. Options for writing files as in \code{\link{writeRaster}}}
+
+  \item{...}{Additional arguments. None implemented}
 }
 
 

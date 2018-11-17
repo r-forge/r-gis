@@ -3,27 +3,30 @@
 \alias{subset}
 \alias{subset,SpatRaster-method}
 \alias{[[,SpatRaster,numeric,missing-method}
+\alias{[[,SpatRaster,character,missing-method}
+\alias{$,SpatRaster-method}
 
-\title{Subset a SpatRaster object}
+\title{Subset of a SpatRaster}
 
 \description{
-Subset a set of layers from a SpatRaster object.  
+Select a subset of layers from a SpatRaster.  
 }
 
 \usage{
-\S4method{subset}{SpatRaster}(x, subset, filename='', overwrite=FALSE, ...)
+\S4method{subset}{SpatRaster}(x, subset, filename="", overwrite=FALSE, wopt=list(), ...)
 }
 
 \arguments{
   \item{x}{SpatRaster}
   \item{subset}{integer or character. Should indicate the layers (represented as integer or by their names)}
-  \item{filename}{character. Output filename (optional)}
-  \item{overwrite}{Logical. If \code{TRUE}, \code{filename} is overwritten}
-  \item{...}{additional arguments as for \code{\link{writeRaster}}}
+  \item{filename}{character. Output filename. Optional}
+  \item{overwrite}{logical. If \code{TRUE}, \code{filename} is overwritten}
+  \item{wopt}{list. Options for writing files as in \code{\link{writeRaster}}}
+  \item{...}{Additional arguments. None implemented}  
 }
 
 \value{
-Raster* object
+SpatRaster
 }
 
 \examples{

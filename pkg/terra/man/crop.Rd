@@ -12,16 +12,17 @@ Cut out a part of a SpatRaster with a SpatExtent, or another object from which a
 }
 
 \usage{
-\S4method{crop}{SpatRaster}(x, y, snap="near", filename="", overwrite=FALSE, ...)
+\S4method{crop}{SpatRaster}(x, y, snap="near", filename="", overwrite=FALSE, wopt=list(), ...)
 
 }
 
 \arguments{
-  \item{x}{SpatRaster object}
-  \item{y}{SpatExtent object}
+  \item{x}{SpatRaster}
+  \item{y}{SpatExtent}
   \item{snap}{Character. One of "near", "in", or "out"}  
-  \item{filename}{Character. Output filename. Optional}
-  \item{overwrite}{Logical. If \code{TRUE}, \code{filename} is overwritten}
+  \item{filename}{character. Output filename. Optional}
+  \item{overwrite}{logical. If \code{TRUE}, \code{filename} is overwritten}
+  \item{wopt}{list. Options for writing files as in \code{\link{writeRaster}}}
   \item{...}{Additional arguments. None implemented}  
 }
 
@@ -33,7 +34,7 @@ SpatRaster
 
 
 \examples{
-r <- rast(nrow=45, ncol=90)
+r <- rast(nrows=45, ncols=90)
 values(r) <- 1:ncell(r)
 e <- ext(-160, 10, 30, 60)
 rc <- crop(r, e)

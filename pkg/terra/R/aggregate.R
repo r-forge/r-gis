@@ -23,16 +23,9 @@
 	return(fun)
 }
 
-.overwrite <- function(...) {
-	overwrite <- list(...)$overwrite
-	if (is.null(overwrite)) { 
-		overwrite <- FALSE 
-	}
-	overwrite
-}
 
 setMethod('aggregate', signature(x='SpatRaster'), 
-function(x, fact=2, fun='mean', na.rm=TRUE, filename="", overwrite=FALSE, ...)  {
+function(x, fact=2, fun='mean', na.rm=TRUE, filename="", overwrite=FALSE, wopt=list(), ...)  {
 
 	#expand=TRUE, 
 	
@@ -56,10 +49,11 @@ function(x, fact=2, fun='mean', na.rm=TRUE, filename="", overwrite=FALSE, ...)  
 		op <- NA
 	}
 
+	
 	if (!is.na(op)) {	
-		r <- methods::new('SpatRaster')
+		opt <- .runOptions(filename[1], overwrite[1], wopt)
 		#	fun='mean', expand=TRUE, na.rm=TRUE, filename=""
-		x@ptr <- x@ptr$aggregate(dims, fun, na.rm, filename, overwrite)
+		x@ptr <- x@ptr$aggregate(dims, fun, na.rm, opt)
 		return (show_messages(x, "aggregate"))
 	} else {
 		e <- as.vector(ext(x))
@@ -70,7 +64,7 @@ function(x, fact=2, fun='mean', na.rm=TRUE, filename="", overwrite=FALSE, ...)  
 		nc <- ncol(x)
 		
 		readStart(x)
-		b <- writeStart(out, filename)
+		b <- writeStart(out, filename[1], overwrite[1], wopt)
 		for (i in 1:b$n) {
 			#v <- x@ptr$get_aggregates(dims, b$row[i], b$nrows[i], 1, nc)
 			v <- x@ptr$get_aggregates(dims)
