@@ -1,7 +1,7 @@
 # Author: Robert J. Hijmans
 # Date :  June 2017
-# Version 0.9
-# Licence GPL v3
+# Version 1.0
+# License GPL v3
 
 
 
@@ -37,10 +37,13 @@ setMethod ("show" , "SpatVector",
 		e <- as.vector(ext(object))
 		cat("class       :", class(object), "\n")
 		cat("geometry    :", geomtype(object), "\n")
-		cat("elements    : ", length(object), "\n", sep="" ) 
+		cat("elements    : ", size(object), "\n", sep="" ) 
 		cat("extent      : ", e[1], ", ", e[2], ", ", e[3], ", ", e[4], "  (xmin, xmax, ymin, ymax)\n", sep="")
 		cat("coord. ref. :", crs(object), "\n")
-		cat("names       :", paste(names(object), collapse=", "), "\n")		
+		nms <- names(object)
+		if (length(nms) > 0) {
+			cat("names       :", paste(names(object), collapse=", "), "\n")		
+		}
 	}
 )
 
@@ -77,6 +80,8 @@ setMethod ("show" , "SpatRaster",
 			nsr <- nsrc(object)	
 			m <- .inMemory(object)
 			f <- .filenames(object)
+			f <- gsub("\\", "/", f, fixed=TRUE)
+
 			sources <- rep("memory", length(m))
 			sources[!m] <- f[!m] 
 			if (nsr > 1) {

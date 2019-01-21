@@ -19,6 +19,7 @@
 #include "spatRaster.h"
 
 
+// need to take care of NAs here. OK for NAN, but not for int types
 template <typename T>
 void operator+(std::vector<T>& a, const std::vector<T>& b) {
     std::transform(a.begin(), a.end(), b.begin(), a.begin(), std::plus<T>());
@@ -135,7 +136,7 @@ bool smooth_operator(std::string oper) {
 }
 
 
-SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions opt) {
+SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 
@@ -144,7 +145,7 @@ SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions opt) {
 		return out;
 	}
 
-	if (!compare_geom(x, true, false)) {
+	if (!compare_geom(x, true, true)) {
 		out.setError("dimensions and/or extent do not match");
 		return(out);
 	}
@@ -153,7 +154,7 @@ SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions opt) {
 		out.setError("raster has no values"); // or warn and treat as NA?
 		return out;
 	}
-  	out.writeStart(opt);
+ 	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	x.readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
@@ -182,7 +183,7 @@ SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions opt) {
 		} else if (oper == "<") {
 			a < b;
 		}
-		out.writeValues(a, out.bs.row[i]);
+		if (!out.writeValues(a, out.bs.row[i])) return out;
 	}
 	out.writeStop();
 	readStop();
@@ -192,7 +193,7 @@ SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions opt) {
 
 
 
-SpatRaster SpatRaster::arith(double x, std::string oper, SpatOptions opt) {
+SpatRaster SpatRaster::arith(double x, std::string oper, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 	if (!smooth_operator(oper)) {
@@ -200,7 +201,7 @@ SpatRaster SpatRaster::arith(double x, std::string oper, SpatOptions opt) {
 		return out;
 	}
 
-  	out.writeStart(opt);
+  	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
@@ -231,7 +232,7 @@ SpatRaster SpatRaster::arith(double x, std::string oper, SpatOptions opt) {
 		} else {
 			// stop
 		}
-		out.writeValues(a, out.bs.row[i]);
+		if (!out.writeValues(a, out.bs.row[i])) return out;
 	}
 	out.writeStop();
 	readStop();
@@ -239,7 +240,7 @@ SpatRaster SpatRaster::arith(double x, std::string oper, SpatOptions opt) {
 }
 
 
-SpatRaster SpatRaster::arith_rev(double x, std::string oper, SpatOptions opt) {
+SpatRaster SpatRaster::arith_rev(double x, std::string oper, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 	if (!smooth_operator(oper)) {
@@ -247,7 +248,7 @@ SpatRaster SpatRaster::arith_rev(double x, std::string oper, SpatOptions opt) {
 		return out;
 	}
 
-  	out.writeStart(opt);
+  	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
@@ -276,7 +277,7 @@ SpatRaster SpatRaster::arith_rev(double x, std::string oper, SpatOptions opt) {
 		} else {
 			// stop
 		}
-		out.writeValues(a, out.bs.row[i]);
+		if (!out.writeValues(a, out.bs.row[i])) return out;
 	}
 	out.writeStop();
 	readStop();

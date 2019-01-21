@@ -19,23 +19,23 @@
 
 SpatHole::SpatHole() {}
 
-SpatHole::SpatHole(std::vector<double> X, std::vector<double> Y) {	
-	x = X; y = Y;  
+SpatHole::SpatHole(std::vector<double> X, std::vector<double> Y) {
+	x = X; y = Y;
 	extent.xmin = *std::min_element(X.begin(), X.end());
 	extent.xmax = *std::max_element(X.begin(), X.end());
 	extent.ymin = *std::min_element(Y.begin(), Y.end());
 	extent.ymax = *std::max_element(Y.begin(), Y.end());
 }
 
-bool SpatPart::addHole(std::vector<double> X, std::vector<double> Y) { 
-	SpatHole h(X, Y);	
+bool SpatPart::addHole(std::vector<double> X, std::vector<double> Y) {
+	SpatHole h(X, Y);
 	holes.push_back(h);
 	// check if inside pol?
 	return true;
 }
 
 
-bool SpatPart::addHole(SpatHole h) { 
+bool SpatPart::addHole(SpatHole h) {
 	holes.push_back(h);
 	// check if inside pol?
 	return true;
@@ -45,16 +45,16 @@ bool SpatPart::addHole(SpatHole h) {
 SpatPart::SpatPart() {}
 
 SpatPart::SpatPart(double X, double Y) {
-	x.push_back(X); 
-	y.push_back(Y);  
+	x.push_back(X);
+	y.push_back(Y);
 	extent.xmin = X;
 	extent.xmax = X;
 	extent.ymin = Y;
 	extent.ymax = Y;
 }
 
-SpatPart::SpatPart(std::vector<double> X, std::vector<double> Y) { 
-	x = X; y = Y;  
+SpatPart::SpatPart(std::vector<double> X, std::vector<double> Y) {
+	x = X; y = Y;
 	extent.xmin = *std::min_element(X.begin(), X.end());
 	extent.xmax = *std::max_element(X.begin(), X.end());
 	extent.ymin = *std::min_element(Y.begin(), Y.end());
@@ -65,21 +65,21 @@ SpatPart::SpatPart(std::vector<double> X, std::vector<double> Y) {
 SpatGeom::SpatGeom() {};
 
 SpatGeom::SpatGeom(SpatPart p) {
-	parts.push_back(p); 
-	extent = p.extent;			
+	parts.push_back(p);
+	extent = p.extent;
 }
-		
-bool SpatGeom::addPart(SpatPart p) { 
-	parts.push_back(p); 
+
+bool SpatGeom::addPart(SpatPart p) {
+	parts.push_back(p);
 	if (parts.size() > 1) {
 		extent.unite(p.extent);
 	} else {
 		extent = p.extent;
 	}
-	return true; 
+	return true;
 }
 
-bool SpatGeom::addHole(SpatHole h) { 
+bool SpatGeom::addHole(SpatHole h) {
 	long i = parts.size()-1;
 	if (i > -1) {
 		parts[i].addHole(h);
@@ -90,18 +90,18 @@ bool SpatGeom::addHole(SpatHole h) {
 }
 
 
-bool SpatGeom::setPart(SpatPart p, unsigned i) { 
-	parts[i] = p; 
+bool SpatGeom::setPart(SpatPart p, unsigned i) {
+	parts[i] = p;
 	if (parts.size() > 1) {
 		extent.unite(p.extent);
 	} else {
 		extent = p.extent;
 	}
-	return true; 
+	return true;
 }
 
-SpatPart SpatGeom::getPart(unsigned i) { 
-	return parts[i]; 
+SpatPart SpatGeom::getPart(unsigned i) {
+	return parts[i];
 }
 
 std::vector<double> SpatVector::getDv(unsigned i) {
@@ -136,9 +136,14 @@ unsigned SpatVector::nrow() {
 	return lyr.geoms.size();
 }
 
-unsigned SpatVector::size() {
+size_t SpatVector::size() {
 	return lyr.geoms.size();
 }
+
+bool SpatVector::could_be_lonlat() {
+	SpatExtent e = getExtent();
+	return e.could_be_lonlat(getCRS());
+};
 
 
 SpatExtent SpatVector::getExtent(){
@@ -162,56 +167,33 @@ std::string SpatVector::type(){
 	} else if (lyr.geoms[0].gtype == 1) {
 		return "lines";
 	} else if (lyr.geoms[0].gtype == 2) {
-		return "polygons";		
+		return "polygons";
 	} else {
 		return("unknown");
 	}
 }
 
-double SpatGeom::area(){
-	return 0;
+
+
+SpatGeom SpatVector::getGeom(unsigned i) {
+	return lyr.geoms[i];
 }
 
-std::vector<double> SpatVector::area(){
-	unsigned n = size();
-	std::vector<double> out(n);
-	SpatGeom g;
-	for (size_t i=0; i<n; i++) {
-		g = getGeom(i);
-		out[i] = g.area();
-	}
-	return(out);
-};
-
-double SpatGeom::length(){
-	return 0;
-}
-
-std::vector<double> SpatVector::length() {
-	unsigned n = size();
-	std::vector<double> out(n);
-	SpatGeom g;
-	for (size_t i=0; i<n; i++) {
-		g = getGeom(i);
-		out[i] = g.length();
-	}
-	return(out);	
-};
-
-
-
-SpatGeom SpatVector::getGeom(unsigned i) { 
-	return lyr.geoms[i]; 
-}
-
-bool SpatVector::addGeom(SpatGeom p) { 
-	lyr.geoms.push_back(p); 
+bool SpatVector::addGeom(SpatGeom p) {
+	lyr.geoms.push_back(p);
 	if (lyr.geoms.size() > 1) {
 		lyr.extent.unite(p.extent);
 	} else {
 		lyr.extent = p.extent;
 	}
-	return true; 
+	return true;
+}
+
+bool SpatVector::setGeom(SpatGeom p) {
+	lyr.geoms.resize(1);
+	lyr.geoms[0] = p;
+	lyr.extent = p.extent;
+	return true;
 }
 
 
@@ -240,22 +222,22 @@ SpatDataFrame SpatVector::getGeometryDF() {
 	SpatPart p;
 	SpatHole h;
 	SpatDataFrame out;
-	
+
 	out.add_column(1, "geom");
 	out.add_column(1, "part");
 	out.add_column(0, "x");
 	out.add_column(0, "y");
 	out.add_column(1, "hole");
 	out.resize(n);
-	
+
 	size_t idx = 0;
 	for (size_t i=0; i < size(); i++) {
 		g = getGeom(i);
 		for (size_t j=0; j < g.size(); j++) {
 			p = g.getPart(j);
 			for (size_t q=0; q < p.x.size(); q++) {
-				out.iv[0][idx] = i;
-				out.iv[1][idx] = j;
+				out.iv[0][idx] = i+1;
+				out.iv[1][idx] = j+1;
 				out.dv[0][idx] = p.x[q];
 				out.dv[1][idx] = p.y[q];
 				out.iv[2][idx] = 0;
@@ -265,11 +247,11 @@ SpatDataFrame SpatVector::getGeometryDF() {
 				for (size_t k=0; k < p.nHoles(); k++) {
 					h = p.getHole(k);
 					for (size_t q=0; q < h.x.size(); q++) {
-						out.iv[0][idx] = i;
-						out.iv[1][idx] = j;
+						out.iv[0][idx] = i+1;
+						out.iv[1][idx] = j+1;
 						out.dv[0][idx] = h.x[q];
 						out.dv[1][idx] = h.y[q];
-						out.iv[2][idx] = 1;
+						out.iv[2][idx] = k+1;
 						idx++;
 					}
 				}
@@ -285,63 +267,81 @@ SpatGeomType SpatVector::getGType(std::string &type) {
 	else if (type == "polygons") { return polygons; }
 	else { return unknown; }
 }
-	
 
-void SpatVector::setGeometry(std::string type, std::vector<unsigned> geom, std::vector<unsigned> part, std::vector<double> x, std::vector<double> y, std::vector<bool> hole) {
 
-// it is assumed that values are sorted by geom, part, hole
-	
-	unsigned lastgeom = geom[0];
+void SpatVector::setGeometry(std::string type, std::vector<unsigned> gid, std::vector<unsigned> part, std::vector<double> x, std::vector<double> y, std::vector<unsigned> hole) {
+
+// it is assumed that values are sorted by gid, part, hole
+	unsigned lastgeom = gid[0];
 	unsigned lastpart = part[0];
-	std::vector<double> X, Y;
-//	X.push_back(x[0]);
-//	Y.push_back(y[0]);
-	bool isHole = hole[0];
+	unsigned lasthole = hole[0];
+	bool isHole = lasthole > 0;
 
+	std::vector<double> X, Y;
 	SpatGeom g;
 	g.gtype = getGType(type);
-	
-	for (size_t i=0; i<geom.size(); i++) {
-		if ((lastgeom != geom[i]) || (lastpart != part[i])) {
-			if (isHole) {
-				SpatHole h(X, Y);
-				g.addHole(h);
-			} else {
-				SpatPart p(X, Y);
-				g.addPart(p);
-			}
+
+	for (size_t i=0; i<gid.size(); i++) {
+		if ((lastgeom != gid[i]) || (lastpart != part[i]) || (lasthole != hole[i])) {
+            if (g.gtype == polygons) {
+                if ((X[0] != X[X.size()-1]) || (Y[0] != Y[Y.size()-1])) {
+                    X.push_back(X[0]);
+                    Y.push_back(Y[0]);
+                }
+                if (isHole) {
+                    SpatHole h(X, Y);
+                    g.addHole(h);
+                } else {
+                    SpatPart p(X, Y);
+                    g.addPart(p);
+                }
+            } else {
+                SpatPart p(X, Y);
+                g.addPart(p);
+            }
 			lastpart = part[i];
-			isHole = hole[i];
+            lasthole = hole[i];
+            isHole = lasthole > 0;
 			X.resize(0);
-			Y.resize(0);	
-			if (lastgeom != geom[i]) {
+			Y.resize(0);
+			if (lastgeom != gid[i]) {
 				addGeom(g);
 				g.parts.resize(0);
-				lastgeom = geom[i];
+				lastgeom = gid[i];
 			}
 		}
 		X.push_back(x[i]);
 		Y.push_back(y[i]);
 	}
-	if (isHole) {
-		SpatHole h(X, Y);
-		g.addHole(h);
+
+	if (g.gtype == polygons) {
+        if ((X[0] != X[X.size()-1]) || (Y[0] != Y[Y.size()-1])) {
+            X.push_back(X[0]);
+            Y.push_back(Y[0]);
+        }
+        if (isHole) {
+            SpatHole h(X, Y);
+            g.addHole(h);
+        } else {
+            SpatPart p(X, Y);
+            g.addPart(p);
+        }
 	} else {
 		SpatPart p(X, Y);
 		g.addPart(p);
 	}
-	addGeom(g);	
+	addGeom(g);
 }
 
 
 
-SpatVector SpatVector::subset(std::vector<unsigned> range) { 
+SpatVector SpatVector::subset(std::vector<unsigned> range) {
 	SpatVector out;
 	for (size_t i=0; i < range.size(); i++) {
-		out.addGeom( lyr.geoms[range[i]] ); 
+		out.addGeom( lyr.geoms[range[i]] );
 	}
 	out.lyr.crs = lyr.crs;
 	//df ?
-	return out;	
+	return out;
 };
 

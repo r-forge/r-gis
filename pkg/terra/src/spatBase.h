@@ -20,10 +20,12 @@
 #include <string>
 #include <cmath>
 
+#define useGDAL
+
+
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
 #endif
-
 
 class SpatMessages {
 	public:
@@ -32,7 +34,7 @@ class SpatMessages {
 		bool has_warning = false;
 		std::string error;
 		std::vector<std::string> warnings;
-		
+
 		void setError(std::string s) {
 			has_error = true;
 			error = s;
@@ -52,16 +54,16 @@ class SpatOptions {
 		bool todisk = false;
 		double memfrac = 0.6;
 
+	public:
 		std::string def_datatype = "FLT4S";
-		std::string def_filetype = "GTiff"; 
+		std::string def_filetype = "GTiff";
 		bool overwrite = false;
-		
+
 		std::string datatype = "";
-		std::string filetype = ""; 
+		std::string filetype = "";
 		std::string filename = "";
 		std::vector<std::string> gdal_options;
-	public:
-		
+
 		SpatOptions();
 		SpatOptions(const SpatOptions &opt);
 		SpatOptions deepcopy(const SpatOptions &opt);
@@ -71,9 +73,9 @@ class SpatOptions {
 		void set_todisk(bool b);
 		double get_memfrac();
 		void set_memfrac(double d);
-		std::string get_tempdir();	
+		std::string get_tempdir();
 		void set_tempdir(std::string d);
-		
+
 		std::string get_def_datatype();
 		std::string get_def_filetype();
 		void set_def_datatype(std::string d);
@@ -102,27 +104,53 @@ class SpatExtent {
 //		SpatExtent() {xmin = inf; xmax = neginf; ymin = inf; ymax = neginf;}
 		SpatExtent() {xmin = -180; xmax = 180; ymin = -90; ymax = 90;}
 		SpatExtent(double _xmin, double _xmax, double _ymin, double _ymax) {xmin = _xmin; xmax = _xmax; ymin = _ymin; ymax = _ymax;}
-		
-		void intersect(SpatExtent e) { 
+
+		void intersect(SpatExtent e) { // check first if intersects
 			xmin = std::max(xmin, e.xmin);
 			xmax = std::min(xmax, e.xmax);
 			ymin = std::max(ymin, e.ymin);
 			ymax = std::min(ymax, e.ymax);
 		}
 
-		void unite(SpatExtent e) { 
+		void unite(SpatExtent e) {
 			xmin = std::min(xmin, e.xmin);
 			xmax = std::max(xmax, e.xmax);
 			ymin = std::min(ymin, e.ymin);
 			ymax = std::max(ymax, e.ymax);
 		}
 
-		std::vector<double> asVector() { 
-			std::vector<double> e(4);
-			e[0] = xmin; e[1] = xmax; e[2] = ymin; e[3] = ymax; 
+		std::vector<double> asVector() {
+			std::vector<double> e = { xmin, xmax, ymin, ymax };
 			return(e);
 		}
-			
+
+
+		bool is_lonlat(std::string crs) {
+			bool b1 = crs.find("longlat") != std::string::npos;
+			bool b2 = crs.find("epsg:4326") != std::string::npos;
+			return (b1 | b2);
+		}
+		
+		bool could_be_lonlat(std::string crs) {
+			bool b = is_lonlat(crs);
+			if ((!b) & (crs=="")) {
+				if ((xmin >=-180.1) & (xmax <= 180.1) & (ymin >= -90.1) & (ymax <= 90.1)) {
+					b = true;
+				}
+			}
+			return b;
+		}
+
+		bool is_global_lonlat(std::string crs) {
+			if (could_be_lonlat(crs)) {
+                // could be refined
+                if (std::abs(xmax - xmin - 360) < 0.001) {
+                    return true;
+                }
+            }
+			return false;
+		}
+
 		bool valid() {
 			return ((xmax > xmin) && (ymax > ymin));
 		}

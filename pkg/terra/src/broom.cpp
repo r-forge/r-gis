@@ -106,28 +106,30 @@ std::vector<double> broom_dist_planar(std::vector<double> &v, std::vector<double
 */
 
 
-SpatRaster SpatRaster::gridDistance(SpatOptions opt) {
+SpatRaster SpatRaster::gridDistance(SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 	if (!hasValues()) {
 		out.setError("cannot compute distance for a raster with no values");
 		return out;
 	}
-	
+
 	//bool isgeo = out.islonlat
 
 	std::vector<double> res = resolution();
-	std::vector<unsigned> dim = {nrow, ncol};
+	std::vector<unsigned> dim = {nrow(), ncol()};
 
 	SpatRaster first = out.geometry();
 
 	std::string tempfile = "";
-	std::vector<double> above(ncol, std::numeric_limits<double>::infinity());
+	std::vector<double> above(ncol(), std::numeric_limits<double>::infinity());
     std::vector<double> d, v, vv;
 	readStart();
 	std::string filename = opt.get_filename();
 	opt.set_filename("");
   	first.writeStart(opt);
+ 	if (!first.writeStart(opt)) { return first; }
+
 	for (size_t i = 0; i < first.bs.n; i++) {
         v = readBlock(first.bs, i);
         d = broom_dist_planar(v, above, res, dim);
@@ -136,7 +138,7 @@ SpatRaster SpatRaster::gridDistance(SpatOptions opt) {
 	first.writeStop();
   	first.readStart();
 	opt.set_filename(filename);
-  	out.writeStart(opt);
+  	if (!out.writeStart(opt)) { return out; }
 	for (size_t i = out.bs.n; i>0; i--) {
         v = readBlock(out.bs, i-1);
 		std::reverse(v.begin(), v.end());

@@ -7,6 +7,7 @@
 \alias{ncell}
 \alias{nlyr}
 \alias{nsrc}
+\alias{size}
 \alias{dim}
 \alias{ncol<-}
 \alias{nrow<-}
@@ -19,11 +20,10 @@
 \alias{nlyr,SpatRaster-method}
 \alias{nsrc,SpatRaster-method}
 \alias{ncell,SpatRaster-method}
-\alias{length,SpatRaster-method}
+\alias{size,SpatRaster-method}
 \alias{dim,SpatRaster-method}
 \alias{dim<-,SpatRaster-method}
-\alias{length,SpatRaster-method}
-\alias{length,SpatVector-method}
+\alias{size,SpatVector-method}
 
 \alias{res}
 \alias{xres}
@@ -45,19 +45,21 @@ Set the number of rows or columns or layers. When setting dimensions, all source
 \usage{
 \S4method{ncol}{SpatRaster}(x)
 \S4method{nrow}{SpatRaster}(x)
-ncol(x, ...) <- value
-nrow(x, ...) <- value
-
-\S4method{ncell}{SpatRaster}(x)
 \S4method{nlyr}{SpatRaster}(x)
+\S4method{ncell}{SpatRaster}(x)
+\S4method{size}{SpatRaster}(x)
 \S4method{nsrc}{SpatRaster}(x)
 \S4method{res}{SpatRaster}(x)
+
+ncol(x, ...) <- value
+nrow(x, ...) <- value
 
 \S4method{xres}{SpatRaster}(x)
 \S4method{yres}{SpatRaster}(x)
 
 \S4method{ncol}{SpatVector}(x)
 \S4method{nrow}{SpatVector}(x)
+\S4method{size}{SpatVector}(x, ...)
 
 }
 

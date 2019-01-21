@@ -1,7 +1,7 @@
 # Author: Robert J. Hijmans
 # Date : October 2018
 # Version 1.0
-# Licence GPL v3
+# License GPL v3
 
 
 setMethod("c", signature(x="SpatRaster"), 
@@ -15,6 +15,26 @@ setMethod("c", signature(x="SpatRaster"),
 		show_messages(x, "c")		
 	}
 )
+
+
+setMethod("adjacent", signature(x="SpatRaster"), 
+	function(x, cells, directions="rook", include=FALSE, ...) {
+		v <- x@ptr$adjacent(cells-1, directions, include)
+		show_messages(x, "adjacent")
+		v <- do.call(rbind, v)
+		return(v+1)
+	}
+)
+
+
+setMethod("area", signature(x="SpatRaster"), 
+	function(x, filename="", overwrite=FALSE, wopt=list(), ...) {
+		opt <- .runOptions(filename[1], overwrite[1], wopt)
+		x@ptr <- x@ptr$area(opt)
+		show_messages(x, "area")
+	}
+)
+
 
 
 setMethod("clamp", signature(x="SpatRaster"), 
@@ -38,6 +58,14 @@ setMethod("crop", signature(x="SpatRaster", y="ANY"),
 )
 
 
+setMethod("disaggregate", signature(x="SpatRaster"), 
+	function(x, fact, filename="", overwrite=FALSE, wopt=list(), ...) {
+		opt <- .runOptions(filename[1], overwrite[1], wopt)
+		x@ptr <- x@ptr$disaggregate(fact, opt)
+		show_messages(x, "disaggregate")
+	}
+)
+
 setMethod("gridDistance", signature(x="SpatRaster"), 
 	function(x, filename="", overwrite=FALSE, wopt=list(), ...) {
 		opt <- .runOptions(filename[1], overwrite[1],wopt)
@@ -58,13 +86,20 @@ setMethod("mask", signature(x="SpatRaster", mask="SpatRaster"),
 setMethod("rasterize", signature(x="SpatVector", y="SpatRaster"), 
 	function(x, y, background=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
 		opt <- .runOptions(filename[1], overwrite[1],wopt)
-		y@ptr <- y@ptr$rasterizePolygons(x@ptr, background[1], opt)
+		gtype <- geomtype(x)
+		if (gtype == "polygons") {
+			y@ptr <- y@ptr$rasterizePolygons(x@ptr, background[1], opt)
+		} else if (gtype == "lines") {
+			y@ptr <- y@ptr$rasterizeLines(x@ptr, background[1], opt)
+		} else {
+			stop("not implemented yet")
+		}
 		show_messages(y, "rasterize")
 	}
 )
 
 
-setMethod('reclassify', signature(x='SpatRaster', rcl='ANY'), 
+setMethod("reclassify", signature(x="SpatRaster", rcl="ANY"), 
 function(x, rcl, include.lowest=FALSE, right=TRUE, filename="", overwrite=FALSE, wopt=list(), ...) {
 	
 	
@@ -101,4 +136,12 @@ setMethod("trim", signature(x="SpatRaster"),
 	}
 )
 
+
+setMethod("warp", signature(x="SpatRaster", y="SpatRaster"), 
+	function(x, y, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
+		opt <- .runOptions(filename[1], overwrite[1], wopt)
+		x@ptr <- x@ptr$warp(y@ptr, method, opt)
+		show_messages(x, "warp")
+	}
+)
 

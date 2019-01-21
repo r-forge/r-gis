@@ -18,7 +18,7 @@
 #include "spatRaster.h"
 
 
-SpatRaster SpatRaster::crop(SpatExtent e, std::string snap, SpatOptions opt) {
+SpatRaster SpatRaster::crop(SpatExtent e, std::string snap, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 
@@ -42,18 +42,18 @@ SpatRaster SpatRaster::crop(SpatExtent e, std::string snap, SpatOptions opt) {
 	unsigned col2 = colFromX(out.extent.xmax - 0.5 * xr);
 	unsigned row1 = rowFromY(out.extent.ymax - 0.5 * yr);
 	unsigned row2 = rowFromY(out.extent.ymin + 0.5 * yr);
-	if ((row1==0) && (row2==nrow-1) && (col1==0) && (col2==ncol-1)) {
+	if ((row1==0) && (row2==nrow()-1) && (col1==0) && (col2==ncol()-1)) {
 		return(out);
 	}
 
-	unsigned ncols = out.ncol;
+	unsigned ncols = out.ncol();
 
- 	out.writeStart(opt);
+ 	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	std::vector<double> v;
 	for (size_t i = 0; i < out.bs.n; i++) {
 		v = readValues(row1+out.bs.row[i], out.bs.nrows[i], col1, ncols);
-		out.writeValues(v, out.bs.row[i]);
+		if (!out.writeValues(v, out.bs.row[i])) return out;
 	}
 	out.writeStop();
 	readStop();

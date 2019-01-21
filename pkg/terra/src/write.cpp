@@ -18,12 +18,12 @@
 #include <random>
 #include <chrono>
 #include "spatRaster.h"
-#include "SimpleIni/SimpleIni.h"
+#include "SimpleIni.h"
 #include "string_utils.h"
 #include "math_utils.h"
 
 
-std::string tempFile(std::string tmpdir, std::string extension, double seed) {
+std::string tempFile(SpatOptions &opt, double seed) {
     std::vector<char> characters = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','J','K',
     'L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m',
     'n','o','p','q','r','s','t','u','v','w','x','y','z' };
@@ -35,7 +35,9 @@ std::string tempFile(std::string tmpdir, std::string extension, double seed) {
 	};
     std::string filename(15, 0);
     std::generate_n(filename.begin(), 15, draw);
-	filename = tmpdir + "/terra_" + filename + extension;
+	std::string tmpdir = opt.get_tempdir();
+	std::string extension = ".tif";
+	filename = tmpdir + "/spat_" + filename + extension;
 	return filename;
 }
 
@@ -51,15 +53,17 @@ bool SpatRaster::isSource(std::string filename) {
 }
 
 
-bool SpatRaster::writeRaster(SpatOptions opt) {
-	
+bool SpatRaster::writeRaster(SpatOptions &opt) {
+
 	std::string filename = opt.get_filename();
 	std::string datatype = opt.get_datatype();
 	bool overwrite = opt.get_overwrite();
-	lrtrim(filename);
+	//if (overwrite) {std::cout << "overwrite true\n";} else {std::cout << "overwrite false\n";}
+	//std::cout << "datatype " << datatype << "\n";
+
 	if (filename == "") {
 		double seed = std::chrono::system_clock::now().time_since_epoch().count();
-		filename = tempFile(".", ".tif", seed);
+		filename = tempFile(opt, seed);
 	} else if (file_exists(filename)) {
 		if (overwrite) {
 			if (isSource(filename)) {
@@ -75,10 +79,19 @@ bool SpatRaster::writeRaster(SpatOptions opt) {
 	lowercase(ext);
 
 	if (ext == ".grd") {
-		std::ofstream fs(filename, std::ios::ate | std::ios::binary);
 		std::vector<double> v = getValues();
-		fs.write((char*)&v[0], v.size() * sizeof(double));
-		fs.close();
+		//source[0].fsopen(filename);
+		//source[0].fswrite(v);
+		//source[0].fsclose();
+
+//	    std::string grifile = setFileExt(filename, ".gri");
+//		std::ofstream fs(grifile, std::ios::out | std::ios::binary);
+//		fs.write((char*)&v[0], v.size() * sizeof(double));
+//		fs.close();
+
+        writeStart(opt);
+        writeValues(v, 0);
+        writeStop();
         return writeHDR(filename);
 	} else {
 		std::string format = opt.get_filetype();
@@ -92,7 +105,7 @@ bool SpatRaster::writeRaster(SpatOptions opt) {
 }
 
 
-bool SpatRaster::writeStart(SpatOptions opt) {
+bool SpatRaster::writeStart(SpatOptions &opt) {
 
 //	double inf = std::numeric_limits<double>::infinity();
 //	s.min_range = inf;
@@ -100,11 +113,11 @@ bool SpatRaster::writeStart(SpatOptions opt) {
 	bool success = true;
 	std::string filename = opt.get_filename();
 	std::string datatype = opt.get_datatype();
-	
+
 	if (filename == "") {
 		if (!canProcessInMemory(4)) {
 			double seed = std::chrono::system_clock::now().time_since_epoch().count();
-			filename = tempFile(".", ".tif", seed);
+			filename = tempFile(opt, seed);
 		}
 	}
 
@@ -123,10 +136,15 @@ bool SpatRaster::writeStart(SpatOptions opt) {
 				if (opt.get_overwrite()) {
 					remove(filename.c_str());
 				} else {
-					// stop()
+					setError("file exists");
+					return false;
 				}
 			}
-			//(*fs).open(fname, ios::out | ios::binary);
+//			source[0].fsopen(filename);
+            // create file and close it
+            std::string griname = setFileExt(source[0].filename, ".gri");
+            std::ofstream fs(griname, std::ios::out | std::ios::binary);
+            fs.close();
 		} else {
 			// open GDAL filestream
 			#ifdef useGDAL
@@ -144,7 +162,7 @@ bool SpatRaster::writeStart(SpatOptions opt) {
 		addWarning("file was already open");
 	}
 	source[0].open_write = true;
-	source[0].filename = {filename};
+	source[0].filename = filename;
 	bs = getBlockSize(4);
 	return success;
 }
@@ -158,11 +176,19 @@ bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row){
 	}
 	bool success = true;
 	if (source[0].driver == "raster") {
-		unsigned size = vals.size();
-		//(*fs).write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
+		//source[0].fswrite(vals);
+
+		unsigned sz = vals.size();
 		std::string fname = setFileExt(source[0].filename, ".gri");
+
+		// make sure we write at the right place if not in order.
+		// also deal with BIL/BIP/BSQ
 		std::ofstream fs(fname, std::ios::ate | std::ios::binary);
-		fs.write(reinterpret_cast<const char*>(&vals[0]), size*sizeof(double));
+		long cursize = fs.tellp() / sizeof(double);
+        long needpos = row * ncol();
+        //std::cout << cursize << " " << needpos << "\n";
+
+		fs.write(reinterpret_cast<const char*>(&vals[0]), sz*sizeof(double));
 		fs.close();
 
 	} else if (source[0].driver == "gdal") {
@@ -173,14 +199,40 @@ bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row){
 		return false;
 		#endif
 	} else {
-        source[0].values = vals;
-        source[0].hasValues = true;
-        source[0].memory = true;
-        source[0].setRange();
+		size_t sz = source[0].values.size();
+		size_t start = row * ncol() * nlyr();
+		if (sz == 0) { // first or all
+			source[0].values = vals;
+		} else if (sz == start) { // in chunks
+			source[0].values.insert(source[0].values.end(), vals.begin(), vals.end());
+		} else { // async
+			if (start+vals.size() > sz) {
+				source[0].values.resize(start+vals.size());
+			}
+			for (size_t i=0; i<vals.size(); i++) {
+				source[0].values[start+i] = vals[i];
+			}
+		}
 	}
 	return success;
 }
 
+template <typename T>
+std::vector<T> flatten(const std::vector<std::vector<T>>& v) {
+    std::size_t total_size = 0;
+    for (const auto& sub : v)
+        total_size += sub.size();
+    std::vector<T> result;
+    result.reserve(total_size);
+    for (const auto& sub : v)
+        result.insert(result.end(), sub.begin(), sub.end());
+    return result;
+}
+
+bool SpatRaster::writeValues2(std::vector<std::vector<double>> &vals, unsigned row){
+    std::vector<double> vv = flatten(vals);
+    return writeValues(vv, row);
+}
 
 bool SpatRaster::writeStop(){
 	if (!source[0].open_write) {
@@ -189,9 +241,8 @@ bool SpatRaster::writeStop(){
 	}
 	source[0].open_write = false;
 	bool success = true;
-
 	if (source[0].driver == "raster") {
-		//(*fs).close();
+		//source[0].fsclose();
 		writeHDR(source[0].filename);
 	} else if (source[0].driver == "gdal") {
 		#ifdef useGDAL
@@ -200,6 +251,8 @@ bool SpatRaster::writeStop(){
 		setError("GDAL is not available");
 		return false;
 		#endif
+	} else {
+		source[0].setRange();
 	}
 	source[0].hasValues = true;
 	return success;
@@ -218,8 +271,8 @@ bool SpatRaster::setValues(std::vector<double> _values) {
 		s.memory = true;
 		s.names = getNames();
 		s.driver = "memory";
-		
-		s.setRange(); 
+
+		s.setRange();
 		setSource(s);
 		result = true;
 	} else {
@@ -228,7 +281,7 @@ bool SpatRaster::setValues(std::vector<double> _values) {
 	return (result);
 }
 
-void SpatRaster::setRange() { 
+void SpatRaster::setRange() {
 	for (size_t i=0; i<nsrc(); i++) {
 		if (source[i].memory) { // for now. should read from files as needed
 			source[i].setRange();
@@ -236,12 +289,10 @@ void SpatRaster::setRange() {
 	}
 }
 
-
-
 void RasterSource::setRange() {
 	double vmin, vmax;
-	unsigned nc = ncol * nrow;
-	unsigned start;
+	size_t nc = ncol * nrow;
+	size_t start;
 	range_min.resize(nlyr);
 	range_max.resize(nlyr);
 	hasRange.resize(nlyr);
@@ -266,8 +317,8 @@ bool SpatRaster::writeHDR(std::string filename) {
 	ini.SetValue("georeference", "ymin", std::to_string(extent.ymin).c_str());
 	ini.SetValue("georeference", "ymax", std::to_string(extent.ymax).c_str());
 	ini.SetValue("georeference", "crs", crs.c_str());
-	ini.SetValue("dimensions", "nrow", std::to_string(nrow).c_str());
-	ini.SetValue("dimensions", "ncol", std::to_string(ncol).c_str());
+	ini.SetValue("dimensions", "nrow", std::to_string(nrow()).c_str());
+	ini.SetValue("dimensions", "ncol", std::to_string(ncol()).c_str());
 	ini.SetValue("dimensions", "nlyr", std::to_string(nlyr()).c_str());
 	ini.SetValue("dimensions", "names", concatenate(getNames(), std::string(":|:")).c_str());
 	ini.SetValue("data", NULL, NULL);

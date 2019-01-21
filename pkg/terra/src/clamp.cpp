@@ -56,7 +56,7 @@ void clamp_vector(std::vector<double> &v, double low, double high, bool usevalue
 
 
 
-SpatRaster SpatRaster::clamp(double low, double high, bool usevalue, SpatOptions opt) {
+SpatRaster SpatRaster::clamp(double low, double high, bool usevalue, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 	if (low > high) {
@@ -68,12 +68,12 @@ SpatRaster SpatRaster::clamp(double low, double high, bool usevalue, SpatOptions
 		return out;
 	}
 	
-  	out.writeStart(opt);
+  	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> v = readBlock(out.bs, i);
 		clamp_vector(v, low, high, usevalue);
-		out.writeValues(v, out.bs.row[i]);
+		if (!out.writeValues(v, out.bs.row[i])) return out;
 	}
 	readStop();
 	out.writeStop();

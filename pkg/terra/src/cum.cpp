@@ -15,10 +15,10 @@
 // You should have received a copy of the GNU General Public License
 // along with spat. If not, see <http://www.gnu.org/licenses/>.
 
-#include <type_traits>
-#include <vector>
+//#include <type_traits>
 #include "spatRaster.h"
-#include "NA.h"
+#include "vecmath.h"
+
 
 
 template <typename T>
@@ -108,242 +108,7 @@ void cummin(std::vector<T>& v, bool narm) {
 }
 
 
-
-template <typename T>
-T vsum(std::vector<T>& v, bool narm) {
-	T x = v[0];
-	if (narm) {
-		for (size_t i=1; i<v.size(); i++) {
-			if (is_NA(x)) {
-				x = v[i];
-			} else if (!is_NA(v[i])) {
-				x += v[i];
-			}
-		}
-	} else {
-		for (size_t i=1; i<v.size(); i++) {
-			if (!is_NA(x)) {
-				if (is_NA(v[i])) {
-					x = NA<T>::value;
-				} else {
-					x += v[i];
-				}
-			}
-		}
-	}
-	return x;
-}
-
-
-template <typename T>
-T vprod(std::vector<T>& v, bool narm) {
-	T x = v[0];
-	if (narm) {
-		for (size_t i=1; i<v.size(); i++) {
-			if (is_NA(x)) {
-				x = v[i];
-			} else if (!is_NA(v[i])) {
-				x *= v[i];
-			}
-		}
-	} else {
-		for (size_t i=1; i<v.size(); i++) {
-			if (!is_NA(x)) {
-				if (is_NA(v[i])) {
-					x = NA<T>::value;
-				} else {
-					x *= v[i];
-				}
-			}
-		}
-	}
-	return x;
-}
-
-
-
-template <typename T>
-T vmean(std::vector<T>& v, bool narm) {
-	T x = 0;
-	unsigned d = 0;
-	if (narm) {
-		for (size_t i=0; i<v.size(); i++) {
-			if (!is_NA(v[i])) {
-				x += v[i];
-				d++;
-			}
-		}
-	} else {
-		for (size_t i=0; i<v.size(); i++) {
-			if (!is_NA(x)) {
-				if (is_NA(v[i])) {
-					x = NA<T>::value;
-					d = 0;
-				} else {
-					x += v[i];
-					d++;
-				}
-			}
-		}
-	}
-	if (d > 0) {
-		x /= d;
-	} else {
-		x = NA<T>::value;
-	}
-	return x;
-}
-
-
-
-
-template <typename T>
-T vmin(std::vector<T>& v, bool narm) {
-	T x = v[0];
-	if (narm) {
-		for (size_t i=1; i<v.size(); i++) {
-			if (!is_NA(v[i])) {
-				if (is_NA(x)) {
-					x = v[i];
-				} else {
-					x = std::min(x, v[i]);
-				}
-			}
-		}
-	} else {
-		for (size_t i=1; i<v.size(); i++) {
-			if (!is_NA(x)) {
-				if (is_NA(v[i])) {
-					x = NA<T>::value;
-				} else {
-					x = std::min(x, v[i]);
-				}
-			}
-		}
-	}
-	return x;
-}
-
-
-template <typename T>
-T vmax(std::vector<T>& v, bool narm) {
-	T x = v[0];
-	if (narm) {
-		for (size_t i=1; i<v.size(); i++) {
-			if (is_NA(v[i])) {
-				if (is_NA(x)) {
-					x = v[i];
-				} else {
-					x = std::max(x, v[i]);
-				}
-			}
-		}
-	} else {
-		for (size_t i=1; i<v.size(); i++) {
-			if (!is_NA(x)) {
-				if (is_NA(v[i])) {
-					x = NA<T>::value;
-				} else {
-					x = std::max(x, v[i]);
-				}
-			}
-		}
-	}
-	return x;
-}
-
-
-// problematic; should be ok for int and float but
-// won't work with bool values (nodata == 0)
-template <typename T>
-T vall(std::vector<T>& v, bool narm) {
-	T x;
-	if (narm) {
-		x = 1;
-        for (size_t i=0; i<v.size(); i++) {
-			if (!is_NA(v[i])) {
-				if (v[i] == 0) {
-					x = 0;
-					break;
-				} else {
-					x = 1;
-				}
-			}
-        }
-		//x = x < 0 ? NA<T>::value : x;
-    } else {
-		x = 1;
-        for (size_t i=0; i<v.size(); i++) {
-            if (is_NA(v[i]) | (v[i] == 0)) {
-                x = v[i];
-                break;
-			}
-		}
-	}
-	return x;
-}
-
-
-template <typename T>
-T vany(std::vector<T>& v, bool narm) {
-	T x = 0;
-	bool hasnd = false;
-	for (size_t i=0; i<v.size(); i++) {
-		if (!is_NA(v[i])) {
-			if (v[i] != 0) {
-				x = 1;
-				break;
-			} else {
-				x = 0;
-			}
-		} else {
-			hasnd = true;
-		}
-	}
-	if (hasnd & (x == 0) & (!narm)) {
-		x = NAN;
-	}
-	return x;
-}
-
-
-
-template <typename T>
-std::vector<T> vrange(std::vector<T>& v, bool narm) {
-	std::vector<T> x = { v[0], v[0] };
-
-	if (narm) {
-		for (size_t i=1; i<v.size(); i++) {
-			if (!is_NA(v[i])) {
-				if (is_NA(x[0])) {
-					x[0] = v[i];
-					x[1] = v[i];
-				} else {
-					x[0] = std::min(x[0], v[i]);
-					x[1] = std::max(x[1], v[i]);
-				}
-			}
-		}
-	} else {
-		for (size_t i=1; i<v.size(); i++) {
-			if (!is_NA(x[0])) {
-				if (is_NA(v[i])) {
-					x[0] = NA<T>::value;
-					x[1] = NA<T>::value;
-				} else {
-					x[0] = std::min(x[0], v[i]);
-					x[1] = std::max(x[1], v[i]);
-				}
-			}
-		}
-	}
-	return x;
-}
-
-
-
-
-SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions opt) {
+SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 
@@ -355,16 +120,16 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions opt) {
 	if (!hasValues()) {
 		out.setError("raster has no values");
 		return out;
-	}	
+	}
 
-  	out.writeStart(opt);
+  	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	unsigned nl = out.nlyr();
 	std::vector<double> v(nl);
 	unsigned nc;
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
-		nc = out.bs.nrows[i] * out.ncol;
+		nc = out.bs.nrows[i] * out.ncol();
 		for (size_t j=0; j<nc; j++) {
 			for (size_t k=0; k<nl; k++) {
 				v[k] = a[j+k*nc];
@@ -382,7 +147,7 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions opt) {
 				a[j+k*nc] = v[k];
 			}
 		}
-		out.writeValues(a, out.bs.row[i]);
+		if (!out.writeValues(a, out.bs.row[i])) return out;
 	}
 	out.writeStop();
 	readStop();
@@ -391,7 +156,7 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions opt) {
 
 
 
-SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bool narm, SpatOptions opt) {
+SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bool narm, SpatOptions &opt) {
 
 	SpatRaster out = geometry(1);
 
@@ -410,7 +175,7 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 		out.source[0].names[0] = fun;
 	}
 
-  	out.writeStart(opt);
+  	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	unsigned nl = nlyr();
 	std::vector<double> v(nl);
@@ -421,7 +186,7 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
-		nc = out.bs.nrows[i] * out.ncol;
+		nc = out.bs.nrows[i] * out.ncol();
 		std::vector<double> b(nc * nlout);
 		for (size_t j=0; j<nc; j++) {
 			for (size_t k=0; k<nl; k++) {
@@ -455,7 +220,7 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 }
 
 
-SpatRaster SpatRaster::summary(std::string fun, bool narm, SpatOptions opt) {
+SpatRaster SpatRaster::summary(std::string fun, bool narm, SpatOptions &opt) {
 	std::vector<double> add;
 	return summary_numb(fun, add, narm, opt);
 }
