@@ -3,7 +3,6 @@
 #include "recycle.h"
 
 
-
 SpatRaster SpatRaster::warp(SpatRaster x, std::string method, SpatOptions &opt) {
 
 	unsigned nl = nlyr();
@@ -54,6 +53,7 @@ SpatRaster SpatRaster::warp(SpatRaster x, std::string method, SpatOptions &opt) 
         std::vector<std::vector<double>> xy = out.xyFromCell(cells);
 		std::vector<std::vector<double>> v = extractXY(xy[0], xy[1], method);
 		if (!out.writeValues2(v, out.bs.row[i])) return out;
+		
 	}
 	out.writeStop();
 	readStop();

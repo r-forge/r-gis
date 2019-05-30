@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -17,10 +17,11 @@
 
 #include <random>
 #include <chrono>
-#include "spatRaster.h"
-#include "SimpleIni.h"
 #include "string_utils.h"
 #include "math_utils.h"
+#include "hdr.h"
+#include "spatRaster.h"
+
 
 
 std::string tempFile(SpatOptions &opt, double seed) {
@@ -67,7 +68,7 @@ bool SpatRaster::writeRaster(SpatOptions &opt) {
 	} else if (file_exists(filename)) {
 		if (overwrite) {
 			if (isSource(filename)) {
-				setError("cannot overwrite object to itself");
+				setError("cannot overwrite object to its own file source");
 			}
 			remove(filename.c_str());
 		} else {
@@ -127,19 +128,19 @@ bool SpatRaster::writeStart(SpatOptions &opt) {
 
 	} else {
 		source[0].memory = false;
-		bool exists = file_exists(filename);
+		if (file_exists(filename)) {
+			if (opt.get_overwrite()) {
+				remove(filename.c_str());
+			} else {
+				setError("file exists");
+				return false;
+			}
+		}
+
 		std::string ext = getFileExt(filename);
 		lowercase(ext);
 		if (ext == ".grd") {
 			source[0].driver = "raster";
-			if (exists) {
-				if (opt.get_overwrite()) {
-					remove(filename.c_str());
-				} else {
-					setError("file exists");
-					return false;
-				}
-			}
 //			source[0].fsopen(filename);
             // create file and close it
             std::string griname = setFileExt(source[0].filename, ".gri");
@@ -150,7 +151,11 @@ bool SpatRaster::writeStart(SpatOptions &opt) {
 			#ifdef useGDAL
 			source[0].driver = "gdal" ;
 			std::string format = opt.get_filetype();
-			success = writeStartGDAL(filename, format, datatype, opt.get_overwrite());
+			success = writeStartGDAL(filename, format, datatype);
+			if (!success) {
+				setError("file exists");
+				return false;
+			}
 			#else
 			setError("GDAL is not available");
 			return false;
@@ -163,13 +168,21 @@ bool SpatRaster::writeStart(SpatOptions &opt) {
 	}
 	source[0].open_write = true;
 	source[0].filename = filename;
-	bs = getBlockSize(4);
+	bs = getBlockSize(opt.get_blocksizemp());
+	//bs = getBlockSize(4);
+
+
+    #ifdef useRcpp
+    //SpatProgressBar pb;
+	//pbar = new Progress(bs.n, opt.do_progress(bs.n), pb);
+	pbar = new Progress(bs.n, opt.do_progress(bs.n));
+	#endif
 	return success;
 }
 
 
 
-bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row){
+bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row) {
 	if (!source[0].open_write) {
 		setError("cannot write (no open file)");
 		return false;
@@ -214,6 +227,17 @@ bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row){
 			}
 		}
 	}
+		
+
+#ifdef useRcpp
+	if (Progress::check_abort()) {
+		pbar->cleanup();
+		setError("aborted");
+		return(false);
+	}
+	pbar->increment();
+#endif	
+		
 	return success;
 }
 
@@ -255,6 +279,12 @@ bool SpatRaster::writeStop(){
 		source[0].setRange();
 	}
 	source[0].hasValues = true;
+
+#ifdef useRcpp
+	//pbar->cleanup();
+	delete pbar;
+#endif	
+
 	return success;
 }
 
@@ -308,28 +338,22 @@ void RasterSource::setRange() {
 
 
 bool SpatRaster::writeHDR(std::string filename) {
-	CSimpleIniA ini;
-	ini.SetValue("version", NULL, NULL);
-	ini.SetValue("version", "version", "2");
-	ini.SetValue("georeference", NULL, NULL);
-	ini.SetValue("georeference", "xmin", std::to_string(extent.xmin).c_str());
-	ini.SetValue("georeference", "xmax", std::to_string(extent.xmax).c_str());
-	ini.SetValue("georeference", "ymin", std::to_string(extent.ymin).c_str());
-	ini.SetValue("georeference", "ymax", std::to_string(extent.ymax).c_str());
-	ini.SetValue("georeference", "crs", crs.c_str());
-	ini.SetValue("dimensions", "nrow", std::to_string(nrow()).c_str());
-	ini.SetValue("dimensions", "ncol", std::to_string(ncol()).c_str());
-	ini.SetValue("dimensions", "nlyr", std::to_string(nlyr()).c_str());
-	ini.SetValue("dimensions", "names", concatenate(getNames(), std::string(":|:")).c_str());
-	ini.SetValue("data", NULL, NULL);
-	ini.SetValue("data", "datatype", "FLT8S"); // double
-	ini.SetValue("data", "nodata", std::to_string(-1 * std::numeric_limits<double>::max()).c_str());
-	ini.SetValue("data", "range_min", concatenate(dbl2str(range_min()), std::string(":|:")).c_str());
-	ini.SetValue("data", "range_max", concatenate(dbl2str(range_max()), std::string(":|:")).c_str());
-
-	//string f = setFileExt(filename, ".grd");
-	SI_Error rc = ini.SaveFile(filename.c_str());
-	return rc >= 0 ;
+	std::vector<std::string> s(14);
+	s[0] = std::to_string(extent.xmin);
+	s[1] = std::to_string(extent.xmax);
+	s[2] = std::to_string(extent.ymin);
+	s[3] = std::to_string(extent.ymax);
+	s[4] = crs;
+	s[5] = std::to_string(nrow());
+	s[6] = std::to_string(ncol());
+	s[7] = std::to_string(nlyr());
+	s[8] = concatenate(getNames(), std::string(":|:"));
+	s[9] = "FLT8S"; // double
+	s[10] = std::to_string(-1 * std::numeric_limits<double>::max());
+	s[11] = concatenate(dbl2str(range_min()), std::string(":|:"));
+	s[12] = concatenate(dbl2str(range_max()), std::string(":|:"));
+	s[13] = filename;
+	return hdr_write(s);
 }
 
 

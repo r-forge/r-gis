@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -178,7 +178,7 @@ SpatRaster SpatRaster::reclassify(std::vector<std::vector<double>> rcl, unsigned
 	}
 	if (nc == 3) {
 		for (size_t i=0; i<nr; i++) {
-			if (rcl[i][0] > rcl[i][1]) {
+			if (rcl[0][i] > rcl[1][i]) {
 				out.setError("'from' smaller than 'to' in reclassification matrix");
 				return out;
 			}
@@ -192,7 +192,7 @@ SpatRaster SpatRaster::reclassify(std::vector<std::vector<double>> rcl, unsigned
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> v = readBlock(out.bs, i);
 		reclass_vector(v, rcl, right, lowest);
-		if (!out.writeValues(v, out.bs.row[i])) return out;
+		if (!out.writeValues(v, out.bs.row[i])) return out;		
 	}
 	readStop();
 	out.writeStop();

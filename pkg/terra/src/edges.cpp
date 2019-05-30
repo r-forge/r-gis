@@ -1,7 +1,7 @@
 // Robert Hijmans, November 2011 
 
 
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -19,7 +19,6 @@
 // along with spat. If not, see <http://www.gnu.org/licenses/>.
 
 #include "spatRaster.h"
-
 
 std::vector<double> get_border(std::vector<double> xd, std::vector<unsigned> dim, bool classes, std::string edgetype, unsigned dirs) {
 

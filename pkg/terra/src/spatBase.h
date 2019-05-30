@@ -20,7 +20,11 @@
 #include <string>
 #include <cmath>
 
+// comment out if GDAL not available
 #define useGDAL
+// comment out if this is not for R (no Rcpp)
+#define useRcpp
+
 
 
 #ifndef M_PI
@@ -58,6 +62,8 @@ class SpatOptions {
 		std::string def_datatype = "FLT4S";
 		std::string def_filetype = "GTiff";
 		bool overwrite = false;
+		unsigned progress = 4;
+		unsigned blocksizemp = 4;
 
 		std::string datatype = "";
 		std::string filetype = "";
@@ -86,10 +92,15 @@ class SpatOptions {
 		void set_filetype(std::string d);
 		void set_datatype(std::string d);
 		void set_overwrite(bool b);
+		void set_progress(unsigned p);
+		void set_blocksizemp(unsigned x);
 		std::string get_filename();
 		std::string get_filetype();
 		std::string get_datatype();
 		bool get_overwrite();
+		unsigned get_progress();
+		bool do_progress(unsigned n);
+		unsigned get_blocksizemp();
 
 		SpatMessages msg;
 };
@@ -130,7 +141,7 @@ class SpatExtent {
 			bool b2 = crs.find("epsg:4326") != std::string::npos;
 			return (b1 | b2);
 		}
-		
+
 		bool could_be_lonlat(std::string crs) {
 			bool b = is_lonlat(crs);
 			if ((!b) & (crs=="")) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -27,9 +27,11 @@ SpatOptions::SpatOptions(const SpatOptions &opt) {
 	memfrac = opt.memfrac;
 	todisk = opt.todisk;
 	def_datatype = opt.def_datatype;
-	def_filetype = opt.def_datatype; 
+	def_filetype = opt.def_filetype; 
 	filename = "";
 	overwrite = false;	
+	progress = opt.progress;
+	blocksizemp = opt.blocksizemp;
 }
 
 
@@ -50,6 +52,20 @@ std::string SpatOptions::get_filetype() { return filetype;}
 
 bool SpatOptions::get_overwrite() { return overwrite; }
 void SpatOptions::set_overwrite(bool b) { overwrite = b; }
+
+unsigned SpatOptions::get_progress() { return progress; }
+void SpatOptions::set_progress(unsigned p) { 
+	progress = p; 
+}
+bool SpatOptions::do_progress(unsigned n) { 
+	return ((progress > 0) & (progress <= n));
+}
+
+unsigned SpatOptions::get_blocksizemp() { return blocksizemp; }
+void SpatOptions::set_blocksizemp(unsigned x) { 
+	blocksizemp = x; 
+}
+
 
 void SpatOptions::set_filename(std::string d) { lrtrim(d); filename = d; }
 std::string SpatOptions::get_filename() { return filename; }

@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -15,7 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with spat. If not, see <http://www.gnu.org/licenses/>.
 
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -34,6 +34,7 @@
 
 #include "spatRaster.h"
 #include <cmath>
+
 
 void clamp_vector(std::vector<double> &v, double low, double high, bool usevalue) {
 	size_t n = v.size();

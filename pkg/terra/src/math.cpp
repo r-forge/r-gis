@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -17,6 +17,7 @@
 
 #include <functional>
 #include "spatRaster.h"
+
 
 template <typename T> int sign(T value) {
     return (T(0) < value) - (value < T(0));
@@ -62,6 +63,7 @@ SpatRaster SpatRaster::math(std::string fun, SpatOptions &opt) {
 			for(double& d : a) if (!std::isnan(d)) d = trunc(d);
 		}
 		if (!out.writeValues(a, out.bs.row[i])) return out;
+		
 	}
 	out.writeStop();
 	readStop();
@@ -115,6 +117,7 @@ SpatRaster SpatRaster::trig(std::string fun, SpatOptions &opt) {
 			for(double& d : a) if (!std::isnan(d)) d = tan(d * M_PI);
 		}
 		if (!out.writeValues(a, out.bs.row[i])) return out;
+		
 	}
 	out.writeStop();
 	readStop();

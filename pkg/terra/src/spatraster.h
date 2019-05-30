@@ -23,6 +23,12 @@
 #include "gdal_priv.h"
 #endif
 
+#ifdef useRcpp
+#include <Rcpp.h>
+// [[Rcpp::depends(RcppProgress)]]
+#include <progress.hpp>
+#include <progress_bar.hpp>
+#endif
 
 
 class RasterAttributeTable {
@@ -113,6 +119,10 @@ class SpatRaster {
 
 	public:
 
+#ifdef useRcpp
+		Progress* pbar;
+#endif
+
 ////////////////////////////////////////////////////
 // properties and property-like methods for entire object
 ////////////////////////////////////////////////////
@@ -201,7 +211,7 @@ class SpatRaster {
 // helper methods
 ////////////////////////////////////////////////////
 
-		bool compare_geom(SpatRaster x, bool lyrs, bool crs, bool warncrs=false);
+		bool compare_geom(SpatRaster x, bool lyrs, bool crs, bool warncrs=false, bool ext=true, bool rowcol=true, bool res=false);
 
 		std::vector<double> cellFromXY (std::vector<double> x, std::vector<double> y);
 		double cellFromXY(double x, double y);
@@ -250,7 +260,7 @@ class SpatRaster {
 		bool writeStop();
 		bool writeHDR(std::string filename);
 
-		bool writeStartGDAL(std::string filename, std::string format, std::string datatype, bool overwrite);
+		bool writeStartGDAL(std::string filename, std::string format, std::string datatype);
 		bool writeValuesGDAL(std::vector<double> vals, unsigned row);
 		bool writeStopGDAL();
 
@@ -295,6 +305,7 @@ class SpatRaster {
 
 		SpatExtent align(SpatExtent e, std::string snap);
 		SpatRaster clamp(double low, double high, bool usevalue, SpatOptions &opt);
+		SpatRaster cover(SpatRaster x, double value, SpatOptions &opt);
 		SpatRaster crop(SpatExtent e, std::string snap, SpatOptions &opt);
 		SpatRaster cum(std::string fun, bool narm, SpatOptions &opt);
 		std::vector<std::vector<std::vector<double>>> extractVector(SpatVector v, std::string fun="");
@@ -303,22 +314,30 @@ class SpatRaster {
         std::vector<double> line_cells(SpatGeom& g);
         std::vector<double> polygon_cells(SpatGeom& g);
 
-
-		SpatRaster focal(std::vector<double> w, double fillvalue, bool narm, unsigned fun, SpatOptions &opt);
+		SpatRaster flip(bool vertical, SpatOptions &opt);
+		SpatRaster focal(std::vector<double> w, double fillvalue, bool narm, std::string fun, SpatOptions &opt);
 		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows);
+		SpatRaster init(std::string value, bool plusone, SpatOptions &opt);
 		SpatRaster isnot(SpatOptions &opt);
 		SpatRaster logic(SpatRaster x, std::string oper, SpatOptions &opt);
 		SpatRaster logic(bool x, std::string oper, SpatOptions &opt);
-		SpatRaster mask(SpatRaster x, SpatOptions &opt);
+		SpatRaster mask(SpatRaster x, bool inverse, double maskvalue, double updatevalue, SpatOptions &opt);
 		SpatRaster math(std::string fun, SpatOptions &opt);
-		SpatRaster trig(std::string fun, SpatOptions &opt);
+		SpatRaster merge(SpatRaster x, SpatOptions &opt);
+		SpatRaster rotate(bool left, SpatOptions &opt);
+
 		SpatRaster rasterizePolygons(SpatVector p, double background, SpatOptions &opt);
 		SpatRaster rasterizeLines(SpatVector p, double background, SpatOptions &opt);
 		SpatRaster reclassify(std::vector<std::vector<double>> rcl, unsigned right, bool lowest, SpatOptions &opt);
 		std::vector<double> readSample(unsigned src, unsigned srows, unsigned scols);
 		SpatRaster sampleRegular(unsigned size);
+		SpatRaster shift(double x, double y, SpatOptions &opt);
+
+
 		SpatRaster summary(std::string fun, bool narm, SpatOptions &opt);
 		SpatRaster summary_numb(std::string fun, std::vector<double> add, bool narm, SpatOptions &opt);
+		SpatRaster transpose(SpatOptions &opt);
+		SpatRaster trig(std::string fun, SpatOptions &opt);
 		SpatRaster trim(unsigned padding, SpatOptions &opt);
 		SpatRaster edges(bool classes, std::string type, unsigned directions, SpatOptions &opt);
 		SpatRaster warp(SpatRaster x, std::string method, SpatOptions &opt);

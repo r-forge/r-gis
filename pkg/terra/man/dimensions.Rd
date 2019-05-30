@@ -11,6 +11,7 @@
 \alias{dim}
 \alias{ncol<-}
 \alias{nrow<-}
+\alias{nlyr<-}
 \alias{ncell,ANY-method}
 \alias{nrow,SpatRaster-method}
 \alias{ncol,SpatRaster-method}
@@ -18,6 +19,7 @@
 \alias{ncol<-,SpatRaster,numeric-method}
 
 \alias{nlyr,SpatRaster-method}
+\alias{nlyr<-,SpatRaster,numeric-method}
 \alias{nsrc,SpatRaster-method}
 \alias{ncell,SpatRaster-method}
 \alias{size,SpatRaster-method}
@@ -53,6 +55,7 @@ Set the number of rows or columns or layers. When setting dimensions, all source
 
 ncol(x, ...) <- value
 nrow(x, ...) <- value
+nlyr(x, ...) <- value
 
 \S4method{xres}{SpatRaster}(x)
 \S4method{yres}{SpatRaster}(x)
@@ -76,7 +79,6 @@ integer
 
 \seealso{ \link{ext}}
 
-
 \examples{
 r <- rast()
 ncell(r)
@@ -85,13 +87,13 @@ nrow(r)
 dim(r)
 nsrc(r)
 
-# nrow(r) <- 18
-# ncol(r) <- 36
+nrow(r) <- 18
+ncol(r) <- 36
 # equivalent to
-# dim(r) <- c(18, 36) 
+dim(r) <- c(18, 36) 
 
 dim(r)
-#dim(r) <- c(10, 10, 5)
+dim(r) <- c(10, 10, 5)
 dim(r)
 
 xres(r)
@@ -99,7 +101,7 @@ yres(r)
 res(r)
 
 #res(r) <- 1/120
-# set yres differently
+# different xres and yres
 #res(r) <- c(1/120, 1/60)
 }
 

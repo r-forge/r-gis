@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -18,7 +18,6 @@
 //#include <type_traits>
 #include "spatRaster.h"
 #include "vecmath.h"
-
 
 
 template <typename T>
@@ -148,6 +147,7 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions &opt) {
 			}
 		}
 		if (!out.writeValues(a, out.bs.row[i])) return out;
+
 	}
 	out.writeStop();
 	readStop();
@@ -181,12 +181,12 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 	std::vector<double> v(nl);
 	v.insert( v.end(), add.begin(), add.end() );
 
-	unsigned nc;
+	//unsigned nc;
 	unsigned nlout = out.nlyr();
 
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
-		nc = out.bs.nrows[i] * out.ncol();
+		unsigned nc = out.bs.nrows[i] * out.ncol();
 		std::vector<double> b(nc * nlout);
 		for (size_t j=0; j<nc; j++) {
 			for (size_t k=0; k<nl; k++) {
@@ -212,7 +212,8 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 				b[j+nc] = rng[1];
 			}
 		}
-		out.writeValues(b, out.bs.row[i]);
+		if (!out.writeValues(b, out.bs.row[i])) return out;
+
 	}
 	out.writeStop();
 	readStop();

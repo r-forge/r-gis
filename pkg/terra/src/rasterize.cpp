@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -20,6 +20,7 @@
 
 #include <vector>
 #include "spatRaster.h"
+
 
 std::vector<double> rasterize_polygon(std::vector<double> r, double value, const std::vector<double> &pX, const std::vector<double> &pY, const unsigned nrows, const unsigned ncols, const double xmin, const double ymax, const double rx, const double ry) {
 
@@ -103,6 +104,7 @@ SpatRaster SpatRaster::rasterizePolygons(SpatVector p, double background, SpatOp
 			}
 		}
 		if (!out.writeValues(v, out.bs.row[i])) return out;
+		
 	}
 	out.writeStop();
 	return(out);
@@ -156,6 +158,7 @@ SpatRaster SpatRaster::rasterizeLines(SpatVector p, double background, SpatOptio
 			}
 		}
 		if (!out.writeValues(v, out.bs.row[i])) return out;
+		
 	}
 	out.writeStop();
 	return(out);
