@@ -3,18 +3,44 @@
 # Version 0.9
 # License GPL v3
 
-setMethod("readValues", signature(x='SpatRaster'), 
-function(x, row=1, nrows=nrow(x), col=1, ncols=ncol(x), ...) {
-	x@ptr$readValues(row-1, nrows-1, col-1, ncols-1)
+setMethod("hasValues", signature(x="SpatRaster"), 
+	function(x, ...) {
+		x@ptr$hasValues
+	}
+)
+
+setMethod("readValues", signature(x="SpatRaster"), 
+function(x, row=1, nrows=nrow(x), col=1, ncols=ncol(x), mat=FALSE, dataframe=FALSE, ...) {
+	stopifnot(col > 0)
+	stopifnot(row > 0)
+	v <- x@ptr$readValues(row-1, nrows, col-1, ncols)
+	if (dataframe || mat) {
+		v <- matrix(v, ncol = nlyr(x))
+		colnames(v) <- names(x)	
+	}
+	if (dataframe) {
+		v <- data.frame(v)	
+		ff <- is.factor(x)
+		if (any(ff)) {
+			ff <- which(ff)
+			levs <- levels(x)
+			for (f in ff) {
+				lev <- levs[[f]]
+				v[[f]] = factor(v[[f]], levels=lev$levels)
+				levels(v[[f]]) = lev$labels
+			}
+		}
+	}
+	v
 }
 )
 
 
-setMethod("values", signature(x='SpatRaster'), 
-function(x, matrix=TRUE, ...) {
+setMethod("values", signature(x="SpatRaster"), 
+function(x, mat=TRUE, ...) {
 	if (.hasValues(x)) {
 		v <- x@ptr$getValues()
-		if (matrix) {
+		if (mat) {
 			v <- matrix(v, ncol=nlyr(x))
 			colnames(v) <- names(x)
 		}
@@ -26,7 +52,7 @@ function(x, matrix=TRUE, ...) {
 )
 
 
-setMethod('values<-', signature(x='SpatRaster', 'ANY'), 
+setMethod("values<-", signature(x="SpatRaster", "ANY"), 
 	function(x, value) {
 	if (is.matrix(value)) { 
 		if (nrow(value) == nrow(x)) {
@@ -40,7 +66,7 @@ setMethod('values<-', signature(x='SpatRaster', 'ANY'),
 	}
 	
 	if (!(is.numeric(value) || is.integer(value) || is.logical(value))) {
-		stop('value must be numeric, integer, or logical')
+		stop("value must be numeric, integer, or logical")
 	}
 
 	lv <- length(value)
@@ -79,16 +105,16 @@ setMethod('values<-', signature(x='SpatRaster', 'ANY'),
 
 
 
-setMethod('sources', signature(x='SpatRaster'), 
+setMethod("sources", signature(x="SpatRaster"), 
 	function(x, ...) {
 		src <- x@ptr$filenames
 		src[src == ""] <= "memory"
-		data.frame(source=src, nlyr=x@ptr$nlyrBySource())
+		data.frame(source=src, nlyr=x@ptr$nlyrBySource(), stringsAsFactors=FALSE)
 	}
 )
 
 
-setMethod('minmax', signature(x='SpatRaster'), 
+setMethod("minmax", signature(x="SpatRaster"), 
 	function(x) {
 		rmin <- x@ptr$range_min
 		rmax <- x@ptr$range_max
@@ -97,10 +123,26 @@ setMethod('minmax', signature(x='SpatRaster'),
 )
 
 
-setMethod('setMinMax', signature(x='SpatRaster'), 
+setMethod("setMinMax", signature(x="SpatRaster"), 
 	function(x) {
 		if (!.hasMinMax(x)) {
 			x@ptr$setRange
 		}
+	}
+)
+
+
+setMethod("compareGeom", signature(x="SpatRaster", y="SpatRaster"), 
+	function(x, y, ..., lyrs=TRUE, crs=TRUE, warncrs=FALSE, ext=TRUE, rowcol=TRUE, res=FALSE) {
+		dots <- list(...)
+		bool <- x@ptr$compare_geom(y@ptr, lyrs, crs, warncrs, ext, rowcol, res)
+		show_messages(x, "compareGeom")
+		if (length(dots)>1) {
+			for (i in 1:length(dots)) {
+				bool <- x@ptr$compare_geom(dots[[i]]@ptr, lyrs, crs, warncrs, ext, rowcol, res)
+				show_messages(x, "compareGeom")
+			}
+		}
+		bool
 	}
 )

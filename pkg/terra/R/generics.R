@@ -6,7 +6,8 @@
 
 setMethod("c", signature(x="SpatRaster"), 
 	function(x, ...) {
-		for (i in list(...)) {
+		dots <- list(...)
+		for (i in dots) {
 			if (class(i) == "SpatRaster") {
 				x@ptr <- x@ptr$combineSources(i@ptr)
 			}
@@ -36,6 +37,22 @@ setMethod("area", signature(x="SpatRaster"),
 )
 
 
+setMethod("atan2", signature(y="SpatRaster", x="SpatRaster"),
+	function(y, x) { 
+		opt <- .runOptions(filename="", overwrite=TRUE, wopt=list())
+		y@ptr <- y@ptr$atan2(x@ptr, opt)
+		show_messages(y, "atan2")
+	}
+)
+	
+
+setMethod("boundaries", signature(x="SpatRaster"), 
+	function(x, classes=FALSE, type="inner", directions=8, filename="", overwrite=FALSE, wopt=list(), ...) {
+		opt <- .runOptions(filename, overwrite,wopt)
+		x@ptr <- x@ptr$boundaries(classes[1], type[1], directions[1], opt)
+		show_messages(x, "boundaries")
+	}
+)
 
 setMethod("clamp", signature(x="SpatRaster"), 
 	function(x, lower=-Inf, upper=Inf, values=TRUE, filename="", overwrite=FALSE, wopt=list(), ...) {
@@ -44,6 +61,25 @@ setMethod("clamp", signature(x="SpatRaster"),
 		show_messages(x, "clamp")
 	}
 )
+
+
+setMethod("classify", signature(x="SpatRaster"), 
+function(x, rcl, include.lowest=FALSE, right=TRUE, othersNA=FALSE, filename="", overwrite=FALSE, wopt=list(), ...) {
+	
+	if (is.data.frame(rcl)) {
+		rcl <- as.matrix(rcl)
+	}
+
+	right <- ifelse(is.na(right), 2, ifelse(right, 0, 1))
+	include.lowest <- as.logical(include.lowest[1])
+
+	opt <- .runOptions(filename, overwrite, wopt)
+    x@ptr <- x@ptr$classify(as.vector(rcl), NCOL(rcl), right, include.lowest, othersNA, opt)
+	show_messages(x, "classify")	
+}
+)
+
+
 
 setMethod("crop", signature(x="SpatRaster", y="ANY"), 
 	function(x, y, snap="near", filename="", overwrite=FALSE, wopt=list(), ...) {
@@ -73,13 +109,7 @@ setMethod("disaggregate", signature(x="SpatRaster"),
 	}
 )
 
-setMethod("gridDistance", signature(x="SpatRaster"), 
-	function(x, filename="", overwrite=FALSE, wopt=list(), ...) {
-		opt <- .runOptions(filename, overwrite,wopt)
-		x@ptr <- x@ptr$gridDistance(opt)
-		show_messages(x, "gridDistance")
-	}
-)
+
 
 setMethod("flip", signature(x="SpatRaster"), 
 	function(x, vertical=TRUE, filename="", overwrite=FALSE, wopt=list(), ...) {
@@ -93,57 +123,43 @@ setMethod("flip", signature(x="SpatRaster"),
 setMethod("mask", signature(x="SpatRaster", mask="SpatRaster"), 
 	function(x, mask, inverse=FALSE, maskvalue=NA, updatevalue=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
 		opt <- .runOptions(filename, overwrite,wopt)
-		x@ptr <- x@ptr$mask(mask@ptr, inverse[1], maskvalue[1], updatevalue[1], opt)
+		x@ptr <- x@ptr$mask_raster(mask@ptr, inverse[1], maskvalue[1], updatevalue[1], opt)
+		show_messages(x, "mask")		
+	}
+)
+
+setMethod("mask", signature(x="SpatRaster", mask="SpatVector"), 
+	function(x, mask, inverse=FALSE, updatevalue=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
+		opt <- .runOptions(filename, overwrite,wopt)
+		x@ptr <- x@ptr$mask_vector(mask@ptr, inverse[1], NA, updatevalue[1], opt)
 		show_messages(x, "mask")		
 	}
 )
 
 
-setMethod("merge", signature(x="SpatRaster", y="SpatRaster"), 
-	function(x, y, filename="", overwrite=FALSE, wopt=list(), ...) { 
+setMethod("project", signature(x="SpatRaster"), 
+	function(x, crs, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
 		opt <- .runOptions(filename, overwrite, wopt)
-		x@ptr <- x@ptr$merge(y, opt)
-		show_messages(x, "merge")		
+		x@ptr <- x@ptr$project(crs, method, opt)
+		show_messages(x, "project")
 	}
 )
 
-
+setMethod("project", signature(x="SpatVector"), 
+	function(x, crs, ...)  {
+		x@ptr <- x@ptr$project(crs)
+		show_messages(x, "project")
+	}
+)
 
 setMethod("rasterize", signature(x="SpatVector", y="SpatRaster"), 
 	function(x, y, background=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
-		opt <- .runOptions(filename, overwrite,wopt)
-		gtype <- geomtype(x)
-		if (gtype == "polygons") {
-			y@ptr <- y@ptr$rasterizePolygons(x@ptr, background[1], opt)
-		} else if (gtype == "lines") {
-			y@ptr <- y@ptr$rasterizeLines(x@ptr, background[1], opt)
-		} else {
-			stop("not implemented yet")
-		}
+		opt <- .runOptions(filename, overwrite, wopt)
+		y@ptr <- y@ptr$rasterize(x@ptr, background[1], opt)
 		show_messages(y, "rasterize")
 	}
 )
 
-
-setMethod("reclassify", signature(x="SpatRaster", rcl="ANY"), 
-function(x, rcl, include.lowest=FALSE, right=TRUE, filename="", overwrite=FALSE, wopt=list(), ...) {
-	
-	
-	if ( is.null(dim(rcl)) ) { 
-		stopifnot((length(rcl) %% 3 == 0))
-		rcl <- matrix(rcl, ncol=3, byrow=TRUE) 
-	} else if (is.data.frame(rcl)) {
-		rcl <- as.matrix(rcl)
-	}
-
-	right <- ifelse(is.na(right), 2, ifelse(right, 0, 1))
-	include.lowest <- as.logical(include.lowest[1])
-
-	opt <- .runOptions(filename, overwrite, wopt)
-    x@ptr <- x@ptr$rcppReclassify(rcl, right, include.lowest, opt)
-	show_messages(x, "reclassify")	
-}
-)
 
 
 
@@ -158,6 +174,7 @@ setMethod("rotate", signature(x="SpatRaster"),
 
 setMethod("sampleRegular", signature(x="SpatRaster", size="numeric"), 
 	function(x, size, ...) { 
+		size <- max(1, min(size(x), size))
 		x@ptr <- x@ptr$sampleRegular(size)
 		show_messages(x, "sampleRegular")		
 	}
@@ -169,6 +186,15 @@ setMethod("shift", signature(x="SpatRaster"),
 		opt <- .runOptions(filename, overwrite, wopt)
 		x@ptr <- x@ptr$shift(dx, dy, opt)
 		show_messages(x, "shift")		
+	}
+)
+
+
+setMethod("t", signature(x="SpatRaster"), 
+	function(x) {
+		opt <- .runOptions(filename="", overwrite=TRUE, wopt=list())
+		x@ptr <- x@ptr$transpose(opt)
+		show_messages(x, "t")
 	}
 )
 
@@ -189,11 +215,15 @@ setMethod("transpose", signature(x="SpatRaster"),
 	}
 )
 
-setMethod("t", signature(x="SpatRaster"), 
-	function(x) {
-		opt <- .runOptions(filename="", overwrite=TRUE, wopt=list())
-		x@ptr <- x@ptr$transpose(opt)
-		show_messages(x, "t")
+setMethod("unique", signature(x="SpatRaster", incomparables="ANY"), 
+	function(x, incomparables=FALSE, ...) {
+		u <- x@ptr$unique(incomparables)
+		if (!incomparables) {
+			if (!length(u)) return(u)
+			u <- do.call(cbind, u)
+			colnames(u) = names(x)
+		}
+		u
 	}
 )
 

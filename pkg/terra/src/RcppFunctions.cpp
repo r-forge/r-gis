@@ -36,28 +36,43 @@ Rcpp::List getBlockSizeR(SpatRaster* r, unsigned n) {
 }
 
 
+Rcpp::List getDataFrame(SpatDataFrame* v) {
 
-
-Rcpp::List getAttributes(SpatVector* v) {
 	unsigned n = v->ncol();
 	Rcpp::List out(n);	
-	std::vector<unsigned> itype = v->getItype();
+	if (n == 0) {
+		return(out);
+	} 
+
+	std::vector<std::string> nms = v->names;
+	std::vector<unsigned> itype = v->itype;
 	for (size_t i=0; i < n; i++) {
 		if (itype[i] == 0) {
-			out[i] = v->getDv(i);
+			out[i] = v->getD(i);
 		} else if (itype[i] == 1) {
-			out[i] = v->getIv(i);
+			out[i] = v->getI(i);
 		} else {
-			out[i] = v->getSv(i);
+			out[i] = v->getS(i);
 		}
 	}	
+	out.names() = nms;
 	// todo: deal with NAs in int and str
 	return out;
-// df is nice, but no no of variables is <= 20, and no "stringsAsFactors"=false
+//  Rcpp::df is nice, but no of variables is <= 20, 
+//  and no "stringsAsFactors"=false
 //	Rcpp::DataFrame result(out);
 //	result.attr("names") = v->names();
 //	return result;
+}	
+
+
+
+Rcpp::List getAttributes(SpatVector* v) {
+	SpatDataFrame df = v->lyr.df;
+	Rcpp::List lst = getDataFrame(&df);
+	return lst;
 }
+
 
 
 Rcpp::DataFrame getGeometry(SpatVector* v) {
@@ -74,7 +89,32 @@ Rcpp::DataFrame getGeometry(SpatVector* v) {
 }
 
 
-SpatRaster rcppReclassify(SpatRaster* x, Rcpp::NumericMatrix rcl, unsigned right, bool lowest, SpatOptions &opt) {
+/*
+bool setAttributes(SpatVector* v, Rcpp::List x, std::vector<std::string> names, std::vector<std::string> types) {
+	unsigned n = x.size();
+	std::vector<double> vd;
+	std::vector<long> vi;
+	std::vector<std::string> vs;
+	
+	for (size_t i=0; i < n; i++) {
+		Rcpp::NumericVector nv = x[i];
+		if (types[i] == "numeric") {
+			vd = Rcpp::as<std::vector<double> >(nv);
+			v->lyr.df.add_column(vd, names[i]);
+		} else if (types[i] == "integer") {
+			vi = Rcpp::as<std::vector<long> >(nv);
+			v->lyr.df.add_column(vi, names[i]);
+		} else {
+			vs = Rcpp::as<std::vector<std::string> >(nv);
+			v->lyr.df.add_column(vs, names[i]);
+		}
+	}
+	return true;
+}
+*/
+
+/*
+SpatRaster rcppReclassify(SpatRaster* x, Rcpp::NumericMatrix rcl, unsigned right, bool lowest, bool othersNA, SpatOptions &opt) {
 	unsigned nc = rcl.ncol();
 	unsigned nr = rcl.nrow();
 	//printf("nc %u nr %u \n", nr, nr);
@@ -84,11 +124,12 @@ SpatRaster rcppReclassify(SpatRaster* x, Rcpp::NumericMatrix rcl, unsigned right
 			rc[c].push_back(rcl(r,c));
 		}
 	}
-	SpatRaster out = x->reclassify(rc, right, lowest, opt);
+	SpatRaster out = x->reclassify(rc, right, lowest, othersNA, opt);
 	return out;
 }
+*/
 
-
+/*
 Rcpp::NumericMatrix rcppAdjacent(SpatRaster* x, std::vector<double> cells, std::string directions, bool include) {
 	
 	std::vector<std::vector<double>> a = x->adjacent(cells, directions, include);
@@ -98,11 +139,11 @@ Rcpp::NumericMatrix rcppAdjacent(SpatRaster* x, std::vector<double> cells, std::
 	Rcpp::NumericMatrix m(nr, nc);
 	for (size_t i=0; i<nr; i++) {
 		for (size_t j=0; j<nc; j++) {
-			m(i,j) = a[i][j];
+			m(i,j) = a[i][i];
 		}
 	}
 	return m;
 }
-
+*/
 
 

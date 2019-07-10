@@ -15,7 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with spat. If not, see <http://www.gnu.org/licenses/>.
 
-#include <cmath>
 #include "spatRaster.h"
 #include "recycle.h"
 #include "NA.h"
@@ -80,6 +79,26 @@ double SpatRaster::cellFromRowCol (unsigned row, unsigned col) {
 	std::vector<unsigned> cols = {col};
 	std::vector<double> cell = cellFromRowCol(rows, cols);
 	return  cell[0];
+}
+
+std::vector<double> SpatRaster::cellFromRowColCombine(std::vector<unsigned> row, std::vector<unsigned> col) {
+	recycle(row, col);
+	size_t n = row.size();
+	size_t nc = ncol();
+	size_t nr = nrow();
+	
+	std::vector<double> result(n * n);
+	for (size_t i=0; i<n; i++) {
+		for (size_t j=0; j<n; j++) {
+			result[i*n+j] = (row[i]<0 || row[i] >= nr || col[j]<0 || col[j] >= nc) ? NAN : row[i] * nc + col[j];
+		}
+	}
+	return result;
+}
+
+
+double SpatRaster::cellFromRowColCombine(unsigned row, unsigned col) {
+	return cellFromRowCol(row, col);
 }
 
 
@@ -171,7 +190,7 @@ unsigned SpatRaster::rowFromY(double y) {
 }
 
 
-std::vector< std::vector<double> > SpatRaster::xyFromCell( std::vector<double> &cell ) {
+std::vector< std::vector<double> > SpatRaster::xyFromCell( std::vector<double> &cell) {
 	size_t n = cell.size();
 	double xmin = extent.xmin;
 	double ymax = extent.ymax;
@@ -181,7 +200,7 @@ std::vector< std::vector<double> > SpatRaster::xyFromCell( std::vector<double> &
     unsigned nc = ncol();
 	std::vector< std::vector<double> > out(2, std::vector<double> (n, NAN) );
 	for (size_t i = 0; i<n; i++) {
-        if ((cell[i] < 0) | (cell[i] > ncells)) { continue; }
+		if ((cell[i] < 0) || (cell[i] >= ncells)) continue; 
         unsigned row = cell[i] / nc;
         unsigned col = cell[i] - (row * nc);
         out[0][i] = xmin + (col + 0.5) * xr;
@@ -191,7 +210,7 @@ std::vector< std::vector<double> > SpatRaster::xyFromCell( std::vector<double> &
 }
 
 
-std::vector< std::vector<double> > SpatRaster::xyFromCell( double cell ) {
+std::vector< std::vector<double> > SpatRaster::xyFromCell( double cell) {
 	std::vector<double> Cell = {cell};
 	return xyFromCell(Cell);
 }

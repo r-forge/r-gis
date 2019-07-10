@@ -4,17 +4,17 @@
 # License GPL v3
 
 
-setMethod('names', signature(x='SpatRaster'), 
+setMethod("names", signature(x="SpatRaster"), 
 	function(x) { 
 		x@ptr$names
 	}
 )
 
 
-setMethod('names<-', signature(x='SpatRaster'), 
+setMethod("names<-", signature(x="SpatRaster"), 
 	function(x, value)  {
 		if (length(value) != nlyr(x)) {
-			stop('incorrect number names')
+			stop("incorrect number of names")
 		}
 		if (! x@ptr$setNames(value)) {
 			stop("cannot set these names")
@@ -27,9 +27,22 @@ setMethod('names<-', signature(x='SpatRaster'),
 )
 
 
-setMethod('names', signature(x='SpatVector'), 
+setMethod("names", signature(x="SpatVector"), 
 	function(x) { 
-		x@ptr$names()
+		x@ptr$names
 	}
 )
 
+
+setMethod("names<-", signature(x="SpatVector"), 
+	function(x, value)  {
+		if (length(value) != ncol(x)) {
+			stop("incorrect number names")
+		}
+		x@ptr$names <- value
+		if (any(names(x) != value)) {
+			warning("some names were changed to make them valid and/or unique")
+		}
+		return(x)
+	}
+)

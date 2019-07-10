@@ -152,7 +152,7 @@ bool smooth_operator(std::string oper) {
 
 SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions &opt) {
 
-	SpatRaster out = geometry();
+	SpatRaster out = geometry(nlyr());
 
 	if (!smooth_operator(oper)) {
 		out.setError("unknown arith function");
@@ -199,7 +199,7 @@ SpatRaster SpatRaster::arith(SpatRaster x, std::string oper, SpatOptions &opt) {
 		} else if (oper == "<") {
 			a < b;
 		}
-		if (!out.writeValues(a, out.bs.row[i], out.bs.nrows[i], 0, ncol()))) return out;
+		if (!out.writeValues(a, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 
 	}
 	out.writeStop();
@@ -255,7 +255,7 @@ SpatRaster SpatRaster::arith(double x, std::string oper, SpatOptions &opt) {
 		} else {
 			// stop
 		}
-		if (!out.writeValues(a, out.bs.row[i], out.bs.nrows[i], 0, ncol() )) return out;
+		if (!out.writeValues(a, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 	}
 	out.writeStop();
 	readStop();
@@ -278,11 +278,11 @@ SpatRaster SpatRaster::arith_rev(double x, std::string oper, SpatOptions &opt) {
 		if (oper == "+") {
 			for(double& d : a)  d += x;
 		} else if (oper == "-") {
-			for(double& d : a)  d -= x;
+			for(double& d : a)  d = x - d;
 		} else if (oper == "*") {
 			for(double& d : a)  d *= x;
 		} else if (oper == "/") {
-			for(double& d : a)  d /= x;
+			for(double& d : a)  d = x / d;
 		} else if (oper == "^") {
 			for(double& d : a)  d = std::pow(x, d);
 		} else if (oper == "%") {
@@ -302,7 +302,7 @@ SpatRaster SpatRaster::arith_rev(double x, std::string oper, SpatOptions &opt) {
 		} else {
 			// stop
 		}
-		if (!out.writeValues(a, out.bs.row[i]), out.bs.nrows[i], 0, ncol()) return out;
+		if (!out.writeValues(a, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 	}
 	out.writeStop();
 	readStop();

@@ -18,140 +18,282 @@
 #include "spatRaster.h"
 #include <cmath>
 
-void reclass_vector(std::vector<double> &v, std::vector<std::vector<double>> rcl, unsigned doright, bool lowest) {
+void reclass_vector(std::vector<double> &v, std::vector<std::vector<double>> rcl, unsigned doright, bool lowest, bool othNA) {
 
 	size_t nc = rcl.size(); // should be 2 or 3
 	if (nc == 2) {
 		doright = 3;
 	}
-
-	bool right;
+	bool right = false;
 	bool leftright = false;
 	if ((doright != 0) & (doright != 1)) {
 		leftright = true;
 	} else if (doright == 0) {
 		right = true;
-	} else {
-		right = false;
 	}
-
 
 //	bool hasNA = false;
 	double NAval = NAN;
 
 	size_t n = v.size();
+	unsigned nr = rcl[0].size();
+
+	if (nc == 1) {
+		std::vector<double> rc = rcl[0];
+		std::sort(rc.begin(), rc.end());
+		if (right) {   // interval closed at left and right
+			if (lowest)	{
+				for (size_t i=0; i<n; i++) {
+					if (std::isnan(v[i])) {
+						v[i] = NAval;
+					} else if ((v[i] < rc[0]) | (v[i] > rc[nr-1])) {
+						v[i] = NAval;
+					} else {
+						for (size_t j=1; j<nr; j++) {
+							if (v[i] <= rc[j]) {
+								v[i] = j;
+								break;
+							}
+						}
+					}
+				}
+			} else {
+				for (size_t i=0; i<n; i++) {
+					if (std::isnan(v[i])) {
+						v[i] = NAval;
+					} else if ((v[i] <= rc[0]) | (v[i] > rc[nr-1])) {
+						v[i] = NAval;
+					} else {
+						for (size_t j=1; j<nr; j++) {
+							if (v[i] <= rc[j]) {
+								v[i] = j;
+								break;
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if (lowest)	{
+				for (size_t i=0; i<n; i++) {
+					if (std::isnan(v[i])) {
+						v[i] = NAval;
+					} else if ((v[i] < rc[0]) | (v[i] > rc[nr-1])) {
+						v[i] = NAval;
+					} else if (v[i] == rc[nr-1]) {
+						v[i] = nr-1;
+					} else {
+						for (size_t j=1; j<nr; j++) {
+							if (v[i] < rc[j]) {
+								v[i] = j;
+								break;
+							}
+						}
+					}
+				}
+			} else {
+				for (size_t i=0; i<n; i++) {
+					if (std::isnan(v[i])) {
+						v[i] = NAval;
+					} else if ((v[i] < rc[0]) | (v[i] >= rc[nr-1])) {
+						v[i] = NAval;
+					} else {
+						for (size_t j=1; j<nr; j++) {
+							if (v[i] < rc[j]) {
+								v[i] = j;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}	
 
 	// "is - becomes"
-	if (nc == 2) {
+	} else if (nc == 2) {
+
+		bool hasNAN = false;
+		double replaceNAN = NAval;
+		for (size_t j=0; j<nr; j++) {
+			if (std::isnan(rcl[0][j])) {
+				hasNAN = true;
+				replaceNAN = rcl[1][j];
+			}
+		} 
 		for (size_t i=0; i<n; i++) {
 			if (std::isnan(v[i])) {
-				v[i] = NAval;
+				if (hasNAN) {
+					v[i] = replaceNAN;
+				} else {
+					v[i] = NAval;
+				}
 			} else {
-				for (size_t j=0; j<nc; j++) {
+				bool found = false;
+				for (size_t j=0; j<nr; j++) {
 					if (v[i] == rcl[0][j]) {
 						v[i] = rcl[1][j];
+						found = true;
 						break;
 					}
+				}
+				if ((othNA) & (!found)) {
+					v[i] = NAval;
 				}
 			}
 		}
 
 	// "from - to - becomes"
-	} else if (leftright) {   // interval closed at left and right
+	} else {
+		
+		bool hasNAN = false;
+		double replaceNAN = NAval;
+		for (size_t j=0; j<nr; j++) {
+			if (std::isnan(rcl[0][j]) || std::isnan(rcl[1][j])) {
+				hasNAN = true;
+				replaceNAN = rcl[2][j];
+			}
+		} 
+		
+		if (leftright) {   // interval closed at left and right
 
-		for (size_t i=0; i<n; i++) {
-			if (std::isnan(v[i])) {
-				v[i] = NAval;
-			} else {
-				for (size_t j=0; j<nc; j++) {
-					if ((v[i] >= rcl[0][j]) & (v[i] <= rcl[1][j])) {
-						v[i] = rcl[1][j];
-						break;
+			for (size_t i=0; i<n; i++) {
+				if (std::isnan(v[i])) {
+					if (hasNAN) {
+						v[i] = replaceNAN;
+					} else {
+						v[i] = NAval;
 					}
+				} else {
+					bool found = false;
+					for (size_t j=0; j<nr; j++) {
+						if ((v[i] >= rcl[0][j]) & (v[i] <= rcl[1][j])) {
+							v[i] = rcl[1][j];
+							found = true;
+							break;
+						}
+					}
+					if ((othNA) & (!found))  {
+						v[i] = NAval;
+					}				
 				}
 			}
-		}
 		} else if (right) {  // interval closed at right
-			if (lowest) {  // include lowest value (left) of interval
+				if (lowest) {  // include lowest value (left) of interval
 
-			double lowval = rcl[0][0];
-			double lowres = rcl[2][0];
-			for (size_t i=1; i<nc; i++) {
-				if (rcl[0][i] < lowval) {
-					lowval = rcl[0][i];
-					lowres = rcl[2][i];
-				}
-			}
-
-
-			for (size_t i=0; i<n; i++) {
-				if (std::isnan(v[i])) {
-					v[i] = NAval;
-				} else if (v[i] == lowval) {
-					v[i] = lowres;
-				} else {
-					for (size_t j=0; j<nc; j++) {
-						if ((v[i] > rcl[0][j]) & (v[i] <= rcl[1][j])) {
-							v[i] = rcl[2][j];
-							break;
-						}
+				double lowval = rcl[0][0];
+				double lowres = rcl[2][0];
+				for (size_t i=1; i<nr; i++) {
+					if (rcl[0][i] < lowval) {
+						lowval = rcl[0][i];
+						lowres = rcl[2][i];
 					}
 				}
-			}
 
-		} else { // !dolowest
 				for (size_t i=0; i<n; i++) {
-				if (std::isnan(v[i])) {
-					v[i] = NAval;
-				} else {
-					for (size_t j=0; j<nc; j++) {
-						if ((v[i] > rcl[0][j]) & (v[i] <= rcl[1][j])) {
-							v[i] = rcl[2][j];
-							break;
+					if (std::isnan(v[i])) {
+						if (hasNAN) {
+							v[i] = replaceNAN;
+						} else {
+							v[i] = NAval;
+						}
+					} else if (v[i] == lowval) {
+						v[i] = lowres;
+					} else {
+						bool found = false;
+						for (size_t j=0; j<nr; j++) {
+							if ((v[i] > rcl[0][j]) & (v[i] <= rcl[1][j])) {
+								v[i] = rcl[2][j];
+								found = true;
+								break;
+							}
+						}
+						if  ((othNA) & (!found))  {
+							v[i] = NAval;
+						}
+					}
+				}
+
+			} else { // !dolowest
+					for (size_t i=0; i<n; i++) {
+					if (std::isnan(v[i])) {
+						if (hasNAN) {
+							v[i] = replaceNAN;
+						} else {
+							v[i] = NAval;
+						}
+					} else {
+						bool found = false;
+						for (size_t j=0; j<nr; j++) {
+							if ((v[i] > rcl[0][j]) & (v[i] <= rcl[1][j])) {
+								v[i] = rcl[2][j];
+								found = true;
+								break;
+							}
+						}
+						if  ((othNA) & (!found))  {
+							v[i] = NAval;
 						}
 					}
 				}
 			}
-		}
 
-	} else { // !doright
+		} else { // !doright
 
-		if (lowest) { // which here means highest because right=FALSE
+			if (lowest) { // which here means highest because right=FALSE
 
-			double lowval = rcl[1][0];
-			double lowres = rcl[2][0];
-			for (size_t i=0; i<nc; i++) {
-				if (rcl[1][i] > lowval) {
-					lowval = rcl[1][i];
-					lowres = rcl[2][i];
+				double lowval = rcl[1][0];
+				double lowres = rcl[2][0];
+				for (size_t i=0; i<nr; i++) {
+					if (rcl[1][i] > lowval) {
+						lowval = rcl[1][i];
+						lowres = rcl[2][i];
+					}
 				}
-			}
 
-			for (size_t i=0; i<n; i++) {
-				if (std::isnan(v[i])) {
-					v[i] = NAval;
-				} else if (v[i] == lowval) {
-					v[i] = lowres;
-				} else {
-					for (size_t j=0; j<nc; j++) {
-						if ((v[i] >= rcl[0][j]) & (v[i] < rcl[1][j])) {
-							v[i] = rcl[2][j];
-							break;
+				for (size_t i=0; i<n; i++) {
+					if (std::isnan(v[i])) {
+						if (hasNAN) {
+							v[i] = replaceNAN;
+						} else {
+							v[i] = NAval;
+						}
+					} else if (v[i] == lowval) {
+						v[i] = lowres;
+					} else {
+						bool found = false;
+						for (size_t j=0; j<nr; j++) {
+							if ((v[i] >= rcl[0][j]) & (v[i] < rcl[1][j])) {
+								v[i] = rcl[2][j];
+								found = true;
+								break;
+							}
+						}
+						if  ((othNA) & (!found))  {
+							v[i] = NAval;
 						}
 					}
 				}
-			}
 
-		} else { //!dolowest
+			} else { //!dolowest
 
-			for (size_t i=0; i<n; i++) {
-				if (std::isnan(v[i])) {
-					v[i] = NAval;
-				} else {
-					for (size_t j=0; j<nc; j++) {
-						if ((v[i] >= rcl[0][j]) & (v[i] < rcl[1][j])) {
-							v[i] = rcl[2][j];
-							break;
+				for (size_t i=0; i<n; i++) {
+					if (std::isnan(v[i])) {
+						if (hasNAN) {
+							v[i] = replaceNAN;
+						} else {
+							v[i] = NAval;
+						}
+					} else {
+						bool found = false;
+						for (size_t j=0; j<nr; j++) {
+							if ((v[i] >= rcl[0][j]) & (v[i] < rcl[1][j])) {
+								v[i] = rcl[2][j];
+								found = true;
+								break;
+							}
+						}
+						if  ((othNA) & (!found))  {
+							v[i] = NAval;
 						}
 					}
 				}
@@ -161,12 +303,12 @@ void reclass_vector(std::vector<double> &v, std::vector<std::vector<double>> rcl
 }
 
 
-SpatRaster SpatRaster::reclassify(std::vector<std::vector<double>> rcl, unsigned right, bool lowest, SpatOptions &opt) {
+SpatRaster SpatRaster::reclassify(std::vector<std::vector<double>> rcl, unsigned right, bool lowest, bool othersNA, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 	size_t nc = rcl.size();
 	size_t nr = rcl[0].size();
-	if (nc < 2 || nc > 3 || nr < 1) {
+	if (nc < 1 || nc > 3 || nr < 1) {
 		out.setError("reclassification matrix must have 2 or 3 columns, and at least one row");
 		return out;
 	}
@@ -185,19 +327,45 @@ SpatRaster SpatRaster::reclassify(std::vector<std::vector<double>> rcl, unsigned
 		}
 	}
 
-
-
   	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> v = readBlock(out.bs, i);
-		reclass_vector(v, rcl, right, lowest);
+		reclass_vector(v, rcl, right, lowest, othersNA);
 		if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;		
 	}
 	readStop();
 	out.writeStop();
 	return(out);
 
+}
+
+
+SpatRaster SpatRaster::reclassify(std::vector<double> rcl, unsigned nc, unsigned right, bool lowest, bool othersNA, SpatOptions &opt) {
+	
+	SpatRaster out;
+	std::vector< std::vector<double>> rc(nc);
+	if ((rcl.size() % nc) != 0) {
+		out.setError("incorrect length of reclassify matrix");
+		return(out);
+	}
+	unsigned nr = rcl.size() / nc;
+	
+	if (nc == 1) {
+		rc[0] = rcl;
+	} else if (nc==2) {
+		rc[0] = std::vector<double>(rcl.begin(), rcl.begin()+nr);
+		rc[1] = std::vector<double>(rcl.begin()+nr, rcl.end());
+	} else if (nc==3) {
+		rc[0] = std::vector<double>(rcl.begin(), rcl.begin()+nr);
+		rc[1] = std::vector<double>(rcl.begin()+nr, rcl.begin()+2*nr);
+		rc[2] = std::vector<double>(rcl.begin()+2*nr, rcl.end());
+	} else {
+		out.setError("incorrect number of columns in reclassify matrix");
+		return(out);
+	}
+	out = reclassify(rc, right, lowest, othersNA, opt);
+	return out;
 }
 
 

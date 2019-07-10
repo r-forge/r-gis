@@ -9,10 +9,35 @@
 	warning("cell numbers larger than ", 2^.Machine$double.digits, " are approximate")
 }
 
+
+.makeDataFrame <- function(x, v) {
+	v <- data.frame(v)	
+	ff <- is.factor(x)
+	if (any(ff)) {
+		ff <- which(ff)
+		levs <- levels(x)
+		for (f in ff) {
+			lev <- levs[[f]]
+			v[[f]] = factor(v[[f]], levels=lev$levels)
+			levels(v[[f]]) = lev$labels
+		}
+	}
+	v
+}
+
+
 setMethod("extract", signature(x="SpatRaster", y="SpatVector"), 
-function(x, y, fun="", ...) { 
-    r <- x@ptr$extractVector(y@ptr, fun)
+function(x, y, fun=NULL, ...) { 
+    r <- x@ptr$extractVector(y@ptr)
 	x <- show_messages(x, "extract")
+
+	#f <- function(i) if(length(i)==0) { NA } else { i }
+	#r <- rapply(r, f, how="replace")
+
+	if (!is.null(fun)) {
+	  	r <- rapply(r, fun, ...)
+		r <- matrix(r, nrow=nrow(y), byrow=TRUE)
+	}
 	r
 })
 
@@ -28,7 +53,7 @@ function(x, i, j, ... , drop=FALSE) {
 
 
 setMethod("extract", signature(x="SpatRaster", y="matrix"), 
-function(x, y, fun="", ...) { 
+function(x, y, ...) { 
 	if (ncol(y) != 2) {
 		stop("extract works with a 2 column matrix of x and y coordinates")
 	}
@@ -39,7 +64,7 @@ function(x, y, fun="", ...) {
 
 setMethod("[", c("SpatRaster", "missing", "missing"),
 function(x, i, j, ... , drop=FALSE) {
-	values(x, matrix=drop)
+	values(x, mat=drop)
 })
 
 
@@ -50,6 +75,7 @@ function(x, i, j, ... ,drop=FALSE) {
 		i <- cellFromRowCol(x, i, 1:ncol(x))
 		# probably better to do return( readValues(x, i-1) )
 	} 
+	i[i<1] <- NA
 	r <- x@ptr$extractCell(i-1)
 	show_messages(x)
 	if (drop) {
@@ -65,6 +91,7 @@ setMethod("[", c("SpatRaster", "missing", "numeric"),
 function(x, i, j, ... ,drop=FALSE) {
 	i <- cellFromRowCol(x, 1:nrow(x), j)
 	if (any(na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
+	
 	r <- x@ptr$extractCell(i-1)
 	show_messages(x)
 	if (drop) {
@@ -79,7 +106,7 @@ function(x, i, j, ... ,drop=FALSE) {
 
 setMethod("[", c("SpatRaster", "numeric", "numeric"),
 function(x, i, j, ..., drop=FALSE) {
-	i <- cellFromRowCol(x, i, j)
+	i <- cellFromRowColCombine(x, i, j)
 	if (any(na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
 	r <- x@ptr$extractCell(i-1)
 	show_messages(x)

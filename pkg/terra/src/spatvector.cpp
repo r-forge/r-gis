@@ -17,6 +17,11 @@
 
 #include "spatVector.h"
 
+#ifdef useGDAL
+	#include "crs.h"
+#endif
+
+
 SpatHole::SpatHole() {}
 
 SpatHole::SpatHole(std::vector<double> X, std::vector<double> Y) {
@@ -124,8 +129,13 @@ std::vector<unsigned> SpatVector::getIplace(){
 	return lyr.df.iplace;
 }
 
-std::vector<std::string> SpatVector::names(){
-	return lyr.df.names;
+
+std::vector<std::string> SpatVector::get_names(){
+	return lyr.df.get_names();
+}
+
+void SpatVector::set_names(std::vector<std::string> s){
+	lyr.df.set_names(s);
 }
 
 unsigned SpatVector::ncol() {
@@ -139,6 +149,11 @@ unsigned SpatVector::nrow() {
 size_t SpatVector::size() {
 	return lyr.geoms.size();
 }
+
+bool SpatVector::is_lonlat() {
+	SpatExtent e = getExtent();
+	return e.is_lonlat(getCRS());
+};
 
 bool SpatVector::could_be_lonlat() {
 	SpatExtent e = getExtent();
@@ -162,11 +177,11 @@ void SpatVector::setCRS(std::string CRS){
 std::string SpatVector::type(){
 	if (size() == 0) {
 		return "none";
-	} else if (lyr.geoms[0].gtype == 0) {
+	} else if (lyr.geoms[0].gtype == points) {
 		return "points";
-	} else if (lyr.geoms[0].gtype == 1) {
+	} else if (lyr.geoms[0].gtype == lines) {
 		return "lines";
-	} else if (lyr.geoms[0].gtype == 2) {
+	} else if (lyr.geoms[0].gtype == polygons) {
 		return "polygons";
 	} else {
 		return("unknown");
@@ -215,6 +230,36 @@ unsigned SpatVector::nxy() {
 	return n;
 }
 
+
+std::vector<std::vector<double>> SpatVector::coordinates() {
+	SpatGeom g;
+	SpatPart p;
+	SpatHole h;
+	std::vector<std::vector<double>> out(2);
+	for (size_t i=0; i < size(); i++) {
+		g = getGeom(i);
+		for (size_t j=0; j < g.size(); j++) {
+			p = g.getPart(j);
+			for (size_t q=0; q < p.x.size(); q++) {
+				out[0].push_back( p.x[q] );
+				out[1].push_back( p.y[q] );
+			}
+			if (p.hasHoles()) {
+				for (size_t k=0; k < p.nHoles(); k++) {
+					h = p.getHole(k);
+					for (size_t q=0; q < h.x.size(); q++) {
+						out[0].push_back( h.x[q] );
+						out[1].push_back( h.y[q] );
+					}
+				}
+			}
+		}
+	}
+	return out;
+}
+
+
+
 SpatDataFrame SpatVector::getGeometryDF() {
 	unsigned n = nxy();
 
@@ -228,7 +273,7 @@ SpatDataFrame SpatVector::getGeometryDF() {
 	out.add_column(0, "x");
 	out.add_column(0, "y");
 	out.add_column(1, "hole");
-	out.resize(n);
+	out.resize_rows(n);
 
 	size_t idx = 0;
 	for (size_t i=0; i < size(); i++) {
@@ -334,14 +379,96 @@ void SpatVector::setGeometry(std::string type, std::vector<unsigned> gid, std::v
 }
 
 
+SpatVector SpatVector::subset_rows(std::vector<int> range) {
 
-SpatVector SpatVector::subset(std::vector<unsigned> range) {
 	SpatVector out;
-	for (size_t i=0; i < range.size(); i++) {
-		out.addGeom( lyr.geoms[range[i]] );
+	int n = nrow();
+	std::vector<unsigned> r;
+	for (size_t i=0; i<range.size(); i++) {
+	if ((range[i] >= 0) & (range[i] < n)) {
+			r.push_back(range[i]);
+		}
+	}
+
+	for (size_t i=0; i < r.size(); i++) {
+		out.addGeom( lyr.geoms[r[i]] );
 	}
 	out.lyr.crs = lyr.crs;
-	//df ?
+	out.lyr.df = lyr.df.subset_rows(r);
 	return out;
 };
+
+
+SpatVector SpatVector::subset_rows(int i) {
+	std::vector<int> range(1, i);
+	SpatVector out = subset_rows(range);
+	return out;
+};
+
+
+SpatVector SpatVector::subset_cols(std::vector<int> range) {
+	SpatVector out;
+	out.lyr.geoms = lyr.geoms;
+	out.lyr.crs = lyr.crs;
+	int nc = ncol();
+
+	std::vector<unsigned> r;
+	for (size_t i=0; i<range.size(); i++) {
+	if ((range[i] >= 0) & (range[i] < nc)) {
+			r.push_back(range[i]);
+		}
+	}
+	out.lyr.df = lyr.df.subset_cols(r);
+	return out;
+};
+
+
+SpatVector SpatVector::subset_cols(int i) {
+	std::vector<int> range(1, i);
+	SpatVector out = subset_cols(range);
+	return out;
+};
+
+
+SpatVector SpatVector::project(std::string crs) {
+
+	SpatVector s;
+
+    #ifndef useGDAL
+		s.setError("GDAL is not available");
+		return(s);
+	#else
+	SpatDataFrame d = getGeometryDF();
+
+	std::vector<double> x = d.dv[0];
+	std::vector<double> y = d.dv[1];
+
+	s.msg = transform_coordinates(x, y, getCRS(), crs);
+
+	if (!s.msg.has_error) {
+		unsigned n = d.iv[0].size();
+		std::vector<unsigned> a, b, c;
+		for (size_t i=0; i<n; i++) {
+			a.push_back(d.iv[0][i]);
+			b.push_back(d.iv[1][i]);
+			c.push_back(d.iv[2][i]);
+		}
+		s.setGeometry(type(), a, b, x, y, c);
+		s.setCRS(crs);
+		s.lyr.df = lyr.df;
+	}
+	#endif
+	return s;
+}
+
+
+/*
+std::vector<std::vector<double>> SpatVector::test(std::vector<double> x, std::vector<double> y, std::string fromcrs, std::string tocrs) {
+	std::vector<std::vector<double>> xy(2);
+	xy[0] = x;
+	xy[1] = y;
+	SpatMessages msg = transform_coordinates(xy, fromcrs, tocrs);
+	return xy;
+}
+*/
 

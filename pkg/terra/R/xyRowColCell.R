@@ -39,11 +39,18 @@ setMethod(cellFromRowCol, signature(object="SpatRaster", row="numeric", col="num
 	}
 )
 
+setMethod(cellFromRowColCombine, signature(object="SpatRaster", row="numeric", col="numeric"), 
+	function(object, row, col, ...) {
+		object@ptr$cellFromRowColCombine(row-1, col-1) + 1
+	}
+)
+
+
 setMethod(xyFromCell, signature(object="SpatRaster", cell="numeric"), 		
 	function(object, cell, ...) {
 		xy <- object@ptr$xyFromCell(cell-1)
 		xy <- do.call(cbind, xy)
-		colnames(xy) <- c('x', 'y')
+		colnames(xy) <- c("x", "y")
 		xy
 	}
 )

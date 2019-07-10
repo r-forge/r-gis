@@ -34,7 +34,7 @@ SpatRaster SpatRaster::init(std::string value, bool plusone, SpatOptions &opt) {
 		size_t nr = nrow();
 		for (size_t i = 0; i < nr; i++) {
 			std::fill(v.begin(), v.end(), i+plusone);				
-			if (!out.writeValues(v, i, 1, 0, ncol()))) return out;
+			if (!out.writeValues(v, i, 1, 0, ncol())) return out;
 		}
 	} else if (value == "col") {
 		std::vector<double> col(ncol());
@@ -95,6 +95,23 @@ SpatRaster SpatRaster::init(std::string value, bool plusone, SpatOptions &opt) {
 		}
 	}
 
+	out.writeStop();
+	return(out);
+}
+
+
+
+SpatRaster SpatRaster::init(double value, SpatOptions &opt) {
+	SpatRaster out = geometry();
+ 	if (!out.writeStart(opt)) { return out; }
+	unsigned nc = ncol();
+	std::vector<double> v(out.bs.nrows[0]*nc, value);	
+	for (size_t i = 0; i < out.bs.n; i++) {
+		if (i > 0 && i == (out.bs.n-1)) {
+			v.resize(bs.nrows[i]*nc);
+		}
+		if (!out.writeValues(v, i, 1, 0, ncol())) return out;
+	}
 	out.writeStop();
 	return(out);
 }

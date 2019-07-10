@@ -120,6 +120,20 @@ function(x) {
 	}
 )
 
+
+setMethod("res<-", signature(x="SpatRaster"), 
+	function(x, value) {
+		if (length(value) == 1) {
+			value <- c(value, value)
+		} else if (length(value) > 2) {
+			warning("value should have length 1 or 2. Additional values ignored")
+		}		
+		x@ptr <- x@ptr$set_resolution(value[1], value[2])
+		show_messages(x, "resolution")
+	}
+)
+
+
 setMethod("xres", signature(x="SpatRaster"), 
 function(x) {
 		res(x)[1]

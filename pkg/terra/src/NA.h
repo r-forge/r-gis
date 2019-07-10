@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with spat. If not, see <http://www.gnu.org/licenses/>.
 
+#include <cmath>
 
 template <class T> class NA {
 public:
@@ -27,7 +28,14 @@ public:
 };
 
 
-template <typename T> bool is_NA(const T v) {
+//template <> class NA<bool> {
+//public:
+//    static constexpr bool value = false;
+//};
+
+
+template <typename T> 
+bool is_NA(const T v) {
     if (std::is_floating_point<T>::value) {
         return std::isnan(v);
     } else {

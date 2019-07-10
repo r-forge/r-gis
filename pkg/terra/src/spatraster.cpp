@@ -107,7 +107,9 @@ SpatRaster::SpatRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::
 	s.layers.resize(1, 1);
 	s.datatype = "";
 	s.crs =_crs;
-	for (unsigned i=0; i < rcl[2]; i++) { s.names.push_back("lyr." + std::to_string(i+1)) ; }
+	for (unsigned i=0; i < rcl[2]; i++) { 
+		s.names.push_back("lyr." + std::to_string(i+1)) ; 
+	}
 
 	setSource(s);
 }
@@ -128,7 +130,9 @@ SpatRaster::SpatRaster(unsigned _nrow, unsigned _ncol, unsigned _nlyr, SpatExten
 	s.layers.resize(1, 1);
 	s.datatype = "";
 	s.crs=_crs;
-	for (unsigned i=0; i < _nlyr; i++) {	s.names.push_back("lyr." + std::to_string(i+1)) ; }
+	for (unsigned i=0; i < _nlyr; i++) {	
+		s.names.push_back("lyr." + std::to_string(i+1)) ; 
+	}
 	setSource(s);
 }
 
@@ -153,18 +157,25 @@ SpatRaster::SpatRaster(const SpatRaster &r) {
 
 SpatRaster SpatRaster::geometry(long nlyrs) {
 	RasterSource s;
+	s.values.resize(0);
 	s.nrow = nrow();
 	s.ncol = ncol();
 	s.extent = extent;
 	s.crs = crs;
 	s.memory = true;
 	s.hasValues = false;
-	nlyrs = (nlyrs < 1) ? nlyr(): nlyrs;
+	long nl = nlyr();
+	bool keepnlyr = ((nlyrs == nl) | (nlyrs < 1));
+	nlyrs = (keepnlyr) ? nlyr(): nlyrs;
 	s.resize(nlyrs);
-	s.values.resize(0);
-
-	std::vector<std::string> nms(s.nlyr);
-	for (size_t i=0; i < s.nlyr; i++) { nms[i] = "lyr" + std::to_string(i+1); }
+	std::vector<std::string> nms;
+	if (keepnlyr) {
+		nms = getNames();
+	} else {
+		for (size_t i=0; i < s.nlyr; i++) { 
+			nms.push_back("lyr" + std::to_string(i+1)); 
+		}
+	}	
 	s.names = nms;
 	SpatRaster out;
 	out.setSource(s);
@@ -190,6 +201,27 @@ void SpatRaster::setCRS(std::string _crs) {
 std::vector<double> SpatRaster::resolution() {
 	return std::vector<double> { (extent.xmax - extent.xmin) / ncol(), (extent.ymax - extent.ymin) / nrow() };
 }
+
+
+SpatRaster SpatRaster::setResolution(double xres, double yres) {
+	SpatRaster out;
+
+	if ((xres <= 0) | (yres <= 0)) {
+		out.setError("resolution must be larger than 0");
+		return(out);
+	}
+	SpatExtent e = extent;
+	unsigned nc = round((e.xmax-e.xmin) / xres);
+	unsigned nr = round((e.ymax-e.ymin) / yres);
+	double xmax = e.xmin + nc * xres;
+	double ymax = e.ymin + nr * yres;
+	unsigned nl = nlyr();
+	std::vector<unsigned> rcl = {nr, nc, nl};
+	std::vector<double> ext = {e.xmin, xmax, e.ymin, ymax};
+	
+	return SpatRaster(rcl, ext, crs);
+}
+
 
 unsigned SpatRaster::ncol() {
 	if (source.size() > 0) {
@@ -249,6 +281,11 @@ std::vector<double> SpatRaster::range_max() {
 	}
 	return(x);
 }
+
+bool SpatRaster::is_lonlat() {
+	SpatExtent e = getExtent();
+	return e.is_lonlat(getCRS());
+};
 
 bool SpatRaster::could_be_lonlat() {
 	SpatExtent e = getExtent();

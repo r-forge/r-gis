@@ -3,23 +3,107 @@
 # Version 0.9
 # License GPL v3
 
-	
 
-setMethod('predict', signature(object='SpatRaster'), 
-	function(object, model, fun=predict, ..., filename="", overwrite=FALSE, wopt=list()) {
-		out <- rast(object)
-		readStart(object)
+.runModel <- function(model, fun, d, nl, const, na.rm, ...) {
+	if (! is.null(const)) {
+		d <- cbind(d, const[1])
+	} 
+	if (na.rm) {
+		n <- nrow(d)
+		i <- rowSums(is.na(d)) == 0
+		d <- d[i,,drop=FALSE]
+		if (ncol(d) > 0) {
+			r <- fun(model, d, ...)
+			r <- as.matrix(r)
+			if (!all(i)) {
+				m <- matrix(NA, nrow=nl*n, ncol=ncol(r))
+				m[i,] <- r
+				colnames(m) <- colnames(r)
+				r <- m
+			}
+		} else {
+			r <- matrix(NA, nrow=nl*n, ncol=1)
+		}
+		return (r)
+	} else {
+		r <- fun(model, d, ...)
+		return( as.matrix(r) )
+	}
+}
+
+
+
+.getFactors <- function(m, facts=NULL, lyrnms) {
+
+	if (!is.null(facts)) {
+		stopifnot(is.list(factors))
+		f <- names(factors)
+		if (any(trimws(f) == "")) {
+			stop("all factors must be named")
+		}
+	} else if (inherits(m, "randomForest")) {
+		f <- names(which(sapply(m$forest$xlevels, max) != "0"))
+		if (length(f) > 0) { 
+			factors <- m$forest$xlevels[f]
+		}
+	} else if (inherits(m, "gbm")) {
+		dafr <- m$gbm.call$dataframe 
+		i <- sapply(dafr, is.factor)
+		if (any(i)) {
+			j <- which(i)
+			factors <- list()
+			for (i in 1:length(j)) {
+				factors[[i]] <- levels(dafr[[ j[i] ]])
+			}
+			names(factors) <- colnames(dafr)[j]
+		}
+	} else { #glm and others
+		try(factors <- m$xlevels, silent=TRUE)
+	}
+	if (!all(names(factors) %in% lyrnms)) {
+		ff <- f[!(f %in% lyrnms)]
+		stop(paste("factor name(s):", paste(ff, collapse=", "), " not in layer names"))
+	}
+	factors
+}
+	
+setMethod("predict", signature(object="SpatRaster"), 
+	function(object, model, fun=predict, ..., factors=NULL, const=NULL, na.rm=FALSE, filename="", overwrite=FALSE, wopt=list()) {
+
+		nms <- names(object)
+		if (length(unique(nms)) != length(nms)) {
+			tab <- table(nms)
+			stop('duplicate names in SpatRaster: ', tab[tab>1])
+		}
+		
+		#factors should come with the SpatRaster
+		#haveFactor <- FALSE
+		#if (!is.null(factors)) {
+		#	factors <- .getFactors(model, factors, nms)
+		#	fnames <- names(f)
+		#	haveFactor <- TRUE
+		#}
+		
+		nl <- 1
 		nc <- ncol(object)
+		tomat <- FALSE
+		d <- readValues(object, round(0.5*nrow(object)), 1, 1, min(nc,500), TRUE, TRUE)
+
+		r <- .runModel(model, fun, d, nl, const, na.rm, ...)
+		nl <- ncol(r)		
+		out <- rast(object, nlyr=nl)
+		cn <- colnames(r)
+		if (length(cn) == nl) names(out) <- make.names(cn, TRUE)
+		
+		readStart(object)
 		b <- writeStart(out, filename, overwrite, wopt)
-		on.exit(writeStop(out))		
 		for (i in 1:b$n) {
-			d <- readValues(object, b$row[i], b$nrows[i], 1, nc)
-			d <- data.frame(matrix(d, ncol = ncol(object)))
-			names(d) <- names(object)
-			r <- predict(model, d, ...)
+			d <- readValues(object, b$row[i], b$nrows[i], 1, nc, TRUE, TRUE)
+			r <- .runModel(model, fun, d, nl, const, na.rm, ...)
 			writeValues(out, r, b$row[i])
 		}
 		readStop(object)
+		writeStop(out)
 		return(out)
 	}
 )

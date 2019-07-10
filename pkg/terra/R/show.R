@@ -17,7 +17,20 @@
 	x <- paste0(x, " <<- ", pkg, ":::", x)
 	for (cmd in x) eval(parse(text = cmd))
 }
-	
+
+
+setMethod ("show" , "Rcpp_SpatCategories", 
+	function(object) {
+		print(data.frame(value=object$levels, label=object$labels))
+	}
+)
+
+setMethod ("show" , "Rcpp_SpatDataFrame", 
+	function(object) {
+		d <- .getSpatDF(object)
+		head(d)
+	}
+)
 
 
 setMethod ("show" , "SpatExtent", 
@@ -172,4 +185,5 @@ setMethod ("tail" , "SpatRaster",
 		tail(x[(nc-n+1):nc], n=n, ...)
 	}
 )
+
 

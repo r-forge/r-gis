@@ -1,4 +1,4 @@
-// Copyright (c) 2018  Robert J. Hijmans
+// Copyright (c) 2018-2019  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -17,6 +17,7 @@
 
 #include "spatBase.h"
 #include "spatDataframe.h"
+#include "spatMessages.h"
 
 enum SpatGeomType { points, lines, polygons, unknown };
 
@@ -79,12 +80,14 @@ class SpatVector {
 		SpatLayer lyr;
 		std::vector<SpatLayer> lyrs;
 
-		std::vector<std::string> names();
+		std::vector<std::string> get_names();
+		void set_names(std::vector<std::string> s);
 		unsigned nrow();
 		unsigned ncol();
 		unsigned nxy();
 
 		SpatExtent getExtent();
+		bool is_lonlat();
 		bool could_be_lonlat();
 		std::string type();
 		SpatGeomType getGType(std::string &type);
@@ -97,12 +100,23 @@ class SpatVector {
 		bool addGeom(SpatGeom p);
 		bool setGeom(SpatGeom p);
 		SpatDataFrame getGeometryDF();
+		std::vector<std::vector<double>> coordinates();
 
-		SpatVector subset(std::vector<unsigned> range);
+		SpatVector project(std::string crs);
+		//std::vector<std::vector<double>> test(std::vector<double> x, std::vector<double> y, std::string fromcrs, std::string tocrs);
+		
+		SpatVector subset_cols(int i);
+		SpatVector subset_cols(std::vector<int> range);
+		SpatVector subset_rows(int i);
+		SpatVector subset_rows(std::vector<int> range);
+
 		void setGeometry(std::string type, std::vector<unsigned> gid, std::vector<unsigned> part, std::vector<double> x, std::vector<double> y, std::vector<unsigned> hole);
 
 		std::vector<double> area();
 		std::vector<double> length();
+		SpatDataFrame distance(SpatVector x, bool pairwise);
+		SpatDataFrame distance();
+
 		size_t size();
 		SpatVector as_lines();
 
@@ -116,6 +130,15 @@ class SpatVector {
 		std::vector<unsigned> getItype();
 		std::vector<unsigned> getIplace();
 
+		void add_column(unsigned dtype, std::string name) {
+			lyr.df.add_column(dtype, name);
+		};
+		
+		template <typename T>
+		bool add_column(std::vector<T> x, std::string name) {
+			return lyr.df.add_column(x, name);
+		}
+		
 		SpatMessages msg;
 		void setError(std::string s) { msg.setError(s); }
 		void addWarning(std::string s) { msg.addWarning(s); }

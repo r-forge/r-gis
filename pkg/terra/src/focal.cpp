@@ -22,17 +22,18 @@
 
 // todo: three dimensional focal
 
-std::vector<double> focal_get(std::vector<double> d, std::vector<unsigned> dim, std::vector<unsigned> ngb, double fillvalue) {
+std::vector<double> focal_get(std::vector<double> d, std::vector<unsigned> dim, std::vector<unsigned> ngb, double fillvalue, unsigned offset) {
 
   // object
-	int nrows = dim[0];
-	int ncols = dim[1];
+	unsigned ncols = dim[1];
+	unsigned nrows = dim[0];
+
 
   // window
 	unsigned wrows = ngb[0];
 	unsigned wcols = ngb[1];
-	int wr = std::floor(wrows / 2);
-	int wc = std::floor(wcols / 2);
+	unsigned wr = std::floor(wrows / 2);
+	unsigned wc = std::floor(wcols / 2);
 
   //	if ((wrows % 2 == 0) | (wcols % 2 == 0))
   //		error("weights matrix must have uneven sides");
@@ -40,14 +41,13 @@ std::vector<double> focal_get(std::vector<double> d, std::vector<unsigned> dim, 
 	unsigned n = nrows * ncols * wrows * wcols;
   	std::vector<double> val(n, fillvalue);
 
-	int f = 0;
-	int row, col;
-	for (int i = 0; i < nrows; i++) {
-		for (int j = 0; j < ncols; j++) {
-			for (int r=-wr; r <= wr ; r++) {
-			row = i+r;
-				for (int c=-wc; c <= wc ; c++) {
-					col = j+c;
+	unsigned f = 0;
+	for (size_t i = offset; i < nrows; i++) {
+		for (size_t j = 0; j < ncols; j++) {
+			for (size_t r=-wr; r <= wr ; r++) {
+				unsigned row = i+r;
+				for (size_t c=-wc; c <= wc ; c++) {
+					unsigned col = j+c;
 					if (col >= 0 && col < ncols && row >= 0 && row < nrows) {
 						val[f] = d[row*ncols+col];
 					}
@@ -63,23 +63,22 @@ std::vector<double> focal_get(std::vector<double> d, std::vector<unsigned> dim, 
 
 std::vector<double> SpatRaster::focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows) {
 
-	std::vector<unsigned> dim = {nrow(), ncol()};
-
-	int wr = std::floor(w[0]/2);
+	unsigned wr = std::floor(w[0]/2);
 	unsigned row2 = std::max(unsigned(0), row-wr);
-	unsigned nrows2 = std::min(nrows, nrows+wr);
-
+	unsigned nrows2 = std::min(nrow(), nrows+wr);
+	unsigned offset = row - row2;
 	readStart();
 	std::vector<double> d = readValues(row2, nrows2, 0, ncol());
 	readStop();
 
-	std::vector<double> f = focal_get(d, dim, w, fillvalue);
-	if ((row2 < row) | (nrows2 > nrows)) {
-		int start = (row2-row) * ncol();
-		int end = f.size() - (nrows2-nrows) * ncol();
-		return std::vector<double> (&f[start], &f[end]);
-//		f = f[start:end];
-	}
+	std::vector<unsigned> dim = {nrows, ncol()};
+	std::vector<double> f = focal_get(d, dim, w, fillvalue, offset);
+
+//	if ((row2 < row) | (nrows2 > nrows)) {
+//		unsigned start = (row-row2) * dim[1] * w[0] * w[1];
+//		unsigned end = start + nrows * dim[1] * w[0] * w[1];
+//		return std::vector<double> (f.begin()+start, f.begin()+end);
+//	}
 	return(f);
 }
 
@@ -92,6 +91,7 @@ SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm,
 	std::vector<unsigned> window;
 	unsigned size = w.size();
 	if (size > 3) {
+		// this does not look correct (only for square matrices)
 		wmat = true;
 		ww = w.size();
 		unsigned wsize = sqrt(ww);
@@ -115,14 +115,20 @@ SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm,
  	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	std::vector<double> v, f, d;
-
-
 	std::vector<double> fv;
+	
+	unsigned wr = std::floor(w[0]/2);
 
 	for (size_t i = 0; i < out.bs.n; i++) {
-		d = readValues(out.bs.row[i], out.bs.nrows[i], 0, ncol());
+
+		unsigned startrow = std::max(unsigned(0), out.bs.row[i]-wr);
+		unsigned nrows = out.bs.nrows[i] + wr;
+		nrows = (nrows + startrow) > nrow() ? nrow() - startrow : nrows;
+		unsigned offset = out.bs.row[i]-startrow;
+
+		d = readValues(startrow, nrows, 0, ncol());
 		dim[0] = out.bs.nrows[i];
-		f = focal_get(d, dim, window, fillvalue);
+		f = focal_get(d, dim, window, fillvalue, offset);
 		v.resize(out.bs.nrows[i] * ncol());
 		for (size_t j = 0; j < v.size(); j++) {
 			double z = 0;
@@ -165,7 +171,7 @@ SpatRaster SpatRaster::focal(std::vector<double> w, double fillvalue, bool narm,
 				v[j] = NAN;
 			}
 		}
-		if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol()))) return out;
+		if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 
 	}
 	readStop();

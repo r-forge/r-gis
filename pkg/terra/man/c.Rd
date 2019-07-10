@@ -8,7 +8,7 @@
 \title{Combine}
 
 \description{
-Combine SpatRaster objects (similar to raster::stack).
+Combine SpatRaster objects (similar to \code{raster::} \code{\link[raster]{stack}})
 }
 
 \usage{
@@ -31,7 +31,7 @@ SpatRaster
 \examples{
 r <- rast(nrow=5, ncol=9)
 values(r) <- 1:ncell(r)
-x <- c(r, r)
+x <- c(r, r*2, r*3)
 }
 
 \keyword{spatial}
