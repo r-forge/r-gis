@@ -47,15 +47,24 @@ function(x, fact=2, fun='mean', na.rm=TRUE, filename="", overwrite=FALSE, wopt=l
 		out <- show_messages(out, "aggregate")
 		dims <- x@ptr$get_aggregate_dims(fact)
 		b <- x@ptr$getBlockSize(4)		
-		nc <- ncol(x)	
+		nr <- floor(b$nrows[1] / fact[1]) * fact[1]
+		nrs <- rep(nr, floor(nrow(x)/nr))
+		d <- nrow(x) - sum(nrs) 
+		if (d > 0) nrs <- c(nrs, d)
+		b$row <- cumsum(nrs)-nrs[1]
+		b$nrows <- nrs
+		b$n <- length(nrs)
+		outnr <- b$nrows / fact[1]
+		outrows  <- 1+cumsum(outnr)-outnr[1]
 		readStart(x)
-		ignore <- writeStart(out, filename, overwrite, opt)
+		ignore <- writeStart(out, filename, overwrite, wopt)
 		on.exit(writeStop(out))		
+		nc <- ncol(x)
 		for (i in 1:b$n) {
-			v <- x@ptr$readValues(b$row[i], b$nrows[i], 0, nc)
+			v <- readValues(x, b$row[i]+1, b$nrows[i], 1, nc)
 			v <- x@ptr$get_aggregates(v, b$nrows[i], dims)
 			v <- sapply(v, fun, na.rm=na.rm)
-			writeValues(out, v, b$row[i])
+			writeValues(out, v, outrows[i])
 		}
 		readStop(x)
 		return(out)

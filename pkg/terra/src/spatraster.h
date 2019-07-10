@@ -256,7 +256,9 @@ class SpatRaster {
 
 		bool writeStart(SpatOptions &opt);
 		bool writeValues(std::vector<double> &vals, unsigned row);
-		bool writeValues2(std::vector<std::vector<double>> &vals, unsigned row);
+		bool writeValues(std::vector<double> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols);
+		bool writeValues2(std::vector<std::vector<double>> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols);
+		
 		bool writeStop();
 		bool writeHDR(std::string filename);
 
@@ -357,4 +359,10 @@ SpatRaster SQRTfree(SpatRaster* g) {
 	return r;
 }
 */
+
+
+class SpatRasterCollection {
+	public:
+		std::vector<SpatRaster> x;
+};
 

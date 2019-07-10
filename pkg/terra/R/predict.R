@@ -13,7 +13,7 @@ setMethod('predict', signature(object='SpatRaster'),
 		b <- writeStart(out, filename, overwrite, wopt)
 		on.exit(writeStop(out))		
 		for (i in 1:b$n) {
-			d <- object@ptr$readValues(b$row[i], b$nrows[i], 0, nc)
+			d <- readValues(object, b$row[i], b$nrows[i], 1, nc)
 			d <- data.frame(matrix(d, ncol = ncol(object)))
 			names(d) <- names(object)
 			r <- predict(model, d, ...)

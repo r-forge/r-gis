@@ -19,7 +19,7 @@ function(x, fun, ..., filename="", overwrite=FALSE, wopt=list())  {
 	nc <- ncol(x)
 	b <- writeStart(out, filename, overwrite, wopt)
 	for (i in 1:b$n) {
-		v <- x@ptr$readValues(b$row[i], b$nrows[i], 0, nc)
+		v <- readValues(x, b$row[i], b$nrows[i], 1, nc)
 		v <- matrix(v, ncol=nlyr(x))
 		r <- apply(v, 1, fun, ...)
 		# if i==1, check size of output and adjust layers

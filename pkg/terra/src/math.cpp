@@ -62,7 +62,7 @@ SpatRaster SpatRaster::math(std::string fun, SpatOptions &opt) {
 		} else if (fun == "trunc") {
 			for(double& d : a) if (!std::isnan(d)) d = trunc(d);
 		}
-		if (!out.writeValues(a, out.bs.row[i])) return out;
+		if (!out.writeValues(a, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 		
 	}
 	out.writeStop();
@@ -116,7 +116,7 @@ SpatRaster SpatRaster::trig(std::string fun, SpatOptions &opt) {
 		} else if (fun == "tanpi") {
 			for(double& d : a) if (!std::isnan(d)) d = tan(d * M_PI);
 		}
-		if (!out.writeValues(a, out.bs.row[i])) return out;
+		if (!out.writeValues(a, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 		
 	}
 	out.writeStop();

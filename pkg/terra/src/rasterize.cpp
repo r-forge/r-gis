@@ -103,7 +103,7 @@ SpatRaster SpatRaster::rasterizePolygons(SpatVector p, double background, SpatOp
 				}
 			}
 		}
-		if (!out.writeValues(v, out.bs.row[i])) return out;
+		if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 		
 	}
 	out.writeStop();
@@ -157,7 +157,7 @@ SpatRaster SpatRaster::rasterizeLines(SpatVector p, double background, SpatOptio
 				v = rasterize_line(v, value, part.x, part.y, nrow(), ncol(), extent.xmin, extent.ymax, resx, resy);
 			}
 		}
-		if (!out.writeValues(v, out.bs.row[i])) return out;
+		if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 		
 	}
 	out.writeStop();

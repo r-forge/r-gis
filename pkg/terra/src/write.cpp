@@ -91,7 +91,7 @@ bool SpatRaster::writeRaster(SpatOptions &opt) {
 //		fs.close();
 
         writeStart(opt);
-        writeValues(v, 0);
+        writeValues(v, 0, nrow(), 0, ncol());
         writeStop();
         return writeHDR(filename);
 	} else {
@@ -182,7 +182,7 @@ bool SpatRaster::writeStart(SpatOptions &opt) {
 
 
 
-bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row) {
+bool SpatRaster::writeValues(std::vector<double> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols) {
 	if (!source[0].open_write) {
 		setError("cannot write (no open file)");
 		return false;
@@ -206,7 +206,7 @@ bool SpatRaster::writeValues(std::vector<double> &vals, unsigned row) {
 
 	} else if (source[0].driver == "gdal") {
 		#ifdef useGDAL
-		success = writeValuesGDAL(vals, row);
+		success = writeValuesGDAL(vals, row, nrows, col, ncols);
 		#else
 		setError("GDAL is not available");
 		return false;
@@ -253,9 +253,9 @@ std::vector<T> flatten(const std::vector<std::vector<T>>& v) {
     return result;
 }
 
-bool SpatRaster::writeValues2(std::vector<std::vector<double>> &vals, unsigned row){
+bool SpatRaster::writeValues2(std::vector<std::vector<double>> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols){
     std::vector<double> vv = flatten(vals);
-    return writeValues(vv, row);
+    return writeValues(vv, startrow, nrows, startcol, ncols);
 }
 
 bool SpatRaster::writeStop(){
