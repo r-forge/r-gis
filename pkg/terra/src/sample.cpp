@@ -75,14 +75,12 @@ SpatRaster SpatRaster::sampleRegular(unsigned size) {
 	for (size_t src=0; src<nsrc(); src++) {
 		if (source[src].memory) {
 			v = readSample(src, nr, nc);
+		} else if (source[src].driver == "raster") {
+			v = readSampleBinary(src, nr, nc);
 		} else {
-			if (source[src].driver == "raster") {
-				v = readSampleBinary(src, nr, nc);
-			} else {
 		    #ifdef useGDAL
-				v = readGDALsample(src, nr, nc);
+			v = readGDALsample(src, nr, nc);
 			#endif
-			}
 		}
 		out.source[0].values.insert(out.source[0].values.end(), v.begin(), v.end());
 	}
@@ -92,4 +90,28 @@ SpatRaster SpatRaster::sampleRegular(unsigned size) {
 
 	return out;
 }
+
+
+/*
+SpatDataFrame sampleCells(unsigned size, std::string type, bool replace) {
+
+	SpatDataFrame out;
+	if (size >= ncell() & !replace) {
+		out.setError("size >= ncell() & !replace");
+		return out;
+	}
+	if (!source[0].hasValues) {
+		out.setError("Raster has no values");
+		return (out);
+	}
+	if (type == "Random") {
+		
+	} else if (type == "Regular") {
+		
+	} else { //type == "Stratified" 
+	
+	} // else "Cluster"
+	return out;
+}
+*/
 

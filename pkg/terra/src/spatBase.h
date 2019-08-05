@@ -21,10 +21,12 @@
 #include <cmath>
 #include "spatMessages.h"
 
-// comment out if GDAL not available
-#define useGDAL
 // comment out if this is not for R (no Rcpp)
-#define useRcpp
+#define useRCPP
+// comment out if GDAL is not available
+#define useGDAL
+// comment out if GEOS is not available
+#define useGEOS
 
 
 #ifndef M_PI
@@ -163,6 +165,11 @@ class SpatExtent {
 		bool valid() {
 			return ((xmax > xmin) && (ymax > ymin));
 		}
+
+		bool equal(SpatExtent e, double tolerance);
+		SpatExtent round(int n);
+		SpatExtent floor();
+		SpatExtent ceil();
 };
 
 

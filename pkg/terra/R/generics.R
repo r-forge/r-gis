@@ -4,26 +4,21 @@
 # License GPL v3
 
 
-setMethod("c", signature(x="SpatRaster"), 
-	function(x, ...) {
-		dots <- list(...)
-		for (i in dots) {
-			if (class(i) == "SpatRaster") {
-				x@ptr <- x@ptr$combineSources(i@ptr)
-			}
-		}
-		x@ptr$setNames(x@ptr$names)
-		show_messages(x, "c")		
-	}
-)
-
-
 setMethod("adjacent", signature(x="SpatRaster"), 
 	function(x, cells, directions="rook", include=FALSE, ...) {
 		v <- x@ptr$adjacent(cells-1, directions, include)
 		show_messages(x, "adjacent")
 		v <- do.call(rbind, v)
 		return(v+1)
+	}
+)
+
+
+setMethod("align", signature(x="SpatExtent", y="SpatRaster"), 
+	function(x, y, snap="near", ...) {
+		x@ptr <- y@ptr$align(x@ptr, tolower(snap))
+		#show_messages(x, "align")
+		x
 	}
 )
 
@@ -35,7 +30,6 @@ setMethod("area", signature(x="SpatRaster"),
 		show_messages(x, "area")
 	}
 )
-
 
 setMethod("atan2", signature(y="SpatRaster", x="SpatRaster"),
 	function(y, x) { 
@@ -51,6 +45,20 @@ setMethod("boundaries", signature(x="SpatRaster"),
 		opt <- .runOptions(filename, overwrite,wopt)
 		x@ptr <- x@ptr$boundaries(classes[1], type[1], directions[1], opt)
 		show_messages(x, "boundaries")
+	}
+)
+
+
+setMethod("c", signature(x="SpatRaster"), 
+	function(x, ...) {
+		dots <- list(...)
+		for (i in dots) {
+			if (class(i) == "SpatRaster") {
+				x@ptr <- x@ptr$combineSources(i@ptr)
+			}
+		}
+		x@ptr$setNames(x@ptr$names)
+		show_messages(x, "c")		
 	}
 )
 
@@ -75,7 +83,7 @@ function(x, rcl, include.lowest=FALSE, right=TRUE, othersNA=FALSE, filename="", 
 
 	opt <- .runOptions(filename, overwrite, wopt)
     x@ptr <- x@ptr$classify(as.vector(rcl), NCOL(rcl), right, include.lowest, othersNA, opt)
-	show_messages(x, "classify")	
+	show_messages(x, "classify")
 }
 )
 
@@ -90,6 +98,16 @@ setMethod("crop", signature(x="SpatRaster", y="ANY"),
 		opt <- .runOptions(filename, overwrite, wopt)
 		x@ptr <- x@ptr$crop(y@ptr, snap[1], opt)
 		show_messages(x, "crop")		
+	}
+)
+
+
+
+setMethod("collapse", signature(x="SpatRaster"), 
+	function(x, y, filename="", overwrite=FALSE, wopt=list(), ...) { 
+		opt <- .runOptions(filename, overwrite, wopt)
+		x@ptr <- x@ptr$collapse(y@ptr, opt)
+		show_messages(x, "collapse")		
 	}
 )
 
@@ -120,6 +138,21 @@ setMethod("flip", signature(x="SpatRaster"),
 )
 
 
+setMethod("freq", signature(x="SpatRaster"), 
+	function(x, bylayer=TRUE, ...) {
+		v <- x@ptr$freq(bylayer[1])
+		if (bylayer) {
+			v <- lapply(1:length(v), function(i) cbind(i, matrix(v[[i]], ncol=2)))
+			v <- do.call(rbind, v)
+			colnames(v) <- c("layer", "value", "count")
+		} else {
+			v <- matrix(v[[1]], ncol=2, dimnames=list(NULL, c("value", "count")))
+		}
+		v
+	}
+)
+
+
 setMethod("mask", signature(x="SpatRaster", mask="SpatRaster"), 
 	function(x, mask, inverse=FALSE, maskvalue=NA, updatevalue=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
 		opt <- .runOptions(filename, overwrite,wopt)
@@ -137,6 +170,7 @@ setMethod("mask", signature(x="SpatRaster", mask="SpatVector"),
 )
 
 
+
 setMethod("project", signature(x="SpatRaster"), 
 	function(x, crs, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
 		opt <- .runOptions(filename, overwrite, wopt)
@@ -152,6 +186,15 @@ setMethod("project", signature(x="SpatVector"),
 	}
 )
 
+
+setMethod("quantile", signature(x="SpatRaster"), 
+	function(x, probs=seq(0, 1, 0.25), na.rm=FALSE, filename="", overwrite=FALSE, wopt=list(), ...) { 
+		opt <- .runOptions(filename, overwrite, wopt)
+		x@ptr <- x@ptr$quantile(probs, na.rm[1], opt)
+		show_messages(x, "quantile")
+	}
+)
+
 setMethod("rasterize", signature(x="SpatVector", y="SpatRaster"), 
 	function(x, y, background=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
 		opt <- .runOptions(filename, overwrite, wopt)
@@ -159,8 +202,6 @@ setMethod("rasterize", signature(x="SpatVector", y="SpatRaster"),
 		show_messages(y, "rasterize")
 	}
 )
-
-
 
 
 setMethod("rotate", signature(x="SpatRaster"), 
@@ -171,14 +212,6 @@ setMethod("rotate", signature(x="SpatRaster"),
 	}
 )
 
-
-setMethod("sampleRegular", signature(x="SpatRaster", size="numeric"), 
-	function(x, size, ...) { 
-		size <- max(1, min(size(x), size))
-		x@ptr <- x@ptr$sampleRegular(size)
-		show_messages(x, "sampleRegular")		
-	}
-)
 
 
 setMethod("shift", signature(x="SpatRaster"), 

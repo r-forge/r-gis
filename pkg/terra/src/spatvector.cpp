@@ -74,6 +74,10 @@ SpatGeom::SpatGeom(SpatPart p) {
 	extent = p.extent;
 }
 
+SpatGeom::SpatGeom(SpatGeomType g) {
+	gtype = g;
+}
+
 bool SpatGeom::addPart(SpatPart p) {
 	parts.push_back(p);
 	if (parts.size() > 1) {
@@ -232,21 +236,18 @@ unsigned SpatVector::nxy() {
 
 
 std::vector<std::vector<double>> SpatVector::coordinates() {
-	SpatGeom g;
-	SpatPart p;
-	SpatHole h;
 	std::vector<std::vector<double>> out(2);
 	for (size_t i=0; i < size(); i++) {
-		g = getGeom(i);
+		SpatGeom g = getGeom(i);
 		for (size_t j=0; j < g.size(); j++) {
-			p = g.getPart(j);
+			SpatPart p = g.getPart(j);
 			for (size_t q=0; q < p.x.size(); q++) {
 				out[0].push_back( p.x[q] );
 				out[1].push_back( p.y[q] );
 			}
 			if (p.hasHoles()) {
 				for (size_t k=0; k < p.nHoles(); k++) {
-					h = p.getHole(k);
+					SpatHole h = p.getHole(k);
 					for (size_t q=0; q < h.x.size(); q++) {
 						out[0].push_back( h.x[q] );
 						out[1].push_back( h.y[q] );
@@ -261,25 +262,22 @@ std::vector<std::vector<double>> SpatVector::coordinates() {
 
 
 SpatDataFrame SpatVector::getGeometryDF() {
-	unsigned n = nxy();
 
-	SpatGeom g;
-	SpatPart p;
-	SpatHole h;
 	SpatDataFrame out;
-
 	out.add_column(1, "geom");
 	out.add_column(1, "part");
 	out.add_column(0, "x");
 	out.add_column(0, "y");
 	out.add_column(1, "hole");
+
+	unsigned n = nxy();
 	out.resize_rows(n);
 
 	size_t idx = 0;
 	for (size_t i=0; i < size(); i++) {
-		g = getGeom(i);
+		SpatGeom g = getGeom(i);
 		for (size_t j=0; j < g.size(); j++) {
-			p = g.getPart(j);
+			SpatPart p = g.getPart(j);
 			for (size_t q=0; q < p.x.size(); q++) {
 				out.iv[0][idx] = i+1;
 				out.iv[1][idx] = j+1;
@@ -290,7 +288,7 @@ SpatDataFrame SpatVector::getGeometryDF() {
 			}
 			if (p.hasHoles()) {
 				for (size_t k=0; k < p.nHoles(); k++) {
-					h = p.getHole(k);
+					SpatHole h = p.getHole(k);
 					for (size_t q=0; q < h.x.size(); q++) {
 						out.iv[0][idx] = i+1;
 						out.iv[1][idx] = j+1;
@@ -407,9 +405,10 @@ SpatVector SpatVector::subset_rows(int i) {
 
 
 SpatVector SpatVector::subset_cols(std::vector<int> range) {
-	SpatVector out;
-	out.lyr.geoms = lyr.geoms;
-	out.lyr.crs = lyr.crs;
+	SpatVector out = *this;
+	//out.lyr.geoms = lyr.geoms;
+	//out.lyr.crs = lyr.crs;
+	//out.lyr.extent = lyr.extent;
 	int nc = ncol();
 
 	std::vector<unsigned> r;

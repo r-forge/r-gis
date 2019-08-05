@@ -27,7 +27,7 @@
 
 
 setMethod("extract", signature(x="SpatRaster", y="SpatVector"), 
-function(x, y, fun=NULL, ...) { 
+function(x, y, fun=NULL, ..., drop=FALSE) { 
     r <- x@ptr$extractVector(y@ptr)
 	x <- show_messages(x, "extract")
 
@@ -37,9 +37,15 @@ function(x, y, fun=NULL, ...) {
 	if (!is.null(fun)) {
 	  	r <- rapply(r, fun, ...)
 		r <- matrix(r, nrow=nrow(y), byrow=TRUE)
+		colnames(r) <- names(x)
+	} else if (drop) {
+		r <- unlist(r)
+		r <- matrix(r, nrow=nrow(y), byrow=TRUE)
+		colnames(r) <- names(x)	
 	}
 	r
 })
+
 
 setMethod("[", c("SpatRaster", "SpatVector", "missing"),
 function(x, i, j, ... , drop=FALSE) {
@@ -70,7 +76,7 @@ function(x, i, j, ... , drop=FALSE) {
 
 setMethod("[", c("SpatRaster", "numeric", "missing"),
 function(x, i, j, ... ,drop=FALSE) {
-	if (any(na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
+	if (any(stats::na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
 	if (nargs() > 2) {
 		i <- cellFromRowCol(x, i, 1:ncol(x))
 		# probably better to do return( readValues(x, i-1) )
@@ -90,7 +96,7 @@ function(x, i, j, ... ,drop=FALSE) {
 setMethod("[", c("SpatRaster", "missing", "numeric"),
 function(x, i, j, ... ,drop=FALSE) {
 	i <- cellFromRowCol(x, 1:nrow(x), j)
-	if (any(na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
+	if (any(stats::na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
 	
 	r <- x@ptr$extractCell(i-1)
 	show_messages(x)
@@ -107,7 +113,7 @@ function(x, i, j, ... ,drop=FALSE) {
 setMethod("[", c("SpatRaster", "numeric", "numeric"),
 function(x, i, j, ..., drop=FALSE) {
 	i <- cellFromRowColCombine(x, i, j)
-	if (any(na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
+	if (any(stats::na.omit(i) > 2^.Machine$double.digits)) .big_number_warning()
 	r <- x@ptr$extractCell(i-1)
 	show_messages(x)
 	if (drop) {

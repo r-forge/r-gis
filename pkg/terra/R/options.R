@@ -11,7 +11,7 @@
  
 .setOptions <- function(x, opt) {
 	nms <- names(opt)
-	s <- nms %in% c("progress", "tempdir", "memfrac", "datatype", "filetype", "filename", "overwrite")
+	s <- nms %in% c("progress", "tempdir", "memfrac", "datatype", "filetype", "filename", "overwrite", "todisk")
 	
 	if (any(!s)) {
 		warning(paste(nms[!s], collapse = ", "), " invalid option(s)")
@@ -41,6 +41,7 @@
 		opt$overwrite <- overwrite[1]
 	}
 	#show_messages(opt)
+	#opt$todisk <- TRUE
 	opt
 }
 
@@ -51,6 +52,8 @@
 	cat("datatype    :" , opt$def_datatype, "\n")
 	cat("filetype    :" , opt$def_filetype, "\n")
 }
+
+
  
 terraOptions <- function(...) {
 	dots <- list(...)
@@ -62,4 +65,21 @@ terraOptions <- function(...) {
 		.terra_environment$options@ptr <- opt
 	}
 }
+
+
+tmpFiles <- function(old=FALSE, remove=FALSE) {
+	d <- .terra_environment$options@ptr$tempdir
+	if (old) {
+		f <- list.files(dirname(d), recursive=TRUE, pattern="^spat_", full.names=TRUE)
+	} else {
+		f <- list.files(d, pattern="^spat", full.names=TRUE)
+	}
+	if (remove) {
+		file.remove(f) 
+		return(invisible(f))
+	} else {
+		return(f)
+	}
+}
+
 

@@ -18,93 +18,7 @@
 //#include <type_traits>
 #include "spatRaster.h"
 #include "vecmath.h"
-
-
-template <typename T>
-void cumsum(std::vector<T>& v, bool narm) {
-    if (narm) {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i])) {
-                v[i] = v[i-1];
-            } else if (!is_NA(v[i-1])){
-                v[i] += v[i-1];
-            }
-        }
-    } else {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i]) | is_NA(v[i-1])) {
-                v[i] = NA<T>::value;
-            } else {
-                v[i] += v[i-1];
-            }
-        }
-    }
-}
-
-template <typename T>
-void cumprod(std::vector<T>& v, bool narm) {
-    if (narm) {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i])) {
-                v[i] = v[i-1];
-            } else if (!is_NA(v[i-1])){
-                v[i] *= v[i-1];
-            }
-        }
-    } else {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i]) | is_NA(v[i-1])) {
-                v[i] = NA<T>::value;
-            } else {
-                v[i] *= v[i-1];
-            }
-        }
-    }
-}
-
-
-template <typename T>
-void cummax(std::vector<T>& v, bool narm) {
-    if (narm) {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i])) {
-                v[i] = v[i-1];
-            } else if (!is_NA(v[i-1])){
-                v[i] = std::max(v[i], v[i-1]);
-            }
-        }
-    } else {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i]) | is_NA(v[i-1])) {
-                v[i] = NA<T>::value;
-            } else {
-                v[i] = std::max(v[i], v[i-1]);
-            }
-        }
-    }
-}
-
-
-template <typename T>
-void cummin(std::vector<T>& v, bool narm) {
-    if (narm) {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i])) {
-                v[i] = v[i-1];
-            } else if (!is_NA(v[i-1])){
-                v[i] = std::min(v[i], v[i-1]);
-            }
-        }
-    } else {
-        for (size_t i=1; i<v.size(); i++) {
-            if (is_NA(v[i]) | is_NA(v[i-1])) {
-                v[i] = NA<T>::value;
-            } else {
-                v[i] = std::min(v[i], v[i-1]);
-            }
-        }
-    }
-}
+#include "modal.h"
 
 
 SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions &opt) {
@@ -117,7 +31,7 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions &opt) {
 		return out;
 	}
 	if (!hasValues()) {
-		out.setError("raster has no values");
+	//	out.setError("raster has no values");
 		return out;
 	}
 
@@ -155,62 +69,64 @@ SpatRaster SpatRaster::cum(std::string fun, bool narm, SpatOptions &opt) {
 }
 
 
+double vstdev(std::vector<double> v, bool narm) {
+	double m = vmean(v, narm);
+	for (double& d : v) d = pow(d - m, 2);
+	m = vmean(v, narm);
+	return sqrt(m);
+}
+	
+
 
 SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bool narm, SpatOptions &opt) {
 
 	SpatRaster out = geometry(1);
 
-	std::vector<std::string> f {"sum", "mean", "min", "max", "range", "prod", "any", "all"};
+	std::vector<std::string> f {"sum", "mean", "min", "max", "range", "prod", "any", "all", "stdev"};
 	if (std::find(f.begin(), f.end(), fun) == f.end()) {
 		out.setError("unknown summary function");
 		return out;
 	}
 
 	if (fun == "range") {
-		out.source[0].nlyr = 2;
-		out.source[0].names.resize(2);
-		out.source[0].names[0] = "range_min" ;
-		out.source[0].names[1] = "range_max" ;
-	} else {
-		out.source[0].names[0] = fun;
-	}
+		return range(add, narm, opt);
+	} 
+	out.source[0].names[0] = fun;
+  	if (!hasValues()) { return out; }
 
+	std::function<double(std::vector<double>&, bool)> sumFun;
+	if (fun == "sum") {
+		sumFun = vsum<double>;
+	} else if (fun == "mean") {
+		sumFun = vmean<double>;
+	} else if (fun == "prod") {
+		sumFun = vprod<double>;
+	} else if (fun == "min") {
+		sumFun = vmin<double>;
+	} else if (fun == "max") {
+		sumFun = vmax<double>;
+	} else if (fun == "any") {
+		sumFun = vany<double>;
+	} else if (fun == "all") {
+		sumFun = vall<double>;
+	} else if (fun == "stdev") {
+		sumFun = vstdev;
+	}
   	if (!out.writeStart(opt)) { return out; }
 	readStart();
 	unsigned nl = nlyr();
 	std::vector<double> v(nl);
 	v.insert( v.end(), add.begin(), add.end() );
 
-	//unsigned nc;
-	unsigned nlout = out.nlyr();
-
 	for (size_t i = 0; i < out.bs.n; i++) {
 		std::vector<double> a = readBlock(out.bs, i);
 		unsigned nc = out.bs.nrows[i] * out.ncol();
-		std::vector<double> b(nc * nlout);
+		std::vector<double> b(nc);
 		for (size_t j=0; j<nc; j++) {
 			for (size_t k=0; k<nl; k++) {
 				v[k] = a[j+k*nc];
 			}
-			if (fun == "sum") {
-				b[j] = vsum(v, narm);
-			} else if (fun == "mean") {
-				b[j] = vmean(v, narm);
-			} else if (fun == "prod") {
-				b[j] = vprod(v, narm);
-			} else if (fun == "min") {
-				b[j] = vmin(v, narm);
-			} else if (fun == "max") {
-				b[j] = vmax(v, narm);
-			} else if (fun == "any") {
-				b[j] = vany(v, narm);
-			} else if (fun == "all") {
-				b[j] = vall(v, narm);
-			} else if (fun == "range") {
-                std::vector<double> rng = vrange(v, narm);
-				b[j] = rng[0];
-				b[j+nc] = rng[1];
-			}
+			b[j] = sumFun(v, narm);
 		}
 		if (!out.writeValues(b, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 
@@ -224,5 +140,86 @@ SpatRaster SpatRaster::summary_numb(std::string fun, std::vector<double> add, bo
 SpatRaster SpatRaster::summary(std::string fun, bool narm, SpatOptions &opt) {
 	std::vector<double> add;
 	return summary_numb(fun, add, narm, opt);
+}
+
+
+
+SpatRaster SpatRaster::modal(std::vector<double> add, std::string ties, bool narm, SpatOptions &opt) {
+
+	SpatRaster out = geometry(1);
+	out.source[0].names[0] = "modal" ;
+  	if (!hasValues()) { return out; }
+
+
+	std::vector<std::string> f {"lowest", "highest", "first", "random", "NA"};
+	//std::vector<std::string>::iterator it; 
+	auto it = std::find(f.begin(), f.end(), ties);
+	if (it == f.end()) {
+		out.setError("unknown summary function");
+		return out;
+	} 
+	size_t ities = std::distance(f.begin(), it);
+
+  	if (!out.writeStart(opt)) { return out; }
+
+	uint32_t seed = 1;
+	std::default_random_engine rgen(seed);
+	std::uniform_real_distribution<double> dist (0.0,1.0);
+
+	readStart();
+	unsigned nl = nlyr();
+	std::vector<double> v(nl);
+	v.insert( v.end(), add.begin(), add.end() );
+
+	for (size_t i = 0; i < out.bs.n; i++) {
+		std::vector<double> a = readBlock(out.bs, i);
+		unsigned nc = out.bs.nrows[i] * out.ncol();
+		std::vector<double> b(nc);
+		for (size_t j=0; j<nc; j++) {
+			for (size_t k=0; k<nl; k++) {
+				v[k] = a[j+k*nc];
+			}		
+			b[j] = modal_value(v, ities, narm, rgen, dist);
+		}
+		if (!out.writeValues(b, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
+	}
+	out.writeStop();
+	readStop();
+	return(out);
+}
+
+
+
+SpatRaster SpatRaster::range(std::vector<double> add, bool narm, SpatOptions &opt) {
+	SpatRaster out = geometry(2);
+	out.source[0].names.resize(2);
+	out.source[0].names[0] = "range_min" ;
+	out.source[0].names[1] = "range_max" ;
+  	if (!hasValues()) { return out; }
+
+  	if (!out.writeStart(opt)) { return out; }
+	readStart();
+	unsigned nl = nlyr();
+	std::vector<double> v(nl);
+	v.insert( v.end(), add.begin(), add.end() );
+
+	for (size_t i = 0; i < out.bs.n; i++) {
+		std::vector<double> a = readBlock(out.bs, i);
+		unsigned nc = out.bs.nrows[i] * out.ncol();
+		std::vector<double> b(nc * 2);
+		for (size_t j=0; j<nc; j++) {
+			for (size_t k=0; k<nl; k++) {
+				v[k] = a[j+k*nc];
+			}
+			std::vector<double> rng = vrange(v, narm);
+			b[j] = rng[0];
+			b[j+nc] = rng[1];
+		}
+		if (!out.writeValues(b, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
+
+	}
+	out.writeStop();
+	readStop();
+	return(out);
 }
 

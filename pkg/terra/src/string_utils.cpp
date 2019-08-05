@@ -21,6 +21,22 @@
 #include <vector>
 #include <numeric>
 
+std::string double_to_string(double x) { 
+	std::string s = std::to_string (x);
+	s.erase( s.find_last_not_of('0') + 1, std::string::npos );
+	s.erase( s.find_last_not_of('.') + 1, std::string::npos );
+	return s;
+}
+
+
+std::vector<std::string> double_to_string(const std::vector<double> &x, std::string prep) { 
+	std::vector<std::string> out(x.size());
+	for (size_t i=0; i<x.size(); i++) {
+		out[i] = prep + double_to_string (x[i]);
+	}
+	return out;
+}
+
 
 std::string concatenate(std::vector<std::string> v, std::string delim) {
 	for (size_t i=0; i<(v.size()-1); i++) {
@@ -49,6 +65,15 @@ bool is_in_set(std::string s, std::vector<std::string> ss) {
 	std::set<std::string> sset (ss.begin(), ss.end());
 	return sset.find(s) != sset.end();
 }
+
+
+/*
+unsigned where_in_set(std::string s, std::vector<std::string> ss) {
+	std::set<std::string> sset (ss.begin(), ss.end());
+	unsigned out = sset.find(s);
+	return out;
+}
+*/
 
 std::string is_in_set_default(std::string s, std::vector<std::string> ss, std::string defvalue, bool tolower) {
 	if (tolower) lowercase(s);

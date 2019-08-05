@@ -17,7 +17,7 @@ function(x, subset, filename="", overwrite=FALSE, wopt=list(), ...) {
 		subset <- i
 	}
 
-	subset <- as.integer(subset - 1)
+	subset <- as.integer(stats::na.omit(subset) - 1)
 	
 	opt <- .runOptions(filename, overwrite, wopt)
 	x@ptr <- x@ptr$subset(subset, opt)
@@ -39,6 +39,11 @@ function(x, i, j, ... ,drop=TRUE) {
 setMethod("[[", c("SpatRaster", "character", "missing"),
 function(x, i, j, ... ,drop=TRUE) {
 	subset(x, i, ...)
+})
+
+setMethod("[[", c("SpatRaster", "logical", "missing"),
+function(x, i, j, ... ,drop=TRUE) {
+	subset(x, which(i), ...)
 })
 
 
@@ -68,16 +73,12 @@ setMethod("subset", signature(x="SpatVector"),
 	x <- show_messages(x, "subset")
 	if (drop) {	# drop geometry
 		d <- x@ptr$getDF()
-		as.data.frame(d)
+		as.data.frame(d, stringsAsFactors=FALSE)
 	} else {
 		x
 	}
 }
 
-setMethod("$", "SpatVector",  function(x, name) { 
-	s <- .subset_cols(x, name, drop=TRUE) 
-	s[,1,drop=TRUE]
-})
 
 
 setMethod("[[", c("SpatVector", "numeric", "missing"),
@@ -97,12 +98,23 @@ function(x, i, j, ... , drop=FALSE) {
 	x@ptr <- x@ptr$subset_rows(i-1)
 	x <- show_messages(x)
 	if (drop) {
-		as.data.frame(x)
+		as.data.frame(x, stringsAsFactors=FALSE)
 	} else {
 		x
 	}
 })
 
+setMethod("[", c("SpatVector", "logical", "missing"),
+function(x, i, j, ... , drop=FALSE) {
+	i <- which(i)
+	x@ptr <- x@ptr$subset_rows(i-1)
+	x <- show_messages(x)
+	if (drop) {
+		as.data.frame(x, stringsAsFactors=FALSE)
+	} else {
+		x
+	}
+})
 
 setMethod("[", c("SpatVector", "numeric", "numeric"),
 function(x, i, j, ... , drop=FALSE) {
@@ -110,7 +122,7 @@ function(x, i, j, ... , drop=FALSE) {
 	x@ptr <- p$subset_cols(j-1)	
 	x <- show_messages(x)
 	if (drop) {
-		as.data.frame(x)
+		as.data.frame(x, stringsAsFactors=FALSE)
 	} else {
 		x
 	}
@@ -122,7 +134,7 @@ function(x, i, j, ... , drop=FALSE) {
 	x@ptr <- x@ptr$subset_cols(j-1)	
 	x <- show_messages(x)
 	if (drop) {
-		as.data.frame(x)
+		as.data.frame(x, stringsAsFactors=FALSE)
 	} else {
 		x
 	}
@@ -131,7 +143,7 @@ function(x, i, j, ... , drop=FALSE) {
 setMethod("[", c("SpatVector", "missing", "character"),
 function(x, i, j, ... , drop=FALSE) {
 	m <- match(j, names(x))
-	m <- na.omit(m)
+	m <- stats::na.omit(m)
 	if (length(m) == 0) { 
 		m <- 0
 	}
@@ -140,8 +152,40 @@ function(x, i, j, ... , drop=FALSE) {
 
 setMethod("[", c("SpatVector", "numeric", "character"),
 function(x, i, j, ... , drop=FALSE) {
-	m <- match(j, names(x))
-	m <- na.omit(m)
-	if (length(m) == 0) m[,m,drop=drop]
+	x <- x[i,]
+	j <- match(j, names(x))
+	j <- stats::na.omit(j)
+	if (length(j) == 0) j <- 0
+	x[,j,drop=drop]
+})
+
+
+setMethod("[", c("SpatVector", "logical", "character"),
+function(x, i, j, ... , drop=FALSE) {
+	x <- x[i,]
+	j <- match(j, names(x))
+	j <- stats::na.omit(j)
+	if (length(j) == 0) j <- 0
+	x[,j,drop=drop]
+})
+
+
+setMethod("[", c("SpatVector", "logical", "numeric"),
+function(x, i, j, ... , drop=FALSE) {
+	x <- x[i,]
+	j <- stats::na.omit(j)
+	if (length(j) == 0) j <- 0
+	x[,j,drop=drop]
+})
+
+
+
+setMethod("[", c("SpatVector", "missing", "missing"),
+function(x, i, j, ... , drop=FALSE) {
+	if (drop) {
+		values(x)
+	} else {
+		x
+	}
 })
 

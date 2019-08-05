@@ -18,30 +18,35 @@
 \alias{Compare,SpatRaster,math-method}
 \alias{Math,SpatRaster-method}
 \alias{Math2,SpatRaster-method}
+\alias{Math,SpatExtent-method}
+\alias{Math2,SpatExtent-method}
+\alias{Compare,SpatExtent,SpatExtent-method}
 
 \title{Mathematical operations with SpatRaster objects}
 
 \description{
-Standard arithmetic operators for computations with Raster* objects and numeric values. The following operators and methods are available:
 
-\code{ +, -, *, /, ^, \%\%, \%/\% }
+Standard arithmetic operators for computations with SpatRaster objects and numeric values. The following operators and methods are available for SpatRaster:
 
-\code{==, !=, >, <,  <=, >=}
+\bold{Arith}: \code{ +, -, *, /, ^, \%\%, \%/\% }
+
+\bold{Compare}: \code{==, !=, >, <,  <=, >=}
+
+\bold{\code{\link{Summary}}}: \code{"max", "min", "range", "prod", "sum", "any", "all"}
  
-\code{"abs", "sign", "sqrt", "ceiling", "floor", "trunc",  "cummax", "cummin", }
-
-\code{"cumprod", "cumsum", "log", "log10", "log2", "log1p", "acos", "acosh", "asin", }
-
-\code{"asinh", "atan", "atanh", "exp", "expm1", "cos", "cosh", "sin", "sinh", "tan", "tanh"}. 
+\bold{Math}: \code{"abs", "sign", "sqrt", "ceiling", "floor", "trunc",  "cummax", "cummin", "cumprod", "cumsum", "log", "log10", "log2", "log1p", "acos", "acosh", "asin", "asinh", "atan", "atanh", "exp", "expm1", "cos", "cosh", "sin", "sinh", "tan", "tanh"}
  
-\code{"round", "signif"}
+\bold{Math2}: \code{"round", "signif"}
  
 If multiple SpatRaster objects are used, these must have the same extent and resolution. Operators are applied on a cell by cell basis.
+
+For \bold{SpatExtent} the following methods have been implemented: \code{"round", "floor", "ceil", "=="}
+
 }
 
 
 \section{Note}{
-You can use the somewhat more flexible \code{\link{reduce}} method instead of the Math-methods.
+You can use the somewhat more flexible \code{\link{app}} method instead of the Math-methods.
 }
 
 

@@ -1,6 +1,6 @@
 # Author: Robert J. Hijmans
-# Date :  June 2008
-# Version 0.9
+# Date :  June 2019
+# Version 1.0
 # Licence GPL v3
 
 
@@ -26,7 +26,7 @@
 		
 		
 	if (missing(main)) {
-		main <- ''
+		main <- ""
 	}
 	
 	if (missing(xlab)) {
@@ -94,7 +94,7 @@
 		if (! gridded) {
 			if (add) {
 				for (i in 1:nl) {
-					points(x[,i], y[,i], cex=cex, ...)			
+					graphics::points(x[,i], y[,i], cex=cex, ...)			
 				}				
 			} else {
 				for (i in 1:nl) {
@@ -109,7 +109,7 @@
 	} else  {
 		if (! gridded) {
 			if (add) {
-				points(x, y, cex=cex, ...)
+				graphics::points(x, y, cex=cex, ...)
 			} else {
 				plot(x, y, cex=cex, xlab=ln1[1], ylab=ln2[1], main=main[1], ...)			
 			}
@@ -146,7 +146,7 @@ setMethod("plot", signature(x="SpatRaster", y="SpatRaster"),
 .plotdens <- function(x, y, nc, nr, asp=NULL, xlim=NULL, ylim=NULL, ...) {
 	xy <- stats::na.omit(cbind(x,y))
 	if (nrow(xy) == 0) {
-		stop('only NA values (in this sample?)')
+		stop("only NA values (in this sample?)")
 	}
 	r <- apply(xy, 2, range)
 	rx <- r[,1]

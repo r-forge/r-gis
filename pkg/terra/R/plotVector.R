@@ -1,28 +1,45 @@
 # Author: Robert J. Hijmans
-# Date :  June 2008
+# Date :  June 2019
 # Version 1.0
 # License GPL v3
 
-setMethod("plot", signature(x="SpatVector", y="missing"), 
-	function(x, y, xlab="", ylab="", add=FALSE, ...)  {
-		if (add) {
-			lines(x, ...)
-			invisible();
+.getCols <- function(n, cols) {
+	if (!is.null(cols)) {
+		ncols <- length(cols)
+		if (ncols > n) {
+			steps <- ncols/n
+			i <- round(seq(1, ncols, steps))
+			cols <- cols[i]				
+		} else if (ncols < n) {
+			cols <- rep_len(cols, n)
 		}
+	} 
+	cols
+}
+
+setMethod("plot", signature(x="SpatVector", y="missing"), 
+	function(x, y, col=NULL, xlab="", ylab="", axes=TRUE, add=FALSE, ...)  {
 		g <- geom(x)
 		gtype <- geomtype(x)
-
 		if (couldBeLonLat(x, warn=FALSE)) {
 			asp <- 1/cos((mean(as.vector(ext(x))[3:4]) * pi)/180)
 		} else {
 			asp <- 1
 		}
+		col <- .getCols(size(x), col)
 		
 		if (gtype == "points") {
-			plot(g[,3], g[,4], xlab=xlab, ylab=ylab, asp=asp, ...)
+			if (is.null(col)) col = "black"
+			if (add) {
+				points(g[,3], g[,4], col=col, ...)			
+			} else {
+				plot(g[,3], g[,4], col=col, axes=axes, xlab=xlab, ylab=ylab, asp=asp, ...)
+			}
 		} else {
 			e <- matrix(as.vector(ext(x)), 2)
-			plot(e, type="n", xlab=xlab, ylab=ylab, asp=asp, ...)
+			if (!add) {
+				plot(e, type="n", axes=axes, xlab=xlab, ylab=ylab, asp=asp, ...)
+			}
 			g <- split(g, g[,1])
 			if (gtype == "polygons") {
 				g <- lapply(g, function(x) split(x, x[,2]))
@@ -35,12 +52,18 @@ setMethod("plot", signature(x="SpatVector", y="missing"),
 						a <- a[-nrow(a), ]
 						g[[i]][[1]] <- a
 					}
-					graphics::polypath(a[,3:4], rule = "evenodd", ...)
+					graphics::polypath(a[,3:4], col=col[i], rule = "evenodd", ...)
 				}
 
 			} else {
 				g <- lapply(g, function(x) split(x, x[,2]))
-				p <- sapply(g, function(x) lapply(x, function(y) lines(y[,3:4], ...)))			
+				#p <- sapply(g, function(x) lapply(x, function(y) lines(y[,3:4], ...))	
+				for (i in 1:length(g)) {
+					x <- g[[i]]
+					for (j in 1:length(x)) {
+						lines(x[[j]][,3:4], col=col[i], ...)
+					}
+				}
 			}
 		}
 	}
@@ -48,11 +71,13 @@ setMethod("plot", signature(x="SpatVector", y="missing"),
 
 
 setMethod("lines", signature(x="SpatVector"), 
-	function(x, ...)  {
+	function(x, col=NULL, ...)  {
+		if (is.null(col)) col <- "black"
 		g <- geom(x)
 		gtype <- geomtype(x)
+		col <- .getCols(size(x), col)
 		if (gtype == "points") {
-			points(g[,3:4], ...)
+			graphics::points(g[,3:4], col=col, ...)
 		} else {
 			g <- split(g, g[,1])
 			if (gtype == "polygons") {
@@ -60,7 +85,15 @@ setMethod("lines", signature(x="SpatVector"),
 			} else {
 				g <- lapply(g, function(x) split(x, x[,2]))
 			}
-			p <- sapply(g, function(x) lapply(x, function(y) lines(y[,3:4], ...)))
+			#p <- sapply(g, function(x) lapply(x, function(y) graphics::lines(y[,3:4], ...)))
+			for (i in 1:length(g)) {
+				x <- g[[i]]
+				for (j in 1:length(x)) {
+					lines(x[[j]][,3:4], col=col[i], ...)
+				}
+			}
+			
+			
 		}
 	}
 )
@@ -68,18 +101,10 @@ setMethod("lines", signature(x="SpatVector"),
 
 
 setMethod("points", signature(x="SpatVector"), 
-	function(x, ...)  {
-		points(geom(x)[,3:4], ...)
+	function(x, col=NULL, ...)  {
+		col <- .getCols(size(x), col)
+		if (is.null(col)) col <- "black"
+		graphics::points(geom(x)[,3:4], col=col, ...)
 	}
 )
-
-
-setMethod("lines", signature(x="SpatExtent"), 
-	function(x, ...)  {
-		e <- as.vector(x)
-		p <- rbind(c(e[1],e[3]), c(e[1],e[4]), c(e[2],e[4]), c(e[2],e[3]), c(e[1],e[3]))
-		lines(p, ...)		
-	}
-)
-
 
