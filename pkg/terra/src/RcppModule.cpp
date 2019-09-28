@@ -1,6 +1,77 @@
 #include <Rcpp.h>
 #include "spatRaster.h"
-#include "RcppFunctions.h"
+
+#include "gdal_priv.h"
+
+
+Rcpp::List getBlockSizeR(SpatRaster* r, unsigned n) { 
+    BlockSize bs = r->getBlockSize(n);
+	Rcpp::List L = Rcpp::List::create(Rcpp::Named("row") = bs.row, Rcpp::Named("nrows") = bs.nrows, Rcpp::Named("n") = bs.n);
+	return(L);
+}
+
+
+Rcpp::List getDataFrame(SpatDataFrame* v) {
+	unsigned n = v->ncol();
+	Rcpp::List out(n);	
+	if (n == 0) {
+		return(out);
+	} 
+
+	std::vector<std::string> nms = v->names;
+	std::vector<unsigned> itype = v->itype;
+	for (size_t i=0; i < n; i++) {
+		if (itype[i] == 0) {
+			out[i] = v->getD(i);
+		} else if (itype[i] == 1) {
+			out[i] = v->getI(i);
+		} else {
+			out[i] = v->getS(i);
+		}
+	}	
+	out.names() = nms;
+	// todo: deal with NAs in int and str
+	return out;
+//  Rcpp::df is nice, but no of variables is <= 20, 
+//  and no "stringsAsFactors"=false
+//	Rcpp::DataFrame result(out);
+//	result.attr("names") = v->names();
+//	return result;
+}	
+
+
+
+Rcpp::List getVectorAttributes(SpatVector* v) {
+	SpatDataFrame df = v->lyr.df;
+	Rcpp::List lst = getDataFrame(&df);
+	return lst;
+}
+
+Rcpp::List getRasterAttributes(SpatRaster* x) {
+	Rcpp::List lst;
+	if (x->nlyr() > 0) {
+		SpatDataFrame df = x->source[0].atts[0];
+		lst = getDataFrame(&df);
+	}
+	return lst;
+}
+
+
+
+Rcpp::DataFrame getGeometry(SpatVector* v) {
+	SpatDataFrame df = v->getGeometryDF();
+
+	Rcpp::DataFrame out = Rcpp::DataFrame::create(
+			Rcpp::Named("id") = df.iv[0], 
+			Rcpp::Named("part") = df.iv[1], 
+			Rcpp::Named("x") = df.dv[0],
+			Rcpp::Named("y") = df.dv[1],
+			Rcpp::Named("hole") = df.iv[2]
+	);
+	return out;
+}
+
+
 
 RCPP_EXPOSED_CLASS(SpatMessages)
 RCPP_EXPOSED_CLASS(SpatOptions)
@@ -17,6 +88,7 @@ RCPP_MODULE(spat){
 
     using namespace Rcpp;
 
+
     class_<SpatExtent>("SpatExtent")
 		.constructor()
 		.constructor<double, double, double, double>()
@@ -27,6 +99,7 @@ RCPP_MODULE(spat){
 		.method("equal", &SpatExtent::equal, "equal")		
 		.method("floor", &SpatExtent::floor, "floor")		
 		.method("round", &SpatExtent::round, "round")		
+		.method("union", &SpatExtent::unite, "union")		
 	;	
 
     class_<SpatMessages>("SpatMessages")
@@ -56,6 +129,8 @@ RCPP_MODULE(spat){
 
 		.property("todisk", &SpatOptions::get_todisk, &SpatOptions::set_todisk)
 		.field("messages", &SpatOptions::msg, "messages")
+		.field("gdal_options", &SpatOptions::gdal_options, "gdal_options")
+		.field("names", &SpatOptions::names, "names")
 	//	.property("overwrite", &SpatOptions::set_overwrite, &SpatOptions::get_overwrite )
 		//.field("gdaloptions", &SpatOptions::gdaloptions)		
 	;
@@ -102,7 +177,7 @@ RCPP_MODULE(spat){
 		.method("distance_other", (SpatDataFrame (SpatVector::*)(SpatVector, bool))( &SpatVector::distance))
 //		.method("distance_other2", (SpatDataFrame (SpatVector::*)(SpatVector))( &SpatVector::distance2))
 		.method("extent", &SpatVector::getExtent, "extent")		
-		.method("getDF", &getAttributes, "get attributes")
+		.method("getDF", &getVectorAttributes, "get attributes")
 		.method("getGeometry", &getGeometry, "getGeometry")
 		.method("isLonLat", &SpatVector::is_lonlat, "isLonLat")
 		.method("length", &SpatVector::length, "length")		
@@ -124,6 +199,7 @@ RCPP_MODULE(spat){
 		.method("buffer", &SpatVector::buffer, "buffer")	
 #ifdef useGEOS
 		.method("buffer2", &SpatVector::buffer2, "buffer2")		
+		.method("intersect", &SpatVector::intersect, "intersect")		
 #endif
 	;
 
@@ -147,6 +223,8 @@ RCPP_MODULE(spat){
 	    //.constructor<std::string>()
 	    .constructor<std::vector<std::string> >()
 		.constructor<std::vector<unsigned>, std::vector<double>, std::string>()
+
+		.method("spatinit", &SpatRaster::spatinit, "init")
 		
 		.method("combineSources", &SpatRaster::combineSources, "combineSources")
 		.method("compare_geom", &SpatRaster::compare_geom, "compare_geom")
@@ -154,6 +232,7 @@ RCPP_MODULE(spat){
 		.method("copy", &SpatRaster::deepCopy, "deepCopy")
 		.property("crs", &SpatRaster::getCRS, &SpatRaster::setCRS )
 		.property("extent", &SpatRaster::getExtent, &SpatRaster::setExtent )
+		.method("getRasterAtt", &getRasterAttributes, "get attributes")
 			
 		//.field_readonly("hasRAT", &SpatRaster::hasRAT )
 		//.field_readonly("hasCT", &SpatRaster::hasCT )
@@ -226,6 +305,9 @@ RCPP_MODULE(spat){
 		.method("as_points", &SpatRaster::as_points, "as_points")
 		.method("as_polygons", &SpatRaster::as_polygons, "as_polygons")
 		.method("atan2", &SpatRaster::atan_2, "atan2")
+
+		.method("bilinearValues", &SpatRaster::bilinearValues, "bilin")
+
 		.method("boundaries", &SpatRaster::edges, "edges")
 		.method("buffer", &SpatRaster::buffer, "buffer")
 		.method("gridDistance", &SpatRaster::gridDistance, "gridDistance")
@@ -262,6 +344,7 @@ RCPP_MODULE(spat){
 		.method("rotate", &SpatRaster::rotate, "rotate")
 		.method("sampleRegular", &SpatRaster::sampleRegular, "sampleRegular")	
 		.method("shift", &SpatRaster::shift, "shift")
+		.method("slope", &SpatRaster::slope, "slope")
 		.method("summary", &SpatRaster::summary, "summary")
 		.method("summary_numb", &SpatRaster::summary_numb, "summary_numb")
 		.method("transpose", &SpatRaster::transpose, "transpose")
@@ -283,3 +366,4 @@ RCPP_MODULE(spat){
 	;
 	
 }
+

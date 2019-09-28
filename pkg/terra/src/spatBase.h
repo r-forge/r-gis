@@ -22,7 +22,7 @@
 #include "spatMessages.h"
 
 // comment out if this is not for R (no Rcpp)
-#define useRCPP
+#define useRcpp
 // comment out if GDAL is not available
 #define useGDAL
 // comment out if GEOS is not available
@@ -45,14 +45,16 @@ class SpatOptions {
 		std::string def_filetype = "GTiff";
 		std::string def_bandorder = "BIL";
 		bool overwrite = false;
-		unsigned progress = 4;
+		unsigned progress = 3;
 		unsigned blocksizemp = 4;
+		size_t steps = 0;
 
 		std::string datatype = "";
 		std::string bandorder = "";
 		std::string filetype = "";
 		std::string filename = "";
 		std::vector<std::string> gdal_options;
+		std::vector<std::string> names;
 
 		SpatOptions();
 		SpatOptions(const SpatOptions &opt);
@@ -89,6 +91,8 @@ class SpatOptions {
 		unsigned get_progress();
 		bool do_progress(unsigned n);
 		unsigned get_blocksizemp();
+		void set_steps(size_t n);
+		size_t get_steps();
 
 		SpatMessages msg;
 };

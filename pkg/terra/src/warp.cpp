@@ -11,7 +11,7 @@ SpatRaster SpatRaster::warp(SpatRaster x, std::string method, SpatOptions &opt) 
 	unsigned nl = nlyr();
 	SpatRaster out = x.geometry(nl);
 	out.setNames(getNames());
-	std::vector<std::string> f {"bilinear", "neighbor"};
+	std::vector<std::string> f {"bilinear", "ngb"};
 	if (std::find(f.begin(), f.end(), method) == f.end()) {
 		out.setError("unknown warp method");
 		return out;
@@ -23,17 +23,15 @@ SpatRaster SpatRaster::warp(SpatRaster x, std::string method, SpatOptions &opt) 
 	std::string crsin = getCRS();
 	std::string crsout = out.getCRS();
 	bool do_prj = true;	
-	if ((crsin == "") || (crsout == "")) {
+	if ((crsin == crsout) || (crsin == "") || (crsout == "")) {
 		do_prj = false;	
-	} else if (crsin == crsout) {
-		do_prj = false;			
 	}
 	
 	if (!do_prj) {
 		SpatExtent e = out.extent;
 		e.intersect(extent);
 		if (!e.valid()) {
-			out.setError("No spatial overlap");
+			out.addWarning("No spatial overlap");
 			return out;
 		}
 	}
@@ -79,13 +77,12 @@ SpatRaster SpatRaster::warp(SpatRaster x, std::string method, SpatOptions &opt) 
 		if (!out.writeValues2(v, out.bs.row[i], out.bs.nrows[i], 0, out.ncol())) return out;
 	}
 	out.writeStop();
-
 	return(out);
 }
 
 
 
-SpatRaster SpatRaster::project(std::string crs, std::string method, SpatOptions &opt) {
+SpatRaster SpatRaster::project(std::string newcrs, std::string method, SpatOptions &opt) {
 
 	SpatRaster temp;
 
@@ -94,17 +91,17 @@ SpatRaster SpatRaster::project(std::string crs, std::string method, SpatOptions 
 	return temp;
 	#else 
 	
-	std::string crsin = getCRS();
-	if ((crsin == "") || (crs == "")) {
+	std::string oldcrs = getCRS();
+	if ((oldcrs == "") || (newcrs == "")) {
 		temp.setError("insufficient crs info");	
 		return temp;
-	} else if (crsin == crs) {
-		temp.setError("crs are the same");	
+	} else if (oldcrs == newcrs) {
+		temp.setError("input and output crs are the same");	
 		return temp;
 	}
 
 	std::vector<std::vector<double>> p = extent.asPoints();
-	temp.msg = transform_coordinates(p[0], p[1], crsin, crs);
+	temp.msg = transform_coordinates(p[0], p[1], oldcrs, newcrs);
 	if (temp.hasError()) {
 		temp.msg = msg;
 		return temp;
@@ -115,7 +112,7 @@ SpatRaster SpatRaster::project(std::string crs, std::string method, SpatOptions 
 	}
 	SpatExtent e(vmin(p[0], false), vmax(p[0], false), vmin(p[1], false), vmax(p[1], false));
 
-	temp = SpatRaster(nrow(), ncol(), nlyr(), e, crs);
+	temp = SpatRaster(nrow(), ncol(), nlyr(), e, newcrs);
 	return warp(temp, method, opt);
 	#endif	
 }

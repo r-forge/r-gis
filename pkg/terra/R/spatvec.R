@@ -12,6 +12,15 @@ setMethod("geomtype", signature(x="SpatVector"),
 	}
 )	
 
+setMethod("geomtype", signature(x="Spatial"), 
+	function(x, ...){ 
+		type <- sub("spatial", "", as.vector(tolower(class(x))))
+		type <- sub("dataframe", "", type)
+		if (type %in% c("grid", "pixels")) type <- "raster"
+		type
+	}
+)	
+
 setMethod("geom", signature(x="SpatVector"), 
 	function(x, ...){ 
 		x@ptr$getGeometry()
@@ -42,10 +51,16 @@ setMethod("area", signature(x="SpatVector"),
 	}
 )	
 
-setMethod("length", signature(x="SpatVector"), 
+setMethod("perimeter", signature(x="SpatVector"), 
 	function(x) {
 		a <- x@ptr$length();
 		x <- show_messages(x, "length");
 		return(a)
+	}
+)	
+
+setMethod("length", signature(x="SpatVector"), 
+	function(x) {
+		size(x)
 	}
 )	

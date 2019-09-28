@@ -16,33 +16,52 @@
 // along with spat. If not, see <http://www.gnu.org/licenses/>.
 
 #include <cmath>
+#include <limits>
 
-template <class T> class NA {
-public:
+
+template <class T> 
+class NA {
+  public:
     static constexpr T value = std::is_floating_point<T>::value ? NAN : std::numeric_limits<T>::min();
 };
 
-template <> class NA<unsigned> {
+// bool has no NA
+template <> class NA<bool> {
+public:
+  static constexpr unsigned value = false;
+};
+
+template <typename T>
+struct is_string {
+  static const bool value = false;
+};
+
+template <class T, class Traits, class Alloc>
+struct is_string<std::basic_string<T, Traits, Alloc>> {
+  static const bool value = true;
+};
+
+/*
+template <> class NAvalue<unsigned> {
 public:
     static constexpr unsigned value = std::numeric_limits<unsigned>::max();
 };
-
-
-//template <> class NA<bool> {
-//public:
-//    static constexpr bool value = false;
-//};
-
+*/
 
 template <typename T> 
 bool is_NA(const T v) {
     if (std::is_floating_point<T>::value) {
         return std::isnan(v);
     } else {
-        bool b = v == NA<T>::value;
+        bool b = v == (NA<T>::value);
         return b;
-	}
+  	}
 }
+
+template <> class NA<unsigned> {
+public:
+    static constexpr unsigned value = std::numeric_limits<unsigned>::max();
+};
 
 
 template <typename T>
@@ -53,7 +72,6 @@ void set_NA(std::vector<T> &v, double naflag) {
 		std::replace(v.begin(), v.end(), flag, navalue);
 	}
 }
-
 
 /*
 class NA_long {

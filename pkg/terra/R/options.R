@@ -9,16 +9,39 @@
 	.terra_environment$options <- opt
 }
  
+ 
 .setOptions <- function(x, opt) {
 	nms <- names(opt)
-	s <- nms %in% c("progress", "tempdir", "memfrac", "datatype", "filetype", "filename", "overwrite", "todisk")
+	
+	g <- which(nms == "gdal")
+	if (length(g) > 0) {
+		gopt <- unlist(opt[g])
+		opt <- opt[-g]
+		nms <- nms[-g]
+		i <- grep("=", gopt)
+		gopt <- gopt[i]
+		gopt <- gsub(" ", "", gopt)
+		x$gdal_options <- gopt
+	}
+	
+	s <- nms %in% c("progress", "tempdir", "memfrac", "datatype", "filetype", "filename", "overwrite", "todisk", "names")
 	
 	if (any(!s)) {
-		warning(paste(nms[!s], collapse = ", "), " invalid option(s)")
+		bad <- paste(nms[!s], collapse=",")
+		warning(paste("cannot recognize some options:", bad))
 	}
 		
 	if (any(s)) {
-		for (i in which(s)) {
+		nms <- nms[s]
+		i <- which(nms == "names")	
+		if (length(i) > 0) {
+			namevs <- trimws(unlist(strsplit(opt[[i]], ",")))
+			x[["names"]] <- namevs
+			opt <- opt[-i]
+			nms <- nms[-i]
+		}
+		
+		for (i in seq_along(nms)) {
 			x[[nms[i]]] <- opt[[i]]
 		}
 	}
@@ -51,6 +74,7 @@
 	cat("tempdir     :" , opt$tempdir, "\n")
 	cat("datatype    :" , opt$def_datatype, "\n")
 	cat("filetype    :" , opt$def_filetype, "\n")
+	cat("progress    :" , opt$progress, "\n")
 }
 
 

@@ -57,8 +57,19 @@ setMethod("as.vector", signature(x="SpatRaster"),
 
 setMethod("as.matrix", signature(x="SpatRaster"), 
 	function(x, wide=FALSE, ...) {
+		if (!hasValues(x)) {
+			stop("SpatRaster has no cell values")
+		}
 		if (wide) {
-			m <- matrix( values(x, FALSE), nrow=nrow(x), byrow=TRUE)
+			if (nlyr(x) > 1) {
+				m <- values(x, matrix=TRUE)
+				m <- lapply(1:ncol(m), function(i) {
+					matrix(m[,i],nrow=nrow(x),byrow=TRUE)
+					})
+				m <- do.call(cbind, m)
+			} else {
+				m <- matrix(values(x, matrix=FALSE),nrow=nrow(x),byrow=TRUE)
+			}
 		} else {
 			m <- values(x, matrix=TRUE)
 		}
@@ -248,13 +259,16 @@ setAs("Spatial", "SpatVector",
 	function(from) {
 		g <- geom(from)
 		colnames(g)[1] <- "id"
-		if ("cump" %in% colnames(g)) {
-			g <- g[,c(1,2,5,6,4)]
-		}
 		if (inherits(from, "SpatialPolygons")) {
 			vtype <- "polygons"
+			if ("cump" %in% colnames(g)) {
+				g <- g[,c(1,2,5,6,4)]
+			}
 		} else if (inherits(from, "SpatialLines")) {
 			vtype <- "lines"
+			if ("cump" %in% colnames(g)) {
+				g <- g[,colnames(g) != "cump"]
+			}
 		} else {
 			vtype <- "points"
 			g <- cbind(g[,1,drop=FALSE], part=1:nrow(g), g[,2:3])

@@ -78,7 +78,7 @@ function(x, rcl, include.lowest=FALSE, right=TRUE, othersNA=FALSE, filename="", 
 		rcl <- as.matrix(rcl)
 	}
 
-	right <- ifelse(is.na(right), 2, ifelse(right, 0, 1))
+	right <- ifelse(is.na(right), 2, ifelse(right, 1, 0))
 	include.lowest <- as.logical(include.lowest[1])
 
 	opt <- .runOptions(filename, overwrite, wopt)
@@ -88,14 +88,27 @@ function(x, rcl, include.lowest=FALSE, right=TRUE, othersNA=FALSE, filename="", 
 )
 
 
+.getExt <- function(x) {
+	return(x)
+}
+
 
 setMethod("crop", signature(x="SpatRaster", y="ANY"), 
 	function(x, y, snap="near", filename="", overwrite=FALSE, wopt=list(), ...) {
-		if (!inherits(y, "SpatExtent")) {
-			y <- try(ext(y))
-			if (class(y) == "try-error") { stop("cannot get an extent from y") }
-		}
 		opt <- .runOptions(filename, overwrite, wopt)
+
+		if (!inherits(y, "SpatExtent")) {
+			e <- try(ext(y), silent=TRUE)
+			if (class(e) == "try-error") { 
+				e <- try(raster::extent(y), silent=TRUE)
+				if (class(e) == "try-error") { 
+					stop("cannot get an extent from y")
+				}
+				e <- ext(as.vector(t(raster::bbox(e))))
+			}
+			y <- e
+		}
+
 		x@ptr <- x@ptr$crop(y@ptr, snap[1], opt)
 		show_messages(x, "crop")		
 	}
@@ -174,6 +187,10 @@ setMethod("mask", signature(x="SpatRaster", mask="SpatVector"),
 setMethod("project", signature(x="SpatRaster"), 
 	function(x, crs, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
 		opt <- .runOptions(filename, overwrite, wopt)
+		if (!is.character(crs)) {
+			warning("crs should be a character value")
+			crs <- as.character(crs(crs))
+		}
 		x@ptr <- x@ptr$project(crs, method, opt)
 		show_messages(x, "project")
 	}
@@ -181,6 +198,9 @@ setMethod("project", signature(x="SpatRaster"),
 
 setMethod("project", signature(x="SpatVector"), 
 	function(x, crs, ...)  {
+		if (!is.character(crs)) {
+			crs <- crs(x)
+		}
 		x@ptr <- x@ptr$project(crs)
 		show_messages(x, "project")
 	}
@@ -196,9 +216,15 @@ setMethod("quantile", signature(x="SpatRaster"),
 )
 
 setMethod("rasterize", signature(x="SpatVector", y="SpatRaster"), 
-	function(x, y, background=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
+	function(x, y, field=1:nrow(x), background=NA, update=FALSE, filename="", overwrite=FALSE, wopt=list(), ...) { 
 		opt <- .runOptions(filename, overwrite, wopt)
-		y@ptr <- y@ptr$rasterize(x@ptr, background[1], opt)
+		if (is.character(field)) {
+			field <- x[[field, drop=TRUE]]
+			if (!is.numeric(field)) {
+				stop("this is not a numerical variable")
+			}
+		}
+		y@ptr <- y@ptr$rasterize(x@ptr, field, background[1], update[1], opt)
 		show_messages(y, "rasterize")
 	}
 )
@@ -221,6 +247,18 @@ setMethod("shift", signature(x="SpatRaster"),
 		show_messages(x, "shift")		
 	}
 )
+
+setMethod("slope", signature(x="SpatRaster"), 
+	function(x, neighbors=8, unit="degrees", filename="", overwrite=FALSE, wopt=list(), ...) { 
+		opt <- .runOptions(filename, overwrite, wopt)
+		stopifnot(neighbors %in% c(4,8))
+		stopifnot(unit %in% c("degrees", "radians"))
+		x@ptr <- x@ptr$slope(neighbors, unit=="degrees", opt)
+		show_messages(x, "slope")		
+	}
+)
+
+
 
 
 setMethod("t", signature(x="SpatRaster"), 

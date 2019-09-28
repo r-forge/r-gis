@@ -1,5 +1,8 @@
 # terra
 
+[![Travis build
+status](https://travis-ci.org/rspatial/terra.svg?branch=master)](https://travis-ci.org/rspatial/terra)
+
 This R package is a replacement of the [raster](https://github.com/rspatial/raster) package.
 It has a very similar, but simpler, interface, and it is much faster.
 
@@ -11,7 +14,7 @@ The first (alpha) release is expected by July 2019.
 
 ## Installation
 
-You need to have the current version of `raster` from CRAN (>= 2.9-22) or install the [development version of "raster"](https://github.com/rspatial/raster).
+You need to install the latest version of "raster" from CRAN or [github](https://github.com/rspatial/raster).
 
 ### Windows
 
@@ -41,7 +44,6 @@ And now, in R, install the packages.
 ```
 library(devtools)
 install.packages("raster")
-#devtools::install_github("rspatial/raster")
 devtools::install_github("rspatial/terra")
 ```
 
@@ -54,14 +56,13 @@ To install these on Ubuntu you can do:
 ```
 sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable
 sudo apt-get update
-sudo apt-get install libgdal-dev libgeos-dev libgeos++-dev libproj-dev 
+sudo apt-get install libgdal-dev libgeos-dev libproj-dev 
 ```
 
 And now, in R, install the packages.
 ```
 library(devtools)
 install.packages("raster")
-#devtools::install_github("rspatial/raster")
 devtools::install_github("rspatial/terra")
 ```
 
