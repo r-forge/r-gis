@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library
 //
@@ -73,8 +73,8 @@ std::vector<double> fourCellsFromXY (unsigned ncols, unsigned nrows, double xmin
     //double row = (ymax - y[i]) * yres_inv;
     //double col = (x[i] - xmin) * xres_inv;
 
-    double roundRow = floor(row);
-    double roundCol = floor(col);
+    double roundRow = std::floor(row);
+    double roundCol = std::floor(col);
 
     if (roundRow < 0 || roundRow > maxrow || roundCol < 0 || roundCol > maxcol) {
       continue;
@@ -193,7 +193,7 @@ std::vector<std::vector<double>> SpatRaster::bilinearValues(std::vector<double> 
 	std::vector<std::vector<double>> xy = xyFromCell(four);
 	std::vector<std::vector<double>> v = extractCell(four);
 	size_t n = x.size();
-	double halfyres = yres()/2;
+//	double halfyres = yres()/2;
 	std::vector<std::vector<double>> res(nlyr(), std::vector<double>(n));
 /*	if (lonlat) {
         for (size_t i=0; i<n; i++) {
@@ -439,8 +439,8 @@ std::vector<std::vector<double>> SpatRaster::extractXY(std::vector<double> &x, s
                 unsigned rq = row_d % 2;
                 unsigned cq = col_d % 2;
 
-                double row1 = floor((ymax - y[i]) / yrs);
-                double col1 = floor((x[i] - xmin) / xrs);
+                double row1 = std::floor((ymax - y[i]) / yrs);
+                double col1 = std::floor((x[i] - xmin) / xrs);
                 if ((row1 < 0) || (row1 > mnr)) { continue; }
 
                 double row2 = (rq == 0) ? row1-1 : row1+1;
@@ -570,14 +570,14 @@ std::vector<std::vector<double>> SpatRaster::extractCell(std::vector<double> &ce
 			}
 		} else {
 			std::vector<std::vector<double>> srcout;
-			if (source[0].driver == "raster") {
-				srcout = readCellsBinary(src, cell);
-			} else {
+			//if (source[0].driver == "raster") {
+			//	srcout = readCellsBinary(src, cell);
+			//} else {
 			#ifdef useGDAL
-				std::vector<std::vector<unsigned>> rc = rowColFromCell(cell);
-				srcout = readRowColGDAL(src, rc[0], rc[1]);
+			std::vector<std::vector<unsigned>> rc = rowColFromCell(cell);
+			srcout = readRowColGDAL(src, rc[0], rc[1]);
 			#endif
-			}
+			//}
 			for (size_t i=0; i<slyrs; i++) {
 				out[lyr] = srcout[i];
 				lyr++;

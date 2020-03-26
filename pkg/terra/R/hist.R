@@ -6,7 +6,7 @@
 
 setMethod("hist", signature(x="SpatRaster"), 
 	function(x, layer, maxcell=1000000, plot=TRUE, main, ...) {
-		
+			
 		if (missing(layer)) {
 			y <- 1:nlyr(x)
 		} else if (is.character(layer)) {
@@ -41,6 +41,8 @@ setMethod("hist", signature(x="SpatRaster"),
 			mfrow <- graphics::par("mfrow")
 			spots <- mfrow[1] * mfrow[2]
 			if (spots < nl) {
+				old.par <- graphics::par(no.readonly =TRUE)
+				on.exit(graphics::par(old.par))   
 				graphics::par(mfrow=c(nr, nc))
 			}
 			for (i in 1:length(y)) {
@@ -72,7 +74,7 @@ setMethod("hist", signature(x="SpatRaster"),
 		v <- stats::na.omit(values(x))
 	} else {
 		# TO DO: make a function that does this by block and combines  all data into a single histogram
-		v <- values(sampleRegular(x, maxcell))
+		v <- spatSample(x, maxcell, method="regular", as.raster=FALSE)
 		msg <- paste(round(100 * length(v) / ncell(x)), "% of the raster cells were used.", sep="")
 		if (any(is.na(v))) {
 			v <- stats::na.omit(v)

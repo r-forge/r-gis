@@ -18,6 +18,11 @@
 			if (test1 | test2) { 
 				fun <- "mean" 
 			}
+			test1 <- isTRUE(try( deparse(fun)[2] == 'UseMethod(\"median\")', silent=TRUE))
+			test2 <- isTRUE(try( fun@generic == "median", silent=TRUE))
+			if (test1 | test2) { 
+				fun <- "median" 
+			}
 		} 
 	}
 	return(fun)
@@ -75,4 +80,6 @@ function(x, fact=2, fun="mean", ..., filename="", overwrite=FALSE, wopt=list()) 
 	}
 }
 )
+
+
 

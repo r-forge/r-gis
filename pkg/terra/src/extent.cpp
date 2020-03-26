@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -21,10 +21,13 @@
 
 
 bool SpatExtent::equal(SpatExtent e, double tolerance) {
-	bool e1 = is_equal(xmax, e.xmax, tolerance);
-	bool e2 = is_equal(xmin, e.xmin, tolerance);
-	bool e3 = is_equal(ymax, e.ymax, tolerance);
-	bool e4 = is_equal(ymin, e.ymin, tolerance);
+	double xr = (xmax - xmin) / tolerance;
+	double yr = (ymax - ymin) / tolerance;
+	
+	bool e1 = fabs(xmax - e.xmax) < xr;
+	bool e2 = fabs(xmin - e.xmin) < xr;
+	bool e3 = fabs(ymax - e.ymax) < yr;
+	bool e4 = fabs(ymin - e.ymin) < yr;
 	return (e1 && e2 && e3 && e4);
 }	
 
@@ -91,15 +94,15 @@ SpatExtent SpatRaster::align(SpatExtent e, std::string snap) {
 		ymn = round((e.ymin-orig[1]) / res[1]) * res[1] + orig[1];
 		ymx = round((e.ymax-orig[1]) / res[1]) * res[1] + orig[1];
 	} else if (snap == "out") {
-		xmn = floor((e.xmin-orig[0]) / res[0]) * res[0] + orig[0];
-		xmx = ceil((e.xmax-orig[0]) / res[0]) * res[0] + orig[0];
-		ymn = floor((e.ymin-orig[1]) / res[1]) * res[1] + orig[1];
-		ymx = ceil((e.ymax-orig[1]) / res[1]) * res[1] + orig[1];
+		xmn = std::floor((e.xmin-orig[0]) / res[0]) * res[0] + orig[0];
+		xmx = std::ceil((e.xmax-orig[0]) / res[0]) * res[0] + orig[0];
+		ymn = std::floor((e.ymin-orig[1]) / res[1]) * res[1] + orig[1];
+		ymx = std::ceil((e.ymax-orig[1]) / res[1]) * res[1] + orig[1];
 	} else { //if (snap == "in") {
-		xmn = ceil((e.xmin-orig[0]) / res[0]) * res[0] + orig[0];
-		xmx = floor((e.xmax-orig[0]) / res[0]) * res[0] + orig[0];
-		ymn = ceil((e.ymin-orig[1]) / res[1]) * res[1] + orig[1];
-		ymx = floor((e.ymax-orig[1]) / res[1]) * res[1] + orig[1];
+		xmn = std::ceil((e.xmin-orig[0]) / res[0]) * res[0] + orig[0];
+		xmx = std::floor((e.xmax-orig[0]) / res[0]) * res[0] + orig[0];
+		ymn = std::ceil((e.ymin-orig[1]) / res[1]) * res[1] + orig[1];
+		ymx = std::floor((e.ymax-orig[1]) / res[1]) * res[1] + orig[1];
 	}
 	
 	if (xmn == xmx) {
@@ -139,7 +142,7 @@ std::vector<double> SpatRaster::origin() {
 bool SpatRaster::compare_geom(SpatRaster x, bool lyrs, bool crs, bool warncrs, bool ext, bool rowcol, bool res) {
 	
 	if (ext) {
-		if (!extent.equal(x.extent, 10)) {
+		if (!extent.equal(x.extent, 100)) {
 			setError("extents do not match");
 			return false;
 		}

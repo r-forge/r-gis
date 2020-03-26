@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -604,7 +604,7 @@ SpatRaster SpatRaster::extend(SpatExtent e, SpatOptions &opt) {
 	SpatRaster out = geometry(nlyr());
 	e = out.align(e, "near");
 	e.unite(extent);
-	if (extent.equal(e, 1)) {
+	if (extent.equal(e, 1000)) {
 		out = deepCopy();
 		return out;
 	}

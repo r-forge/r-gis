@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -20,10 +20,13 @@
 
 
 SpatRaster::SpatRaster(std::string fname) {
+#ifdef useGDAL
 	constructFromFile(fname);
+#endif
 }
 
 SpatRaster::SpatRaster(std::vector<std::string> fname) {
+#ifdef useGDAL
 	constructFromFile(fname[0]);
 	SpatRaster r;
 	bool success;
@@ -42,6 +45,7 @@ SpatRaster::SpatRaster(std::vector<std::string> fname) {
 			return;
 		}
 	}
+#endif
 }
 
 

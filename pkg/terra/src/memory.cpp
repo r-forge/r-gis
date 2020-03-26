@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -41,7 +41,7 @@ BlockSize SpatRaster::getBlockSize(unsigned n, unsigned steps) {
 		cs = nrow() / steps;
 	} else {
 		cs = chunkSize(n);
-		bs.n = ceil(nrow() / double(cs));
+		bs.n = std::ceil(nrow() / double(cs));
 	}
 
 	bs.row = std::vector<unsigned>(bs.n);

@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -42,7 +42,7 @@ bool SpatVector::write(std::string filename, std::string format, bool overwrite)
 		return false;
     }
     OGRLayer *poLayer;
-    poLayer = poDS->CreateLayer(basename(filename).c_str(), NULL, wkbPoint, NULL );
+    poLayer = poDS->CreateLayer(basename_noext(filename).c_str(), NULL, wkbPoint, NULL );
     if( poLayer == NULL ) {
         setError("Layer creation failed");
 		return false;

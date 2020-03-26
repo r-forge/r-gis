@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -22,6 +22,7 @@
 
 #include "spatRaster.h"
 #include "file_utils.h"
+#include "string_utils.h"
 #include "NA.h"
 
 #include "gdal_priv.h"
@@ -30,12 +31,35 @@
 #include "ogr_spatialref.h"
 
 #include "gdal_rat.h"
+//#include "hdr.h"
 
 
 void SpatRaster::spatinit() {
     GDALAllRegister();
-    OGRRegisterAll();
+    OGRRegisterAll(); // should go to SpatVector
+	//GDALregistred = true;
 }
+
+
+
+
+
+bool SpatRaster::constructFromFiles(std::vector<std::string> fnames) {
+
+	SpatRaster r = SpatRaster(fnames[0]);
+	setSource(r.source[0]);
+	for (size_t i=1; i<fnames.size(); i++) {
+		r = SpatRaster(fnames[i]);
+		if (!compare_geom(r, false, true, true)) {
+			setError("geometry of " + fnames[i] + " does not match previous sources");
+			return false;
+		} else {
+			addSource(r);
+		}
+	}
+	return true;
+}
+
 
 
 
@@ -105,8 +129,14 @@ std::string basename_sds(std::string f) {
 	if (std::string::npos != i) {
 		f.erase(0, i + 1);
 	}
-	f = std::regex_replace(f, std::regex(".hdf"), "");
+	const size_t j = f.find_last_of(":");
+	if (std::string::npos != j) {
+		f.erase(0, j + 1);
+	}
+	f = std::regex_replace(f, std::regex(".hdf$"), "");
+	f = std::regex_replace(f, std::regex(".nc$"), "");
 	f = std::regex_replace(f, std::regex("\""), "");
+	
 	return f;
 }
 
@@ -120,53 +150,60 @@ bool SpatRaster::constructFromSubDataSets(std::string filename, std::vector<std:
 		if (pos != std::string::npos) {
 			s.erase(0, pos + delim.length());
 			sd.push_back(s);
-		} else {
+		} 
+		//else {
 			// _DESC=
-			s.erase(0, pos + delim.length());
+		//	s.erase(0, pos + delim.length());
 			//nms.push_back(s);
 			//printf( "%s\n", s.c_str() );
 
-		}
+		//}
 	}
 
-	constructFromFileGDAL(sd[0]);
-	SpatRaster r;
+	constructFromFile(sd[0]);
+	SpatRaster out;
 	bool success;
     for (size_t i=1; i < sd.size(); i++) {
 //		printf( "%s\n", sd[i].c_str() );
-		success = r.constructFromFileGDAL(sd[i]);
+		success = out.constructFromFile(sd[i]);
 		if (success) {
-//			r.source[0].subdataset = true;
-			addSource(r);
-			if (r.msg.has_error) {
-				setError(r.msg.error);
+//			out.source[0].subdataset = true;
+			addSource(out);
+			if (out.msg.has_error) {
+				setError(out.msg.error);
 				return false;
 			}
 		} else {
-			if (r.msg.has_error) {
-				setError(r.msg.error);
+			if (out.msg.has_error) {
+				setError(out.msg.error);
 			}
 			return false;
 		}
 	}
 
-	std::vector<std::string> names = filenames();
-	for (std::string& s : names) s = basename_sds(s);
-	success = setNames(names);
-
+	for (std::string& s : sd) s = basename_sds(s);
+	success = setNames(sd);
+	
 	return true;
 }
 
 
-bool SpatRaster::constructFromFileGDAL(std::string fname) {
+bool SpatRaster::constructFromFile(std::string fname) {
 
     GDALDataset *poDataset;
-    //GDALAllRegister();
+    
+	//if (!GDALregistred) spatinit(); //
+	GDALAllRegister();
+
 	const char* pszFilename = fname.c_str();
     poDataset = (GDALDataset *) GDALOpen( pszFilename, GA_ReadOnly );
 
     if( poDataset == NULL )  {
-		setError("cannot read from " + fname );
+		if (!file_exists(fname)) {
+			setError("file does not exist");
+		} else {
+			setError("cannot read from " + fname );
+		}
 		return false;
 	}
 
@@ -315,9 +352,9 @@ bool SpatRaster::constructFromFileGDAL(std::string fname) {
 			s.names.push_back(bandname);
 		} else {
 			if (s.nlyr > 1) {
-				s.names.push_back(basename(fname) + std::to_string(i+1) ) ;
+				s.names.push_back(basename_noext(fname) + std::to_string(i+1) ) ;
 			} else {
-				s.names.push_back(basename(fname)) ;
+				s.names.push_back(basename_noext(fname)) ;
 			}
 		}
 	}

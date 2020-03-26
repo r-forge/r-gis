@@ -30,15 +30,19 @@ Plot (that is, make a map of) the values of a SpatRaster or SpatVector
 
 \usage{
 \S4method{plot}{SpatRaster,numeric}(x, y, col, maxcell=100000, leg.mar=NULL, 
-		leg.levels=5, leg.shrink=c(0,0), leg.main=NULL, leg.main.cex=1, leg.ext=NULL,
-		digits, useRaster=TRUE, zlim, xlab="", ylab="", axes=TRUE, add=FALSE, ...)
+   leg.levels=5, leg.shrink=c(0,0), leg.main=NULL, leg.main.cex=1, leg.ext=NULL,
+   digits, useRaster=TRUE, zlim, xlab="", ylab="", axes=TRUE, add=FALSE, ...)
 
-\S4method{plot}{SpatRaster,missing}(x, y, maxcell=100000, nc, nr, main, maxnl=16, add=FALSE, ...)
-\S4method{plot}{SpatRaster,SpatRaster}(x, y, maxcell=100000, nc, nr, maxnl=16, gridded=FALSE, ncol=25, nrow=25, ...)
+\S4method{plot}{SpatRaster,missing}(x, y, maxcell=100000, nc, nr, main, 
+   maxnl=16, add=FALSE, ...)
+\S4method{plot}{SpatRaster,SpatRaster}(x, y, maxcell=100000, nc, nr, 
+   maxnl=16, gridded=FALSE, ncol=25, nrow=25, ...)
 
-\S4method{plot}{SpatVector,missing}(x, y, col=NULL, xlab="", ylab="", axes=TRUE, add=FALSE, ...)
+\S4method{plot}{SpatVector,missing}(x, y, col=NULL, xlab="", ylab="", 
+   axes=TRUE, add=FALSE, border="black", ...)
 
-\S4method{plot}{SpatVector,character}(x, y, col=topo.colors(100), xlab="", ylab="", axes=TRUE, add=FALSE, leg.ext=NULL, leg.type=NULL, leg.levels=5, digits, ...)
+\S4method{plot}{SpatVector,character}(x, y, col=topo.colors(100), xlab="", ylab="", 
+   axes=TRUE, add=FALSE, leg.ext=NULL, leg.type=NULL, leg.levels=5, digits, ...)
 
 \S4method{plot}{SpatExtent,missing}(x, y, col=NULL, xlab="", ylab="", axes=TRUE, ...)
 
@@ -77,6 +81,7 @@ Plot (that is, make a map of) the values of a SpatRaster or SpatVector
   \item{ncol}{positive integer. Number of columns for gridding}
   \item{nrow}{positive integer. Number of rows for gridding}
   \item{add}{logical. If \code{TRUE} add the object to the current plot (for points, lines, and polygons  this is an alternative to the \code{lines} or \code{points} methods}   
+  \item{border}{character to select the border (polygon outline) color}
   \item{...}{additional graphical arguments}  
 }
 

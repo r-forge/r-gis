@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -34,7 +34,7 @@
 
 
 double dmod(double x, double n) {
-	return(x - n * floor(x/n));
+	return(x - n * std::floor(x/n));
 }
 
 

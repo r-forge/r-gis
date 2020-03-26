@@ -12,7 +12,8 @@ Compute quantiles for each cell across the layers of a SpatRaster
 }
 
 \usage{
-\S4method{quantile}{SpatRaster}(x, probs=seq(0, 1, 0.25), na.rm=FALSE, filename="", overwrite=FALSE, wopt=list(), ...) 
+\S4method{quantile}{SpatRaster}(x, probs=seq(0, 1, 0.25), na.rm=FALSE,
+    filename="", overwrite=FALSE, wopt=list(), ...) 
 }
 
 \arguments{
@@ -40,7 +41,7 @@ q <- quantile(r)
 q
 
 # same as (but faster than)
-# qa <- app(r, quantile)
+qa <- app(r, quantile)
 }
 
 \keyword{methods}

@@ -10,7 +10,8 @@ Warp transfers values between SpatRaster objects that do not align (have a diffe
 }
 
 \usage{
-\S4method{warp}{SpatRaster,SpatRaster}(x, y, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)
+\S4method{warp}{SpatRaster,SpatRaster}(x, y, method="bilinear", 
+       filename="", overwrite=FALSE, wopt=list(), ...)
 }
 
 \arguments{
@@ -40,15 +41,20 @@ values(r) <- 1:ncell(r)
 s <- rast(nrow=25, ncol=30, xmin=1, xmax=11, ymin=-1, ymax=11)
 x <- warp(r, s, method='bilinear')
 
+opar <- par(no.readonly =TRUE)
 par(mfrow=c(1,2))
 plot(r)
 plot(x)
+par(opar)
 
 # warp to different CRS
-a <- rast(ncol=40, nrow=40, xmin=-110, xmax=-90, ymin=40, ymax=60, crs="+proj=longlat +datum=WGS84")
+a <- rast(ncol=40, nrow=40, xmin=-110, xmax=-90, ymin=40, ymax=60, 
+          crs="+proj=longlat +datum=WGS84")
 values(a) = 1:ncell(a)
-b <- rast(ncol=94, nrow=124, xmin=-944881.473102882, xmax=935118.526897118, ymin=4664377.90135485, ymax=7144377.90135485, crs="+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +datum=WGS84")
+b <- rast(ncol=94, nrow=124, xmin=-944881, xmax=935118, ymin=4664377, ymax=7144377, 
+     crs="+proj=lcc +lat_1=48 +lat_2=33 +lon_0=-100 +datum=WGS84")
 w <- warp(a, b)
+
 }
 
 \keyword{spatial}

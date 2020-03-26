@@ -1,4 +1,4 @@
-// Copyright (c) 2018-2019  Robert J. Hijmans
+// Copyright (c) 2018-2020  Robert J. Hijmans
 //
 // This file is part of the "spat" library.
 //
@@ -123,6 +123,8 @@ class SpatRaster {
 
 	public:
 
+	//	bool GDALregistred = false;
+
 #ifdef useRcpp
 		Progress* pbar;
 #endif
@@ -207,7 +209,7 @@ class SpatRaster {
 
 		bool constructFromFile(std::string fname);
 		bool constructFromFiles(std::vector<std::string> fnames);
-		bool constructFromFileGDAL(std::string fname);
+		//bool constructFromFileGDAL(std::string fname);
 		bool constructFromSubDataSets(std::string filename, std::vector<std::string> sds);
 
 		void addSource(SpatRaster x);
@@ -291,15 +293,15 @@ class SpatRaster {
 		bool writeValuesGDAL(std::vector<double> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols);
 		bool writeStopGDAL();
 
-		bool writeStartBinary(std::string filename, std::string datatype, std::string bandorder, bool overwrite);
-		bool writeValuesBinary(std::vector<double> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols);
+		//bool writeStartBinary(std::string filename, std::string datatype, std::string bandorder, bool overwrite);
+		//bool writeValuesBinary(std::vector<double> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols);
 
 		bool writeValuesMem(std::vector<double> &vals, unsigned startrow, unsigned nrows, unsigned startcol, unsigned ncols);
 
 		// binary (flat) source
-		std::vector<double> readValuesBinary(unsigned src, unsigned row, unsigned nrows, unsigned col, unsigned ncols);
-		std::vector<double> readSampleBinary(unsigned src, unsigned srows, unsigned scols);
-		std::vector<std::vector<double>> readCellsBinary(unsigned src, std::vector<double> cells);
+		//std::vector<double> readValuesBinary(unsigned src, unsigned row, unsigned nrows, unsigned col, unsigned ncols);
+		//std::vector<double> readSampleBinary(unsigned src, unsigned srows, unsigned scols);
+		//std::vector<std::vector<double>> readCellsBinary(unsigned src, std::vector<double> cells);
 
 		// gdal source
 		std::vector<double> readValuesGDAL(unsigned src, unsigned row, unsigned nrows, unsigned col, unsigned ncols);
@@ -314,7 +316,7 @@ class SpatRaster {
 
 		SpatRaster writeRaster(SpatOptions &opt);
 		SpatRaster writeRasterGDAL(std::string filename, std::string format, std::string datatype, bool overwrite, SpatOptions &opt);
-		SpatRaster writeRasterBinary(std::string filename, std::string datatype, std::string bandorder, bool overwrite);
+		//SpatRaster writeRasterBinary(std::string filename, std::string datatype, std::string bandorder, bool overwrite);
 
 		bool canProcessInMemory(unsigned n);
 		unsigned chunkSize(unsigned n);
@@ -356,8 +358,8 @@ class SpatRaster {
 		std::vector<std::vector<double>> extractCell(std::vector<double> &cell);
         std::vector<std::vector<double>> extractXY(std::vector<double> &x, std::vector<double> &y, std::string method);
 		SpatRaster flip(bool vertical, SpatOptions &opt);
-		SpatRaster focal(std::vector<double> w, double fillvalue, bool narm, std::string fun, SpatOptions &opt);
-		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, unsigned row, unsigned nrows);
+		SpatRaster focal(std::vector<unsigned> w, std::vector<double> m, double fillvalue, bool narm, std::string fun, SpatOptions &opt);
+		std::vector<double> focal_values(std::vector<unsigned> w, double fillvalue, int row, int nrows);
 		std::vector<std::vector<double>> freq(bool bylayer);
 		bool get_aggregate_dims(std::vector<unsigned> &fact, std::string &message);
 		std::vector<unsigned> get_aggregate_dims2(std::vector<unsigned> fact);
@@ -393,7 +395,10 @@ class SpatRaster {
 		std::vector<double> readSample(unsigned src, unsigned srows, unsigned scols);
 		SpatRaster rotate(bool left, SpatOptions &opt);
 
-		SpatRaster sampleRegular(unsigned size);
+		SpatRaster sampleRegularRaster(unsigned size);
+		SpatRaster sampleRandomRaster(unsigned size, bool replace, unsigned seed);
+		std::vector<std::vector<double>> sampleRegularValues(unsigned size);
+		std::vector<std::vector<double>> sampleRandomValues(unsigned size, bool replace, unsigned seed);
 		
 		SpatRaster slope(unsigned neighbors, bool degrees, SpatOptions &opt);
 	
