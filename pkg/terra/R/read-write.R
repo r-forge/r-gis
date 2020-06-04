@@ -47,12 +47,14 @@ setMethod("writeStop", signature(x="SpatRaster"),
 	} 
 )
 
-
 setMethod("writeValues", signature(x="SpatRaster", v="vector"), 
-	function(x, v, start) {
-		wstart <- start[1]-1
-		nrows <- start[2]
-		success <- x@ptr$writeValues(v, wstart, nrows, 0, ncol(x))
+	function(x, v, start, nrows, ...) {
+		#wstart <- start[1]-1
+		#nrows <- start[2]
+		#if (is.na(nrows)) {
+		#	nrows <- length(v) / (ncol(x) * nlyr(x))
+		#}
+		success <- x@ptr$writeValues(v, start-1, nrows, 0, ncol(x))
 		show_messages(x, "writeValues")
 		invisible(success)
 	}
@@ -74,7 +76,8 @@ function(x, filename, overwrite=FALSE, ...) {
 	if (filename == "") {
 		stop("provide a filename")
 	}
-	success <- x@ptr$write(filename, "ESRI Shapefile", overwrite[1])
+	lyrname <- gsub(".shp", "", basename(filename))
+	success <- x@ptr$write(filename, lyrname, "ESRI Shapefile", overwrite[1])
 	show_messages(x, "writeVector")
 	invisible(TRUE)
 }

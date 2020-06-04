@@ -37,7 +37,7 @@ setMethod ("show" , "SpatVector",
 		cat("geometry    :", geomtype(object), "\n")
 		cat("elements    : ", size(object), "\n", sep="" ) 
 		cat("extent      : ", e[1], ", ", e[2], ", ", e[3], ", ", e[4], "  (xmin, xmax, ymin, ymax)\n", sep="")
-		cat("coord. ref. :", crs(object), "\n")
+		cat("coord. ref. :", .proj4(object), "\n")
 		nms <- names(object)
 		if (length(nms) > 0) {
 			cat("names       :", paste(names(object), collapse=", "), "\n")		
@@ -62,8 +62,7 @@ setMethod ("show" , "SpatRaster",
 		e <- as.vector(ext(object))
 		cat("extent      : " , e[1], ", ", e[2], ", ", e[3], ", ", e[4], "  (xmin, xmax, ymin, ymax)\n", sep="")
 
-		crs <- crs(object)
-		cat("coord. ref. :" , crs(object), "\n")
+		cat("coord. ref. :" , .proj4(object), "\n")
 		
 		mnr <- 5
 
@@ -74,7 +73,7 @@ setMethod ("show" , "SpatRaster",
 			ln <- c(ln[1:mnr], "...")
 		}
 
-		if (.hasValues(object)) {
+		if (hasValues(object)) {
 			nsr <- nsrc(object)	
 			m <- .inMemory(object)
 			f <- .filenames(object)
@@ -86,7 +85,7 @@ setMethod ("show" , "SpatRaster",
 				lbs <- .nlyrBySource(object)
 				lbsprint <- paste0(" (", lbs, " layers)")
 				lbsprint[lbs == 1] <- ""
-				cat("data sources:", sources[1], lbsprint, "\n")
+				cat("data sources:", sources[1], lbsprint[1], "\n")
 				for (i in 2:(min(mnr, nsr))) {
 					cat("             ", sources[i], lbsprint[i], "\n")
 				}			
@@ -139,6 +138,44 @@ setMethod ("show" , "SpatRaster",
 			cat("data sources:", "no data\n")
 			cat("names       :", paste(ln, collapse=", "), "\n")
 		}
+	}
+)
+
+
+setMethod ("show" , "SpatStack", 
+	function(object) {
+		
+		cat("class       :" , class(object), "\n")
+		ns <- nsds(object)
+		cat("subdatasets :", ns, "\n") 
+		if (ns == 0) return()
+		
+		d <- c(object@ptr$nrow(), object@ptr$ncol())
+		sameRes <- object@ptr$oneRes;
+		if (sameRes) {
+			cat("dimensions  :", paste(d, collapse=", "), "(nrow, ncol)\n") 
+		} else {
+			cat("dimensions  :", "variable, including ", paste(d, collapse=", "), "(nrow, ncol)\n") 
+		}
+		nss <- sapply(1:ns, function(i) object@ptr$getsds(i-1)$nlyr())
+		cat("nlyr        :", paste(nss, collapse=", "), "\n") 
+
+		obj <- rast()
+		obj@ptr <- object@ptr$getsds(0)
+		
+		xyres <- res(obj)
+		if (sameRes){
+			cat("resolution  : " , xyres[1], ", ", xyres[2], "  (x, y)\n", sep="")
+		} else {
+			cat("resolution  : variable, including " , xyres[1], ", ", xyres[2], "  (x, y)\n", sep="")		
+		}
+		e <- as.vector(ext(obj))
+		cat("extent      : " , e[1], ", ", e[2], ", ", e[3], ", ", e[4], "  (xmin, xmax, ymin, ymax)\n", sep="")
+
+		cat("coord. ref. :" , .proj4(obj), "\n")
+		
+		ln <- object@ptr$names
+		cat("names       :", paste(ln, collapse=", "), "\n")
 	}
 )
 

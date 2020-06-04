@@ -54,18 +54,18 @@ void vector_minmax(std::vector<double> v, double &min, int &imin, double &max, i
 
 
 double roundn(double x, int n){
-  double d = pow(10, n);
-  return std::round(x * d) / d;
+	double d = pow(10.0, n);
+	return std::round(x * d) / d;
 }
 
 double signif(double x, unsigned n) {
-  double b = x;
-  unsigned i;
-  for (i = 0; b >= 1; ++i) {
-    b = b / 10;
-  }
-  int d = n-i;
-  return roundn(x, d); 
+	double b = x;
+	unsigned i;
+	for (i = 0; b >= 1; ++i) {
+		b = b / 10;
+	}
+	int d = n-i;
+	return roundn(x, d); 
 }
 
 bool is_equal(double a, double b, double tolerance=10.0) {

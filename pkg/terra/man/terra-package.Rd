@@ -16,16 +16,16 @@ Note the following important differences in function names with the raster packa
 
 \tabular{ll}{
 raster package \tab terra package\cr
-\code{raster, brick}\tab\code{\link{rast}}\cr
-\code{stack} (for creating an object from file)\tab\code{\link{rast}}\cr
+\code{raster, brick, stack}\tab\code{\link{rast}}\cr
 \code{stack} (for combining Raster* objects)\tab\code{\link{c}}\cr
 \code{rasterFromXYZ}\tab\code{\link{rast}( , type="xyz")}\cr
 \code{extent}\tab\code{\link{ext}}\cr
 \code{calc}\tab\code{\link{app}}\cr
+\code{overlay}\tab\code{\link{lapp}}\cr
 \code{stackApply}\tab\code{\link{tapp}}\cr
 \code{reclassify, subs, cut}\tab\code{\link{classify}}\cr
 \code{cellStats}\tab\code{\link{global}}\cr
-\code{projectRaster}\tab\code{\link{warp}, \link{project}}\cr
+\code{projectRaster}\tab\code{\link{project}}\cr
 \code{shapefile}\tab\code{\link{vect}}\cr
 \code{gridDistance, distanceFromPoints} \tab \code{\link{distance}}\cr
 \code{drawExtent, drawPoly, drawLine} \tab \code{\link{draw}}\cr
@@ -33,6 +33,7 @@ raster package \tab terra package\cr
 \code{stackSelect}\tab\code{\link{collapse}}\cr
 \code{compareRaster}\tab\code{\link{compareGeom}}\cr
 \code{sampleRegular}\tab\code{\link{spatSample}}\cr
+\code{sampleRandom}\tab\code{\link{spatSample}}\cr
 }
 
 Below is a list of some of the most important methods grouped by theme. Some of these may not have been implemented yet. 
@@ -61,7 +62,8 @@ SpatRaster objects can be created, from scratch, files, or from objects of other
     \code{\link{trim}} \tab Trim a SpatRaster by removing exterior rows and/or columns that only have NAs\cr
     \code{\link{aggregate}} \tab Combine cells of a SpatRaster to create larger cells \cr
     \code{\link{disaggregate}} \tab Subdivide cells \cr
-    \code{\link{warp}} \tab Warp values to a SpatRaster with a different origin and/or resolution and/or coordinate reference system \cr	
+    \code{\link{resample}} \tab Resample (warp) values to a SpatRaster with a different origin and/or resolution \cr 
+	\code{\link{project}} \tab Project (warp) values to a SpatRaster with a different coordinate reference system \cr
     \code{\link{shift}} \tab Adjust the location of SpatRaster \cr
     \code{\link{flip}} \tab  Flip values horizontally or vertically \cr
     \code{\link{rotate}} \tab Rotate values around the date-line (for lon/lat data) \cr
@@ -80,8 +82,8 @@ SpatRaster objects can be created, from scratch, files, or from objects of other
     \code{\link{Summary-methods}} \tab Summary functions (\code{mean, max, min, range, prod, sum, any, all}) \cr
     \code{\link{Compare-methods}} \tab Compare functions (\code{==, !=, >, <, <=, >=}) \cr
     \code{\link{app}} \tab Apply a function to cells of a SpatRaster (as in \code{base::apply}) \cr
-    \code{\link{tapp}} \tab Apply a function to cells of a SpatRaster by groups of layers (as in \code{base::tapply})\cr
-    \code{\link{overlay}} \tab Computations on multiple SpatRaster objects \cr
+    \code{\link{tapp}} \tab Apply a function to groups of layers (as in \code{base::tapply})\cr
+    \code{\link{lapp}} \tab Apply a function to layers of a SpatRaster\cr
     \code{\link{cover}} \tab First layer covers second layer except where the first layer is \code{NA} \cr
     \code{\link{mask}} \tab Use values from first SpatRaster except where cells of the mask SpatRaster are \code{NA} (or another value of choice)\cr
     \code{\link{classify}} \tab (Re-)classify values \cr
@@ -99,7 +101,7 @@ SpatRaster objects can be created, from scratch, files, or from objects of other
     \code{\link{unique}} \tab Get the unique values in a SpatRaster \cr
     \code{\link{freq}} \tab Frequency table of SpatRaster cell values \cr
     \code{crosstab} \tab Cross-tabulate two SpatRasters\cr
-    \code{quantile} \tab Quantiles \cr
+    \code{\link{quantile}} \tab Quantiles \cr
     \code{summary} \tab Summary of the values of a SpatRaster (quartiles and mean) \cr
   --------------------------- \tab ------------------------------------------------------------------------------------------ \cr
   }
@@ -155,8 +157,7 @@ Apart from the function listed below, you can also use indexing with \code{[} fo
     \code{\link{as.matrix}} \tab Get cell values as a matrix \cr
     \code{\link{as.array}} \tab Get cell values as an array \cr
     \code{\link{extract}} \tab Extract cell values from a SpatRaster (e.g., by cell, coordinates, polygon)\cr
-    \code{sampleRandom} \tab Random sample \cr
-    \code{\link{spatSample}} \tab Regular sample \cr
+    \code{\link{spatSample}} \tab Regular or random sample \cr
     \code{\link{minmax}} \tab Get the minimum and maximum value of the cells of a SpatRaster (if known) \cr
     \code{\link{setMinMax}} \tab Compute the minimum and maximum value of a SpatRaster if these are not known \cr
   --------------------------- \tab ------------------------------------------------------------------------------------------ \cr
@@ -195,7 +196,7 @@ Apart from the function listed below, you can also use indexing with \code{[} fo
 
 \section{X. Getting and setting SpatRaster dimensions }{
 
-Basic parameters of existing SpatRasters can be obtained, and in most cases changed. If there are values associated with a SpatRaster object (either in memory or via a link to a file) these are lost when you change the number of columns or rows or the resolution. This is not the case when the extent is changed (as the number of columns and rows will not be affected). Similarly, with \bold{projection} you can set the projection, but this does not transform the data (see \link{warp} for that).   
+Basic parameters of existing SpatRasters can be obtained, and in most cases changed. If there are values associated with a SpatRaster object (either in memory or via a link to a file) these are lost when you change the number of columns or rows or the resolution. This is not the case when the extent is changed (as the number of columns and rows will not be affected). Similarly, with \bold{crs} you can set the projection, but this does not transform the data (see \link{project} for that).   
 
   \tabular{ll}{
     \code{\link{ncol}}\tab The number of columns \cr
@@ -269,14 +270,14 @@ The name in \bold{bold} is the equivalent command in ArcGIS.
   \code{union} or "+" \tab \bold{union} polygons\cr
   \code{cover} \tab \bold{update} and \bold{identity} a polygons\cr
   \code{symdif} \tab\bold{symmetrical difference} of two polygons \cr 
-  \code{aggregate} \tab \bold{dissolve} smaller polygons into larger ones \cr
-  \code{disaggregate} \tab \bold{explode}: turn polygon parts into separate polygons \cr
-  \code{crop} \tab \bold{clip} vector data using a rectangle (SpatExtent )\cr
-  \code{select} \tab \bold{select} - interactively select spatial features\cr
-  \code{click} \tab \bold{identify} attributes by clicking on a map\cr
-  \code{merge} \tab \bold{Join table} \cr
-  \code{extract} \tab spatial queries between SpatVector and SpatRaster objects \cr
-  \code{as.data.frame} \tab coerce coordinates into a data.frame\cr
+  \code{\link{aggregate}} \tab \bold{dissolve} smaller polygons into larger ones \cr
+  \code{\link{disaggregate}} \tab \bold{explode}: turn polygon parts into separate polygons \cr
+  \code{\link{crop}} \tab \bold{clip} vector data using a rectangle (SpatExtent )\cr
+  \code{\link{select}} \tab \bold{select} - interactively select spatial features\cr
+  \code{\link{click}} \tab \bold{identify} attributes by clicking on a map\cr
+  \code{\link{merge}} \tab \bold{Join table} \cr
+  \code{\link{extract}} \tab spatial queries between SpatVector and SpatRaster objects \cr
+  \code{\link{as.data.frame}} \tab get attributes as a data.frame\cr
   --------------------------- \tab ------------------------------------------------------------------------------------------ \cr  
 }
 }

@@ -19,6 +19,7 @@ The perimeter method works only on SpatVector objects, and computes the length o
 \S4method{area}{SpatRaster}(x, filename="", overwrite=FALSE,  wopt=list(), ...)
 
 \S4method{area}{SpatVector}(x, ...)
+
 \S4method{perimeter}{SpatVector}(x)
 }
 
@@ -40,7 +41,7 @@ In other cases, the unit is set by coordinate references system. In most cases i
 
 
 \examples{
-f <- system.file("exdata/lux.shp", package="terra")
+f <- system.file("ex/lux.shp", package="terra")
 v <- vect(f)
 a <- area(v)
 a

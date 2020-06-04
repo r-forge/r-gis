@@ -27,9 +27,14 @@ setMethod("vect", signature(x="Spatial"),
 	}
 )
 
+setMethod("vect", signature(x="sf"), 
+	function(x, ...) {
+		methods::as(x, "SpatVector")
+	}
+)
 
 setMethod("vect", signature(x="matrix"), 
-	function(x, type="points", atts=NULL, crs=NA, ...) {
+	function(x, type="points", atts=NULL, crs="", ...) {
 		type <- tolower(type)
 		stopifnot(type %in% c("points", "lines", "polygons"))
 		
@@ -40,8 +45,12 @@ setMethod("vect", signature(x="matrix"),
 			return(p)
 		}
 		
-		if (ncol(x) == 2) { # treat as unique points
-			p@ptr$setGeometry(type, 1:nr, rep(1, nr), x[,1], x[,2], rep(FALSE, nr))
+		if (ncol(x) == 2) { 
+			if (type == "points") {	# treat as unique points
+				p@ptr$setGeometry(type, 1:nr, rep(1, nr), x[,1], x[,2], rep(FALSE, nr))
+			} else {
+				p@ptr$setGeometry(type, rep(1, nr), rep(1, nr), x[,1], x[,2], rep(FALSE, nr))
+			}
 		} else if (ncol(x) == 4) {
 			p@ptr$setGeometry(type, x[,1], x[,2], x[,3], x[,4], rep(FALSE, nr))		
 		} else if (ncol(x) == 5) {
@@ -52,9 +61,7 @@ setMethod("vect", signature(x="matrix"),
 		if (!is.null(atts)) {
 			values(p) <- atts
 		}
-		if (!is.na(crs)) {
-			p@ptr$crs <- ifelse(is.na(crs), "", as.character(crs))
-		}
+		crs(p) <- ifelse(is.na(crs), "", as.character(crs))
 		show_messages(p)
 	}
 )
@@ -70,7 +77,9 @@ setMethod("$<-", "SpatVector",
 	function(x, name, value) { 
 		i <- which(name == names(x))[1]
 		if (is.na(i)) {
-			if (is.numeric(cv)) {
+			if (is.integer(value)) {
+				x@ptr$add_column_long(value, name)	
+			} else if (is.numeric(value)) {
 				x@ptr$add_column_double(value, name)	
 			} else {
 				x@ptr$add_column_string(as.character(value), name)

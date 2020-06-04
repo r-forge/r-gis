@@ -16,6 +16,7 @@ Get the data sources of a SpatRaster and the number of layers by source. Sources
 
 \usage{
 \S4method{sources}{SpatRaster}(x, ...)
+
 \S4method{hasValues}{SpatRaster}(x, ...)
 }
 
@@ -28,7 +29,7 @@ Get the data sources of a SpatRaster and the number of layers by source. Sources
 
 
 \examples{
-f <- system.file("exdata/test.tif", package="terra")
+f <- system.file("ex/test.tif", package="terra")
 r <- rast(f)
 s <- rast(r)
 values(s) <- 1:ncell(s)

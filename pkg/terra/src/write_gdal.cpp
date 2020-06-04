@@ -30,9 +30,11 @@
 
 
 
-void GDALformat(std::string &filename, std::string &format) {
+void getGDALdriver(std::string &filename, std::string &driver) {
 
-	lrtrim(format);
+	lrtrim(driver);
+	if (driver != "") return;
+	
 	lrtrim(filename);
 	std::string ext = getFileExt(filename);
     lowercase(ext);
@@ -54,10 +56,8 @@ void GDALformat(std::string &filename, std::string &format) {
 	};
 
     auto i = drivers.find(ext);
-    if (i == drivers.end()) {
-		format = "GTiff";
-	} else {
-		format = i->second;
+    if (i != drivers.end()) {
+		driver = i->second;
 	}
 }
 
@@ -97,16 +97,21 @@ CPLErr setBandCategories(GDALRasterBand *poBand, std::vector<std::string> cats) 
 
 
 
-bool SpatRaster::writeStartGDAL(std::string filename, std::string format, std::string datatype, bool overwrite, SpatOptions &opt) {
+bool SpatRaster::writeStartGDAL(std::string filename, std::string driver, std::string datatype, bool overwrite, SpatOptions &opt) {
 
-	SpatMessages m = can_write(filename, overwrite);
-	if (m.has_error) {
-		msg = m;
+	std::string errmsg;
+	if (!can_write(filename, overwrite, errmsg)) {
+		setError(errmsg);
 		return(false);
 	}
 
-	GDALformat(filename, format);
-	const char *pszFormat = format.c_str();
+	getGDALdriver(filename, driver);
+	if (driver == "") {
+		setError("cannot guess file type from filename");
+		return(false);	
+	}
+	
+	const char *pszFormat = driver.c_str();
 	const char *pszDstFilename = filename.c_str();
     GDALDriver *poDriver;
     char **papszMetadata;
@@ -147,15 +152,16 @@ bool SpatRaster::writeStartGDAL(std::string filename, std::string format, std::s
 	for (size_t i=0; i < nlyr(); i++) {
 		poBand = poDstDS->GetRasterBand(i+1);
 		poBand->SetDescription(nms[i].c_str());
+		poBand->SetNoDataValue(NAN); // need more work for other than real data types
 	}
 
 	std::vector<double> rs = resolution();
 	double adfGeoTransform[6] = { extent.xmin, rs[0], 0, extent.ymax, 0, -1 * rs[1] };
 	poDstDS->SetGeoTransform(adfGeoTransform);
 
-	std::string prj = getCRS();
+	std::string crs = srs.wkt;
 	OGRSpatialReference oSRS;
-	OGRErr erro = oSRS.importFromProj4(&prj[0]);
+	OGRErr erro = oSRS.SetFromUserInput(&crs[0]);
 	if (erro == 4) {
 		setError("CRS failure");
 		return false ;
@@ -166,6 +172,7 @@ bool SpatRaster::writeStartGDAL(std::string filename, std::string format, std::s
 	CPLFree(pszSRS_WKT);
 
 	source[0].resize(nlyr());
+	source[0].nlyrfile = nlyr();
 	source[0].gdalconnection = poDstDS;
 	source[0].datatype = datatype;
 	for (size_t i =0; i<nlyr(); i++) {
@@ -280,23 +287,23 @@ bool SpatRaster::writeValuesGDAL(std::vector<double> &vals, unsigned startrow, u
 			//std::vector<double> vv(vals.begin(), vals.end());
 			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vals[start], ncols, nrows, GDT_Float64, 0, 0 );
 		} else if (datatype == "FLT4S") {
-			std::vector<float> vv(vals.begin(), vals.end());
-			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[start], ncols, nrows, GDT_Float32, 0, 0 );
+			std::vector<float> vv(vals.begin()+start, vals.begin()+start+nc);
+			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[0], ncols, nrows, GDT_Float32, 0, 0 );
 		} else if (datatype == "INT4S") {
-			std::vector<int32_t> vv(vals.begin(), vals.end());
-			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[start], ncols, nrows, GDT_Int32, 0, 0 );
+			std::vector<int32_t> vv(vals.begin()+start, vals.begin()+start+nc);
+			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[0], ncols, nrows, GDT_Int32, 0, 0 );
 		} else if (datatype == "INT2S") {
-			std::vector<int16_t> vv(vals.begin(), vals.end());
-			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[start], ncols, nrows, GDT_Int16, 0, 0 );
+			std::vector<int16_t> vv(vals.begin()+start, vals.begin()+start+nc);
+			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[0], ncols, nrows, GDT_Int16, 0, 0 );
 		} else if (datatype == "INT4U") {
-			std::vector<uint32_t> vv(vals.begin(), vals.end());
-			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[start], ncols, nrows, GDT_UInt32, 0, 0 );
+			std::vector<uint32_t> vv(vals.begin()+start, vals.begin()+start+nc);
+			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[0], ncols, nrows, GDT_UInt32, 0, 0 );
 		} else if (datatype == "INT2U") {
-			std::vector<uint16_t> vv(vals.begin(), vals.end());
-			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[start], ncols, nrows, GDT_UInt16, 0, 0 );
+			std::vector<uint16_t> vv(vals.begin()+start, vals.begin()+start+nc);
+			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[0], ncols, nrows, GDT_UInt16, 0, 0 );
 		} else if (datatype == "INT1U") {
-			std::vector<int8_t> vv(vals.begin(), vals.end());
-			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[start], ncols, nrows, GDT_Byte, 0, 0 );
+			std::vector<int8_t> vv(vals.begin()+start, vals.begin()+start+nc);
+			err = poBand->RasterIO(GF_Write, startcol, startrow, ncols, nrows, &vv[0], ncols, nrows, GDT_Byte, 0, 0 );
 		}
 		if (err == 4) break;
 

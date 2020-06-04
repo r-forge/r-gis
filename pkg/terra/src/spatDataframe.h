@@ -23,6 +23,9 @@
 
 class SpatDataFrame {
 	public:
+		SpatDataFrame();
+		SpatDataFrame skeleton();
+	
 		SpatMessages msg;
 		void setError(std::string s) { msg.setError(s); }
 		void addWarning(std::string s) { msg.addWarning(s); }
@@ -45,6 +48,10 @@ class SpatDataFrame {
 		std::vector<double> getD(unsigned i);
 		std::vector<long> getI(unsigned i);
 		std::vector<std::string> getS(unsigned i);
+
+		double getDvalue(unsigned i, unsigned j);
+		long getIvalue(unsigned i, unsigned j);
+		std::string getSvalue(unsigned i, unsigned j);
 	
 		void add_row();
 		
@@ -55,11 +62,15 @@ class SpatDataFrame {
 		void add_column(unsigned dtype, std::string name);
 		bool add_column(std::vector<double> x, std::string name);
 		bool add_column(std::vector<long> x, std::string name);
+		bool add_column(std::vector<int> x, std::string name);
 		bool add_column(std::vector<std::string> x, std::string name);
 		
-		void insert_column(std::vector<double>);
-		void insert_column(std::vector<long>);		
-		void insert_column(std::vector<std::string>);
+		void insert_column(std::vector<double>, size_t i);
+		void insert_column(std::vector<long>, size_t i);		
+		void insert_column(std::vector<std::string>, size_t i);
+
+		bool remove_column(std::string field);
+		bool remove_column(int i);		
 
 		void resize_rows(unsigned n);
 		void resize_cols(unsigned n);
@@ -67,8 +78,12 @@ class SpatDataFrame {
 		
 		bool rbind(SpatDataFrame &x);
 		bool cbind(SpatDataFrame &x);
-		
+
+		SpatDataFrame unique(int col);
+		std::vector<int> getIndex(int col, SpatDataFrame &x);
 		std::vector<std::string> get_names();
 		void set_names(std::vector<std::string> nms);
+		
+		std::vector<std::string> get_datatypes();	
 };
 

@@ -70,7 +70,6 @@ setMethod("Compare", signature(e1="numeric", e2="SpatRaster"),
 )
 
 
-
 setMethod("Logic", signature(e1="SpatRaster", e2="SpatRaster"),
     function(e1, e2){ 
 		oper <- as.vector(.Generic)[1]
@@ -116,6 +115,44 @@ setMethod("Logic", signature(e1="logical", e2="SpatRaster"),
 )
 
 
+setMethod("!", signature(x="SpatRaster"),
+	function(x) {
+		x == 0
+	}
+)	
+
+
+setMethod("is.na", signature(x="SpatRaster"),
+	function(x) {
+		x@ptr <- x@ptr$isnan(.terra_environment$options@ptr)
+		show_messages(x, "is.na")
+	}
+)	
+
+
+setMethod("is.nan", signature(x="SpatRaster"),
+	function(x) {
+		x@ptr <- x@ptr$isnan(.terra_environment$options@ptr)
+		show_messages(x, "is.nan")
+	}
+)	
+
+
+setMethod("is.finite", signature(x="SpatRaster"),
+	function(x) {
+		x@ptr <- x@ptr$isfinite(.terra_environment$options@ptr)
+		show_messages(x, "is.finite")
+	}
+)	
+
+setMethod("is.infinite", signature(x="SpatRaster"),
+	function(x) {
+		x@ptr <- x@ptr$isinfinite(.terra_environment$options@ptr)
+		show_messages(x, "is.infinite")
+	}
+)	
+
+
 .summarize <- function(x, ..., fun, na.rm=FALSE) {
 	dots <- list(...)
 	add <- NULL	
@@ -141,6 +178,23 @@ setMethod("Logic", signature(e1="logical", e2="SpatRaster"),
 	x		
 }
 
+
+setMethod("which.max", "SpatRaster",  
+	function(x) { 
+		x@ptr <- x@ptr$summary("which.max", TRUE, .terra_environment$options@ptr)
+		show_messages(x, "which.max")
+	}
+)
+
+setMethod("which.min", "SpatRaster",  
+	function(x) { 
+		x@ptr <- x@ptr$summary("which.min", TRUE, .terra_environment$options@ptr)
+		show_messages(x, "which.min")
+	}
+)
+
+
+
 setMethod("Summary", signature(x="SpatRaster"),
 	function(x, ..., na.rm=FALSE){
 		fun <- as.character(sys.call()[[1L]])
@@ -156,16 +210,20 @@ setMethod("mean", signature(x="SpatRaster"),
 	}
 )
 
+setMethod("median", signature(x="SpatRaster"),
+	function(x, na.rm=FALSE, ...){
+		.summarize(x, ..., fun="median", na.rm=na.rm)
+	}
+)
+
 
 setMethod("Compare", signature(e1="SpatExtent", e2="SpatExtent"),
     function(e1, e2){ 
 		oper <- as.vector(.Generic)[1]
-		if (oper == "==") {
-			return( e1@ptr$equal(e2@ptr, 1) )
-			#show_messages(e1, "==")
-		} else {
-			stop("not implemented for SpatExtent")
+		if (!(oper %in% c("==", "!=", ">", "<", ">=", "<="))) {
+			stop(paste(oper, "not implemented for SpatExtent"))
 		}
+		return( e1@ptr$equal(e2@ptr, oper, 1) )
 	}	
 )
 

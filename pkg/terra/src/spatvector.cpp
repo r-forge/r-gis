@@ -78,13 +78,25 @@ SpatGeom::SpatGeom(SpatGeomType g) {
 	gtype = g;
 }
 
+bool SpatGeom::unite(SpatGeom g) {
+	if (parts.size() == 0) {
+		parts = g.parts;
+		extent = g.extent;
+	} else {
+		parts.insert(parts.end(), g.parts.begin(), g.parts.end());
+		extent.unite(g.extent);
+	}
+	return true;
+}
+
+
 bool SpatGeom::addPart(SpatPart p) {
 	parts.push_back(p);
 	if (parts.size() > 1) {
 		extent.unite(p.extent);
 	} else {
 		extent = p.extent;
-	}
+	}	
 	return true;
 }
 
@@ -113,79 +125,103 @@ SpatPart SpatGeom::getPart(unsigned i) {
 	return parts[i];
 }
 
+SpatVector::SpatVector() {};
+
+SpatVector::SpatVector(SpatGeom g) {
+	addGeom(g);
+};
+
+/*
+SpatVector::SpatVector(const SpatVector &x) {
+	srs = x.srs;
+	df = SpatDataFrame(x.df);	
+}
+*/
+
+SpatVector::SpatVector(SpatExtent e, std::string crs) {
+	SpatPart p;
+	p.x = { e.xmin, e.xmin, e.xmax, e.xmax, e.xmin };
+	p.y = { e.ymin, e.ymax, e.ymax, e.ymin, e.ymin };
+	SpatGeom g(p);
+	setGeom(g);
+	setSRS( {crs});
+};
+
+
 std::vector<double> SpatVector::getDv(unsigned i) {
-	return lyr.df.getD(i);
+	return df.getD(i);
 }
 
 std::vector<long> SpatVector::getIv(unsigned i){
-	return lyr.df.getI(i);
+	return df.getI(i);
 }
 
 std::vector<std::string> SpatVector::getSv(unsigned i){
-	return lyr.df.getS(i);
+	return df.getS(i);
 }
 
 std::vector<unsigned> SpatVector::getItype(){
-	return lyr.df.itype;
+	return df.itype;
 }
 
 std::vector<unsigned> SpatVector::getIplace(){
-	return lyr.df.iplace;
+	return df.iplace;
 }
 
 
 std::vector<std::string> SpatVector::get_names(){
-	return lyr.df.get_names();
+	return df.get_names();
 }
 
 void SpatVector::set_names(std::vector<std::string> s){
-	lyr.df.set_names(s);
+	df.set_names(s);
 }
 
 unsigned SpatVector::ncol() {
-	return lyr.df.ncol();
+	return df.ncol();
 }
 
 unsigned SpatVector::nrow() {
-	return lyr.geoms.size();
+	return geoms.size();
 }
 
 size_t SpatVector::size() {
-	return lyr.geoms.size();
+	return geoms.size();
 }
 
 bool SpatVector::is_lonlat() {
-	SpatExtent e = getExtent();
-	return e.is_lonlat(getCRS());
+	return srs.is_lonlat();
 };
 
 bool SpatVector::could_be_lonlat() {
 	SpatExtent e = getExtent();
-	return e.could_be_lonlat(getCRS());
+	return srs.could_be_lonlat(e);
 };
 
 
 SpatExtent SpatVector::getExtent(){
-	return lyr.extent;
+	return extent;
 }
 
-std::string SpatVector::getCRS(){
-	return lyr.crs;
+
+/*
+void SpatVector::setPRJ(std::string PRJ){
+	crs[0] = PRJ;
 }
 
-void SpatVector::setCRS(std::string CRS){
-	lyr.crs = CRS;
+std::string SpatVector::getPRJ(){
+	return crs[0];
 }
-
+*/
 
 std::string SpatVector::type(){
 	if (size() == 0) {
 		return "none";
-	} else if (lyr.geoms[0].gtype == points) {
+	} else if (geoms[0].gtype == points) {
 		return "points";
-	} else if (lyr.geoms[0].gtype == lines) {
+	} else if (geoms[0].gtype == lines) {
 		return "lines";
-	} else if (lyr.geoms[0].gtype == polygons) {
+	} else if (geoms[0].gtype == polygons) {
 		return "polygons";
 	} else {
 		return("unknown");
@@ -195,23 +231,23 @@ std::string SpatVector::type(){
 
 
 SpatGeom SpatVector::getGeom(unsigned i) {
-	return lyr.geoms[i];
+	return geoms[i];
 }
 
 bool SpatVector::addGeom(SpatGeom p) {
-	lyr.geoms.push_back(p);
-	if (lyr.geoms.size() > 1) {
-		lyr.extent.unite(p.extent);
+	geoms.push_back(p);
+	if (geoms.size() > 1) {
+		extent.unite(p.extent);
 	} else {
-		lyr.extent = p.extent;
+		extent = p.extent;
 	}
 	return true;
 }
 
 bool SpatVector::setGeom(SpatGeom p) {
-	lyr.geoms.resize(1);
-	lyr.geoms[0] = p;
-	lyr.extent = p.extent;
+	geoms.resize(1);
+	geoms[0] = p;
+	extent = p.extent;
 	return true;
 }
 
@@ -389,10 +425,10 @@ SpatVector SpatVector::subset_rows(std::vector<int> range) {
 	}
 
 	for (size_t i=0; i < r.size(); i++) {
-		out.addGeom( lyr.geoms[r[i]] );
+		out.addGeom( geoms[r[i]] );
 	}
-	out.lyr.crs = lyr.crs;
-	out.lyr.df = lyr.df.subset_rows(r);
+	out.srs = srs;
+	out.df = df.subset_rows(r);
 	return out;
 };
 
@@ -406,9 +442,9 @@ SpatVector SpatVector::subset_rows(int i) {
 
 SpatVector SpatVector::subset_cols(std::vector<int> range) {
 	SpatVector out = *this;
-	//out.lyr.geoms = lyr.geoms;
-	//out.lyr.crs = lyr.crs;
-	//out.lyr.extent = lyr.extent;
+	//out.geoms = geoms;
+	//out.crs = crs;
+	//out.extent = extent;
 	int nc = ncol();
 
 	std::vector<unsigned> r;
@@ -417,7 +453,7 @@ SpatVector SpatVector::subset_cols(std::vector<int> range) {
 			r.push_back(range[i]);
 		}
 	}
-	out.lyr.df = lyr.df.subset_cols(r);
+	out.df = df.subset_cols(r);
 	return out;
 };
 
@@ -428,37 +464,6 @@ SpatVector SpatVector::subset_cols(int i) {
 	return out;
 };
 
-
-SpatVector SpatVector::project(std::string crs) {
-
-	SpatVector s;
-
-    #ifndef useGDAL
-		s.setError("GDAL is not available");
-		return(s);
-	#else
-	SpatDataFrame d = getGeometryDF();
-
-	std::vector<double> x = d.dv[0];
-	std::vector<double> y = d.dv[1];
-
-	s.msg = transform_coordinates(x, y, getCRS(), crs);
-
-	if (!s.msg.has_error) {
-		unsigned n = d.iv[0].size();
-		std::vector<unsigned> a, b, c;
-		for (size_t i=0; i<n; i++) {
-			a.push_back(d.iv[0][i]);
-			b.push_back(d.iv[1][i]);
-			c.push_back(d.iv[2][i]);
-		}
-		s.setGeometry(type(), a, b, x, y, c);
-		s.setCRS(crs);
-		s.lyr.df = lyr.df;
-	}
-	#endif
-	return s;
-}
 
 
 /*

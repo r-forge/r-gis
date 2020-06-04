@@ -5,6 +5,7 @@
 \alias{extract}
 \alias{extract,SpatRaster,SpatVector-method}
 \alias{extract,SpatRaster,matrix-method}
+\alias{extract,SpatRaster,data.frame-method}
 \alias{extract,SpatRaster,numeric-method}
 
 \alias{[,SpatRaster,SpatVector,missing-method}
@@ -21,18 +22,21 @@ Extract values from a SpatRaster for a set of locations. The locations can be a 
 } 
 
 \usage{
-\S4method{extract}{SpatRaster,SpatVector}(x, y, fun=NULL, ..., method="simple", drop=FALSE)
+\S4method{extract}{SpatRaster,SpatVector}(x, y, fun=NULL, ..., touches=is.lines(y), method="simple", list=FALSE)
+
 \S4method{extract}{SpatRaster,matrix}(x, y, ...)
+
 \S4method{extract}{SpatRaster,numeric}(x, y, ...)
 }
 
 \arguments{
 \item{x}{SpatRaster}
-\item{y}{SpatVector (for points, lines, polygons), or 2-column matrix (x, y; for points), or a vector with cell numbers}
+\item{y}{SpatVector (for points, lines, polygons), or for points, 2-column matrix or data.frame (x, y) or (lon, lat), or a vector with cell numbers}
 \item{fun}{character. function to summarize the data. Currently ignored}
-\item{...}{additional arguments. None implemented}
+\item{...}{additional arguments passed to `fun`}
+\item{touches}{logical. If \code{TRUE}, values for all cells touched by lines or polygons are extracted, not just those on the line render path, or whose center point is within the polygon. Not relevant for points}
 \item{method}{character. method for extracting values with points. The default is "simple", the alternative is "bilinear"}
-\item{drop}{boolean. If \code{TRUE}, the output is simplified}
+\item{list}{logical. If \code{TRUE}, the output is simplified}
 }
 
 \value{data.frame}
@@ -43,7 +47,7 @@ Extract values from a SpatRaster for a set of locations. The locations can be a 
 r <- rast(ncol=5, nrow=5, xmin=0, xmax=5, ymin=0, ymax=5)
 values(r) <- 1:25
 xy <- rbind(c(0.5,0.5), c(2.5,2.5))
-p <- vect(xy)
+p <- vect(xy, crs="+proj=longlat +datum=WGS84")
 
 extract(r, xy)
 extract(r, p)
@@ -54,7 +58,7 @@ r[,5]
 
 r[c(0:2, 99:101)]
 
-f <- system.file("exdata/test.tif", package="terra")
+f <- system.file("ex/test.tif", package="terra")
 r <- rast(f)
 
 xy <- cbind(179000, 330000)
@@ -78,17 +82,28 @@ y <- c(x,x*2,x*3)
 y[i]
 
 # extract with a polygon
-f <- system.file("exdata/lux.shp", package="terra")
+f <- system.file("ex/lux.shp", package="terra")
 v <- vect(f)
 z <- rast(v)
+v <- v[1:2,]
 values(z) <- 1:100
 e <- extract(z, v)
-e[1:2]
-rapply(e, mean)
+e
+tapply(e[,2], e[,1], mean)
+
+ee <- extract(z, v, list=TRUE)
+rapply(ee, mean)
 
 x <- c(z, z*2, z/3)
+names(x) <- letters[1:3]
+
 e <- extract(x, v)
-matrix(rapply(e, mean), ncol=nlyr(x), byrow=TRUE)
+de <- data.frame(e)
+aggregate(de[,2:4], de[,1,drop=FALSE], mean)
+
+ee <- extract(x, v, list=TRUE)
+matrix(rapply(ee, mean), ncol=nlyr(x), byrow=TRUE)
+
 }
 
 \keyword{methods}

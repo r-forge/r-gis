@@ -29,6 +29,17 @@ std::string double_to_string(double x) {
 }
 
 
+std::vector<char *> string_to_charpnt(std::vector<std::string> s) {
+	size_t n = s.size();
+	std::vector<char *> out(n + 1);
+	for (size_t i = 0; i < n; i++) {
+		out[i] = (char *) (s[i].c_str());
+	}
+	out[n] = nullptr;
+	return out;
+}
+
+
 std::vector<std::string> double_to_string(const std::vector<double> &x, std::string prep) { 
 	std::vector<std::string> out(x.size());
 	for (size_t i=0; i<x.size(); i++) {
@@ -61,19 +72,23 @@ void lowercase(std::string &s) {
 	std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 }
 
-bool is_in_set(std::string s, std::vector<std::string> ss) {
-	std::set<std::string> sset (ss.begin(), ss.end());
-	return sset.find(s) != sset.end();
+bool is_in_vector(std::string s, std::vector<std::string> ss) {
+	//std::set<std::string> sset (ss.begin(), ss.end());
+	//return sset.find(s) != sset.end();
+	auto it = std::find (ss.begin(), ss.end(), s);
+	return (it != ss.end());
 }
 
 
-/*
-unsigned where_in_set(std::string s, std::vector<std::string> ss) {
-	std::set<std::string> sset (ss.begin(), ss.end());
-	unsigned out = sset.find(s);
-	return out;
+int where_in_vector(std::string s, std::vector<std::string> ss) {
+	int i = -1;
+	auto it = std::find (ss.begin(), ss.end(), s);
+	if (it != ss.end()) {
+		i = std::distance(ss.begin(), it);
+	}
+	return i;
 }
-*/
+
 
 std::string is_in_set_default(std::string s, std::vector<std::string> ss, std::string defvalue, bool tolower) {
 	if (tolower) lowercase(s);
@@ -183,7 +198,7 @@ std::vector<long unsigned> order(const std::vector<T> &v) {
   return idx;
 }
 
-
+//does not catch all cases. needs fixing
 void make_unique_names(std::vector<std::string> &s) {
     std::vector<long unsigned> x = order(s);
     std::sort(s.begin(), s.end());

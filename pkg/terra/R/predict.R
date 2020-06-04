@@ -5,14 +5,19 @@
 
 
 .runModel <- function(model, fun, d, nl, const, na.rm, index, ...) {
+	if (!is.data.frame(d)) {
+		d <- data.frame(d)
+	}
 	if (! is.null(const)) {
-		d <- cbind(d, const[1])
-	} 
+		for (i in 1:ncol(const)) {
+			d <- cbind(d, const[,i,drop=FALSE])
+		}
+	}	 
 	if (na.rm) {
 		n <- nrow(d)
 		i <- rowSums(is.na(d)) == 0
 		d <- d[i,,drop=FALSE]
-		if (ncol(d) > 0) {
+		if (nrow(d) > 0) {
 			r <- fun(model, d, ...)
 			if (is.factor(r)) {
 				r <- as.integer(r)
@@ -101,7 +106,7 @@ setMethod("predict", signature(object="SpatRaster"),
 		nc <- ncol(object)
 		tomat <- FALSE
 		d <- readValues(object, round(0.5*nrow(object)), 1, 1, min(nc,500), TRUE, TRUE)
-
+	
 		r <- .runModel(model, fun, d, nl, const, na.rm, index, ...)
 		nl <- ncol(r)		
 		out <- rast(object, nlyr=nl)
@@ -113,7 +118,7 @@ setMethod("predict", signature(object="SpatRaster"),
 		for (i in 1:b$n) {
 			d <- readValues(object, b$row[i], b$nrows[i], 1, nc, TRUE, TRUE)
 			r <- .runModel(model, fun, d, nl, const, na.rm, index, ...)
-			writeValues(out, r, c(b$row[i], b$nrows[i]))
+			writeValues(out, r, b$row[i], b$nrows[i])
 		}
 		readStop(object)
 		out <- writeStop(out)

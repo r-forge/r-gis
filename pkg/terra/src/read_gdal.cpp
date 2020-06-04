@@ -20,10 +20,13 @@
 #include <stdint.h>
 #include <regex>
 
-#include "spatRaster.h"
+//#include "spatRaster.h"
+#include "spatRasterMultiple.h"
+
 #include "file_utils.h"
 #include "string_utils.h"
 #include "NA.h"
+
 
 #include "gdal_priv.h"
 #include "cpl_conv.h" // for CPLMalloc()
@@ -33,23 +36,32 @@
 #include "gdal_rat.h"
 //#include "hdr.h"
 
+#include "gdal_errors.h"
 
-void SpatRaster::spatinit() {
+#if GDAL_VERSION_MAJOR >= 3
+#include "proj.h"
+#endif
+
+
+void SpatRaster::gdalogrproj_init(std::string path) {
     GDALAllRegister();
-    OGRRegisterAll(); // should go to SpatVector
+    OGRRegisterAll(); 
 	//GDALregistred = true;
+#if GDAL_VERSION_MAJOR >= 3
+	if (path != "") {
+		const char *cp = path.c_str();
+		proj_context_set_search_paths(PJ_DEFAULT_CTX, 1, &cp);
+	}
+#endif
 }
-
-
-
 
 
 bool SpatRaster::constructFromFiles(std::vector<std::string> fnames) {
 
-	SpatRaster r = SpatRaster(fnames[0]);
+	SpatRaster r = SpatRaster(fnames[0], -1);
 	setSource(r.source[0]);
 	for (size_t i=1; i<fnames.size(); i++) {
-		r = SpatRaster(fnames[i]);
+		r = SpatRaster(fnames[i], -1);
 		if (!compare_geom(r, false, true, true)) {
 			setError("geometry of " + fnames[i] + " does not match previous sources");
 			return false;
@@ -136,42 +148,58 @@ std::string basename_sds(std::string f) {
 	f = std::regex_replace(f, std::regex(".hdf$"), "");
 	f = std::regex_replace(f, std::regex(".nc$"), "");
 	f = std::regex_replace(f, std::regex("\""), "");
-	
+
 	return f;
 }
 
-bool SpatRaster::constructFromSubDataSets(std::string filename, std::vector<std::string> sds) {
+bool SpatRaster::constructFromSubDataSets(std::string filename, std::vector<std::string> meta, int subds) {
+
 
 	std::vector<std::string> sd; //, nms;
-	std::string delim = "NAME=";
-	for (size_t i=0; i<sds.size(); i++) {
-		std::string s = sds[i];
-		size_t pos = s.find(delim);
+	std::vector<std::string> dc; //, nms;
+	std::string ndelim = "NAME=";
+	std::string ddelim = "DESC=";
+	for (size_t i=0; i<meta.size(); i++) {
+		std::string s = meta[i];
+		size_t pos = s.find(ndelim);
 		if (pos != std::string::npos) {
-			s.erase(0, pos + delim.length());
+			s.erase(0, pos + ndelim.length());
 			sd.push_back(s);
-		} 
-		//else {
-			// _DESC=
-		//	s.erase(0, pos + delim.length());
-			//nms.push_back(s);
-			//printf( "%s\n", s.c_str() );
-
-		//}
+		} else {
+			size_t pos = s.find(ddelim);
+			if (pos != std::string::npos) {
+				s.erase(0, pos + ddelim.length());
+				dc.push_back(s);
+			}
+		}
 	}
-
-	constructFromFile(sd[0]);
+	if (sd.size() == 0) {
+		return false;
+	}
+	bool useDC = (dc.size() == sd.size());
+	int sdsize = sd.size();
+	if ((subds >=0) && (subds < sdsize)) {
+	sd = {sd[subds]};
+		if (useDC) {
+			dc = {dc[subds]};
+		}
+	} 
+	
+	bool success = constructFromFile(sd[0], -1);
+	if (!success) {
+		return false;
+	}
 	SpatRaster out;
-	bool success;
     for (size_t i=1; i < sd.size(); i++) {
 //		printf( "%s\n", sd[i].c_str() );
-		success = out.constructFromFile(sd[i]);
+		success = out.constructFromFile(sd[i], -1);
 		if (success) {
 //			out.source[0].subdataset = true;
 			addSource(out);
 			if (out.msg.has_error) {
-				setError(out.msg.error);
-				return false;
+				//setError(out.msg.error);
+				//return false;
+				addWarning("skipped (different geometry): " + sd[i]);
 			}
 		} else {
 			if (out.msg.has_error) {
@@ -183,18 +211,105 @@ bool SpatRaster::constructFromSubDataSets(std::string filename, std::vector<std:
 
 	for (std::string& s : sd) s = basename_sds(s);
 	success = setNames(sd);
-	
+
 	return true;
 }
 
 
-bool SpatRaster::constructFromFile(std::string fname) {
+
+std::string getDsWKT(GDALDataset *poDataset) { 
+	std::string wkt = "";
+#if GDAL_VERSION_MAJOR >= 3
+	const OGRSpatialReference *srs = poDataset->GetSpatialRef();
+	if (srs == NULL) return wkt;
+	char *cp;
+	const char *options[3] = { "MULTILINE=YES", "FORMAT=WKT2", NULL };
+	OGRErr err = srs->exportToWkt(&cp, options);
+	if (err == OGRERR_NONE) {
+		wkt = std::string(cp);
+	} 
+	CPLFree(cp);
+
+#else
+	if (poDataset->GetProjectionRef() != NULL) { 
+		char *cp;
+		OGRSpatialReference oSRS(poDataset->GetProjectionRef());
+		OGRErr err = oSRS.exportToPrettyWkt(&cp);
+		if (err == OGRERR_NONE) {
+			wkt = std::string(cp);
+		}
+	        CPLFree(cp);
+	}
+#endif 	
+	return wkt;
+}
+
+std::string getDsPRJ(GDALDataset *poDataset) { 
+	std::string prj = "";
+#if GDAL_VERSION_MAJOR >= 3
+	const OGRSpatialReference *srs = poDataset->GetSpatialRef();
+	if (srs == NULL) return prj;
+	char *cp;
+	OGRErr err = srs->exportToProj4(&cp);
+	if (err == OGRERR_NONE) {
+		prj = std::string(cp);
+	}
+        CPLFree(cp);
+#else
+	if( poDataset->GetProjectionRef() != NULL ) {
+		OGRSpatialReference oSRS(poDataset->GetProjectionRef());
+		char *pszPRJ = NULL;
+		oSRS.exportToProj4(&pszPRJ);
+		prj = pszPRJ;
+	}
+#endif	
+	return prj;
+}
+
+
+SpatRasterStack::SpatRasterStack(std::string fname) {
 
     GDALDataset *poDataset;
-    
-	//if (!GDALregistred) spatinit(); //
-	GDALAllRegister();
+    poDataset = (GDALDataset *) GDALOpen( fname.c_str(), GA_ReadOnly );
+    if( poDataset == NULL )  {
+		if (!file_exists(fname)) {
+			setError("file does not exist");
+		} else {
+			setError("cannot read from " + fname );
+		}
+		return;
+	}
 
+	unsigned nl = poDataset->GetRasterCount();
+	if (nl == 0) {
+		std::string delim = "NAME=";
+		std::vector<std::string> meta;
+		char **metadata = poDataset->GetMetadata("SUBDATASETS");
+		SpatRaster sub;
+	    for (size_t i=0; metadata[i] != NULL; i++) {
+			std::string s = metadata[i];
+			size_t pos = s.find(delim);
+			if (pos != std::string::npos) {
+				s.erase(0, pos + delim.length());
+				//sd.push_back(s);
+				if (sub.constructFromFile(s, -1)) {
+					if (!push_back(sub, basename_sds(s))) {
+						addWarning("skipped (different geometry): " + s);
+					}
+				} else {
+					addWarning("skipped (fail): " + s);
+				}
+			}
+		} 
+	} else {
+		setError("file does not consist of subdatasets");
+	}
+}
+
+
+bool SpatRaster::constructFromFile(std::string fname, int subds) {
+
+    GDALDataset *poDataset;
 	const char* pszFilename = fname.c_str();
     poDataset = (GDALDataset *) GDALOpen( pszFilename, GA_ReadOnly );
 
@@ -216,10 +331,9 @@ bool SpatRaster::constructFromFile(std::string fname) {
 			meta.push_back(metadata[i]);
 		}
 		if (meta.size() > 0) {
-			return constructFromSubDataSets(fname, meta);
-		}
+			return constructFromSubDataSets(fname, meta, subds);
+		}// else error??	
 	}
-
 	RasterSource s;
 	s.ncol = poDataset->GetRasterXSize();
 	s.nrow = poDataset->GetRasterYSize();
@@ -249,7 +363,7 @@ bool SpatRaster::constructFromFile(std::string fname) {
 	s.filename = fname;
 	s.driver = "gdal";
 
-
+/*
 	if( poDataset->GetProjectionRef() != NULL ) {
 		OGRSpatialReference oSRS(poDataset->GetProjectionRef());
 		char *pszPRJ = NULL;
@@ -258,7 +372,14 @@ bool SpatRaster::constructFromFile(std::string fname) {
 	} else {
 		s.crs = "";
 	}
+*/
 
+	std::string crs = getDsWKT(poDataset);
+	std::string msg;
+	if (!s.srs.set({crs}, msg)) {
+		setError(msg);
+		return false;
+	}
 
 	GDALRasterBand  *poBand;
 	//int nBlockXSize, nBlockYSize;
@@ -381,7 +502,9 @@ bool SpatRaster::readStartGDAL(unsigned src) {
 }
 
 bool SpatRaster::readStopGDAL(unsigned src) {
-	GDALClose( (GDALDatasetH) source[src].gdalconnection);
+	if (source[src].gdalconnection != NULL) {
+		GDALClose( (GDALDatasetH) source[src].gdalconnection);
+	}
 	source[src].open_read = false;
 	return true;
 }
@@ -752,4 +875,6 @@ std::vector<std::vector<double>> SpatRaster::readRowColGDAL(unsigned src, const 
 	}
 	return out;
 }
+
+
 

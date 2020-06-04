@@ -19,6 +19,7 @@ There is a also a method for merging SpatVector with a data.frame.
 
 \usage{
 \S4method{merge}{SpatRaster,SpatRaster}(x, y, ..., filename="", overwrite=FALSE, wopt=list())
+
 \S4method{merge}{SpatExtent,SpatExtent}(x, y, ...)
 
 \S4method{merge}{SpatVector,data.frame}(x, y, ...)
@@ -61,7 +62,7 @@ m <- do.call(merge, s)
 
 ##
 # SpatVector with data.frame
-f <- system.file("exdata/lux.shp", package="terra")
+f <- system.file("ex/lux.shp", package="terra")
 p <- vect(f)
 dfr <- data.frame(District=p$NAME_1, Canton=p$NAME_2, Value=round(runif(length(p), 100, 1000)))
 dfr <- dfr[1:5, ]

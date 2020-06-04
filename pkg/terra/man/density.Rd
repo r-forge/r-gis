@@ -20,7 +20,7 @@ Create density plots of the cell values of a SpatRaster
 \item{maxcells}{the maximum number of (randomly sampled) cells to be used for creating the plot}
 \item{plot}{if \code{TRUE} produce a plot, else return a density object}
 \item{main}{character. Caption of plot(s)}
-\item{...}{additional arguments passed to \code{\link[graphics]{plot}}}
+\item{...}{additional arguments passed to \code{\link{plot}}}
 }
 
 \value{
@@ -28,7 +28,7 @@ density plot (and a density object, returned invisibly if \code{plot=TRUE)}
 }
 
 \examples{
-logo <- rast(system.file("exdata/logo.tif", package="terra"))
+logo <- rast(system.file("ex/logo.tif", package="terra"))
 density(logo)
 }
 

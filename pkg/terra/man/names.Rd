@@ -4,6 +4,8 @@
 \alias{names<-}
 \alias{names,SpatRaster-method}
 \alias{names<-,SpatRaster-method}
+\alias{names,SpatStack-method}
+\alias{names<-,SpatStack-method}
 \alias{names,SpatVector-method}
 \alias{names<-,SpatVector-method}
   
@@ -15,8 +17,15 @@ Get or set the names of the layers of a SpatRaster or the attributes of a SpatVe
 
 \usage{
 \S4method{names}{SpatRaster}(x)
+
 \S4method{names}{SpatRaster}(x)<-value
+
+\S4method{names}{SpatStack}(x)
+
+\S4method{names}{SpatStack}(x)<-value
+
 \S4method{names}{SpatVector}(x)
+
 \S4method{names}{SpatVector}(x)<-value
 }
 
@@ -46,7 +55,7 @@ names(s) <- c("a", "  a  ", "3")
 names(s)
 
 # SpatVector names
-f <- system.file("exdata/lux.shp", package="terra")
+f <- system.file("ex/lux.shp", package="terra")
 v <- vect(f)
 names(v)
 names(v) <- paste0(substr(names(v), 1, 2), "_", 1:ncol(v))

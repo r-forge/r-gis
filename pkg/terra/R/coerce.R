@@ -3,29 +3,56 @@
 # Version 1.0
 # License GPL v3
 
+setMethod("as.list", signature(x="SpatRaster"), 
+	function(x, ...)  {
+		out <- list()
+		for (i in 1:nlyr(x)) {
+			out[[i]] <- x[[i]]
+		}
+		out
+	}
+)
+
  
 setMethod("as.polygons", signature(x="SpatRaster"), 
-	function(x, values=FALSE, na.rm=FALSE, ...) {
+	function(x, trunc=TRUE, dissolve=TRUE, values=TRUE, ...) {
 		p <- methods::new("SpatVector")
-		p@ptr <- x@ptr$as_polygons(values, na.rm)
-		x <- show_messages(x)
-		show_messages(p)
+		p@ptr <- x@ptr$as_polygons(trunc[1], dissolve[1], values[1], TRUE)
+		#x <- show_messages(x)
+		show_messages(p, "as.polygons")
+	}
+)
+
+setMethod("as.polygons", signature(x="SpatExtent"), 
+	function(x, crs="", ...) {
+		p <- methods::new("SpatVector")
+		p@ptr <- SpatVector$new(x@ptr, crs)
+		show_messages(p, "as.polygons")
 	}
 )
 
 setMethod("as.lines", signature(x="SpatVector"), 
 	function(x, ...) {
 		x@ptr <- x@ptr$as_lines()
-		show_messages(x)
+		show_messages(x, "as.lines")
 	}
 )
 
+
+setMethod("as.points", signature(x="SpatVector"), 
+	function(x, ...) {
+		x@ptr <- x@ptr$as_points()
+		show_messages(x, "as.points")
+	}
+)
+
+
 setMethod("as.points", signature(x="SpatRaster"), 
-	function(x, values=FALSE, na.rm=FALSE, ...) {
+	function(x, values=TRUE, ...) {
 		p <- methods::new("SpatVector")
-		p@ptr <- x@ptr$as_points(values, na.rm)
+		p@ptr <- x@ptr$as_points(values, TRUE)
 		x <- show_messages(x)
-		show_messages(p)
+		show_messages(p, "as.points")
 	}
 )
 
@@ -206,9 +233,10 @@ setAs("SpatRaster", "Raster",
 		s <- sources(from)
 		nl <- nlyr(from)
 		e <- as.vector(ext(from))
+		prj <- .proj4(from)
 		if (nl == 1) {
 			if (s$source == "") {
-				r <- raster(ncol=ncol(from), nrow=nrow(from), crs=crs(from),
+				r <- raster(ncol=ncol(from), nrow=nrow(from), crs=prj,
 			          xmn=e[1], xmx=e[2], ymn=e[3], ymx=e[4])
 				if (.hasValues(from)) {
 					values(r) <- values(from)
@@ -221,13 +249,13 @@ setAs("SpatRaster", "Raster",
 			if (nrow(s) == 1 & s$source[1] != "") {
 				r <- brick(s$source)			
 			} else if (all(s$source=="")) {
-				r <- brick(ncol=ncol(from), nrow=nrow(from), crs=crs(from),
+				r <- brick(ncol=ncol(from), nrow=nrow(from), crs=prj,
 			          xmn=e[1], xmx=e[2], ymn=e[3], ymx=e[4], nl=nlyr(from))
 				if (.hasValues(from)) {
 					values(r) <- values(from)
 				}
 			} else {
-				x <- raster(ncol=ncol(from), nrow=nrow(from), crs=crs(from),
+				x <- raster(ncol=ncol(from), nrow=nrow(from), crs=prj,
 			          xmn=e[1], xmx=e[2], ymn=e[3], ymx=e[4])
 				r <- list()
 				for (i in 1:nl) {
@@ -245,12 +273,19 @@ setAs("SpatRaster", "Raster",
 )
 
 
+setAs("sf", "SpatVector", 
+	function(from) {
+		from <- methods::as(from, "Spatial")
+		methods::as(from, "SpatVector")
+	}
+)
+
 
 setAs("SpatVector", "Spatial", 
 	function(from) {
 		g <- geom(from)
 		colnames(g)[1] <- "object"
-		raster::geom(g, values(from), geomtype(from), crs(from))
+		raster::geom(g, values(from), geomtype(from), .proj4(from))
 	}
 )
 

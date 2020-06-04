@@ -98,40 +98,46 @@ std::vector<double> SpatRaster::readValues(unsigned row, unsigned nrows, unsigne
 			}
 		} else {
 			// read from file
-			std::vector<double> fvals;
-			//if (source[src].driver == "raster") {
-			//	fvals = readValuesBinary(src, row, nrows, col, ncols);
-			//} else {
 			#ifdef useGDAL
-			fvals = readValuesGDAL(src, row, nrows, col, ncols);
-			#endif // useGDAL
-			//}
+			std::vector<double> fvals = readValuesGDAL(src, row, nrows, col, ncols);
 			out.insert(out.end(), fvals.begin(), fvals.end());			
+			#endif // useGDAL
 		}
 	}
 	return out;
 }
 
 
-std::vector<double>  SpatRaster::getValues() {
+std::vector<double> SpatRaster::getValues() {
 	std::vector<double> out;
-
-		unsigned n = nsrc();
-		for (size_t src=0; src<n; src++) {
-			if (source[src].memory) {
-				out.insert(out.end(), source[src].values.begin(), source[src].values.end());
-			} else if (source[0].driver == "raster") {
-				std::vector<double> fvals = readValues(0, nrow(), 0, ncol());
-				out.insert(out.end(), fvals.begin(), fvals.end());
-			} else {
-				#ifdef useGDAL
-				std::vector<double> fvals = readValuesGDAL(src, 0, nrow(), 0, ncol());
-				out.insert(out.end(), fvals.begin(), fvals.end());
-				#endif // useGDAL
-			}
+	unsigned n = nsrc();
+	for (size_t src=0; src<n; src++) {
+		if (source[src].memory) {
+			out.insert(out.end(), source[src].values.begin(), source[src].values.end());
+		} else {
+			#ifdef useGDAL
+			std::vector<double> fvals = readValuesGDAL(src, 0, nrow(), 0, ncol());
+			out.insert(out.end(), fvals.begin(), fvals.end());
+			#endif // useGDAL
 		}
-		
-		
+	}
 	return out;
+}
+
+
+bool SpatRaster::getValuesSource(size_t src, std::vector<double> &out) {
+	
+	unsigned n = nsrc();
+	if (src > n) {
+		return false;
+	}
+	if (source[src].memory) {
+		out = std::vector<double>(source[src].values.begin(), source[src].values.end());
+	} else {
+		#ifdef useGDAL
+		out = readValuesGDAL(src, 0, nrow(), 0, ncol());
+		#endif // useGDAL
+	}	
+	return true;
 }
 

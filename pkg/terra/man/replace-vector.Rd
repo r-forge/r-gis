@@ -14,6 +14,7 @@ Replace values of a SpatVector.
 
 \usage{
 \S4method{$}{SpatVector}(x, name)
+
 \S4method{$}{SpatVector}(x, name)<-value
 }
 
@@ -34,7 +35,7 @@ vector
 
 
 \examples{
-f <- system.file("exdata/lux.shp", package="terra")
+f <- system.file("ex/lux.shp", package="terra")
 v <- vect(f)
 v$NAME_1
 v$ID_1 <- LETTERS[1:12]

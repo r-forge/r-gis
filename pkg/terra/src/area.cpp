@@ -17,7 +17,8 @@
 
 #include <vector>
 #include <math.h>
-#include "GeographicLib_geodesic.h"
+//#include "GeographicLib_geodesic.h"
+#include "geodesic.h"
 #include "spatRaster.h"
 #include "distance.h"
 
@@ -87,11 +88,11 @@ std::vector<double> SpatVector::area() {
 		double a = 6378137;
 		double f = 1 / 298.257223563;
 		for (size_t i=0; i<s; i++) {
-			ar.push_back(lyr.geoms[i].area_lonlat(a, f));
+			ar.push_back(geoms[i].area_lonlat(a, f));
 		}
 	} else {
 		for (size_t i=0; i<s; i++) {
-			ar.push_back(lyr.geoms[i].area_plane());
+			ar.push_back(geoms[i].area_plane());
 		}
 	}
 	return ar;
@@ -160,11 +161,11 @@ std::vector<double> SpatVector::length() {
 		double a = 6378137;
 		double f = 1 / 298.257223563;
 		for (size_t i=0; i<s; i++) {
-			r.push_back(lyr.geoms[i].length_lonlat(a, f));
+			r.push_back(geoms[i].length_lonlat(a, f));
 		}
 	} else {
 		for (size_t i=0; i<s; i++) {
-			r.push_back(lyr.geoms[i].length_plane());
+			r.push_back(geoms[i].length_plane());
 		}
 	}
 	return r;
@@ -178,7 +179,7 @@ SpatRaster SpatRaster::area(SpatOptions &opt) {
 		SpatExtent e = {extent.xmin, extent.xmin+xres(), extent.ymin, extent.ymax};
 		SpatOptions optint(opt);
 		SpatRaster onecol = out.crop(e, "near", optint);
-		SpatVector p = onecol.as_polygons(false, false);
+		SpatVector p = onecol.as_polygons(false, false, false, false);
 		std::vector<double> a = p.area();
 		for (size_t i = 0; i < out.bs.n; i++) {
 			std::vector<double> v;

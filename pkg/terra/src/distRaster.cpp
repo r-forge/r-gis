@@ -38,7 +38,7 @@ std::vector<double> shortDistPoints(const std::vector<double> &x, const std::vec
 SpatRaster SpatRaster::distance(SpatVector p, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
-	if (crs == "") {
+	if (srs.wkt == "") {
 		out.setError("CRS not defined");
 		return(out);
 	}
@@ -47,7 +47,7 @@ SpatRaster SpatRaster::distance(SpatVector p, SpatOptions &opt) {
 	if (gtype != "points") {
 		SpatOptions ops;
 		std::vector<double> feats(p.size(), 1) ;
-		SpatRaster x = rasterize(p, feats, NAN, false, ops);
+		SpatRaster x = rasterize(p, "", feats, NAN, false, false, false, ops);
 		if (gtype == "polygons") {
 			std::string etype = "inner";
 			x = x.edges(false, etype, 8, ops);
@@ -120,9 +120,9 @@ SpatDataFrame SpatVector::distance() {
 		out.setError("only inmplemented for points --- to be improved");
 		return(out);
 	}
-	std::string crs = getCRS();
-	if (crs == "") {
-		out.setError("CRS not defined");
+	std::string srs = getSRS("wkt");
+	if (srs == "") {
+		out.setError("SRS not defined");
 		return(out);
 	}
 	bool lonlat = is_lonlat();
@@ -163,14 +163,15 @@ SpatDataFrame SpatVector::distance(SpatVector x, bool pairwise) {
 		out.setError("only inmplemented for points --- to be improved");
 		return(out);
 	}
-	std::string crs = getCRS();
-	std::string xcrs = x.getCRS();
-	if (crs == "") {
-		out.setError("CRS not defined");
+	//std::vector<std::string> crs = getSRS();
+	//std::vector<std::string> xcrs = x.getSRS();
+
+	if (srs.is_empty()) {
+		out.setError("SRS not defined");
 		return(out);
 	}
-	if (crs != xcrs) {
-		out.setError("CRS do not match");
+	if (! srs.is_equal(x.srs) ) {
+		out.setError("SRSs do not match");
 		return(out);
 	}
 	bool lonlat = is_lonlat();

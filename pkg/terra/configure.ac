@@ -23,7 +23,7 @@ if test [$RVER_MAJOR = "development"]; then
     CXX11STD=`"${RBIN}" CMD config CXX11STD`
 else
     if test [$RVER_MAJOR -lt 3] -o [$RVER_MAJOR -eq 3 -a $RVER_MINOR -lt 3]; then
-        AC_MSG_ERROR([sf is not compatible with R versions before 3.3.0])
+        AC_MSG_ERROR([terra is not compatible with R versions before 3.3.0])
     else
         if test [$RVER_MINOR -eq 3]; then
             CXX11=`"${RBIN}" CMD config CXX1X`
@@ -118,7 +118,7 @@ AC_MSG_CHECKING([GDAL version >= 2.0.1])
 GDAL_MAJ_VER=`echo $GDAL_VERSION | cut -d "." -f1`
 if test ${GDAL_MAJ_VER} -lt 2 ; then
   AC_MSG_RESULT(no)
-  AC_MSG_ERROR([sf is not compatible with GDAL versions below 2.0.1])
+  AC_MSG_ERROR([terra is not compatible with GDAL versions below 2.0.1])
 else
    AC_MSG_RESULT(yes)
 fi
@@ -300,6 +300,7 @@ if test "${gdal_has_proj}" = no; then
    AC_MSG_ERROR([OGRCoordinateTransformation() does not return a coord.trans: PROJ not available?])
 fi
 rm -fr errors.txt gdal_proj.cpp gdal_proj
+AC_MSG_NOTICE([GDAL: ${GDAL_VERSION}])
 
 
 #
@@ -341,7 +342,7 @@ PROJH="no"
 if test "${proj_config_ok}" = yes; then
   PROJ_VERSION=`${PROJ_CONFIG} --modversion`
   PROJV1=`echo "${PROJ_VERSION}" | cut -c 1`
-  if test "${PROJV1}" = "6" ; then
+  if test "${PROJV1}" -ge 6; then
     PROJ6="yes"
     PROJ_CPPFLAGS="${PROJ_CPPFLAGS} -DHAVE_PROJ_H"
     if test "${proj_api}" = yes; then

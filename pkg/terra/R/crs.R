@@ -3,46 +3,35 @@
 # Version 0.9
 # License GPL v3
 
+.proj4 <- function(x) {
+	x@ptr$get_crs("proj4")
+}
+
 
 setMethod("crs", signature("SpatRaster"), 
 	function(x) {
-		x@ptr$crs
+		x@ptr$get_crs("wkt")
 	}
 )
 
 setMethod("crs<-", signature("SpatRaster", "character"), 
 	function(x, ..., value) {
-		x@ptr$crs <- value
-		return(x)
-	}
-)
-
-
-setMethod("crs", signature("SpatRaster"), 
-	function(x) {
-		x@ptr$crs
-	}
-)
-
-
-setMethod("crs<-", signature("SpatRaster", "character"), 
-	function(x, ..., value) {
-		x@ptr$crs <- value
-		return(x)
+		x@ptr$set_crs(value[1])
+		show_messages(x, "crs<-")
 	}
 )
 
 
 setMethod("crs", signature("SpatVector"), 
 	function(x) {
-		x@ptr$crs
+		x@ptr$get_crs("wkt")
 	}
 )
 
 setMethod("crs<-", signature("SpatVector", "character"), 
 	function(x, ..., value) {
-		x@ptr$crs <- trimws(value)
-		return(x)
+		x@ptr$set_crs(value[1])
+		show_messages(x, "crs<-")
 	}
 )
 

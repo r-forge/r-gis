@@ -214,30 +214,53 @@ std::vector<double> compute_aggregates(std::vector<double> &in, size_t nr, size_
 
 SpatRaster SpatRaster::aggregate(std::vector<unsigned> fact, std::string fun, bool narm, SpatOptions &opt) {
 
+	SpatRaster out;
 	std::string message = "";
 	bool success = get_aggregate_dims(fact, message);
 
 // fact 1, 2, 3, are the aggregations factors dy, dx, dz
 // and 4, 5, 6 are the new nrow, ncol, nlyr
-
 	if (!success) {
-		SpatRaster er = geometry();
-		er.setError(message);
-		return er;
+		out.setError(message);
+		return out;
 	}
 
 	double xmax = extent.xmin + fact[4] * fact[1] * xres();
 	double ymin = extent.ymax - fact[3] * fact[0] * yres();
 	SpatExtent e = SpatExtent(extent.xmin, xmax, ymin, extent.ymax);
-	SpatRaster out = SpatRaster(fact[3], fact[4], fact[5], e, crs);
-
-	if (!source[0].hasValues) { return out; }
+	out = SpatRaster(fact[3], fact[4], fact[5], e, "");
+	out.srs = srs;
+	if (fact[5] == nlyr()) {
+		out.setNames(getNames());
+	}
+	
+	if (!source[0].hasValues) { 
+		return out; 
+	}
 
 	std::vector<std::string> f {"sum", "mean", "min", "max", "median", "modal"};
-	if (std::find(f.begin(), f.end(), fun) == f.end()) {
+	auto it = std::find(f.begin(), f.end(), fun);
+	if (it == f.end()) {
 		out.setError("unknown function argument");
 		return out;
 	}
+
+	size_t ifun = std::distance(f.begin(), it);
+	std::string gstring = "";
+	if (ifun > 0) {
+		std::vector<std::string> gf {"average", "min", "max", "med", "mode"};
+		gstring = gf[ifun-1]; 
+	}
+	
+#ifdef useGDAL 
+#if GDAL_VERSION_MAJOR >= 3
+	if (gstring != "") {
+		out = warper(out, "", gstring, opt);
+		return out;
+	}	
+#endif
+#endif
+
 	std::function<double(std::vector<double>&, bool)> agFun = getFun(fun);
 
 	unsigned outnc = out.ncol();

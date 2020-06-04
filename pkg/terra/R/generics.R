@@ -53,14 +53,22 @@ setMethod("c", signature(x="SpatRaster"),
 	function(x, ...) {
 		dots <- list(...)
 		for (i in dots) {
-			if (class(i) == "SpatRaster") {
+			if (inherits(i, "SpatRaster")) {
 				x@ptr <- x@ptr$combineSources(i@ptr)
 			}
 		}
-		x@ptr$setNames(x@ptr$names)
 		show_messages(x, "c")		
 	}
 )
+
+
+setMethod("rep", signature(x="SpatRaster"), 
+	function(x, ...) {
+		i <- rep(1:nlyr(x), ...)
+		x[[i]]
+	}
+)
+
 
 setMethod("clamp", signature(x="SpatRaster"), 
 	function(x, lower=-Inf, upper=Inf, values=TRUE, filename="", overwrite=FALSE, wopt=list(), ...) {
@@ -91,7 +99,6 @@ function(x, rcl, include.lowest=FALSE, right=TRUE, othersNA=FALSE, filename="", 
 .getExt <- function(x) {
 	return(x)
 }
-
 
 setMethod("crop", signature(x="SpatRaster", y="ANY"), 
 	function(x, y, snap="near", filename="", overwrite=FALSE, wopt=list(), ...) {
@@ -132,14 +139,26 @@ setMethod("cover", signature(x="SpatRaster", y="SpatRaster"),
 	}
 )
 
-setMethod("disaggregate", signature(x="SpatRaster"), 
-	function(x, fact, filename="", overwrite=FALSE, wopt=list(), ...) {
+
+setMethod("diff", signature(x="SpatRaster"), 
+	function(x, filename="", overwrite=FALSE, wopt=list(), ...) { 
+		n = nlyr(x)
+		if (n<2) return(rast(x))
+		y = x[[-1]]
+		x = x[[-n]]
 		opt <- .runOptions(filename, overwrite, wopt)
-		x@ptr <- x@ptr$disaggregate(fact, opt)
-		show_messages(x, "disaggregate")
+		x@ptr <- x@ptr$arith_rast(y@ptr, "-", opt)
+		show_messages(x, "diff")
 	}
 )
 
+
+setMethod("disaggregate", signature(x="SpatVector"), 
+	function(x, ...) {
+		x@ptr <- x@ptr$disaggregate()
+		show_messages(x, "disaggregate")
+	}
+)
 
 
 setMethod("flip", signature(x="SpatRaster"), 
@@ -175,33 +194,41 @@ setMethod("mask", signature(x="SpatRaster", mask="SpatRaster"),
 )
 
 setMethod("mask", signature(x="SpatRaster", mask="SpatVector"), 
-	function(x, mask, inverse=FALSE, updatevalue=NA, filename="", overwrite=FALSE, wopt=list(), ...) { 
+	function(x, mask, inverse=FALSE, updatevalue=NA, touches=is.lines(mask), filename="", overwrite=FALSE, wopt=list(), ...) { 
 		opt <- .runOptions(filename, overwrite,wopt)
-		x@ptr <- x@ptr$mask_vector(mask@ptr, inverse[1], NA, updatevalue[1], opt)
+		x@ptr <- x@ptr$mask_vector(mask@ptr, inverse[1], updatevalue[1], opt)
 		show_messages(x, "mask")		
 	}
 )
 
 
-
 setMethod("project", signature(x="SpatRaster"), 
-	function(x, crs, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
+	function(x, y, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
+		
+		method <- ifelse(method == "ngb", "near", method)
 		opt <- .runOptions(filename, overwrite, wopt)
-		if (!is.character(crs)) {
-			warning("crs should be a character value")
-			crs <- as.character(crs(crs))
+		if (inherits(y, "SpatRaster")) {
+			#x@ptr <- x@ptr$warp(y@ptr, method, opt)
+			x@ptr <- x@ptr$warper(y@ptr, "", method, opt)
+		} else {
+			if (!is.character(y)) {
+				warning("crs should be a character value")
+				y <- as.character(crs(y))
+			}
+			#x@ptr <- x@ptr$warpcrs(y, method, opt)
+			x@ptr <- x@ptr$warper(SpatRaster$new(), y, method, opt)
 		}
-		x@ptr <- x@ptr$project(crs, method, opt)
 		show_messages(x, "project")
 	}
 )
 
+
 setMethod("project", signature(x="SpatVector"), 
-	function(x, crs, ...)  {
-		if (!is.character(crs)) {
-			crs <- crs(x)
+	function(x, y, ...)  {
+		if (!is.character(y)) {
+			y <- crs(y)
 		}
-		x@ptr <- x@ptr$project(crs)
+		x@ptr <- x@ptr$project(y)
 		show_messages(x, "project")
 	}
 )
@@ -215,16 +242,21 @@ setMethod("quantile", signature(x="SpatRaster"),
 	}
 )
 
+
 setMethod("rasterize", signature(x="SpatVector", y="SpatRaster"), 
-	function(x, y, field=1:nrow(x), background=NA, update=FALSE, filename="", overwrite=FALSE, wopt=list(), ...) { 
+	function(x, y, field=1:nrow(x), background=NA, update=FALSE, touches=is.lines(x), filename="", overwrite=FALSE, wopt=list(), ...) { 
+		# , update=FALSE, 
+		inverse=FALSE # use "mask" for TRUE
 		opt <- .runOptions(filename, overwrite, wopt)
+		background <- as.numeric(background[1])
+		#if (is.na(background)) background = 0/0 # NAN
 		if (is.character(field)) {
-			field <- x[[field, drop=TRUE]]
-			if (!is.numeric(field)) {
-				stop("this is not a numerical variable")
-			}
+			y@ptr <- y@ptr$rasterize(x@ptr, field, 0, background, update[1], touches[1], inverse[1], opt)
+		} else if (is.numeric(field)) {
+			y@ptr <- y@ptr$rasterize(x@ptr, "", field, background, update[1], touches[1], inverse[1], opt)
+		} else {
+			stop("field should be character or numeric")
 		}
-		y@ptr <- y@ptr$rasterize(x@ptr, field, background[1], update[1], opt)
 		show_messages(y, "rasterize")
 	}
 )
@@ -298,11 +330,32 @@ setMethod("unique", signature(x="SpatRaster", incomparables="ANY"),
 	}
 )
 
-setMethod("warp", signature(x="SpatRaster", y="SpatRaster"), 
+
+setMethod("resample", signature(x="SpatRaster", y="SpatRaster"), 
 	function(x, y, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
+		method <- ifelse(method == "ngb", "near", method)
 		opt <- .runOptions(filename, overwrite, wopt)
-		x@ptr <- x@ptr$warp(y@ptr, method, opt)
-		show_messages(x, "warp")
+		x@ptr <- x@ptr$warper(y@ptr, "", method, opt)
+		show_messages(x, "resample")
 	}
 )
 
+setMethod("summary", signature(object="SpatRaster"), 
+	function(object, size=100000, ...)  {
+		summary(spatSample(object, size, method="regular", ...))
+	}
+)
+
+
+#setMethod("warp", signature(x="SpatRaster", y="SpatRaster"), 
+#	function(x, y, method="bilinear", filename="", overwrite=FALSE, wopt=list(), ...)  {
+#		opt <- .runOptions(filename, overwrite, wopt)
+#		x@ptr <- x@ptr$warper(y@ptr, "", method, opt)
+#		show_messages(x, "warp")
+#	}
+#)
+
+
+
+
+if (!isGeneric("Which")) {setGeneric("Which", function(x) standardGeneric("Which"))}	

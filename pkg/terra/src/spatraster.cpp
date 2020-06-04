@@ -17,21 +17,27 @@
 
 #include "spatRaster.h"
 #include "string_utils.h"
+#include "file_utils.h"
+#include <set>
 
-
-SpatRaster::SpatRaster(std::string fname) {
 #ifdef useGDAL
-	constructFromFile(fname);
+#include "crs.h"
+#endif
+
+
+SpatRaster::SpatRaster(std::string fname, int subds) {
+#ifdef useGDAL
+	constructFromFile(fname, subds);
 #endif
 }
 
 SpatRaster::SpatRaster(std::vector<std::string> fname) {
 #ifdef useGDAL
-	constructFromFile(fname[0]);
+	constructFromFile(fname[0], -1);
 	SpatRaster r;
 	bool success;
 	for (size_t i=1; i<fname.size(); i++) {
-		success = r.constructFromFile(fname[i]);
+		success = r.constructFromFile(fname[i], -1);
 		if (success) {
 			addSource(r);
 			if (r.msg.has_error) {
@@ -51,21 +57,21 @@ SpatRaster::SpatRaster(std::vector<std::string> fname) {
 
 void SpatRaster::setSources(std::vector<RasterSource> s) {
 	source = s;
-//	nrow = s[0].nrow;
-//	ncol = s[0].ncol;
 	extent = s[0].extent;
-	crs = s[0].crs;
+	srs = s[0].srs;
 }
 
 
 void SpatRaster::setSource(RasterSource s) {
 	s.resize(s.nlyr);
-	setSources({s});
+	std::vector<RasterSource> vs = {s};
+	setSources(vs);
 }
 
 
 SpatRaster::SpatRaster(RasterSource s) {
-	setSources( {s} );
+	std::vector<RasterSource> vs = {s};
+	setSources(vs);
 }
 
 
@@ -86,13 +92,14 @@ SpatRaster::SpatRaster() {
 	s.layers.resize(1, 0);
 	s.datatype = "";
 	s.names = {"lyr.1"};
-	s.crs = "+proj=longlat +datum=WGS84";
-
+	s.srs.proj4 = "+proj=longlat +datum=WGS84";
+	s.srs.wkt = "GEOGCS[\"WGS 84\", DATUM[\"WGS_1984\", SPHEROID[\"WGS 84\",6378137,298.257223563]], PRIMEM[\"Greenwich\",0], UNIT[\"degree\",0.0174532925199433]]";
 	setSource(s);
 }
 
 
-SpatRaster::SpatRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::string _crs) {
+
+SpatRaster::SpatRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::string crs) {
 
 	RasterSource s;
 	s.nrow=rcl[0];
@@ -109,8 +116,21 @@ SpatRaster::SpatRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::
 	s.driver = "";
 	s.nlyr = rcl[2];
 	s.layers.resize(1, 0);
+	//s.layers.resize(1, s.nlyr);
+	//std::iota(s.layers.begin(), s.layers.end(), 0);
+
 	s.datatype = "";
-	s.crs =_crs;
+
+#ifdef useGDAL
+	std::string msg;
+	if (!s.srs.set( crs, msg )) {
+		setError(msg);
+		return;
+	}
+#else
+	s.srs.proj4 = lrtrim_copy(crs);
+#endif
+
 	for (unsigned i=0; i < rcl[2]; i++) {
 		s.names.push_back("lyr." + std::to_string(i+1)) ;
 	}
@@ -119,22 +139,33 @@ SpatRaster::SpatRaster(std::vector<unsigned> rcl, std::vector<double> ext, std::
 }
 
 
-SpatRaster::SpatRaster(unsigned _nrow, unsigned _ncol, unsigned _nlyr, SpatExtent ext, std::string _crs) {
+
+SpatRaster::SpatRaster(unsigned nr, unsigned nc, unsigned nl, SpatExtent ext, std::string crs) {
 
 	RasterSource s;
-	s.nrow = _nrow;
-	s.ncol = _ncol;
+	s.nrow = nr;
+	s.ncol = nc;
 	s.extent = ext;
 	s.hasValues = false;
 	s.memory = true;
 	s.filename = "";
 	s.driver = "";
-	s.nlyr = _nlyr;
+	s.nlyr = nl;
 	s.hasRange = { false };
 	s.layers.resize(1, 0);
+	//s.layers.resize(1, _nlyr);
+	//std::iota(s.layers.begin(), s.layers.end(), 0);
 	s.datatype = "";
-	s.crs=_crs;
-	for (unsigned i=0; i < _nlyr; i++) {
+#ifdef useGDAL
+	std::string msg;
+	if (!s.srs.set(crs, msg )) {
+		setError(msg);
+		return;
+	}
+#else
+	s.srs.proj4 = lrtrim_copy(crs);
+#endif
+	for (unsigned i=0; i < nl; i++) {
 		s.names.push_back("lyr." + std::to_string(i+1)) ;
 	}
 	setSource(s);
@@ -159,13 +190,16 @@ SpatRaster::SpatRaster(const SpatRaster &r) {
 }
 */
 
+
+
 SpatRaster SpatRaster::geometry(long nlyrs) {
 	RasterSource s;
 	s.values.resize(0);
 	s.nrow = nrow();
 	s.ncol = ncol();
 	s.extent = extent;
-	s.crs = crs;
+	s.srs = srs;
+	//s.prj = prj;
 	s.memory = true;
 	s.hasValues = false;
 	long nl = nlyr();
@@ -181,26 +215,17 @@ SpatRaster SpatRaster::geometry(long nlyrs) {
 		}
 	}
 	s.names = nms;
-	SpatRaster out;
-	out.setSource(s);
+	SpatRaster out(s);
 	return out;
 }
 
 
 SpatRaster SpatRaster::deepCopy() {
-
 	SpatRaster out = *this;
-//	out.extent = extent;
-//	out.crs = crs;
 	return out;
 }
 
 
-void SpatRaster::setCRS(std::string _crs) {
-	lrtrim(_crs);
-	for (size_t i = 0; i < nsrc(); i++) { source[i].crs = _crs; }
-	crs = _crs;
-}
 
 std::vector<double> SpatRaster::resolution() {
 	return std::vector<double> { (extent.xmax - extent.xmin) / ncol(), (extent.ymax - extent.ymin) / nrow() };
@@ -223,7 +248,10 @@ SpatRaster SpatRaster::setResolution(double xres, double yres) {
 	std::vector<unsigned> rcl = {nr, nc, nl};
 	std::vector<double> ext = {e.xmin, xmax, e.ymin, ymax};
 
-	return SpatRaster(rcl, ext, crs);
+	out = SpatRaster(rcl, ext, {""});
+	out.srs = srs;
+	out.source[0].srs = srs;
+	return out;
 }
 
 
@@ -246,7 +274,9 @@ unsigned SpatRaster::nrow() {
 
 unsigned SpatRaster::nlyr() {
 	unsigned x = 0;
-	for (size_t i=0; i<source.size(); i++) { x += source[i].nlyr; }
+	for (size_t i=0; i<source.size(); i++) {
+		x += source[i].nlyr;
+	}
 	return(x);
 }
 
@@ -287,24 +317,98 @@ std::vector<double> SpatRaster::range_max() {
 }
 
 bool SpatRaster::is_lonlat() {
-	SpatExtent e = getExtent();
-	return e.is_lonlat(getCRS());
+	return srs.is_lonlat();
 };
 
 bool SpatRaster::could_be_lonlat() {
 	SpatExtent e = getExtent();
-	return e.could_be_lonlat(getCRS());
+	return srs.could_be_lonlat(e);
 };
 
 
 bool SpatRaster::is_global_lonlat() {
-	if (could_be_lonlat()) {
-		SpatExtent e = getExtent();
-		double halfres = xres()/ 180;
-		if (((e.xmin - halfres) <= -180) && ((e.xmax + halfres) >= 180)) {
+	SpatExtent e = getExtent();
+	return srs.is_global_lonlat(e);
+};
+
+
+bool SpatRaster::sources_from_file() {
+	for (size_t i=0; i<source.size(); i++) {
+		if (source[i].driver != "memory") {
 			return true;
 		}
 	}
 	return false;
-};
+}
+
+
+SpatRaster SpatRaster::sources_to_disk(std::vector<std::string> &tmpfs, bool unique, SpatOptions &opt) {
+// if a tool needs to read from disk, perhaps from unique filenames
+// use writeRaster to write to a single file.
+	SpatRaster out;
+	size_t nsrc = source.size();
+	std::set<std::string> ufs;
+	size_t ufsize = ufs.size();
+
+	std::string tmpbasename = tempFile(opt.get_tempdir(), "_temp_");
+
+
+	for (size_t i=0; i<nsrc; i++) {
+		bool write = false;
+		if (!source[i].in_order() || (source[i].driver == "memory")) {
+			write = true;
+		} else if (unique) {
+			ufs.insert(source[i].filename);
+			if (ufs.size() == ufsize) {
+				write = true;
+			} else {
+				ufsize++;
+			}
+		}
+		SpatRaster rs(source[i]);
+		if (write) {
+			opt.filename = tmpbasename + std::to_string(i) + ".tif";
+			tmpfs.push_back(opt.filename);
+			rs = rs.writeRaster(opt);
+		}
+		if (i == 0) {
+			out.setSource(rs.source[0]);
+		} else {
+			out.addSource(rs);
+		}
+	}
+	return out;
+}
+
+bool SpatRaster::setSRS(std::string crs) {
+	std::string msg;
+	if (!srs.set(crs, msg )) {
+		addWarning("Cannot set raster SRS: "+ msg);
+		return false;
+	}
+	for (size_t i = 0; i < nsrc(); i++) { 
+		source[i].srs = srs; 
+	}
+	return true;
+}
+
+
+/*
+#ifdef useGDAL	
+bool SpatRaster::setSRS(OGRSpatialReference *poSRS, std::string &msg) {
+	if (!srs.set(poSRS, msg)){
+		addWarning("Cannot set raster SRS: "+ msg);
+		return false;
+	}
+	for (size_t i = 0; i < nsrc(); i++) { 
+		source[i].srs = srs; 
+	}
+	return true;				
+}
+#endif		
+*/
+
+std::string  SpatRaster::getSRS(std::string x) {
+	return srs.get(x);
+}
 

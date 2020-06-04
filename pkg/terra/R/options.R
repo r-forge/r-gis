@@ -5,7 +5,7 @@
 .create_options <- function() {
 	opt <- methods::new("SpatOptions")
 	opt@ptr <- SpatOptions$new()
-	opt@ptr$tempdir <- tempdir()
+	opt@ptr$tempdir <- normalizePath(tempdir(check = TRUE), winslash="/")
 	.terra_environment$options <- opt
 }
  
@@ -28,7 +28,7 @@
 	
 	if (any(!s)) {
 		bad <- paste(nms[!s], collapse=",")
-		warning(paste("cannot recognize some options:", bad))
+		warning(paste("unknown options:", bad))
 	}
 		
 	if (any(s)) {

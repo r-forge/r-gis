@@ -8,11 +8,11 @@
 \alias{rast,SpatRaster-method}
 \alias{rast,matrix-method}
 \alias{rast,array-method}
+\alias{rast,list-method}
 \alias{rast,SpatExtent-method}
 \alias{rast,SpatVector-method}
 \alias{rast,Raster-method}
 \alias{rast,PackedSpatRaster-method}
-
 
 \title{Create a SpatRaster}
 
@@ -26,24 +26,27 @@ When a SpatRaster is created from a file, it does (initially) not contain any ce
 
 
 \usage{
-\S4method{rast}{character}(x, ...)
+\S4method{rast}{character}(x, subds=-1, ...)
 
 \S4method{rast}{missing}(x, nrows=180, ncols=360, nlyrs=1, xmin=-180, xmax=180, 
                                       ymin=-90, ymax=90, crs, extent, resolution, ...)
 
 \S4method{rast}{SpatRaster}(x, nlyrs=nlyr(x), ...) 
 
-\S4method{rast}{matrix}(x, crs=NA, type="", ...)
+\S4method{rast}{matrix}(x, crs="", type="", ...)
 
 \S4method{rast}{SpatVector}(x, nrows=10, ncols=10, nlyrs=1, ...)
 									  
 \S4method{rast}{SpatExtent}(x, nrows=10, ncols=10, nlyrs=1, crs="", ...)
 
+\S4method{rast}{list}(x, ...)
+
 \S4method{rast}{Raster}(x, ...)
 }
 
 \arguments{
-\item{x}{filename (character), Extent, SpatRaster, matrix, array, or Raster* object (from the "raster" package). Can also be missing}
+\item{x}{filename (character), SpatRaster, SpatExtent, SpatVector, matrix, array, list of SpatRaster objects, or Raster* object (from the "raster" package). Can also be missing}
+\item{subds}{positive integer. Subdataset identifier}
 \item{nrows}{positive integer. Number of rows}
 \item{ncols}{positive integer. Number of columns}
 \item{nlyrs}{positive integer. Number of layers}
@@ -72,10 +75,10 @@ SpatRaster
 x <- rast(nrow=108, ncol=21, xmin=0, xmax=10)
 
 # Create a SpatRaster from a file
-f <- system.file("exdata/test.tif", package="terra")
+f <- system.file("ex/test.tif", package="terra")
 r <- rast(f)
 
-s <- rast(system.file("exdata/logo.tif", package="terra"))   
+s <- rast(system.file("ex/logo.tif", package="terra"))   
 
 # Create a skeleton with no associated cell values
 rast(s)

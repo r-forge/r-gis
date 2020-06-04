@@ -28,16 +28,28 @@ setMethod("plot", signature(x="SpatRaster", y="numeric"),
 		Z <- t(as.matrix(object, TRUE)[nrow(object):1, , drop = FALSE])
 		X <- xFromCol(object, 1:ncol(object))
 
+		fact = FALSE
 		if (missing(zlim)) {
 			uvals <- unique(stats::na.omit(as.vector(Z)))
+			uvals <- uvals[is.finite(uvals)]
 			if (length(uvals) == 0) { return(invisible(NULL)) }
-			zlim <- range(uvals, na.rm=TRUE)
+			if (length(uvals) < 10 & (!is.factor(x))) {
+				fact = TRUE
+				Z[is.nan(Z) | is.infinite(Z)] <- NA
+				fz <- as.factor(Z)
+				Z[] = as.numeric(fz)
+				lvs <- list(levels=sort(unique(as.vector(Z))), labels=levels(fz)) 
+				uvals <- lvs$levels
+				zlim <- range(lvs$levels)
+			} else {
+				zlim <- range(uvals, na.rm=TRUE)
+			}
 		} else {
 			zlim <- sort(zlim)
 			Z[Z < zlim[1]] <- zlim[1]
 			Z[Z > zlim[2]] <- zlim[2]
-			uvals <- unique(stats::na.omit(as.vector(Z)))			
-			if (length(uvals) == 0) { return(invisible(NULL)) }
+			uvals <- sort(unique(stats::na.omit(as.vector(Z))))
+			if (length(uvals) == 0) { return(invisible(NULL)) }			
 		}
 		
 #		dv <- dev.list()
@@ -90,7 +102,6 @@ setMethod("plot", signature(x="SpatRaster", y="numeric"),
 		} 
 
 
-		fact = FALSE
 		if (is.factor(x)) {
 			lvs <- levels(x)[[1]]
 			if (length(lvs$labels) > 0) {
@@ -107,13 +118,7 @@ setMethod("plot", signature(x="SpatRaster", y="numeric"),
 			col <- .sampleColors(col, length(labs))
 			.factorLegend(leg.ext, levs, col, labs, n)
 		} else {			
-			if (length(uvals) < 10) {
-				col <- .sampleColors(col, length(uvals))
-				n <- ifelse(leg.ext.set, length(uvals), 20)
-				.fewClassLegend(leg.ext, uvals, col, digits, n)
-			} else {
-				.contLegend(leg.ext, col, zlim, digits, leg.levels)
-			}
+			.contLegend(leg.ext, col, zlim, digits, leg.levels)
 		}	
 		.legMain(leg.main, leg.ext$xmax, leg.ext$ymax, leg.ext$dy, leg.main.cex)
 			
@@ -173,7 +178,7 @@ setMethod("plot", signature(x="SpatRaster", y="missing"),
 		}
 		x <- spatSample(x, maxcell, method="regular", as.raster=TRUE)
 		for (i in 1:nl) {
-		#	image(x[[i]], main=main[i], ...)
+			#	image(x[[i]], main=main[i], ...)
 			plot(x, i, main=main[i], ...)
 		}
 	}
@@ -184,7 +189,7 @@ setMethod("plot", signature(x="SpatRaster", y="missing"),
 setMethod("lines", signature(x="SpatRaster"),
 function(x, mx=50000, ...) {
 	if(prod(dim(x)) > mx) {
-		stop('too many lines')
+		stop("too many lines")
 	}
 	v <- as.polygons(x)
 	lines(v, ...)

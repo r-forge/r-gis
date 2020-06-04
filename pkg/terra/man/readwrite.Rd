@@ -27,12 +27,16 @@ To write chunks, begin by opening a file with \code{writeStart}, then write valu
 
 \usage{
 \S4method{readStart}{SpatRaster}(x, ...)
+
 \S4method{readStop}{SpatRaster}(x)
+
 \S4method{readValues}{SpatRaster}(x, row=1, nrows=nrow(x), col=1, ncols=ncol(x), mat=FALSE, dataframe=FALSE, ...)
 
 \S4method{writeStart}{SpatRaster,character}(x, filename="", overwrite=FALSE, wopt=list(), ...)
+
 \S4method{writeStop}{SpatRaster}(x)
-\S4method{writeValues}{SpatRaster,vector}(x, v, start)
+
+\S4method{writeValues}{SpatRaster,vector}(x, v, start, nrows, ...)
 }
 
 \arguments{
@@ -43,7 +47,7 @@ To write chunks, begin by opening a file with \code{writeStart}, then write valu
   \item{start}{integer. Row number (counting starts at 1) from where to start writing \code{v}}
 
  \item{row}{positive integer. Row number to start from, should be between 1 and nrow(x)}
- \item{nrows}{positive integer. How many rows? Default is 1}
+ \item{nrows}{positive integer. How many rows?}
  \item{col}{positive integer. Column number to start from, should be between 1 and ncol(x)}
  \item{ncols}{positive integer. How many columns? Default is the number of columns left after the start column}
 
