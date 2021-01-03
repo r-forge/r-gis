@@ -1,9 +1,6 @@
 \name{subset-vector}
 
 \alias{subset,SpatVector-method}
-\alias{[[,SpatVector,numeric,missing-method}
-\alias{[[,SpatVector,logical,missing-method}
-\alias{[[,SpatVector,character,missing-method}
 
 \alias{[,SpatVector,missing,missing-method}
 \alias{[,SpatVector,missing,numeric-method}

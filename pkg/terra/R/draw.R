@@ -47,9 +47,9 @@ setMethod("draw", signature(x="character"),
 		objtypes <- c("extent", "polygon", "line", "points")
 		i <- pmatch(tolower(x), objtypes)
 		if (is.na(i)) {
-			stop("invalid object type")
+			error("extent", "invalid object type")
 		} else if (i < 1) {
-			stop("ambiguous object type")
+			error("extent", "ambiguous object type")
 		}
 		x <- objtypes[i]
 		if (x == "extent") {
@@ -58,7 +58,7 @@ setMethod("draw", signature(x="character"),
 			.drawPol(col, lwd, ...)
 		} else if (x == "lines") {
 			.drawLin(col, lwd, ...)
-		} else if (x == "points") {
+		} else if (x == "points" || x == "multipoints" ) {
 			.drawPts(col, lwd, ...)
 		} 
 	}

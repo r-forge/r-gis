@@ -6,7 +6,7 @@
 
 setMethod("hist", signature(x="SpatRaster"), 
 	function(x, layer, maxcell=1000000, plot=TRUE, main, ...) {
-			
+
 		if (missing(layer)) {
 			y <- 1:nlyr(x)
 		} else if (is.character(layer)) {
@@ -14,24 +14,24 @@ setMethod("hist", signature(x="SpatRaster"),
 		} else { 
 			y <- layer 
 		}
-		
+
 		y <- unique(as.integer(round(y)))
 		y <- stats::na.omit(y)
 		y <- y[ y >= 1 & y <= nlyr(x) ]
 		nl <- length(y)
-		
+
 		if (nl == 0) {
-			stop('no layers selected')
+			error("hist", "no layers selected")
 		}
 
 		if (missing(main)) {
 			main=names(x) 
 		}
-		
+
 		if (nl > 1)	{
 			res <- list()
 			if (nl > 16) {
-				warning('only the first 16 layers are plotted')
+				warn("hist", "only the first 16 layers are plotted")
 				nl <- 16
 				y <- y[1:16]
 			}
@@ -47,15 +47,15 @@ setMethod("hist", signature(x="SpatRaster"),
 			}
 			for (i in 1:length(y)) {
 				res[[i]] = .hist1(x[[ y[i] ]], maxcell=maxcell, main=main[y[i]], plot=plot, ...) 
-			}		
+			}
 
 		} else if (nl==1) {
 			if (nlyr(x) > 1) {
 				x <- x[[y]]
 				main <- main[y]
 			}
-			res <- .hist1(x, maxcell=maxcell, main=main, plot=plot, ...) 	
-		}		
+			res <- .hist1(x, maxcell=maxcell, main=main, plot=plot, ...) 
+		}
 		if (plot) {
 			return(invisible(res))
 		} else {
@@ -78,21 +78,21 @@ setMethod("hist", signature(x="SpatRaster"),
 		msg <- paste(round(100 * length(v) / ncell(x)), "% of the raster cells were used.", sep="")
 		if (any(is.na(v))) {
 			v <- stats::na.omit(v)
-			msg <- paste(msg, " (of which ", 100 - round(100 * length(v) / maxcell ), "% was NA.)", sep="")
+			msg <- paste(msg, " (of which ", 100 - round(100 * length(v) / maxcell ), "% was NA)", sep="")
 		}
-		warning(msg)
-	}	
-		
+		warn("hist", msg)
+	}
+
 #	if (.shortDataType(x) == 'LOG') {
 #		v <- v * 1
 #	}
-		
+
 	if (plot) {
 		hist(v, main=main, plot=plot, ...)  
 	} else {
-		hist(v, plot=plot, ...)  		
+		hist(v, plot=plot, ...)  
 	}
-}	
+}
 
 
 

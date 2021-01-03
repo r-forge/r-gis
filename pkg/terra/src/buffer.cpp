@@ -7,7 +7,7 @@ SpatVector SpatVector::point_buffer(double d, unsigned quadsegs) {
 	std::vector<std::vector<double>> xy = coordinates();
 	SpatVector out;
 	out.srs = srs;
-	size_t n = quadsegs * 4;	
+	size_t n = quadsegs * 4;
 	std::vector<double> px(n);
 	std::vector<double> py(n);
 	double step = 360.0 / n;
@@ -15,7 +15,7 @@ SpatVector SpatVector::point_buffer(double d, unsigned quadsegs) {
 	g.addPart(SpatPart(0, 0));
 	size_t npts = size();
 
-	if (is_lonlat()) {
+	if (is_geographic()) {
 		double a=6378137;
 		double f=1/298.257223563;
 		std::vector<double> brng(n);

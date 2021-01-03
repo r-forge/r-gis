@@ -7,64 +7,100 @@
 setClass("SpatRaster",
 	representation (
 		ptr = "C++Object"
-	),	
-	prototype (	
+	),
+	prototype (
 		ptr = NULL
 	),
 	validity = function(object)	{
 		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatRaster")){
 			return(TRUE)
 		} else {
-			return(FALSE)		
+			return(FALSE)
 		}
 	}
 )
 
-setClass("SpatStack",
+setClass("SpatRasterDataset",
 	representation (
 		ptr = "C++Object"
-	),	
-	prototype (	
+	),
+	prototype (
 		ptr = NULL
 	),
 	validity = function(object)	{
-		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatStack")){
+		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatRasterStack")){
 			return(TRUE)
 		} else {
-			return(FALSE)		
+			return(FALSE)
 		}
 	}
 )
+
+setClass("SpatRasterCollection",
+	representation (
+		ptr = "C++Object"
+	),
+	prototype (
+		ptr = NULL
+	),
+	validity = function(object)	{
+		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatRasterCollection")){
+			return(TRUE)
+		} else {
+			return(FALSE)
+		}
+	}
+)
+
 
 setClass("SpatVector",
 	representation (
 		ptr = "C++Object"
-	),	
-	prototype (	
+	),
+	prototype (
 		ptr = NULL
 	),
 	validity = function(object)	{
 		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatVector")){
 			return(TRUE)
 		} else {
-			return(FALSE)		
+			return(FALSE)
 		}
 	}
 )
 
 
+
+setClass("SpatVectorCollection",
+	representation (
+		ptr = "C++Object"
+	),
+	prototype (
+		ptr = NULL
+	),
+	validity = function(object)	{
+		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatVectorCollection")){
+			return(TRUE)
+		} else {
+			return(FALSE)
+		}
+	}
+)
+
+
+
 setClass("SpatExtent",
 	representation (
 		ptr = "C++Object"
-	),	
-	prototype (	
+	),
+	prototype (
 		ptr = NULL
 	),
 	validity = function(object)	{
 		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatExtent")){
 			return(TRUE)
 		} else {
-			return(FALSE)		
+			return(FALSE)
 		}
 	}
 )
@@ -73,15 +109,15 @@ setClass("SpatExtent",
 setClass("SpatOptions",
 	representation (
 		ptr = "C++Object"
-	),	
-	prototype (	
+	),
+	prototype (
 		ptr = NULL
 	),
 	validity = function(object)	{
 		if (is.null(object@ptr) || is(object@ptr, "Rcpp_SpatOptions")){
 			return(TRUE)
 		} else {
-			return(FALSE)		
+			return(FALSE)
 		}
 	}
 )

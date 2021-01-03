@@ -28,11 +28,13 @@ bool SpatSRS::set(std::string txt, std::string &msg) {
 	wkt = "";
 	return true;
 }
+
 #else
 
 
 #include "ogr_spatialref.h"
 #include <gdal_priv.h> // GDALDriver
+
 
 
 bool is_ogr_error(OGRErr err, std::string &msg) {
@@ -90,10 +92,10 @@ bool string_from_spatial_reference(const OGRSpatialReference *srs, std::vector<s
 	out = std::vector<std::string>(2, "");
 	char *cp;
 #if GDAL_VERSION_MAJOR >= 3
-	const char *options[3] = { "MULTILINE=YES", "FORMAT=WKT2", NULL };
+	const char *options[3] = { "MULTILINE=NO", "FORMAT=WKT2", NULL };
 	OGRErr err = srs->exportToWkt(&cp, options);
 #else
-	OGRErr err = srs->exportToPrettyWkt(&cp);
+	OGRErr err = srs->exportToWkt(&cp);
 #endif
 	if (is_ogr_error(err, msg)) {
 		CPLFree(cp);
@@ -129,6 +131,79 @@ bool SpatSRS::set(OGRSpatialReference *poSRS, std::string &msg) {
 	return true;
 }
 */
+
+
+
+
+double SpatSRS::to_meter() {
+	double out;
+	OGRSpatialReference x;
+	if (wkt.size() < 2) {
+		return NAN;
+	}
+	OGRErr erro = x.SetFromUserInput(wkt.c_str());
+	if (erro != OGRERR_NONE) {
+		return NAN;
+	}
+	if (x.IsGeographic()) {
+		return 0;
+	}
+	out = x.GetLinearUnits();
+	return out;
+}
+
+bool SpatSRS::is_same(SpatSRS other, bool ignoreempty) {
+	if (ignoreempty) {
+		if (is_empty() || other.is_empty()) {
+			return true;
+		}
+	}
+	OGRSpatialReference x, y;
+	OGRErr erro = x.SetFromUserInput(wkt.c_str());
+	if (erro != OGRERR_NONE) {
+		return false;
+	}
+	erro = y.SetFromUserInput(other.wkt.c_str());
+	if (erro != OGRERR_NONE) {
+		return false;
+	}
+	return x.IsSame(&y);
+}
+
+
+bool SpatSRS::is_same(std::string other, bool ignoreempty) {
+
+	if (wkt == "" && other == "") {
+		return true;
+	} else if (wkt == "" || other == "") {
+		return ignoreempty ? true : false;
+	}
+
+	OGRSpatialReference x, y;
+	OGRErr erro = x.SetFromUserInput(wkt.c_str());
+	if (erro != OGRERR_NONE) {
+		return false;
+	}
+	erro = y.SetFromUserInput(other.c_str());
+	if (erro != OGRERR_NONE) {
+		return false;
+	}
+	return x.IsSame(&y);
+}
+
+
+bool SpatSRS::is_geographic() {
+	OGRSpatialReference x;
+	if (wkt.size() < 2) {
+		return false;
+	}
+	OGRErr erro = x.SetFromUserInput(wkt.c_str());
+	if (erro != OGRERR_NONE) {
+		return false;
+	}
+	return x.IsGeographic();
+}
+
 
 bool SpatSRS::set(std::string txt, std::string &msg) {
 	wkt="";
@@ -218,6 +293,8 @@ bool wkt_from_string(std::string input, std::string& wkt, std::string& msg) {
 }
 
 
+
+
 SpatMessages transform_coordinates(std::vector<double> &x, std::vector<double> &y, std::string fromCRS, std::string toCRS) {
 
 	SpatMessages m;
@@ -239,7 +316,7 @@ SpatMessages transform_coordinates(std::vector<double> &x, std::vector<double> &
 	poCT = OGRCreateCoordinateTransformation(&source, &target);
 
 	if( poCT == NULL )	{
-		m.setError( "Transformation failed" );
+		m.setError( "Cannot do this transformation" );
 		return (m);
 	}
 
@@ -258,7 +335,73 @@ SpatMessages transform_coordinates(std::vector<double> &x, std::vector<double> &
 }
 
 
+SpatVector SpatVector::project(std::string crs) {
 
+	SpatVector s;
+
+    #ifndef useGDAL
+		s.setError("GDAL is not available");
+		return(s);
+	#else
+
+	OGRSpatialReference source, target;
+	std::string vsrs = getSRS("wkt");
+	const char *pszDefFrom = vsrs.c_str();
+	OGRErr erro = source.SetFromUserInput(pszDefFrom);
+	if (erro != OGRERR_NONE) {
+		s.setError("input crs is not valid");
+		return s;
+	}
+
+	const char *pszDefTo = crs.c_str();
+	erro = target.SetFromUserInput(pszDefTo);
+	if (erro != OGRERR_NONE) {
+		s.setError("output crs is not valid");
+		return s;
+	}
+
+	CPLSetConfigOption("OGR_CT_FORCE_TRADITIONAL_GIS_ORDER", "YES");
+	OGRCoordinateTransformation *poCT;
+	poCT = OGRCreateCoordinateTransformation(&source, &target);
+
+	if( poCT == NULL )	{
+		s.setError( "Cannot do this transformation" );
+		return(s);
+	}
+
+	s.setSRS(crs);
+	s.df = df;
+	std::vector<unsigned> keeprows;
+
+	for (size_t i=0; i < size(); i++) {
+		SpatGeom g = getGeom(i);
+		SpatGeom gg;
+		gg.gtype = g.gtype;
+		for (size_t j=0; j < g.size(); j++) {
+			SpatPart p = g.getPart(j);
+			if (poCT->Transform(p.x.size(), &p.x[0], &p.y[0]) ) {
+				SpatPart pp(p.x, p.y);
+				if (p.hasHoles()) {
+					for (size_t k=0; k < p.nHoles(); k++) {
+						SpatHole h = p.getHole(k);
+						poCT->Transform(h.x.size(), &h.x[0], &h.y[0]);
+						pp.addHole(h.x, h.y);
+					}
+				}
+				gg.addPart(pp);
+				keeprows.push_back(j);
+			}
+		}
+		s.addGeom(gg);
+		s.df.subset_rows(keeprows);	
+	}
+
+	#endif
+	return s;
+}
+
+
+/*
 SpatVector SpatVector::project(std::string crs) {
 
 	SpatVector s;
@@ -278,18 +421,28 @@ SpatVector SpatVector::project(std::string crs) {
 		s.setError(msg);
 		return s;
 	}
-	
+
 	s.msg = transform_coordinates(x, y, srs, outwkt);
 
 	if (!s.msg.has_error) {
 		unsigned n = d.iv[0].size();
 		std::vector<unsigned> a, b, c;
+		std::vector<double> ptx, pty;
+		a.reserve(n);
+		b.reserve(n);
+		c.reserve(n);
+		ptx.reserve(n);
+		pty.reserve(n);
 		for (size_t i=0; i<n; i++) {
-			a.push_back(d.iv[0][i]);
-			b.push_back(d.iv[1][i]);
-			c.push_back(d.iv[2][i]);
+			if (!std::isnan(x[i])) {
+				a.push_back(d.iv[0][i]);
+				b.push_back(d.iv[1][i]);
+				c.push_back(d.iv[2][i]);
+				ptx.push_back(x[i]);
+				pty.push_back(y[i]);
+			}
 		}
-		s.setGeometry(type(), a, b, x, y, c);
+		s.setGeometry(type(), a, b, ptx, pty, c);
 		//std::vector<std::string> refs = srefs_from_string(crs);
 		std::string msg;
 		s.setSRS(crs);
@@ -299,6 +452,8 @@ SpatVector SpatVector::project(std::string crs) {
 	#endif
 	return s;
 }
+
+*/
 
 #endif
 

@@ -4,29 +4,45 @@
 
 \alias{c}
 \alias{c,SpatRaster-method}
-\alias{c,SpatStack-method}
+\alias{c,SpatRasterDataset-method}
+\alias{c,SpatVector-method}
+\alias{c,SpatVectorCollection-method}
 
-\title{Combine}
+\title{Combine SpatRaster or SpatVector objects}
 
 \description{
-Combine SpatRaster objects (similar to \code{raster::} \code{\link[raster]{stack}})
+With \code{c} you can:
+
+-- Combine \code{SpatRaster} objects. They must have the same extent and resolution. Also see \code{\link{add<-}}
+
+-- Add a \code{SpatRaster} to a \code{SpatRasterDataset}
+
+-- Append \code{SpatVector} objects. They must be of the same geometry type. See \code{\link{svc} for combining different geometry type objects in a SpatVectorCollection}
+
+-- Add a \code{SpatVector} to a \code{SpatVectorCollection}
 }
+
+\seealso{\code{\link{collapse}}, \code{\link{add<-}}}
+
 
 \usage{
 \S4method{c}{SpatRaster}(x, ...)
 
-\S4method{c}{SpatStack}(x, ...)
+\S4method{c}{SpatRasterDataset}(x, ...)
+
+\S4method{c}{SpatVector}(x, ...)
+
+\S4method{c}{SpatVectorCollection}(x, ...)
 }
 
 \arguments{
-  \item{x}{SpatRaster or SpatStack}
-  \item{...}{SpatRaster objects to be combined with \code{x}}
+  \item{x}{SpatRaster, SpatVector, SpatRasterDataset or SpatVectorCollection}
+  \item{...}{as for \code{x} (you can only combine raster with raster data and vector with vector data)}
 }
 
 
-
 \value{
-SpatRaster
+Same class as \code{x}
 }
 
 
@@ -37,3 +53,4 @@ x <- c(r, r*2, r*3)
 }
 
 \keyword{spatial}
+

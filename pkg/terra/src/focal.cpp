@@ -21,18 +21,18 @@
 
 std::vector<double> rcValue(std::vector<double> &d, const int& nrow, const int& ncol, const unsigned& nlyr, const int& row, const int& col) {
   
-  std::vector<double> out(nlyr, NAN);
-  if ((row < 0) || (row > (nrow -1)) || (col < 0) || (col > (ncol-1))) {
-    return out;
-  } else {
-    unsigned nc = nrow * ncol;
-    unsigned cell = row * ncol + col;
-    for (size_t i=0; i<nlyr; i++) {
-      unsigned lcell = cell + i * nc;
-      out[i] = d[lcell];
-    }
-  }
-  return out;
+	std::vector<double> out(nlyr, NAN);
+	if ((row < 0) || (row > (nrow -1)) || (col < 0) || (col > (ncol-1))) {
+		return out;
+	} else {
+		unsigned nc = nrow * ncol;
+		unsigned cell = row * ncol + col;
+		for (size_t i=0; i<nlyr; i++) {
+			unsigned lcell = cell + i * nc;
+			out[i] = d[lcell];
+		}
+	}
+	return out;
 }
 
 // todo: three dimensional focal
@@ -40,33 +40,34 @@ std::vector<double> rcValue(std::vector<double> &d, const int& nrow, const int& 
 std::vector<double> get_focal(std::vector<double> &d, int nrow, int ncol, int wrows, int wcols, int offset, double fill) {
 	int wr = wrows / 2;
 	int wc = wcols / 2;
-	wr = std::min(wr, nrow);
-	wc = std::min(wc, ncol);
+	wr = std::min(wr, nrow-1);
+	wc = std::min(wc, ncol-1);
 
-	size_t n = (nrow-offset) * ncol * wrows * wcols;
-	std::vector<double> val(n, fill);
+	size_t n = nrow * ncol * wrows * wcols;
+	std::vector<double> out(n, fill);
 	int f = 0;
-	
-	for (int r = offset; r < nrow; r++) {
-		for (int c = 0; c < ncol; c++) {
+
+	int nrmax = nrow+offset-1;
+	for (int r=0; r < nrow; r++) {
+		for (int c=0; c < ncol; c++) {
 			for (int i = -wr; i <= wr; i++) {
-				int row = r+i;			
-				if (row < 0 || row > (nrow-1)) {
+				int row = r+offset+i;		
+				if ((row < 0) || (row > nrmax)) {
 					f = f + wcols;
 				} else {
 					unsigned bcell = row * ncol;
 					for (int j = -wc; j <= wc; j++) {
-						int col = c + j;	
+						int col = c + j;
 						if ((col >= 0) && (col < ncol)) {
-							val[f] = d[bcell+col];
+							out[f] = d[bcell+col];
 						}
 						f++;
 					}
 				}
-			}	
+			}
 		}
 	}
-	return(val);
+	return(out);
 }
 
 
@@ -80,28 +81,27 @@ std::vector<double> SpatRaster::focal_values(std::vector<unsigned> w, double fil
 	}
 
 	int wr = w[0] / 2;
-	int wc = w[1] / 2;
 	int nr = nrow();
 	int nc = ncol();
-	wr = std::min(wr, nr);
-	wc = std::min(wc, nc);
+	wr = std::min(wr, nr-1);
 
-	int readstart = row-wr;
-	readstart = readstart < 0 ? 0 : readstart;
-	int offset = row-readstart;
-	int readnrows = nrows+(2*wr);
-	readnrows = readnrows > nr ? (nr-readstart) : readnrows;
-	
-	readStart();
-	std::vector<double> d = readValues(readstart, readnrows, 0, nc);
-	readStop();
+	int startrow = row-wr;
+	startrow = startrow < 0 ? 0 : startrow;
+	int offset = row-startrow;
+
+	int readnrows = nrows+offset+wr;
+	readnrows = (startrow+readnrows) > nr ? (nr-startrow) : readnrows;
+
+//	Rcpp::Rcout << readnrows << ", " << offset << ", " << wr << std::endl;
+
+	std::vector<double> d = readValues(startrow, readnrows, 0, nc);
 
 	std::vector<double> f = get_focal(d, nrows, nc, w[0], w[1], offset, fillvalue);
 	return(f);
 }
 
 
-SpatRaster SpatRaster::focal(std::vector<unsigned> w, std::vector<double> m, double fillvalue, bool narm, std::string fun, SpatOptions &opt) {
+SpatRaster SpatRaster::focal(std::vector<unsigned> w, std::vector<double> m, double fillvalue, bool narm, bool naonly, std::string fun, SpatOptions &opt) {
 
 	SpatRaster out = geometry();
 	if (!source[0].hasValues) { return(out); }
@@ -109,7 +109,6 @@ SpatRaster SpatRaster::focal(std::vector<unsigned> w, std::vector<double> m, dou
 	bool wmat = false;
 	if (m.size() > 1) {
 		wmat = true;
-		
 	} else if (w.size() == 1) {
 		w.push_back(w[0]);
 	} 
@@ -126,38 +125,93 @@ SpatRaster SpatRaster::focal(std::vector<unsigned> w, std::vector<double> m, dou
 		out.setError("weight matrix error");
 		return out;
 	}
-
- 	if (!out.writeStart(opt)) { return out; }
+	if (!readStart()) {
+		out.setError(getError());
+		return(out);
+	}
+ 	if (!out.writeStart(opt)) {
+		readStop();
+		return out;
+	}
 
 	std::function<double(std::vector<double>&, bool)> fFun = getFun(fun);
 	std::vector<double> v;
-	
-	for (size_t i = 0; i < out.bs.n; i++) {
-
-		std::vector<double> fv = focal_values(w, fillvalue, out.bs.row[i], out.bs.nrows[i]);
-		v.resize(out.bs.nrows[i] * ncol());
-		if (wmat) {
-			for (size_t j=0; j<v.size(); j++) {
-				v[j] = 0;
-				for (size_t k=0; k<ww; k++) {
-					v[j] += fv[j*ww+k] * m[k];
+	if (naonly) {
+		int mid = ww / 2;
+		for (size_t i = 0; i < out.bs.n; i++) {
+			std::vector<double> fv = focal_values(w, fillvalue, out.bs.row[i], out.bs.nrows[i]);
+			v.resize(out.bs.nrows[i] * ncol(), NAN);
+			if (wmat) {
+				for (size_t j=0; j<v.size(); j++) {
+					double midv = fv[j*ww+mid];
+					if (std::isnan(midv)) {
+						v[j] = 0;
+						for (size_t k=0; k<ww; k++) {
+							v[j] += fv[j*ww+k] * m[k];
+						}
+					} else {
+						v[j] = midv;
+					}
 				}
-			}			
-		} else {
-			for (size_t j=0; j<v.size(); j++) {
-				unsigned off = j*ww;
-				std::vector<double> x(fv.begin()+off, fv.begin()+off+ww);
-				v[j] = fFun(x, narm);
+			} else {
+				for (size_t j=0; j<v.size(); j++) {
+					unsigned off = j*ww;
+					std::vector<double> x(fv.begin()+off, fv.begin()+off+ww);
+					double midv = x[mid];
+					if (std::isnan(midv)) {
+						v[j] = fFun(x, narm);
+					} else {
+						v[j] = midv;
+					}
+				}
 			}
+			if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
 		}
-		if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
+	} else {
+		for (size_t i = 0; i < out.bs.n; i++) {
+	
+	
+			std::vector<double> fv = focal_values(w, fillvalue, out.bs.row[i], out.bs.nrows[i]);
+			v.resize(out.bs.nrows[i] * ncol());
+			if (wmat) {
+				if (narm) {
+					for (size_t j=0; j<v.size(); j++) {
+						v[j] = 0;
+						size_t cnt = 0;
+						for (size_t k=0; k<ww; k++) {
+							double vv = fv[j*ww+k] * m[k];
+							if (!std::isnan(vv)) {
+								v[j] += vv;
+								cnt++;
+							}
+						}
+						if (cnt == 0) v[j] = NAN;
+					}
+				} else {
+					for (size_t j=0; j<v.size(); j++) {
+						v[j] = 0;
+						for (size_t k=0; k<ww; k++) {
+							v[j] += fv[j*ww+k] * m[k];
+						}
+					}
+				}
+			} else {
+				for (size_t j=0; j<v.size(); j++) {
+					unsigned off = j*ww;
+					std::vector<double> x(fv.begin()+off, fv.begin()+off+ww);
+					v[j] = fFun(x, narm);
+				}
+			}
+			if (!out.writeValues(v, out.bs.row[i], out.bs.nrows[i], 0, ncol())) return out;
+		}
 	}
 	out.writeStop();
+	readStop();
 	return(out);
 }
 
 
-/*	
+/*
 		v.resize(out.bs.nrows[i] * ncol());
 		for (size_t j = 0; j < v.size(); j++) {
 			double z = 0;

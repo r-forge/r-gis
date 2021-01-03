@@ -17,9 +17,14 @@
 
 #include <vector>
 #include "spatRaster.h"
+#include "recycle.h"
+#include <random>
+#include <unordered_set>
+#include "string_utils.h"
 
 
-void getSampleRowCol(std::vector<unsigned> &oldrow, std::vector<unsigned> &oldcol, unsigned nrows, unsigned ncols, unsigned snrow, unsigned sncol) {
+void getSampleRowCol(std::vector<size_t> &oldrow, std::vector<size_t> &oldcol, size_t nrows, size_t ncols, size_t snrow, size_t sncol) {
+
 	double rf = nrows / (double)(snrow);
 	double cf = ncols / (double)(sncol);
 	//double rstart = std::floor(0.5 * rf);
@@ -37,22 +42,41 @@ void getSampleRowCol(std::vector<unsigned> &oldrow, std::vector<unsigned> &oldco
 }
 
 
-std::vector<double> SpatRaster::readSample(unsigned src, unsigned srows, unsigned scols) {
-	unsigned oldnc = ncell();
+std::vector<double> SpatRaster::readSample(unsigned src, size_t srows, size_t scols) {
+
 	unsigned nl = source[src].nlyr;
-	std::vector<unsigned> oldcol, oldrow;
-	getSampleRowCol(oldrow, oldcol, nrow(), ncol(), srows, scols);
+	std::vector<size_t> oldcol, oldrow;
 	std::vector<double>	out; 
+	getSampleRowCol(oldrow, oldcol, nrow(), ncol(), srows, scols);
+
 	out.reserve(srows*scols);
-    for (size_t lyr=0; lyr<nl; lyr++) {
-        unsigned old_offset = lyr * oldnc;
-        for (size_t r=0; r<srows; r++) {
- 			unsigned oldc = old_offset + oldrow[r] * ncol();
-            for (size_t c=0; c<scols; c++) {
-				unsigned oldcell = oldc + oldcol[c];
-                out.push_back(source[src].values[oldcell]);
-            }
-        }
+	if (source[src].hasWindow) {
+		size_t offrow = source[src].window.off_row;
+		size_t offcol = source[src].window.off_col;
+		size_t fncol = source[src].window.full_ncol;
+		size_t oldnc = fncol * source[src].window.full_nrow;
+		for (size_t lyr=0; lyr<nl; lyr++) {
+			size_t off1 = lyr * oldnc;
+			for (size_t r=0; r<srows; r++) {
+				size_t off2 = off1 + (oldrow[r]+offrow) * fncol;
+				for (size_t c=0; c<scols; c++) {
+					size_t oldcell = off2 + oldcol[c] + offcol;
+					out.push_back(source[src].values[oldcell]);
+				}
+			}
+		}
+	} else {
+		unsigned oldnc = ncell();
+		for (size_t lyr=0; lyr<nl; lyr++) {
+			size_t off = lyr * oldnc;
+			for (size_t r=0; r<srows; r++) {
+				unsigned oldc = off + oldrow[r] * ncol();
+				for (size_t c=0; c<scols; c++) {
+					unsigned oldcell = oldc + oldcol[c];
+					out.push_back(source[src].values[oldcell]);
+				}
+			}
+		}
 	}
 	return out;
 }
@@ -60,16 +84,16 @@ std::vector<double> SpatRaster::readSample(unsigned src, unsigned srows, unsigne
 
 SpatRaster SpatRaster::sampleRegularRaster(unsigned size) {
 
-	double f = sqrt(size / ncell());
-	unsigned nr = ceil(nrow() * f);
-	unsigned nc = ceil(ncol() * f);
+	double f = std::min(1.0, sqrt(size / ncell()));
+	size_t nr = ceil(nrow() * f);
+	size_t nc = ceil(ncol() * f);
 	if ((size >= ncell()) || ((nc == ncol()) && (nr == nrow()))) {
 		return( *this );
 	}
-	SpatRaster out = geometry(nlyr());
+	SpatRaster out = geometry(nlyr(), true);
 	out.source[0].nrow = nr;
 	out.source[0].ncol = nc;
-	
+
 	if (!source[0].hasValues) return (out);
 
 	std::vector<double> v;
@@ -83,9 +107,10 @@ SpatRaster SpatRaster::sampleRegularRaster(unsigned size) {
 			v = readGDALsample(src, nr, nc);
 			#endif
 		}
+		if (hasError()) return out;
 		out.source[0].values.insert(out.source[0].values.end(), v.begin(), v.end());
 	}
-	out.source[0].driver = "memory";
+	out.source[0].memory = true;
 	out.source[0].hasValues = true;
 	out.source[0].setRange();
 
@@ -96,10 +121,10 @@ std::vector<std::vector<double>> SpatRaster::sampleRegularValues(unsigned size) 
 
 	std::vector<std::vector<double>> out;
 	if (!source[0].hasValues) return (out);
-	
+
 	unsigned nsize;
-	unsigned nr = nrow();
-	unsigned nc = ncol();
+	size_t nr = nrow();
+	size_t nc = ncol();
 	if (size < ncell()) {
 		double f = sqrt(size / ncell());
 		nr = std::ceil(nrow() * f);
@@ -109,6 +134,7 @@ std::vector<std::vector<double>> SpatRaster::sampleRegularValues(unsigned size) 
 	std::vector<double> v;
 	if ((size >= ncell()) || ((nc == ncol()) && (nr == nrow()))) {
 		v = getValues() ;
+		if (hasError()) return out;
 		for (size_t i=0; i<nlyr(); i++) {
 			size_t offset = i * nsize;
 			std::vector<double> vv(v.begin()+offset, v.begin()+offset+nsize);
@@ -127,100 +153,217 @@ std::vector<std::vector<double>> SpatRaster::sampleRegularValues(unsigned size) 
 			v = readGDALsample(src, nr, nc);
 			#endif
 		}
+		if (hasError()) return out;
 		for (size_t i=0; i<source[src].nlyr; i++) {
 			size_t offset = i * nsize;
 			std::vector<double> vv(v.begin()+offset, v.begin()+offset+nsize);
 			out.push_back(vv);
 		}
-	}	
+	}
 	return out;
 }
 
 
-/*
-std::vector<std::vector<double>> SpatRaster::sampleRandom(unsigned size, unsigned seed) {
-    srand(seed); 
-	unsigned nc = ncell();
-	std::vector<double> r(size);
-    for(size_t i = 0; i<size; i++) {
-        r[i] = rand() % nc; 
+std::vector<size_t> sample_replace(size_t size, size_t N, unsigned seed){
+	std::default_random_engine gen(seed);   
+	std::uniform_int_distribution<> U(0, N-1);
+	std::vector<size_t> sample;
+	sample.reserve(size);
+	for (size_t i=0; i<size; i++) {
+		sample.push_back( U(gen) );
 	}
-	std::vector<std::vector<double>> d = extractCell(r);
-    return d; 
+	return sample;
+}
+
+
+std::vector<size_t> sample_replace_weights(size_t size, size_t N, std::vector<double> prob, unsigned seed){
+	
+	// normalize prob
+	double maxw = *max_element(prob.begin(),prob.end());
+	for (double& d : prob)  d /= maxw;
+
+	std::default_random_engine gen(seed);   
+	std::uniform_int_distribution<> U(0, N-1);
+	std::vector<size_t> sample;
+	sample.reserve(size);
+
+	std::uniform_real_distribution<> Uw(0, 1);
+	size_t cnt = 0;
+	while (cnt < size) {
+		double w = Uw(gen);
+		double v = U(gen);
+		if (prob[v] >= w) { 
+			sample.push_back(v);
+			cnt++;
+		}
+	}
+	return sample;
+}
+
+/*
+std::vector<size_t> sample_replace_weights_gen(size_t size, size_t N, std::vector<double> prob, std::default_random_engine gen){
+	
+	// normalize prob
+	double minw = *min_element(prob.begin(),prob.end());
+	double maxw = *max_element(prob.begin(),prob.end()) - minw;
+	for (double& d : prob)  d = (d - minw) / maxw;
+
+	std::uniform_int_distribution<> U(0, N-1);
+	std::vector<size_t> sample;
+	sample.reserve(size);
+
+	std::uniform_real_distribution<> Uw(0, 1);
+	size_t cnt = 0;
+	while (cnt < size) {
+		double w = Uw(gen);
+		double v = U(gen);
+		if (prob[v] >= w) { 
+			sample.push_back(v);
+			cnt++;
+		}
+	}
+	return sample;
 }
 */
 
-#include <random>
-#include <unordered_set>
+std::vector<size_t> sample_no_replace(size_t size, size_t N, unsigned seed){
+	size_t one = 1;
+	size = std::max(one, std::min(size, N)); 
+	std::vector<size_t> sample;
+	if (size == N) {
+		sample.resize(size);
+		std::iota(sample.begin(), sample.end(), 0);
+		return sample;
+	}
+	std::default_random_engine gen(seed);   
+
+	if (size >= .66 * N) {
+		sample.resize(N);
+		std::iota(std::begin(sample), std::end(sample), 0);
+		std::shuffle(sample.begin(), sample.end(), gen);
+		if (size < N) {
+			sample.erase(sample.begin()+size, sample.end());
+		}
+		return sample;
+	}
+
+	std::uniform_real_distribution<> U( 0, std::nextafter(1.0, std::numeric_limits<double>::max() ) );
+
+	sample.reserve(size); 
+	for (size_t i=0; i<N; i++) {
+		if ( ((N-i) * U(gen)) <  (size - sample.size()) ) {
+			sample.push_back(i);
+    		if (sample.size() == size ) {
+				break;
+			}
+		}
+	}
+	return sample;
+}
 
 
-std::vector<double> sample_without_replacement(unsigned size, unsigned N, unsigned seed){
-    // Sample "size" elements from [1, N] without replacement
-    // see https://stackoverflow.com/questions/4461446/stl-way-to-add-a-constant-value-to-a-stdvector    
+std::vector<size_t> sample_no_replace_weights(size_t size, size_t N, std::vector<double> prob, unsigned seed){
+	size_t one = 1;
+	size = std::max(one, std::min(size, N)); 
+	std::vector<size_t> sample;
+	std::default_random_engine gen(seed);
+	if (size == N) {
+		sample.resize(size);
+		std::iota(sample.begin(), sample.end(), 0);
+		std::shuffle(sample.begin(), sample.end(), gen);
+		return sample;
+	}
+
+	std::uniform_int_distribution<> U(0, std::numeric_limits<int>::max());
+	std::unordered_set<size_t> sampleset;
+  
+	size_t isize = size;
+	if (size > (0.8 * N)) {
+		isize = N - size;
+		for (double &d : prob) d = 1-d;
+		size_t ssize = isize * (1.1 + isize / N);
+		size_t cnt=0;
+		while (sampleset.size() < isize) {
+			seed = U(gen);
+			std::vector<size_t> s = sample_replace_weights(ssize, N, prob, seed);
+			for (size_t i=0; i<s.size(); i++) {
+				sampleset.insert(s[i]);
+			} 
+			cnt++;
+			if (cnt > 10) break;
+		}
+		std::vector<size_t> invsamp;
+		invsamp.insert(invsamp.begin(), sampleset.begin(), sampleset.end());
+		std::sort(invsamp.begin(), invsamp.end());
+		invsamp.push_back(N+1);
+		size_t j=0;
+		sample.reserve(size);
+		for (size_t i=0; i<N; i++) {
+			if (i != invsamp[j]) {
+				sample.push_back(i);
+			} else {
+				j++;
+			}
+		}
+		std::shuffle(sample.begin(), sample.end(), gen);
+
+	} else {
+		size_t ssize = size * (1.1 + size / N);
+		size_t cnt=0;
+		while (sampleset.size() < size) {
+			seed = U(gen);
+			std::vector<size_t> s = sample_replace_weights(ssize, N, prob, seed);
+			for (size_t i=0; i<s.size(); i++) {
+				sampleset.insert(s[i]);
+			} 
+			cnt++;
+			if (cnt > 10) break;
+		}	
+		sample.insert(sample.begin(), sampleset.begin(), sampleset.end());
+		if (sample.size() > size) {
+			sample.resize(size);
+		};
+	}
 	
-	size = std::max(unsigned(1), std::min(size, N)); // k <= N
-	
-    std::default_random_engine gen(seed);   
-	std::uniform_int_distribution<> distribution(1, N);
-    std::unordered_set<unsigned> samples;
-    
-    for (size_t r = N - size; r < N; ++r) {
-        int v = distribution(gen) - 1;
-        if (!samples.insert(v).second) samples.insert(r);
-    } 
-    std::vector<double> result(samples.begin(), samples.end());
-    std::shuffle(result.begin(), result.end(), gen);    
-	
-    return result;
-};
+	return(sample);
+}
 
 
-std::vector<double> sample_with_replacement(unsigned size, unsigned N, unsigned seed){
-    // Sample "size" elements from [1, N] without replacement
-    // see https://stackoverflow.com/questions/4461446/stl-way-to-add-a-constant-value-to-a-stdvector    
-	
-	size = std::max((unsigned)1, std::min(size, N)); // k <= N
-	
-    std::default_random_engine gen(seed);   
-    std::vector<double> samples;
-    std::vector<double> result;
-	result.reserve(size);
-    
-	std::uniform_int_distribution<> distribution(0, N-1);
-    for (size_t i=0; i<size; i++) {
-        result.push_back( distribution(gen) );
-    } 
-	
-    return result;
-};
+std::vector<size_t> sample(size_t size, size_t N, bool replace, std::vector<double> prob, unsigned seed){
+	if (N == 0) {
+		std::vector<size_t> s;
+		return s;
+	}
+	bool w = prob.size() == N;
+	if (replace) {
+		if (w) {
+			return sample_replace_weights(size, N, prob, seed);
+		} else {
+			return sample_replace(size, N, seed);	
+		}
+	} else {
+		if (w) {
+			return sample_no_replace_weights(size, N, prob, seed);
+		} else {
+			return sample_no_replace(size, N, seed);	
+		}	
+	}
+}
 
 
-// need to consider the possibility that ncell() > max_int
-
-// if size is large, use (shuffle(values))[1:size] instead
 
 std::vector<std::vector<double>> SpatRaster::sampleRandomValues(unsigned size, bool replace, unsigned seed) {
 
 	double nc = ncell();
-	std::vector<double> dcells;
-
+	std::vector<size_t> cells;
+	std::vector<double> w;
 	if (replace) {
-		if (size >= .6 * nc) {
-			dcells.resize(nc);
-			std::iota(std::begin(dcells), std::end(dcells), 0);
-			std::default_random_engine gen(seed);  
-			std::shuffle(dcells.begin(), dcells.end(), gen);    
-			if (size < nc) {
-				dcells.erase(dcells.begin()+size, dcells.end());	
-			}
-			
-		} else {
-			dcells = sample_without_replacement(size, nc, seed);
-		}
+		cells = sample(size, nc, false, w, seed);
 	} else {
-		dcells = sample_with_replacement(size, nc, seed);
+		cells = sample(size, nc, true, w, seed);
 	}
-	
+
+	std::vector<double> dcells(cells.begin(), cells.end());
 	std::vector<std::vector<double>> d = extractCell(dcells);
 	return d; 
 }
@@ -236,46 +379,365 @@ SpatRaster SpatRaster::sampleRandomRaster(unsigned size, bool replace, unsigned 
 		nr = std::ceil(nrow() * f);
 		nc = std::ceil(ncol() * f);
 	}
-	SpatRaster out = geometry(nlyr());
+	SpatRaster out = geometry(nlyr(), true);
 	out.source[0].nrow = nr;
 	out.source[0].ncol = nc;
 	if (!source[0].hasValues) return (out);
-	
+
 	nsize = nr * nc;
 	std::vector<std::vector<double>> vv = sampleRandomValues(nsize, replace, seed);
 
 	for (size_t i=0; i<vv.size(); i++) {
 		out.source[0].values.insert(out.source[0].values.end(), vv[i].begin(), vv[i].end());
 	}
-	out.source[0].driver = "memory";
+	out.source[0].memory = true;
 	out.source[0].hasValues = true;
 	out.source[0].setRange();
 
 	return out;
 }
 
+std::vector<size_t> SpatExtent::test_sample(size_t size, size_t N, bool replace, std::vector<double> w, unsigned seed) {
+	return sample(size, N, replace, w, seed);
+}
+
+
+std::vector<std::vector<double>> SpatExtent::sampleRandom(size_t size, bool lonlat, unsigned seed){
+	std::vector<std::vector<double>> out(2);
+	if (size == 0) return out;
+	std::default_random_engine gen(seed);   
+
+	if (lonlat) {
+		double d = (ymax - ymin) / 1000;
+		std::vector<double> r = seq(ymin, ymax, d);
+		std::vector<double> w;
+		w.reserve(r.size());
+		for (size_t i=0; i<r.size(); i++) {
+			w.push_back( abs(cos(M_PI * r[i]/180)));
+		}
+		std::vector<size_t> x = sample(size, r.size(), true, w, seed);
+
+		std::vector <double> lat, lon;
+		lat.reserve(size);
+		lon.reserve(size);
+		std::uniform_real_distribution<> U1(-0.5, 0.5);
+
+		double dx = 0.5 * d;
+		for (size_t i=0; i<x.size(); i++) {
+			double v = r[x[i]] + dx * U1(gen);
+			lat.push_back(v);
+		}
+		std::uniform_real_distribution<> U2(xmin, xmax);
+		for (size_t i=0; i<size; i++) {
+			lon.push_back(U2(gen));
+		}
+		out[0] = lon;
+		out[1] = lat;
+
+	} else {
+		std::vector <double> x, y;
+		x.reserve(size);
+		y.reserve(size);
+		std::uniform_real_distribution<> runifx(xmin, xmax);
+		std::uniform_real_distribution<> runify(ymin, ymax);
+		for (size_t i=0; i<size; i++) {
+			x.push_back(runifx(gen));
+			y.push_back(runify(gen));
+		}
+		out[0] = x;
+		out[1] = y;
+	}
+	return out;
+}
+
+
+
+
+std::vector<std::vector<double>> SpatExtent::sampleRegular(size_t size, bool lonlat) {
+	std::vector<std::vector<double>> out(2);
+	if (size == 0) return out;
+	double r1 = xmax - xmin;
+	double r2 = ymax - ymin;
+	double ratio = 0.5 * r1/r2;
+	double n = sqrt(size);
+	double nx = std::max(1.0, std::round(n*ratio));
+	double ny = std::max(1.0, std::round(n/ratio));
+	double x_i = r1 / nx;
+	double y_i = r2 / ny;
+
+	if (lonlat) {
+		std::vector<double> lat, lon, w, xi;
+		lat.reserve(ny);
+		lat.push_back(ymin+0.5*y_i);
+		for (size_t i=1; i<ny; i++) {
+			lat.push_back(lat[i-1] + y_i);
+		}
+		
+		w.reserve(lat.size());
+		for (size_t i=0; i<lat.size(); i++) {
+			w.push_back(cos(M_PI * lat[i] / 180.0));
+		}
+
+		double nwsumw = w.size() / accumulate(w.begin(), w.end(), 0.0);
+		xi.reserve(w.size());
+		for (size_t i=0; i<w.size(); i++) {
+			xi.push_back(x_i / (w[i] * nwsumw));
+		}
+		for (size_t i=0; i<lat.size(); i++) {
+			std::vector <double> x = seq(xmin+0.5*xi[i], xmax, xi[i]);
+			std::vector <double> y(x.size(), lat[i]);
+			out[0].insert(out[0].end(), x.begin(), x.end());
+			out[1].insert(out[1].end(), y.begin(), y.end());
+		}
+	} else {
+		std::vector<double> x, y;
+		x.reserve(nx);
+		y.reserve(ny);
+		x.push_back(xmin+0.5*x_i);
+		for (size_t i=1; i<nx; i++) {
+			x.push_back(x[i-1] + x_i);
+		}
+		y.reserve(ny);
+		y.push_back(ymin+0.5*y_i);
+		for (size_t i=1; i<ny; i++) {
+			y.push_back(y[i-1] + y_i);
+		}
+		rep(x, ny);
+		rep_each(y, nx);
+		out[0] = x;
+		out[1] = y;
+	}
+	
+	return out;
+}
+
+
+std::vector<size_t> SpatRaster::sampleCells(unsigned size, std::string method, bool replace, unsigned seed) {
+
+	std::default_random_engine gen(seed);   
+	std::vector<size_t> out;
+	if ((size >= ncell()) & (!replace)) {
+		out.resize(ncell());
+		std::iota(out.begin(), out.end(), 0);
+		if (method == "random") {
+			std::shuffle(out.begin(), out.end(), gen);
+		}
+		return out;
+	}
+	
+	if (method == "random") {
+	
+	} else if (method == "regular") {
+	
+	} else { //method == "stratified" 
+
+	} // else "Cluster"
+	return out;
+}
+
+
+SpatVector SpatVector::sample(unsigned n, std::string method, bool by_geom, std::string strata, unsigned seed) {
+	std::string gt = type();
+
+	SpatVector out;
+	if (gt != "polygons") {
+		setError("only implemented for polygons");
+		return out;
+	}
+
+	if (strata != "") {
+		
+		// should use
+		// SpatVector a = aggregate(strata, false);
+		// but get nasty self-intersection precision probs.
+		
+		int i = where_in_vector(strata, get_names());
+		if (i < 0) {
+			out.setError("cannot find field");
+			return out;	
+		}
+		SpatDataFrame uv;
+		std::vector<int> idx = df.getIndex(i, uv);
+		for (size_t i=0; i<uv.nrow(); i++) {
+			std::vector<int> g;
+			g.resize(0);
+			for (size_t j=0; j<idx.size(); j++) {
+				if (i == (size_t)idx[j]) {
+					g.push_back(j);
+				}
+			}
+			SpatVector s = subset_rows(g);
+			s = s.sample(n, "random", false, "", seed);
+			for (long &v : s.df.iv[0]) v = v+i; 
+			out = out.append(s, true);
+		}
+		return out;
+	}
+
+	bool lonlat = is_geographic();
+	bool random = (method == "random");
+
+	std::vector<double> a = area();
+	double suma = accumulate(a.begin(), a.end(), 0.0);
+	
+	if (by_geom) {
+		std::vector<double> pa;
+		pa.reserve(a.size());
+		for (size_t i=0; i<a.size(); i++) {
+			pa.push_back(a[i] / suma);
+		}
+		std::vector<std::vector<double>> pxy(2);
+
+		std::vector<size_t> nsamp(size());
+		for (size_t i=0; i<size(); i++) {
+			if (pa[i] > 0) {
+				SpatGeom g = getGeom(i);
+				SpatVector ve(g.extent, "");
+				ve.srs = srs;
+				double vea = ve.area()[0];
+				if (random) {
+					double m = vea / a[i];
+					m = std::max(2.0, std::min(m*m, 100.0));
+					size_t ssize = pa[i] * n * m;
+					pxy = g.extent.sampleRandom(ssize, lonlat, seed);
+				} else {
+					size_t ssize = std::round(pa[i] * n * vea / a[i]);
+					pxy = g.extent.sampleRegular(ssize, lonlat);
+				}
+				SpatVector vpnt(pxy[0], pxy[1], points, "");
+				SpatVector vpol(g);
+				vpnt = vpnt.intersect(vpol);
+				if (random) {
+					size_t psize = pa[i] * n;
+					if (vpnt.size() > psize) {
+						std::vector<int> rows(psize);
+						std::iota(rows.begin(), rows.end(), 0);
+						vpnt = vpnt.subset_rows(rows);
+					}
+				}
+				nsamp[i] = vpnt.size();
+				if (out.size() == 0) {
+					out = vpnt;
+				} else {
+					out = out.append(vpnt, true);
+				}
+			}
+		}
+		std::vector<long> id(size());
+		std::iota(id.begin(), id.end(), 1);
+		rep_each_vect(id, nsamp);
+		SpatDataFrame df;
+		df.add_column(id, "pol.id");
+		out.df = df;
+	} else {
+
+		std::vector<std::vector<double>> pxy(2);
+
+		SpatVector ve(extent, "");
+		ve.srs = srs;
+		double vea = ve.area()[0];
+		if (random) {
+			double m = vea / suma;
+			m = std::max(2.0, std::min(m*m, 100.0));
+			size_t ssize = n * m;
+			pxy = extent.sampleRandom(ssize, lonlat, seed);
+		} else {
+			size_t ssize = std::round(n * vea / suma);
+			pxy = extent.sampleRegular(ssize, lonlat);
+		}
+		out = SpatVector(pxy[0], pxy[1], points, "");
+		out = intersect(out);
+		if (random) {
+			if (out.size() > n) {
+				std::vector<int> rows(out.size());
+				std::iota(rows.begin(), rows.end(), 0);
+				std::default_random_engine gen(seed);   
+				std::shuffle(rows.begin(), rows.end(), gen);
+				rows.resize(n);
+				out = out.subset_rows(rows);
+			}
+		}
+		std::vector<long> id(out.size(), 1);
+		SpatDataFrame df;
+		df.add_column(id, "pol.id");
+		out.df = df;
+	}	
+	out.srs = srs;
+	
+	return out;
+}
+
+
 
 
 /*
-SpatDataFrame sampleCells(unsigned size, std::string type, bool replace) {
+std::vector<double> sample(size_t size, size_t N, bool replace, std::vector<double> prob, unsigned seed){
+    // Sample "size" elements from [1, N]
+	std::vector<double> result;
+	std::default_random_engine gen(seed);   
 
-	SpatDataFrame out;
-	if (size >= ncell() & !replace) {
-		out.setError("size >= ncell() & !replace");
-		return out;
+	bool weights = false;
+	if (prob.size() == N) {
+		weights = true;
+		// should check for neg numbers
+		double minw = *min_element(prob.begin(),prob.end());
+		double maxw = *max_element(prob.begin(),prob.end()) - minw;
+		for (double& d : prob)  d = (d - minw) / maxw;
 	}
-	if (!source[0].hasValues) {
-		out.setError("Raster has no values");
-		return (out);
-	}
-	if (type == "Random") {
-		
-	} else if (type == "Regular") {
-		
-	} else { //type == "Stratified" 
+
+	if (replace) {
+		//std::vector<double> samples;
+		result.reserve(size);
+		std::uniform_int_distribution<> distribution(0, N-1);
+		if (weights) {
+			std::uniform_real_distribution<> wdist(0, 1);
+			size_t cnt = 0;
+			while (cnt < size) {
+				double w = wdist(gen);
+				double v = distribution(gen);
+				if (prob[v] >= w) { 
+					result.push_back(v);
+					cnt++;
+				}
+			}
+		} else {
+			for (size_t i=0; i<size; i++) {
+				result.push_back( distribution(gen) );
+			} 
+		}
+	} else {//without replacement
 	
-	} // else "Cluster"
-	return out;
+		size = std::max(size_t(1), std::min(size, N)); // k <= N
+
+		std::uniform_int_distribution<> distribution(1, N);
+		std::unordered_set<unsigned> samples;
+
+		if (weights) {
+			std::uniform_int_distribution<> wdist(0, N-1);
+			size_t cnt = 0;
+			size_t r = 0;
+			while (cnt < size) {
+				double w = wdist(gen)/N;
+				double v = distribution(gen);
+				if (prob[v] >= w) { 
+					if (!samples.insert(v).second) {
+						samples.insert(r);
+						cnt++;
+					}
+				}
+				r++;
+				r = r%(N-1);
+			}
+		} else {
+			for (size_t r = N - size; r < N; ++r) {
+				unsigned v = distribution(gen) - 1;
+				if (!samples.insert(v).second) samples.insert(r);
+			} 
+		}
+		result = std::vector<double>(samples.begin(), samples.end());
+		std::shuffle(result.begin(), result.end(), gen);    
+	}
+    return result;
 }
 */
 

@@ -22,7 +22,7 @@ Pair plots of layers in a SpatRaster. This is a wrapper around graphics function
 \item{hist}{logical. If TRUE a histogram of the values is shown on the diagonal}
 \item{cor}{logical. If TRUE the correlation coefficient is shown in the upper panels}
 \item{use}{argument passed to the \code{\link[stats]{cor}} function}
-\item{maxcells}{integer. Number of pixels to sample from each layer of large Raster objects}
+\item{maxcells}{integer. Number of pixels to sample from each layer of a large SpatRaster}
 \item{...}{additional arguments (graphical parameters)}
 }
 
@@ -31,14 +31,15 @@ Pair plots of layers in a SpatRaster. This is a wrapper around graphics function
 }
 
 \examples{
-r <-rast(system.file("ex/test.tif", package="terra"))
-s <- c(r*1, 1/r, sqrt(r))
+r <-rast(system.file("ex/elev.tif", package="terra"))
+s <- c(r, 1/r, sqrt(r))
+names(s) <- c("elevation", "inverse", "sqrt") 
 pairs(s)
 
 # to make indvidual histograms:
 hist(r)
 # or scatter plots:
-plot(r, 1/r)
+plot(s[[1]], s[[2]])
 }
 
 

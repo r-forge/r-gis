@@ -31,13 +31,14 @@ function(x, r=1, g=2, b=3, scale, maxcell=500000, stretch=NULL, ext=NULL, interp
 		}
 	}
 	scale <- as.vector(scale)[1]
-	
-	r <- spatSample(x[[r]], maxcell, ext=ext, method="regular", as.raster=TRUE)
-	g <- spatSample(x[[g]], maxcell, ext=ext, method="regular", as.raster=TRUE)
-	b <- spatSample(x[[b]], maxcell, ext=ext, method="regular", as.raster=TRUE)
 
-	RGB <- cbind(values(r), values(g), values(b))
-	
+	if (!is.null(ext)) {
+		x <- crop(x, ext)
+	}
+	x <- spatSample(x[[c(r, g, b)]], maxcell, method="regular", as.raster=TRUE)
+
+	RGB <- values(x)
+
 	if (!is.null(zlim)) {
 		if (length(zlim) == 2) {
 			zlim <- sort(zlim)
@@ -49,7 +50,7 @@ function(x, r=1, g=2, b=3, scale, maxcell=500000, stretch=NULL, ext=NULL, interp
 			} 
 		} else if (NROW(zlim) == 3 & NCOL(zlim) == 2) {
 			for (i in 1:3) {
-				zmin <- min(zlim[i,])		
+				zmin <- min(zlim[i,])
 				zmax <- max(zlim[i,])
 				if (is.null(zlimcol)) {
 					RGB[RGB[,i] < zmin, i] <- zmin
@@ -59,12 +60,12 @@ function(x, r=1, g=2, b=3, scale, maxcell=500000, stretch=NULL, ext=NULL, interp
 				}
 			}
 		} else {
-			stop('zlim should be a vector of two numbers or a 3x2 matrix (one row for each color)')
+			error('zlim should be a vector of two numbers or a 3x2 matrix (one row for each color)')
 		}
 	}
-	
+
 	RGB <- stats::na.omit(RGB)
-	
+
 	if (!is.null(stretch)) {
 		stretch = tolower(stretch)
 		if (stretch == 'lin') {
@@ -78,35 +79,37 @@ function(x, r=1, g=2, b=3, scale, maxcell=500000, stretch=NULL, ext=NULL, interp
 			RGB[,3] <- .eqStretch(RGB[,3])
 			scale <- 255
 		} else if (stretch != '') {
-			warning('invalid stretch value')
+			warn("plotRGB", 'invalid stretch value')
 		}
 	}
 
-	
+
 	naind <- as.vector( attr(RGB, "na.action") )
 	if (!is.null(naind)) {
 		bg <- grDevices::col2rgb(colNA)
 		bg <- grDevices::rgb(bg[1], bg[2], bg[3], alpha=bgalpha, max=255)
-		z <- rep( bg, times=ncell(r))
+		z <- rep( bg, times=ncell(x))
 		z[-naind] <- grDevices::rgb(RGB[,1], RGB[,2], RGB[,3], alpha=alpha, max=scale)
 	} else {
 		z <- grDevices::rgb(RGB[,1], RGB[,2], RGB[,3], alpha=alpha, max=scale)
 	}
-	
-	z <- matrix(z, nrow=nrow(r), ncol=ncol(r), byrow=T)
+
+	z <- matrix(z, nrow=nrow(x), ncol=ncol(x), byrow=TRUE)
 
 	requireNamespace("grDevices")
 	bb <- as.vector(matrix(as.vector(ext(x)), ncol=2))
 
-	bb <- as.vector(ext(r))
-	
+	bb <- as.vector(ext(x))
+
 	if (!add) {
-		if ((!axes) & (!margins)) {
-			graphics::par(plt=c(0,1,0,1))
-		}
+		#if ((!axes) & (!margins)) {
+		#	old.par <- graphics::par(no.readonly =TRUE)
+		#	on.exit(graphics::par(old.par))   
+		#	graphics::par(plt=c(0,1,0,1))
+		#}
 
 		if (is.null(asp)) {
-			if (couldBeLonLat(x)) {
+			if (is.lonlat(x, perhaps=TRUE, warn=FALSE)) {
 			    ym <- mean(bb[3:4])
 				asp <- 1/cos((ym * pi)/180)
 				#asp <- min(5, 1/cos((ym * pi)/180))
@@ -114,16 +117,17 @@ function(x, r=1, g=2, b=3, scale, maxcell=500000, stretch=NULL, ext=NULL, interp
 				asp <- 1
 			}
 		}
-		
+
 		xlim=c(bb[1], bb[2])
 		ylim=c(bb[3], bb[4])
-		
+
 		plot(NA, NA, xlim=xlim, ylim=ylim, type = "n", xaxs='i', yaxs='i', xlab=xlab, ylab=ylab, asp=asp, axes=FALSE, ...)
 		if (axes) {
 			xticks <- graphics::axTicks(1, c(xlim[1], xlim[2], 4))
 			yticks <- graphics::axTicks(2, c(ylim[1], ylim[2], 4))
-			if (xres(r) %% 1 == 0) xticks = round(xticks)
-			if (yres(r) %% 1 == 0) yticks = round(yticks)
+
+			if (xres(x) %% 1 == 0) xticks = round(xticks)
+			if (yres(x) %% 1 == 0) yticks = round(yticks)
 			graphics::axis(1, at=xticks)
 			graphics::axis(2, at=yticks, las = 1)
 			#graphics::axis(3, at=xticks, labels=FALSE, lwd.ticks=0)
@@ -131,7 +135,7 @@ function(x, r=1, g=2, b=3, scale, maxcell=500000, stretch=NULL, ext=NULL, interp
 		}
 	}
 	graphics::rasterImage(z, bb[1], bb[3], bb[2], bb[4], interpolate=interpolate, ...)
-	
+
 	if (!is.null(addfun)) {
 		if (is.function(addfun)) {
 			addfun()

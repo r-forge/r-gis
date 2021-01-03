@@ -3,9 +3,12 @@
 ^windows
 ^misc
 ^cmdapp
+^docker
 ^codeblocks
 ^inst/gdal
 ^inst/proj
+^python
+^revdep
 .travis.yml
 LICENSE
 README.md

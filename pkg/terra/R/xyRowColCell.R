@@ -6,7 +6,7 @@
 setMethod("yFromRow", signature(object="SpatRaster", row="numeric"), 
 	function(object, row) {
 		object@ptr$yFromRow(row - 1)
-	}	
+	}
 )
 
 setMethod(xFromCol, signature(object="SpatRaster", col="numeric"), 
@@ -17,18 +17,24 @@ setMethod(xFromCol, signature(object="SpatRaster", col="numeric"),
 
 setMethod(colFromX, signature(object="SpatRaster", x="numeric"), 
 	function(object, x)	{
-		object@ptr$colFromX(x) + 1
+		cols <- object@ptr$colFromX(x) + 1
+		cols[cols==0] <- NA
+		cols
 	}
 )
 
 setMethod(rowFromY, signature(object="SpatRaster", y="numeric"), 
 	function(object, y)	{
-		object@ptr$rowFromY(y) + 1
-	}	
+		rows <- object@ptr$rowFromY(y) + 1
+		rows[rows==0] <- NA
+		rows
+	}
 )
 
-setMethod(cellFromXY, signature(object="SpatRaster", xy="matrix"), 		
+setMethod(cellFromXY, signature(object="SpatRaster", xy="matrix"), 
 	function(object, xy) {
+		stopifnot(ncol(xy) == 2)
+		#.checkXYnames(colnames(xy))
 		object@ptr$cellFromXY(xy[,1], xy[,2]) + 1
 	}
 )
@@ -46,7 +52,7 @@ setMethod(cellFromRowColCombine, signature(object="SpatRaster", row="numeric", c
 )
 
 
-setMethod(xyFromCell, signature(object="SpatRaster", cell="numeric"), 		
+setMethod(xyFromCell, signature(object="SpatRaster", cell="numeric"), 
 	function(object, cell, ...) {
 		xy <- object@ptr$xyFromCell(cell-1)
 		xy <- do.call(cbind, xy)
@@ -59,10 +65,10 @@ setMethod(yFromCell, signature(object="SpatRaster", cell="numeric"),
 	function(object, cell) {
 		xyFromCell(object, cell)[,2]
 	}  
-		
+
 )
 
-setMethod(xFromCell, signature(object="SpatRaster", cell="numeric"), 	
+setMethod(xFromCell, signature(object="SpatRaster", cell="numeric"), 
 	function(object, cell) {
 		xyFromCell(object, cell)[,1]
 	}  
@@ -71,17 +77,19 @@ setMethod(xFromCell, signature(object="SpatRaster", cell="numeric"),
 setMethod(rowColFromCell, signature(object="SpatRaster", cell="numeric"), 
 	function(object, cell) {
 		rc <- object@ptr$rowColFromCell(cell-1)
-		do.call(cbind, rc)
-	}	
+		rc <- do.call(cbind, rc)
+		rc[rc < 0] <- NA
+		rc+1
+	}
 )
 
-setMethod(rowFromCell, signature(object="SpatRaster", cell="numeric"), 	
+setMethod(rowFromCell, signature(object="SpatRaster", cell="numeric"), 
 	function(object, cell) {
 		rowColFromCell(object, cell)[,1]
 	}
 )
 
-setMethod(colFromCell, signature(object="SpatRaster", cell="numeric"), 	
+setMethod(colFromCell, signature(object="SpatRaster", cell="numeric"), 
 	function(object, cell) {
 		rowColFromCell(object, cell)[,2]
 	}

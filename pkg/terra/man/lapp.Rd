@@ -4,28 +4,29 @@
 
 \alias{lapp}
 \alias{lapp,SpatRaster-method}
-\alias{lapp,SpatStack-method}
+\alias{lapp,SpatRasterDataset-method}
 
-\title{Apply a function to layers of a SpatRaster, or to sub-datasets of a SpatStack}
+\title{Apply a function to layers of a SpatRaster, or to sub-datasets of a SpatRasterDataset}
 
 \description{
 Apply a function to layers of a SpatRaster ("overlay"). 
 
-The number of arguments in function \code{fun} must match the number of layers in the SpatRaster (or the number of sub-datasets in the SpatStack). For example, if you want to multiply two layers, you could use this function : \code{fun=function(x,y){return(x*y)}} percentage: \code{fun=function(x,y){return(100 * x / y)}}. If you combine three layers you could use \code{fun=function(x,y,z){return((x + y) * z)}}
+The number of arguments in function \code{fun} must match the number of layers in the SpatRaster (or the number of sub-datasets in the SpatRasterDataset). For example, if you want to multiply two layers, you could use this function : \code{fun=function(x,y){return(x*y)}} percentage: \code{fun=function(x,y){return(100 * x / y)}}. If you combine three layers you could use \code{fun=function(x,y,z){return((x + y) * z)}}
 
 Before you use the function, test it to make sure that it works for vectors (not only for single numbers). That is, it must return the same number of elements as its input vectors, or multiples of that. Make sure it also returns the same number of values when some or all input values are \code{NA}. Also, the function must return a vector or matrix, not a \code{data.frame}.
 
-Use \code{\link{app}} for summarize functions such as \code{sum}, that take any number of arguments.
+Use \code{\link{app}} for summarize functions such as \code{sum}, that take any number of arguments; and \code{\link{tapp}} to so for groups of layers. 
+
 }
 
 \usage{
 \S4method{lapp}{SpatRaster}(x, fun, ..., usenames=FALSE, filename="", overwrite=FALSE, wopt=list())
 
-\S4method{lapp}{SpatStack}(x, fun, ..., recycle=FALSE, filename="", overwrite=FALSE, wopt=list())
+\S4method{lapp}{SpatRasterDataset}(x, fun, ..., recycle=FALSE, filename="", overwrite=FALSE, wopt=list())
 }
 
 \arguments{
-  \item{x}{SpatRaster or SpatStack}
+  \item{x}{SpatRaster or SpatRasterDataset}
   \item{fun}{function to be applied}
   \item{...}{additional arguments to be passed to \code{fun}} 
   \item{usenames}{logical. Use the layer names to match the function arguments? If \code{FALSE} matching is by position}
@@ -39,7 +40,7 @@ Use \code{\link{app}} for summarize functions such as \code{sum}, that take any 
 SpatRaster
 }
 
-\seealso{\code{ \link[terra]{app}, \link[terra]{tapp},  \link[terra]{math}} }
+\seealso{\code{ \link{app}, \link[terra]{tapp},  \link[terra]{math}} }
 
 \examples{
 s <- rast(system.file("ex/logo.tif", package="terra"))   
@@ -63,8 +64,8 @@ fvi2 <- function(red, green){ (red - green ) / (red + green) }
 names(s)
 x1 <- lapp(s[[1:2]], fvi2, usenames=TRUE)
 x2 <- lapp(s[[2:1]], fvi2, usenames=TRUE)
-# x2 is different from x1 as the order of the layers has changed
-# but x3 and x4 are the same as x1 
+# x1 and x2 are the same, despite the change in the order of the layers
+# x4 is also the same, but x3 is not
 x3 <- lapp(s[[2:1]], fvi2, usenames=FALSE)
 x4 <- lapp(s, fvi2, usenames=TRUE)
 
@@ -74,8 +75,8 @@ x4 <- lapp(s, fvi2, usenames=TRUE)
 
 pairs(c(x1, x2, x3, x4))
 
-## SpatStack
-x <- rstk(s, "first", second=s[[1]])
+## SpatRasterDataset
+x <- sds(s, s[[1]]+50)
 lapp(x, function(x, y) x/y, recycle=TRUE)
 }
  

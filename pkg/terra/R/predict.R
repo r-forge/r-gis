@@ -3,8 +3,15 @@
 # Version 0.9
 # License GPL v3
 
+parfun <- function(cls, data, fun, model, ...) {
+	nr <- nrow(data)
+	nc <- length(cls)
+	s <- split(data, rep(1:nc, each=ceiling(nr/nc), length.out=nr))
+	unlist(parallel::clusterApply(cls, s, function(i, ...) fun(model, i, ...), ...))
+}
 
-.runModel <- function(model, fun, d, nl, const, na.rm, index, ...) {
+
+.runModel <- function(model, fun, d, nl, const, na.rm, index, cores=1, cls=NULL, ...) {
 	if (!is.data.frame(d)) {
 		d <- data.frame(d)
 	}
@@ -18,7 +25,11 @@
 		i <- rowSums(is.na(d)) == 0
 		d <- d[i,,drop=FALSE]
 		if (nrow(d) > 0) {
-			r <- fun(model, d, ...)
+			if (cores > 1) {
+				r <- parfun(cls, d, fun, model, ...)
+			} else {
+				r <- fun(model, d, ...)
+			}
 			if (is.factor(r)) {
 				r <- as.integer(r)
 			} else if (is.data.frame(r)) {
@@ -35,7 +46,11 @@
 			r <- matrix(NA, nrow=nl*n, ncol=1)
 		}
 	} else {
-		r <- fun(model, d, ...)
+		if (cores > 1) {
+			r <- parfun(cls, d, fun, model, ...)
+		} else {
+			r <- fun(model, d, ...)
+		}
 		if (is.factor(r)) {
 			r <- as.integer(r)
 		} else if (is.data.frame(r)) {
@@ -57,7 +72,7 @@
 		stopifnot(is.list(factors))
 		f <- names(factors)
 		if (any(trimws(f) == "")) {
-			stop("all factors must be named")
+			error("predict", "all factors must be named")
 		}
 	} else if (inherits(m, "randomForest")) {
 		f <- names(which(sapply(m$forest$xlevels, max) != "0"))
@@ -80,20 +95,20 @@
 	}
 	if (!all(names(factors) %in% lyrnms)) {
 		ff <- f[!(f %in% lyrnms)]
-		stop(paste("factor name(s):", paste(ff, collapse=", "), " not in layer names"))
+		error("predict", paste("factor name(s):", paste(ff, collapse=", "), " not in layer names"))
 	}
 	factors
 }
-	
+
 setMethod("predict", signature(object="SpatRaster"), 
-	function(object, model, fun=predict, ..., factors=NULL, const=NULL, na.rm=FALSE, index=NULL, filename="", overwrite=FALSE, wopt=list()) {
+	function(object, model, fun=predict, ..., factors=NULL, const=NULL, na.rm=FALSE, index=NULL, cores=1, filename="", overwrite=FALSE, wopt=list()) {
 
 		nms <- names(object)
 		if (length(unique(nms)) != length(nms)) {
 			tab <- table(nms)
-			stop('duplicate names in SpatRaster: ', tab[tab>1])
+			error("predict", "duplicate names in SpatRaster: ", tab[tab>1])
 		}
-		
+
 		#factors should come with the SpatRaster
 		#haveFactor <- FALSE
 		#if (!is.null(factors)) {
@@ -101,29 +116,42 @@ setMethod("predict", signature(object="SpatRaster"),
 		#	fnames <- names(f)
 		#	haveFactor <- TRUE
 		#}
-		
+
 		nl <- 1
 		nc <- ncol(object)
 		tomat <- FALSE
+		readStart(object)
+		on.exit(readStop(object))
 		d <- readValues(object, round(0.5*nrow(object)), 1, 1, min(nc,500), TRUE, TRUE)
-	
+
 		r <- .runModel(model, fun, d, nl, const, na.rm, index, ...)
-		nl <- ncol(r)		
+		nl <- ncol(r)
 		out <- rast(object, nlyr=nl)
 		cn <- colnames(r)
 		if (length(cn) == nl) names(out) <- make.names(cn, TRUE)
-		
-		readStart(object)
+
+		if (cores > 1) {
+			cls <- parallel::makeCluster(cores)
+			on.exit(parallel::stopCluster(cls), add=TRUE)
+			parallel::clusterExport(cls, c("model", "fun"), environment())
+			dots <- list(...)
+			if (length(dots) > 0) {
+				nms <- names(dots)
+				dotsenv <- new.env()
+				lapply(1:length(dots), function(i) assign(nms[i], dots[[i]], envir=dotsenv))
+				parallel::clusterExport(cls, nms, dotsenv)
+			}
+		} else {
+			cls <- NULL
+		}
 		b <- writeStart(out, filename, overwrite, wopt)
 		for (i in 1:b$n) {
 			d <- readValues(object, b$row[i], b$nrows[i], 1, nc, TRUE, TRUE)
-			r <- .runModel(model, fun, d, nl, const, na.rm, index, ...)
+			r <- .runModel(model, fun, d, nl, const, na.rm, index, cores=cores, cls=cls, ...)
 			writeValues(out, r, b$row[i], b$nrows[i])
 		}
-		readStop(object)
-		out <- writeStop(out)
+		writeStop(out)
 		return(out)
 	}
 )
-
 

@@ -10,7 +10,13 @@ setMethod("geomtype", signature(x="SpatVector"),
 	function(x, ...){ 
 		x@ptr$type()
 	}
-)	
+)
+
+setMethod("datatype", signature(x="SpatVector"), 
+	function(x, ...){ 
+		x@ptr$df$get_datatypes()
+	}
+)
 
 
 setMethod("is.lines", signature(x="SpatVector"), 
@@ -26,7 +32,7 @@ setMethod("is.polygons", signature(x="SpatVector"),
 )
 setMethod("is.points", signature(x="SpatVector"), 
 	function(x, ...) {
-		geomtype(x) == "points"
+		grepl("points", geomtype(x))
 	}
 )
 
@@ -38,48 +44,97 @@ setMethod("geomtype", signature(x="Spatial"),
 		if (type %in% c("grid", "pixels")) type <- "raster"
 		type
 	}
-)	
+)
 
 setMethod("geom", signature(x="SpatVector"), 
-	function(x, ...){ 
-		x@ptr$getGeometry()
+	function(x, wkt=FALSE, df=FALSE, ...){
+		if (wkt) {
+			x@ptr$getGeometryWKT()
+		} else {
+			g <- x@ptr$get_geometry()
+			g <- do.call(cbind, g)
+			colnames(g) <- c("geom", "part", "x", "y", "hole")[1:ncol(g)]
+			if (df) {
+				data.frame(g)
+			} else {
+				g
+			}
+		}
 	}
-)	
+)
+
 
 setMethod("dim", signature(x="SpatVector"), 
 	function(x){ 
 		c(nrow(x), ncol(x))
 	}
-)	
+)
 
 setMethod("as.data.frame", signature(x="SpatVector"), 
-	function(x, ...) {
-		d <- data.frame(x@ptr$getDF(), stringsAsFactors=FALSE)
+	function(x, geom=FALSE, ...) {
+		d <- data.frame(x@ptr$getDF(), check.names=FALSE, fix.empty.names=FALSE, stringsAsFactors=FALSE)
 		colnames(d) <- x@ptr$names
+		if (geom) {
+			g <- geom(x, wkt=TRUE)
+			if (nrow(d) > 0) {
+				d$geometry <- g
+			} else {
+				d <- data.frame(geometry=g)
+			}
+		}
 		d
 	}
 )
-	
-	
+
+setMethod("as.list", signature(x="SpatVector"), 
+	function(x, geom=FALSE, ...) {
+		as.list(as.data.frame(x, geom=geom, ...))
+	}
+)
+
+
 
 setMethod("area", signature(x="SpatVector"), 
 	function(x, ...) {
 		a <- x@ptr$area();
-		x <- show_messages(x, "area");
+		x <- messages(x, "area");
 		return(a)
 	}
-)	
+)
 
 setMethod("perimeter", signature(x="SpatVector"), 
 	function(x) {
 		a <- x@ptr$length();
-		x <- show_messages(x, "length");
+		x <- messages(x, "length");
 		return(a)
 	}
-)	
+)
 
 setMethod("length", signature(x="SpatVector"), 
 	function(x) {
 		size(x)
 	}
-)	
+)
+
+
+
+setMethod("fill", signature(x="SpatVector"), 
+	function(x, inverse=FALSE, ...) {
+		if (inverse) {
+			x@ptr <- x@ptr$get_holes()
+		} else {
+			x@ptr <- x@ptr$remove_holes()
+		}
+		messages(x)
+	}
+)
+
+
+
+setMethod("centroids", signature(x="SpatVector"), 
+	function(x, ...) {
+		x@ptr <- x@ptr$centroid()
+		messages(x)
+	}
+)
+

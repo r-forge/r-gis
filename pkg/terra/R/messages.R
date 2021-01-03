@@ -3,67 +3,55 @@
 # Version 1.0
 # License GPL v3
 
-show_messages <- function(x, f="") {
+error <- function(f, emsg="", ...) {
+	stop("[", f, "] ", emsg, ..., call.=FALSE)
+}
+
+warn <- function(f, wmsg="", ...) {
+	warning("[", f, "] ", wmsg, ..., call.=FALSE)
+}
+
+messages <- function(x, f="") {
 	if (methods::.hasSlot(x, "ptr")) {
-		if (x@ptr$messages$has_warning) { 
-			messages <- paste0(f, ": ", paste(x@ptr$messages$warnings, collapse="\n"))
-			x@ptr$messages$warnings <- ""
-			x@ptr$messages$has_warning <- FALSE
-			warning(paste(messages, collapse="\n"), call.=FALSE)
+		if (x@ptr$has_warning()) { 
+			warn(f, paste(x@ptr$getWarnings(), collapse="\n"))
 		}
-		if (x@ptr$messages$has_error) {
-			emsg <- x@ptr$messages$error
-			x@ptr$messages$error <- ""
-			x@ptr$messages$has_error <- FALSE	
-			stop(paste0("(", f, ") ", emsg), call.=FALSE)
+		if (x@ptr$has_error()) {
+			error(f, x@ptr$getError())
 		}
 		return(x)
-	} else {
-		if (x$messages$has_warning) { 
-			messages <- paste0(f, ": ", paste(x$messages$warnings, collapse="\n"))
-			x$messages$warnings <- ""
-			x$messages$has_warning <- FALSE
-			warning(paste(messages, collapse="\n"), call.=FALSE)
+	} else { 
+		if (x$has_warning()) { 
+			warn(f, paste(x$getWarnings(), collapse="\n"))
 		}
-		if (x$messages$has_error) {
-			emsg <- x$messages$error
-			x$messages$error <- ""
-			x$messages$has_error <- FALSE	
-			stop(paste0("(", f, ") ", emsg), call.=FALSE)
+		if (x$has_error()) {
+			error(f, x$getError())
 		}
 		return(x)
 	}
 }
 
 
+.mem_info <- function(x, n=1, print=TRUE) {
+	n <- max(0,n)
+	opt <- .getOptions()
+	opt$ncopies = n;
+	v <- x@ptr$mem_needs(opt)
+	if (print) {
+		gb <- 1024^3 / 8  # 
+		cat("\n------------------------")
+		cat("\nMemory (GB) ")
+		cat("\n------------------------")
+		cat(paste("\navailable       :",  round(v[2] / gb, 2)))
+		cat(paste0("\nallowed (", round(100* v[3]) , "%)   : ", round(v[3] * v[2] / gb, 2)))
 
-.show_messages2 <- function(x, f="") {
-	if (methods::.hasSlot(x, "ptr")) {
-		if (x@ptr$messages$has_warning) { 
-			messages <- paste0(f, ": ", paste(x@ptr$messages$warnings, collapse="\n"))
-			x@ptr$messages$warnings <- ""
-			x@ptr$messages$has_warning <- FALSE
-			warning(paste(messages, collapse="\n"), call.=FALSE)
-		}
-		if (x@ptr$messages$has_error) {
-			emsg <- x@ptr$messages$error
-			x@ptr$messages$error <- ""
-			x@ptr$messages$has_error <- FALSE	
-			stop(paste0("(", f, ") ", emsg), call.=FALSE)
-		}
-	} else {
-		if (x$messages$has_warning) { 
-			messages <- paste0(f, ": ", paste(x$messages$warnings, collapse="\n"))
-			x$messages$warnings <- ""
-			x$messages$has_warning <- FALSE
-			warning(paste(messages, collapse="\n"), call.=FALSE)
-		}
-		if (x$messages$has_error) {
-			emsg <- x$messages$error
-			x$messages$error <- ""
-			x$messages$has_error <- FALSE	
-			stop(paste0("(", f, ") ", emsg), call.=FALSE)
-		}
-	}
+		cat(paste0("\nneeded (n=", n, ")   ", ifelse(n<10, " : ", ": "), round(v[1] / gb, 2)))
+		cat("\n------------------------")
+		cat(paste("\nproc in memory  :", round(v[5]) != 0))
+		cat(paste("\nnr chunks       :", ceiling(nrow(x)/v[4])))
+		cat("\n------------------------\n")
+	} 
+	names(v) <- c("needed", "available", "memfrac", "chunksize")
+	invisible(v)
 }
 

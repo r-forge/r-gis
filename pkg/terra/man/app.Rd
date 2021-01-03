@@ -4,22 +4,27 @@
 
 \alias{app}
 \alias{app,SpatRaster-method}
+\alias{app,SpatRasterDataset-method}
 
 \title{Apply a function to the cells of a SpatRaster}
 
 \description{ 
-Apply a function to values of each cell of a SpatRaster. This is similar to \code{\link[base]{apply}} -- think of each layer in a SpatRaster as a column (or row) in a matrix.
+Apply a function to values of each cell of a SpatRaster. Similar to \code{\link[base]{apply}} -- think of each layer in a SpatRaster as a column (or row) in a matrix. This is generally used to summarize the values of multiple layers into one layer; but this is not required.
+
+You can also apply a function \code{fun} across datasets by layer of a \code{SpatRasterDataset}. In that case, summarization is across SpatRasters, not across layers.
 }
 
 \usage{
-\S4method{app}{SpatRaster}(x, fun, ..., nodes=1, filename="", overwrite=FALSE, wopt=list())
+\S4method{app}{SpatRaster}(x, fun, ..., cores=1, filename="", overwrite=FALSE, wopt=list())
+
+\S4method{app}{SpatRasterDataset}(x, fun, ..., cores=1, filename="", overwrite=FALSE, wopt=list())
 }
 
 \arguments{
-  \item{x}{SpatRaster object}
+  \item{x}{SpatRaster or SpatRasterDataset}
   \item{fun}{function}
   \item{...}{additional arguments for \code{fun}}  
-  \item{nodes}{positive integer. If \code{nodes > 1}, a 'parallel' package cluster with that many nodes is created. Ignored for C++ level implemented functions "max", "min", "mean", "range", "prod", "sum", "any", and "all"}
+  \item{cores}{positive integer. If \code{cores > 1}, a 'parallel' package cluster with that many cores is created and used. Ignored for C++ level implemented functions "max", "min", "mean", "range", "prod", "sum", "any", and "all"}
   \item{filename}{character. Output filename. Optional}
   \item{overwrite}{logical. If \code{TRUE}, \code{filename} is overwritten}
   \item{wopt}{list. Options for writing files as in \code{\link{writeRaster}}}
@@ -39,14 +44,19 @@ To speed things up, parallelization is supported, but this is often not helpful,
 \examples{
 r <- rast(ncols=10, nrows=10)
 values(r) <- 1:ncell(r)
-x <- c(r, r, r)
+x <- c(r, sqrt(r), r-50)
 s <- app(x, fun=sum)
+s
+# for a few generic functions like 
+# "sum", "mean", and "max" you can also do
+sum(x)
 
-library(parallel)
-detectCores()
-cl <- makeCluster(2)
-ss <- app(x, fun=sum, cls=cl)
-
+## SpatRasterDataset
+sd <- sds(x, x*2, x/3)
+a <- app(sd, max)
+a
+# same as 
+max(x, x*2, x/3)
 
 }
 

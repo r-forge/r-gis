@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <string>
 #include <cmath>
-#include "spatMessages.h"
+//#include "spatMessages.h"
 
 #ifndef standalone
 	#define useRcpp
@@ -42,6 +42,62 @@
 #endif
 
 
+
+
+class SpatMessages {
+	public:
+		bool has_error = false;
+		bool has_warning = false;
+		std::string error;
+		std::string message;
+		std::vector<std::string> warnings;
+
+		void setError(std::string s) {
+			has_error = true;
+			error = s;
+		}
+
+		std::string getError() {
+			has_error = false;
+			std::string err = error;
+			error = "";
+			return err;
+		}
+		
+		void addWarning(std::string s) {
+			has_warning = true;
+			warnings.push_back(s);
+		}
+
+		std::string getWarnings() {
+			std::string w = "";
+			for (size_t i = 0; i<warnings.size(); i++) {
+				w += warnings[i] + "\n" ;
+			}
+			warnings.resize(0);
+			has_warning = false;
+			return w;
+		}
+
+		std::string getMessage() {
+			std::string out = message;
+			message = "";
+			return out;
+		}
+		void setMessage(std::string s) {
+			message = s;
+		}
+		
+		std::vector<std::string> getAll() {
+			std::string warns = getWarnings();
+			std::string error = getError();
+			std::string msg = getMessage();
+			std::vector<std::string> amsgs = { error, warns, msg};
+			return amsgs;
+		}
+};
+
+
 class SpatOptions {
 	private:
 		std::string tempdir = "";
@@ -49,6 +105,7 @@ class SpatOptions {
 		double memfrac = 0.6;
 
 	public:
+		unsigned ncopies = 2;
 		std::string def_datatype = "FLT4S";
 		std::string def_filetype = "GTiff";
 		//std::string def_bandorder = "BIL";
@@ -56,11 +113,18 @@ class SpatOptions {
 		unsigned progress = 3;
 		unsigned blocksizemp = 4;
 		size_t steps = 0;
+		bool hasNAflag = false;
+		double NAflag = NAN;
+		bool def_verbose = false;
+		bool verbose = false;
+		int statistics = 1;
+		bool datatype_set = false;
+		//bool ncdfcopy = false;
 
 		std::string datatype = "";
-		std::string bandorder = "";
+		//std::string bandorder = "";
 		std::string filetype = "";
-		std::string filename = "";
+		std::vector<std::string> filenames = {""};
 		std::vector<std::string> gdal_options;
 		std::vector<std::string> names;
 
@@ -79,22 +143,36 @@ class SpatOptions {
 		std::string get_def_datatype();
 		std::string get_def_bandorder();
 		std::string get_def_filetype();
+		bool get_def_verbose();
 		void set_def_datatype(std::string d);
-		void set_def_bandorder(std::string d);
+		//void set_def_bandorder(std::string d);
 		void set_def_filetype(std::string d);
 
 		// single use
-		void set_filename(std::string d);
+		
+		void set_verbose(bool v);
+		void set_def_verbose(bool v);
+		void set_NAflag(double flag);
+		//void set_ncdfcopy(bool x);
+		void set_statistics(int s);
+		//void set_filename(std::string f);
+		void set_filenames(std::vector<std::string> f);
 		void set_filetype(std::string d);
 		void set_datatype(std::string d);
-		void set_bandorder(std::string d);
+		//void set_bandorder(std::string d);
 		void set_overwrite(bool b);
 		void set_progress(unsigned p);
 		void set_blocksizemp(unsigned x);
 		std::string get_filename();
+		std::vector<std::string> get_filenames();
 		std::string get_filetype();
 		std::string get_datatype();
-		std::string get_bandorder();
+		//std::string get_bandorder();
+		bool get_verbose();
+		//bool get_ncdfcopy();
+		int get_statistics();
+		double get_NAflag();
+		bool has_NAflag(double &flag);
 		bool get_overwrite();
 		unsigned get_progress();
 		bool do_progress(unsigned n);
@@ -110,11 +188,14 @@ class SpatOptions {
 class SpatExtent {
 	public:
 		double xmin, xmax, ymin, ymax;
-		double inf = std::numeric_limits<double>::infinity();
-		double neginf = -std::numeric_limits<double>::infinity();
+		// #include <limits>
+		//double inf = std::numeric_limits<double>::infinity();
+		//double neginf = -std::numeric_limits<double>::infinity();
 //		SpatExtent() {xmin = inf; xmax = neginf; ymin = inf; ymax = neginf;}
 		SpatExtent() {xmin = -180; xmax = 180; ymin = -90; ymax = 90;}
 		SpatExtent(double _xmin, double _xmax, double _ymin, double _ymax) {xmin = _xmin; xmax = _xmax; ymin = _ymin; ymax = _ymax;}
+
+		SpatExtent align(double d, std::string snap);
 
 		void intersect(SpatExtent e) { // check first if intersects?
 			xmin = std::max(xmin, e.xmin);
@@ -149,7 +230,7 @@ class SpatExtent {
 		}
 
 		bool valid() {
-			return ((xmax >= xmin) && (ymax >= ymin));
+			return ((xmax > xmin) && (ymax > ymin));
 		}
 
 		bool compare(SpatExtent e, std::string oper, double tolerance);
@@ -157,20 +238,27 @@ class SpatExtent {
 		SpatExtent round(int n);
 		SpatExtent floor();
 		SpatExtent ceil();
+		
+		std::vector<size_t> test_sample(size_t size, size_t N, bool replace, std::vector<double> w, unsigned seed);
+		std::vector<std::vector<double>> sampleRegular(size_t size, bool lonlat);
+		std::vector<std::vector<double>> sampleRandom(size_t size, bool lonlat, unsigned seed);
+		
 };
 
 
 
 class SpatSRS {
 	public:
+//		SpatSRS(std::string s);
 		std::string proj4, wkt;
 		bool set(std::string txt, std::string &msg);
-
 /*
 #ifdef useGDAL	
 		bool set(OGRSpatialReference *poSRS, std::string &msg);
 #endif		
 */
+		double to_meter();
+
 		std::string get(std::string x) {
 			return (x == "proj4" ? proj4 : wkt); 
 		}
@@ -186,6 +274,12 @@ class SpatSRS {
 		bool is_empty() {
 			return (wkt == "");
 		}
+
+		bool is_same(std::string other, bool ignoreempty);
+		bool is_same(SpatSRS x, bool ignoreempty);
+
+
+		bool is_geographic(); // as below, but using GDAL
 
 		bool is_lonlat() {
 			bool b1 = proj4.find("longlat") != std::string::npos;
@@ -215,6 +309,5 @@ class SpatSRS {
 			}
 			return false;
 		}
-
-
 };
+

@@ -3,23 +3,34 @@
 # Version 1.0
 # License GPL v3
 
-setMethod("as.list", signature(x="SpatRaster"), 
-	function(x, ...)  {
-		out <- list()
-		for (i in 1:nlyr(x)) {
-			out[[i]] <- x[[i]]
-		}
-		out
-	}
-)
 
+#setMethod("as.list", signature(x="SpatRaster"), 
+#	function(x, ...) {
+#		lapply(1:nlyr(x), function(i) x[[i]])
+#	}
+#)
+ 
+
+.as.image <- function(x, maxcells=10000) {
+	x <- spatSample(x, size=maxcells, as.raster=TRUE)
+	X <- xFromCol(x, 1:ncol(x))
+	Y <- yFromRow(x, nrow(x):1)
+	Z <- t(as.matrix(x, wide=TRUE)[nrow(x):1,]) 
+	list(x=X, y=Y, z=Z)
+}
+ 
  
 setMethod("as.polygons", signature(x="SpatRaster"), 
-	function(x, trunc=TRUE, dissolve=TRUE, values=TRUE, ...) {
+	function(x, trunc=TRUE, dissolve=TRUE, values=TRUE, extent=FALSE, ...) {
 		p <- methods::new("SpatVector")
-		p@ptr <- x@ptr$as_polygons(trunc[1], dissolve[1], values[1], TRUE)
-		#x <- show_messages(x)
-		show_messages(p, "as.polygons")
+		if (extent) {
+			p@ptr <- x@ptr$dense_extent()
+		} else {
+			opt <- spatOptions("", TRUE, list())
+			p@ptr <- x@ptr$as_polygons(trunc[1], dissolve[1], values[1], TRUE, opt)
+			#x <- messages(x)
+		}
+		messages(p, "as.polygons")
 	}
 )
 
@@ -27,22 +38,38 @@ setMethod("as.polygons", signature(x="SpatExtent"),
 	function(x, crs="", ...) {
 		p <- methods::new("SpatVector")
 		p@ptr <- SpatVector$new(x@ptr, crs)
-		show_messages(p, "as.polygons")
+		messages(p, "as.polygons")
 	}
 )
+
+setMethod("as.lines", signature(x="SpatExtent"), 
+	function(x, crs="", ...) {
+		as.lines(as.polygons(x, crs, ...))
+	}
+)
+
+
+setMethod("as.points", signature(x="SpatExtent"), 
+	function(x, crs="", ...) {
+		#vect(do.call(cbind, x@ptr$as.points()), "points", crs=crs)
+		as.points(as.polygons(x, crs, ...))
+	}
+)
+
 
 setMethod("as.lines", signature(x="SpatVector"), 
 	function(x, ...) {
 		x@ptr <- x@ptr$as_lines()
-		show_messages(x, "as.lines")
+		messages(x, "as.lines")
 	}
 )
 
 
 setMethod("as.points", signature(x="SpatVector"), 
-	function(x, ...) {
-		x@ptr <- x@ptr$as_points()
-		show_messages(x, "as.points")
+	function(x, multi=FALSE, ...) {
+		opt <- .getOptions()
+		x@ptr <- x@ptr$as_points(multi)
+		messages(x, "as.points")
 	}
 )
 
@@ -50,9 +77,10 @@ setMethod("as.points", signature(x="SpatVector"),
 setMethod("as.points", signature(x="SpatRaster"), 
 	function(x, values=TRUE, ...) {
 		p <- methods::new("SpatVector")
-		p@ptr <- x@ptr$as_points(values, TRUE)
-		x <- show_messages(x)
-		show_messages(p, "as.points")
+		opt <- .getOptions()
+		p@ptr <- x@ptr$as_points(values, TRUE, opt)
+		x <- messages(x, "as.points")
+		messages(p, "as.points")
 	}
 )
 
@@ -68,12 +96,13 @@ setMethod("as.vector", signature(x="SpatExtent"),
 	}
 )
 
+
 setMethod("as.character", signature(x="SpatExtent"), 
 	function(x, ...) {
-		paste( x@ptr$vector, collapse=", ")
+		e <- as.vector(x)
+		paste0("ext(", paste(e, collapse=", "), ")")
 	}
 )
-
 
 setMethod("as.vector", signature(x="SpatRaster"), 
 	function(x, mode="any") {
@@ -85,7 +114,7 @@ setMethod("as.vector", signature(x="SpatRaster"),
 setMethod("as.matrix", signature(x="SpatRaster"), 
 	function(x, wide=FALSE, ...) {
 		if (!hasValues(x)) {
-			stop("SpatRaster has no cell values")
+			error("as.matrix", "SpatRaster has no cell values")
 		}
 		if (wide) {
 			if (nlyr(x) > 1) {
@@ -106,7 +135,7 @@ setMethod("as.matrix", signature(x="SpatRaster"),
 
 
 setMethod("as.data.frame", signature(x="SpatRaster"), 
-	function(x, xy=FALSE, cells=FALSE, ...) {
+	function(x, xy=FALSE, cells=FALSE, na.rm=TRUE, ...) {
 		d <- NULL
 		if (xy) {
 			d <- xyFromCell(x, 1:ncell(x))
@@ -115,11 +144,22 @@ setMethod("as.data.frame", signature(x="SpatRaster"),
 			d <- cbind(cell=1:ncell(x), d)
 		}
 		d <- cbind(d, values(x, matrix=TRUE))
+		if (na.rm) d <- stats::na.omit(d) 
 		data.frame(d)
 	}
 )
 
+setAs("SpatRaster", "data.frame", 
+	function(from) {
+		as.data.frame(from)
+	}
+)
 
+setAs("SpatVector", "data.frame", 
+	function(from) {
+		as.data.frame(from)
+	}
+)
 
 setMethod("as.array", signature(x="SpatRaster"), 
 	function(x, ...) {
@@ -129,7 +169,7 @@ setMethod("as.array", signature(x="SpatRaster"),
 		for (i in 1:dm[3]) {
 			a[,,i] <- matrix(x[,i], nrow=dm[1], byrow=TRUE)
 		}
-		a	
+		a
 	}
 )
 
@@ -141,92 +181,82 @@ setMethod("as.array", signature(x="SpatRaster"),
 # check z values, other attributes such as NAvalue that may have been
 # changed after creation of object from file
 # RAT tables
+# Author: Robert J. Hijmans 
+# Date : February 2019
+# Version 1.0
+# License GPL v3
 
-.RasterLayerToSpatRaster <- function(from) { 
+# todo:
+# for ncdf files (not yet natively supported in terra)
+# check the variable to be used
+# 
+# check z values, other attributes such as NAvalue that may have been
+# changed after creation of object from file
+# RAT tables
 
+.fromRasterLayerBrick <- function(from) {
 	f <- filename(from)
 	if (f != "") {
-		# a bit more tricky with ncdf...
 		r <- rast(f)
-	} else {
-		e <- extent(from)
-		r <- rast(ncol=ncol(from), nrow=nrow(from), crs=crs(from),
-		          xmin=e@xmin, xmax=e@xmax, ymin=e@ymin, ymax=e@ymax,
-				  nlyr=1)				
-		if (hasValues(from)) {
-			values(r) <- values(from)
-		}
-	}
-	names(r) <- names(from)
-	return(r)
-}
-
-
-
-.RasterBrickToSpatRaster <- function(from) { 
-
-	f <- filename(from)
-	if (f != "") {
-		# a bit more tricky with ncdf...
 		if (from@file@NAchanged) {
-			warning("changed NAvalue ignored")
+			warn("as,Raster", "changed NA value ignored")
 		}
-		r <- rast(f)
+		return(r)
 	} else {
-		e <- extent(from)
-		nl <- nlayers(from)
-		r <- rast(ncol=ncol(from), nrow=nrow(from), crs=crs(from),
-		          xmin=e@xmin, xmax=e@xmax, ymin=e@ymin, ymax=e@ymax,
-				  nlyr=nl)
+		crsobj <- crs(from)
+		if (is.na(crsobj)) {
+			prj <- ""
+		} else {
+			crscom <- comment(crsobj)
+			if (is.null(crscom)) {
+				prj <- crsobj@projargs
+			} else {
+				prj <- crscom
+			}
+		}
+		r <- rast(	nrows=nrow(from), 
+					ncols=ncol(from),
+					nlyrs=nlayers(from),
+					crs=prj,
+					extent=extent(from))
 		if (hasValues(from)) {
 			values(r) <- values(from)
 		}
+		names(r)  <- names(from)
 	}
-	names(r) <- names(from)
 	return(r)
 }
 
-
-
-.RasterStackToSpatRaster <- function(from) { 
-	nl <- nlayers(from)
-	rr <- methods::as("SpatRaster", from[[1]])		
-	nb <- nbands(from)
-	
-	if ((nb > 1) & (nb == nl)) {
+.fromRasterStack <- function(from) {
+	x <- from[[1]]
+	n <- nbands(x)
+	if ((n > 1) & (n == nlayers(from))) {
 		ff <- lapply(1:nlayers(from), function(i) { filename(from[[i]]) })
-		ff <- unique(ff)
-		if ((length(ff) == 1) & (ff != "")) {
-			rr <- rast(ff)
+		if (length(unique(ff)) == 1) {
+			r <- rast(filename(x))
+			return(r)
 		}
-		names(rr) <- names(from)
-		return(rr)
-	}
-	
-	if (nl > 1) {
-		for (i in 2:nl) {
-			rr <- c(rr, methods::as("SpatRaster", from[[i]]))
-		}
-	}
-	names(rr) <- names(from)	
-	rr
+	} 
+	s <- lapply(1:nlayers(from), function(i) {
+		x <- from[[i]]
+		.fromRasterLayerBrick(x)[[bandnr(x)]]
+	})
+	do.call(c, s)
 }
 
 
 setAs("Raster", "SpatRaster", 
-	function(from) { 
-		if (inherits(from, "RasterLayer")) {
-			r <- .RasterLayerToSpatRaster(from)
+	function(from) {
+		if (inherits(from, "RasterLayer") | inherits(from, "RasterBrick")) { 
+			.fromRasterLayerBrick(from)
+		} else {
+			.fromRasterStack(from)
 		}
-		if (inherits(from, "RasterStack")) {
-			r <- .RasterStackToSpatRaster(from)
-		}
-		if (inherits(from, "RasterBrick")) {
-			r <- .RasterBrickToSpatRaster(from)
-		}
-		show_messages(r, "coerce")
 	}
 )
+
+
+
 
 setAs("SpatRaster", "Raster", 
 	function(from) {
@@ -238,7 +268,7 @@ setAs("SpatRaster", "Raster",
 			if (s$source == "") {
 				r <- raster(ncol=ncol(from), nrow=nrow(from), crs=prj,
 			          xmn=e[1], xmx=e[2], ymn=e[3], ymx=e[4])
-				if (.hasValues(from)) {
+				if (hasValues(from)) {
 					values(r) <- values(from)
 				}
 			} else {
@@ -247,11 +277,11 @@ setAs("SpatRaster", "Raster",
 			names(r) <- names(from)
 		} else {
 			if (nrow(s) == 1 & s$source[1] != "") {
-				r <- brick(s$source)			
+				r <- brick(s$source)
 			} else if (all(s$source=="")) {
 				r <- brick(ncol=ncol(from), nrow=nrow(from), crs=prj,
 			          xmn=e[1], xmx=e[2], ymn=e[3], ymx=e[4], nl=nlyr(from))
-				if (.hasValues(from)) {
+				if (hasValues(from)) {
 					values(r) <- values(from)
 				}
 			} else {
@@ -268,23 +298,87 @@ setAs("SpatRaster", "Raster",
 				r <- stack(r)
 			}
 		}
-		return(r)		
+		return(r)
 	}
 )
 
 
+# to sf from SpatVector
+# could be in sf
+.v2sf <- function(from) {
+	txt <- 'sf::st_as_sf(as.data.frame(from, geom=TRUE), wkt="geometry", crs=from@ptr$get_crs("wkt"))'
+	eval(parse(text = txt))
+}
+
+# from sf. first incomplete draft
+.from_sf <- function(from) {
+	i <- attr(from, "sf_column")
+	geom <- from[[i]]
+	crs <- attr(geom, "crs")$wkt
+	attr(geom, "class") <- NULL
+	types <- t(sapply(geom, function(i) attr(i, "class")))
+	v <- list()
+	for (i in 1:length(geom)) {
+		vv <- list()
+		for (j in 1:length(geom[[i]])) {
+			if (class(geom[[1]][[1]]) == "list") {
+				vvv <- list()
+				for (k in 1:length(geom[[i]][[j]])) {
+					vvv[[k]] <- cbind(i, j, geom[[i]][[j]][[k]], hole= k!=1) 
+				}
+				vv[[j]] <- do.call(rbind, vvv)
+			} else {
+				vv[[j]] <- cbind(i, j, geom[[i]][[j]][[k]], hole=0) 
+			}
+		}
+		v[[i]] <- do.call(rbind, vv)
+	}
+	v <- do.call(rbind, v)
+	colnames(v)[1:4] <- c("id", "part", "x", "y")
+	types <- unique(types[,2])
+	if (length(types) > 1) {
+		error("as,sf", "SpatVector currently only accepts one geometry type")
+	}
+	if (grepl("POINT", types, fixed=TRUE)) {
+		gt = "points"
+	} else if (grepl("LINE", types, fixed=TRUE)) {
+		gt = "lines"
+	} else if (grepl("POLY", types, fixed=TRUE)) {
+		gt = "polygons"
+	}
+	if (ncol(from) > 1) {
+		from[[i]] <- NULL
+		d <- as.data.frame(from)
+		vect(v, type=gt, att=d, crs=crs)
+	} else {
+		vect(v, type=gt, crs=crs)
+	}
+}
+
+
 setAs("sf", "SpatVector", 
 	function(from) {
-		from <- methods::as(from, "Spatial")
-		methods::as(from, "SpatVector")
+		v <- try(.from_sf(from), silent=TRUE)
+		if (inherits(v, "try-error")) {
+			error("as,sf", "coercion failed. You can try coercing via a Spatial* (sp) class")
+		} 
+		v
+	}
+)
+
+
+setAs("im", "SpatRaster", 
+	function(from) {
+		r <- rast(nrows=from$dim[1], ncols=from$dim[2], xmin=from$xrange[1], xmax=from$xrange[2], ymin=from$yrange[1], ymax=from$yrange[2], crs="")
+		values(r) <- from$v
+		flip(r, direction="vertical")
 	}
 )
 
 
 setAs("SpatVector", "Spatial", 
 	function(from) {
-		g <- geom(from)
-		colnames(g)[1] <- "object"
+		g <- geom(from, df=TRUE)
 		raster::geom(g, values(from), geomtype(from), .proj4(from))
 	}
 )
@@ -292,7 +386,7 @@ setAs("SpatVector", "Spatial",
 
 setAs("Spatial", "SpatVector", 
 	function(from) {
-		g <- geom(from)
+		g <- geom(from, df=TRUE)
 		colnames(g)[1] <- "id"
 		if (inherits(from, "SpatialPolygons")) {
 			vtype <- "polygons"
@@ -306,7 +400,7 @@ setAs("Spatial", "SpatVector",
 			}
 		} else {
 			vtype <- "points"
-			g <- cbind(g[,1,drop=FALSE], part=1:nrow(g), g[,2:3])
+			g <- cbind(g[,1,drop=FALSE], part=1:nrow(g), g[,2:3,drop=FALSE])
 		}
 		if (methods::.hasSlot(from, "data")) {
 			v <- vect(g, vtype, from@data, crs(from))

@@ -21,6 +21,53 @@
 #include <type_traits>
 #include <vector>
 #include "NA.h"
+#include <math.h>
+
+
+
+static inline double interpolate(double x, double y1, double y2, unsigned x1, unsigned x2) {
+	double denom = (x2-x1);
+	return y1 + (x-x1) * (y2-y1)/denom;
+}
+
+
+
+static inline std::vector<double> vquantile(std::vector<double> v, const std::vector<double>& probs, bool narm) {
+	size_t n = v.size();
+    if (n==0) {
+        return std::vector<double>(probs.size(), NAN);
+    }
+    if (n == 1) {
+        return std::vector<double>(probs.size(), v[0]);
+    }
+
+	//na_omit(v);
+	v.erase(std::remove_if(std::begin(v), std::end(v),
+        [](const double& value) { return std::isnan(value); }),
+        std::end(v));
+
+	if ((!narm) & (v.size() < n)) {
+        return std::vector<double>(probs.size(), NAN);
+	}
+	n = v.size();
+    std::sort(v.begin(), v.end());
+
+	size_t pn = probs.size();
+	std::vector<double> q(pn);
+
+    for (size_t i = 0; i < pn; ++i) {
+		double x = probs[i] * (n-1);
+		unsigned x1 = std::floor(x);
+		unsigned x2 = std::ceil(x);
+		if (x1 == x2) {
+			q[i] = v[x1];
+		} else {
+			q[i] = interpolate(x, v[x1], v[x2], x1, x2);
+		}
+    }
+    return q;
+}
+
 
 
 template <typename T>
@@ -97,7 +144,31 @@ T vsum(std::vector<T>& v, bool narm) {
 	return x;
 }
 
-
+template <typename T>
+T vsum2(std::vector<T>& v, bool narm) {
+	T x = v[0];
+	if (narm) {		
+		for (size_t i=1; i<v.size(); i++) {
+			if (is_NA(x)) {
+				x = v[i] * v[i];
+			} else if (!is_NA(v[i])) {
+				x += v[i] * v[i];
+			}
+		}
+	} else {
+		for (size_t i=1; i<v.size(); i++) {
+			if (!is_NA(x)) {
+				if (is_NA(v[i])) {
+					x = NA<T>::value;
+					break;
+				} else {
+					x += v[i] * v[i];
+				}
+			}
+		}
+	}
+	return x;
+}
 
 
 template <typename T>
@@ -161,6 +232,43 @@ double vmean(std::vector<T>& v, bool narm) {
 	return x;
 }
 
+template <typename T>
+double vsd(std::vector<T>& v, bool narm) {
+	double m = vmean(v, narm);
+	if (std::isnan(m)) return m;
+	double x = v[0];
+	size_t n = 0;
+	for (size_t i=0; i<v.size(); i++) {
+		if (!is_NA(v[i])) {
+			double d = (v[i] - m);
+			x += d * d;
+			n++;
+		}
+	}
+	n--;
+	if (n==0) return NAN;
+	x = sqrt(x / n);
+	return x;
+}
+
+
+
+template <typename T>
+double vsdpop(std::vector<T>& v, bool narm) {
+	double m = vmean(v, narm);
+	if (std::isnan(m)) return m;
+	double x = v[0];
+	size_t n = 0;
+	for (size_t i=0; i<v.size(); i++) {
+		if (!is_NA(v[i])) {
+			double d = (v[i] - m);
+			x += d * d;
+			n++;
+		}
+	}
+	x = sqrt(x / n);
+	return x;
+}
 
 
 

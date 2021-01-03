@@ -11,20 +11,22 @@ Calculate focal ("moving window") values for the neighborhood of focal cells usi
 }
 
 \usage{
-\S4method{focal}{SpatRaster}(x, w=3, na.rm=TRUE, fillvalue=NA, fun="sum", 
+\S4method{focal}{SpatRaster}(x, w=3, na.rm=TRUE, na.only=FALSE, fillvalue=NA, fun="sum",
             filename="", overwrite=FALSE, wopt=list(), ...) 
 }
 
 \arguments{
 \item{x}{SpatRaster}
   
-\item{w}{window. The window can be defined as one (for a square) or two numbers (row, col); or with an odd-sized matrix with weights. See Details. If the window is defined as a matrix, \code{na.rm=FALSE} and \code{fun=sum}, and cannot be changed}
+\item{w}{window. The window can be defined as one (for a square) or two numbers (row, col); or with an odd-sized weights matrix . See Details. If \code{w} is a matrix, \code{na.rm=FALSE} and \code{fun=sum}, and cannot be changed}
 
 \item{na.rm}{logical. Should missing values be removed?}
 
-\item{fillvalue}{numeric. The value of the cells of the padded rows and columns}
+\item{na.only}{logical. Should only missing values in \code{x} be changed?}
 
-\item{fun}{function. The function fun should take multiple numbers, and return a single number. For example mean, modal, min or max. It should also accept a \code{na.rm} argument}
+\item{fillvalue}{numeric. The value of the cells in the virtual rows and columns outside of the raster}
+
+\item{fun}{function that takes multiple numbers, and returns a single number. For example mean, modal, min or max. It should also accept a \code{na.rm} argument, either as actual argument or through use of \code{...}}
 
 
 \item{filename}{character. Output filename. Optional}
@@ -36,7 +38,7 @@ Calculate focal ("moving window") values for the neighborhood of focal cells usi
 \details{
 \code{focal} 
 
-The window used must have odd dimensions. If you need even sides, you can make a matrix add a column or row with weights of zero. 
+The window used must have odd dimensions. If you need even sides, you can use a matrix and add a column or row with weights of zero. 
 
 Example weight matrices
 
@@ -52,7 +54,7 @@ Sobel filter: \code{filter=matrix(c(1,2,1,0,0,0,-1,-2,-1) / 4, nrow=3)}
 r <- rast(ncols=10, nrows=10, ext(0, 10, 0, 10))
 values(r) <- 1:ncell(r)
 
-f <- focal(r, w=3, fun=function(x, ...)quantile(x, .25, ...), na.rm=TRUE) 
+f <- focal(r, w=3, fun=function(x, ...) quantile(x, .25, ...), na.rm=TRUE) 
 
 f <- focal(r, w=3, fun="mean") 
 

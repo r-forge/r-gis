@@ -6,7 +6,7 @@
 \title{Initialize a SpatRaster with values}
 
 \description{
-Create a SpatRaster with values reflecting a cell property: 'x', 'y', 'col', 'row', 'cell' or 'chess'. Alternatively, a function can be used. In that case, cell values are initialized without reference to pre-existing values. E.g., initialize with a random number (\code{fun=\link{runif}}). While there are more direct ways of achieving this for small objects (see examples) for which a vector with all values can be created in memory, the \code{init} function will also work for Raster* objects with many cells.
+Create a SpatRaster with values reflecting a cell property: 'x', 'y', 'col', 'row', 'cell' or 'chess'. Alternatively, a function can be used. In that case, cell values are initialized without reference to pre-existing values. E.g., initialize with a random number (\code{fun=\link{runif}}). While there are more direct ways of achieving this for small objects (see examples) for which a vector with all values can be created in memory, the \code{init} function will also work for SpatRaster objects with many cells.
 }
 
 \usage{
@@ -28,7 +28,7 @@ SpatRaster
 }
 
 \examples{
-r <- rast(ncol=10, nrow=5, xmn=0, xmx=10, ymn=0, ymx=5)
+r <- rast(ncol=10, nrow=5, xmin=0, xmax=10, ymin=0, ymax=5)
 x <- init(r, fun="cell")
 y <- init(r, fun=runif)
 

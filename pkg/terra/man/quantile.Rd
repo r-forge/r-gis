@@ -27,11 +27,10 @@ Compute quantiles for each cell across the layers of a SpatRaster
 }
 
 \value{
-A vector of quantiles
+SpatRaster with layers representing quantiles
 }
 
-\seealso{ \code{\link[terra]{app}}, \code{\link[terra]{local}}  }
-
+\seealso{ \code{\link{app}}  }
 
 
 \examples{
@@ -40,8 +39,8 @@ r <- c(r/2, r, r*2)
 q <- quantile(r)
 q
 
-# same as (but faster than)
-qa <- app(r, quantile)
+# same but slower
+# qa <- app(r, quantile)
 }
 
 \keyword{methods}

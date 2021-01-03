@@ -19,43 +19,74 @@
 #include "ram.h"
 
 
-bool SpatRaster::canProcessInMemory(unsigned n) {
-	double f = 0.4;
-	return (n * size()) < (availableRAM() * f);
+bool SpatRaster::canProcessInMemory(SpatOptions &opt) {
+	if (opt.get_todisk()) return false;
+	double demand = size() * opt.ncopies;
+	double supply = (availableRAM()) * opt.get_memfrac();
+	std::vector<double> v;
+	double maxsup = v.max_size(); //for 32 bit systems
+	supply = std::min(supply, maxsup);
+	return (demand < supply);
 }
 
 
-unsigned SpatRaster::chunkSize(unsigned n) {
-	double f = 0.2;
-	unsigned cells_in_row = n * ncol() * nlyr();
-	unsigned rows = availableRAM() * f / cells_in_row;
-	unsigned maxrows = 1000;
-	rows = std::min(rows, maxrows);
-	return rows == 0 ? 1 : std::min(rows, nrow());	
+size_t SpatRaster::chunkSize(unsigned n, double frac) {
+	double cells_in_row = n * ncol() * nlyr();
+	double rows = (availableRAM()) * frac / cells_in_row;
+	//double maxrows = 10000;
+	//rows = std::min(rows, maxrows);
+	size_t urows = floor(rows);
+	if (rows < 1) return (1);
+	if (urows < nrow()){
+		return(urows);
+	} else {
+		return (nrow());
+	}
 }
 
 
-BlockSize SpatRaster::getBlockSize(unsigned n, unsigned steps) {
+std::vector<double> SpatRaster::mem_needs(SpatOptions &opt) {
+	//returning bytes
+	unsigned n = opt.ncopies; 
+	double memneed  = ncell() * (nlyr() * n);
+	double memavail = availableRAM(); 
+	double frac = opt.get_memfrac();
+	double csize = chunkSize(n, frac);
+	double inmem = canProcessInMemory(opt); 
+	std::vector<double> out = {memneed, memavail, frac, csize, inmem} ;
+	return out;
+}
+
+//BlockSize SpatRaster::getBlockSize(unsigned n, double frac, unsigned steps) {
+BlockSize SpatRaster::getBlockSize( SpatOptions &opt) {
+
+	unsigned n = opt.get_blocksizemp();
+	double frac = opt.get_memfrac();
+	unsigned steps = opt.get_steps();
+
 	BlockSize bs;
-	unsigned cs;
-	
+	size_t cs;
+
 	if (steps > 0) {
-		steps = std::min(steps, nrow());
+		if (steps > nrow()) {
+			steps = nrow();
+		}
 		bs.n = steps;
 		cs = nrow() / steps;
 	} else {
-		cs = chunkSize(n);
+		cs = chunkSize(n, frac);
 		bs.n = std::ceil(nrow() / double(cs));
 	}
 
-	bs.row = std::vector<unsigned>(bs.n);
-	bs.nrows = std::vector<unsigned>(bs.n, cs);
-	unsigned r = 0;
+	bs.row = std::vector<size_t>(bs.n);
+	bs.nrows = std::vector<size_t>(bs.n, cs);
+	size_t r = 0;
 	for (size_t i =0; i<bs.n; i++) {
 		bs.row[i] = r;
 		r += cs;
 	}
 	bs.nrows[bs.n-1] = cs - ((bs.n * cs) - nrow());
+
 	return bs;
 }
 

@@ -8,7 +8,11 @@
 \alias{Math-methods}
 \alias{Math2-methods}
 
+\alias{Arith,SpatExtent,numeric-method}
+\alias{Arith,SpatExtent,SpatExtent-method}
+
 \alias{Arith,SpatRaster,SpatRaster-method}
+\alias{Arith,SpatVector,SpatVector-method}
 \alias{Arith,SpatRaster,missing-method}
 \alias{Arith,numeric,SpatRaster-method}
 \alias{Arith,SpatRaster,numeric-method}
@@ -20,11 +24,17 @@
 \alias{Logic,SpatRaster,SpatRaster-method}
 \alias{Logic,SpatRaster,numeric-method}
 \alias{Logic,numeric,SpatRaster-method}
+\alias{Logic,SpatRaster,logical-method}
+\alias{Logic,logical,SpatRaster-method}
 \alias{Math,SpatRaster-method}
 \alias{Math2,SpatRaster-method}
 \alias{Math,SpatExtent-method}
 \alias{Math2,SpatExtent-method}
 \alias{Compare,SpatExtent,SpatExtent-method}
+
+\alias{isTRUE,SpatRaster-method}
+\alias{isFALSE,SpatRaster-method}
+\alias{as.logical,SpatRaster-method}
 
 \alias{is.na,SpatRaster-method}
 \alias{is.nan,SpatRaster-method}
@@ -43,26 +53,19 @@ Standard operators and mathematical methods for computations with SpatRaster obj
 
 \bold{Compare}: \code{ ==, !=, >, <,  <=, >=, is.na, is.nan, is.finite, is.infinite}
 
-The terra package does not distunguish between \code{NA} (not available) and \code{NaN} (not a number) and that both are represented as \code{NaN}.  
+The terra package does not distinguish between \code{NA} (not available) and \code{NaN} (not a number). In most cases this state is represented by \code{NaN}.  
 
-\bold{Logical}: \code{!, &, |}
+\bold{Logical}: \code{!, &, |, isTRUE, isFALSE}
 
-\bold{Summary}: \code{"max", "min", "range", "prod", "sum", "any", "all"}
+\bold{Summary}: \code{max, min, range, prod, sum, any, all}
  
-\bold{Math}: \code{"abs", "sign", "sqrt", "ceiling", "floor", "trunc",  "cummax", "cummin", "cumprod", "cumsum", "log", "log10", "log2", "log1p", "acos", "acosh", "asin", "asinh", "atan", "atanh", "exp", "expm1", "cos", "cosh", "sin", "sinh", "tan", "tanh", "round", "signif"}
+\bold{Math}: \code{abs, sign, sqrt, ceiling, floor, trunc,  cummax, cummin, cumprod, cumsum, log, log10, log2, log1p, acos, acosh, asin, asinh, atan, atanh, exp, expm1, cos, cosh, sin, sinh, tan, tanh, round, signif}
 
-
-For \bold{SpatExtent} the following methods have been implemented: \code{"round", "floor", "ceil", "=="}
+The following methods have been implemented for \bold{SpatExtent}: \code{round, floor, ceil, ==},
+for \bold{(SpatExtent, SpatExtent)}: \code{==, +, -}, and 
+for \bold{(SpatExtent, numeric)} : \code{+, -, *, /, \%\%}
 }
 
-
-\usage{
-\S4method{is.na}{SpatRaster}(x)
-}
-
-\arguments{
-  \item{x}{SpatRaster}
-}
 
 \section{seealso}{
 \code{\link{ifel}} to convieniently combine operations and \code{\link{app}} to use mathematical functions not implemented by the package.
@@ -70,7 +73,7 @@ For \bold{SpatExtent} the following methods have been implemented: \code{"round"
 
 
 \value{
-SpatRaster
+SpatRaster or SpatExtent
 }
 
 \examples{
@@ -96,6 +99,21 @@ max(s, na.rm=TRUE)
 x <- is.na(s)
 
 y <- which.max(s)
+
+### SpatExtent methods
+x <- ext(0.1, 2.2, 0, 3)
+y <- ext(-2, 1, -2,2)
+# union
+x + y
+# intersection
+x * y
+
+e <- x %% 2
+e
+e * 2
+e / 2
+e + 1
+e - 1
 }
 
 \keyword{methods}
